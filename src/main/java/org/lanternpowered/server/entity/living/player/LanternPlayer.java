@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.Sets;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
 import org.lanternpowered.server.boss.LanternBossBar;
@@ -144,6 +145,7 @@ import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.server.ServerPlayer;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.BookView;
@@ -180,10 +182,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 @SuppressWarnings("ConstantConditions")
-public class LanternPlayer extends AbstractUser implements Player, AbstractViewer, NetworkIdHolder {
+public class LanternPlayer extends AbstractUser implements ServerPlayer, AbstractViewer, NetworkIdHolder {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = LanternLiving.DEFAULT_EFFECT_COLLECTION.toBuilder()
             // Override the fall sound
@@ -402,7 +402,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
         final LocalKeyRegistry<LanternPlayer> c = getKeyRegistry().forHolder(LanternPlayer.class);
         c.register(Keys.IS_SLEEPING_IGNORED, false);
-        c.registerProvider(Keys.ACTIVE_ITEM, (builder, key) -> {
+        c.registerProvider(Keys.ACTIVE_ITEM, builder -> {
             builder.offerFast((player, item) -> {
                 if (item.isEmpty()) {
                     this.interactionHandler.cancelActiveItem();
@@ -412,7 +412,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                     return false;
                 }
             });
-            builder.get((player) -> player.interactionHandler.getActiveItem());
+            builder.get(player -> player.interactionHandler.getActiveItem());
         });
 
         c.getAsElement(LanternKeys.OPEN_ADVANCEMENT_TREE).addChangeListener((player, oldTree, newTree) -> {
@@ -421,6 +421,23 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
                         newTree.map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
             }
         });
+
+        c.registerProvider(Keys.SPECTATOR_TARGET, builder -> {
+            builder.offerFast((player, optionalEntity) -> {
+                setSpectatorTarget(optionalEntity.orElse(null));
+                return true;
+            });
+            builder.removeFast(player -> {
+                setSpectatorTarget(null);
+                return true;
+            });
+            builder.get(player -> Optional.ofNullable(player.spectatorEntity));
+        });
+    }
+
+    private void setSpectatorTarget(@Nullable Entity entity) {
+        this.spectatorEntity = entity;
+        triggerEvent(new SpectateEntityEvent(entity));
     }
 
     @Override
@@ -1077,6 +1094,11 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     }
 
     @Override
+    public boolean isLocal() {
+        return false;
+    }
+
+    @Override
     public boolean isViewingInventory() {
         return false;
     }
@@ -1088,7 +1110,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
 
     @Override
     public Optional<Container> openInventory(Inventory inventory) {
-        return openInventory(inventory, inventory.getName());
+        return openInventory(inventory, Text.of(inventory.getName()));
     }
 
     @Override
@@ -1221,17 +1243,6 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public boolean respawnPlayer() {
         return false;
-    }
-
-    @Override
-    public Optional<Entity> getSpectatorTarget() {
-        return Optional.ofNullable(this.spectatorEntity);
-    }
-
-    @Override
-    public void setSpectatorTarget(@Nullable Entity entity) {
-        this.spectatorEntity = entity;
-        triggerEvent(new SpectateEntityEvent(entity));
     }
 
     @Override

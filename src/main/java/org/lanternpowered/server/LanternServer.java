@@ -56,8 +56,6 @@ import org.lanternpowered.server.util.SyncLanternThread;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
-import org.spongepowered.api.Console;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -69,6 +67,7 @@ import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePacks;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.server.Server;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.rcon.RconService;
 import org.spongepowered.api.text.Text;
@@ -139,7 +138,7 @@ public final class LanternServer implements Server {
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
 
     // The broadcast channel
-    private volatile MessageChannel broadcastChannel = MessageChannel.TO_ALL;
+    private volatile MessageChannel broadcastChannel = MessageChannel.toPlayersAndServer();
 
     // The maximum amount of players that can join
     private int maxPlayers;
@@ -269,7 +268,7 @@ public final class LanternServer implements Server {
         final String resourcePackPath = config.getDefaultResourcePack();
         if (!resourcePackPath.isEmpty()) {
             try {
-                this.resourcePack = ResourcePacks.fromUri(URI.create(resourcePackPath));
+                this.resourcePack = ResourcePack.fromUri(URI.create(resourcePackPath));
             } catch (FileNotFoundException e) {
                 this.logger.warn("Couldn't find a valid resource pack at the location: {}", resourcePackPath, e);
             }
@@ -291,7 +290,7 @@ public final class LanternServer implements Server {
 
     /**
      * Get the socket address to bind to for a specified service.
-     * 
+     *
      * @param port the port to use
      * @return the socket address
      */
@@ -370,7 +369,7 @@ public final class LanternServer implements Server {
 
     /**
      * Gets the key pair.
-     * 
+     *
      * @return the key pair
      */
     public KeyPair getKeyPair() {
@@ -379,7 +378,7 @@ public final class LanternServer implements Server {
 
     /**
      * Gets the favicon of the server.
-     * 
+     *
      * @return the favicon
      */
     public Optional<Favicon> getFavicon() {
@@ -660,11 +659,6 @@ public final class LanternServer implements Server {
     }
 
     @Override
-    public Console getConsole() {
-        return LanternConsole.INSTANCE;
-    }
-
-    @Override
     public ChunkTicketManager getChunkTicketManager() {
         return this.game.getChunkTicketManager();
     }
@@ -690,6 +684,11 @@ public final class LanternServer implements Server {
     }
 
     @Override
+    public boolean isDedicatedServer() {
+        return true;
+    }
+
+    @Override
     public LanternScheduler getScheduler() {
         return this.scheduler;
     }
@@ -707,5 +706,20 @@ public final class LanternServer implements Server {
     @Override
     public LanternWorldManager getWorldManager() {
         return this.worldManager;
+    }
+
+    @Override
+    public void sendMessage(Text message) {
+        LanternConsole.INSTANCE.sendMessage(message);
+    }
+
+    @Override
+    public MessageChannel getMessageChannel() {
+        return null;
+    }
+
+    @Override
+    public void setMessageChannel(MessageChannel channel) {
+
     }
 }

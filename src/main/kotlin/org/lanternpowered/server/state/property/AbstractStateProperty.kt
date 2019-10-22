@@ -26,6 +26,7 @@
 package org.lanternpowered.server.state.property
 
 import com.google.common.collect.ImmutableCollection
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
@@ -42,6 +43,8 @@ abstract class AbstractStateProperty<T : Comparable<T>, V>(
         override val valueKey: Key<out Value<V>>,
         override val keyValueTransformer: StateKeyValueTransformer<T, V>
 ) : DefaultCatalogType(key), IStateProperty<T, V> {
+
+    override var sortedPossibleValues: List<T> = ImmutableList.sortedCopyOf(this.possibleValues)
 
     private val predicate = Predicate<T> { this.possibleValues.contains(it) }
 

@@ -27,13 +27,13 @@
 
 package org.lanternpowered.api.ext
 
-import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.serializer.TextSerializers
+import org.spongepowered.api.command.CommandCause
 import org.spongepowered.api.text.action.ClickAction
 
 /**
@@ -59,7 +59,7 @@ fun String.toText(fn: TextBuilder.() -> Unit): Text = Text(this, fn)
 /**
  * Applies a [ClickAction.ExecuteCallback] as click action.
  */
-fun TextBuilder.onClick(fn: (Cause) -> Unit): TextBuilder = onClick(ClickAction.ExecuteCallback.builder().callback(fn).build())
+fun TextBuilder.onClick(fn: (CommandCause) -> Unit): TextBuilder = onClick(ClickAction.ExecuteCallback.builder().callback(fn).build())
 
 inline operator fun TextFormat.plus(that: TextFormat): TextFormat = merge(that)
 inline operator fun TextFormat.plus(that: TextStyle): TextFormat = style(that)

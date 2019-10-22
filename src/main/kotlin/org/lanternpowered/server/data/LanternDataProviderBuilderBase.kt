@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.data
 
+import org.lanternpowered.api.ext.emptyOptional
+import org.lanternpowered.server.data.key.OptionalValueKey
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
@@ -49,24 +51,6 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
 
     fun build(): LanternDataProvider<V, E> {
         val supportedTester = this.supportedByHandler ?: { true }
-
-        // Generate missing remove handlers, defaults
-        // to fail always
-
-        var removeHandler = this.removeHandler
-        var removeFastHandler = this.removeFastHandler
-        if (removeHandler == null) {
-            if (removeFastHandler != null) {
-                removeHandler = removeFromRemoveFast(this.key, removeFastHandler)
-            } else {
-                // Default to non removable
-                removeHandler = failRemoveHandler
-                removeFastHandler = failRemoveFastHandler
-            }
-        }
-        if (removeFastHandler == null) {
-            removeFastHandler = removeFastFromRemove(this.key, removeHandler)
-        }
 
         // Generate missing offer handlers, if none is specified,
         // offering will always fail
@@ -111,6 +95,36 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
             }
         }
 
+        // Generate missing remove handlers, defaults
+        // to fail always
+        // With the exception to optional values, if no
+        // remove handler is found, it will try to offer
+        // empty optionals.
+
+        var removeHandler = this.removeHandler
+        var removeFastHandler = this.removeFastHandler
+        if (removeHandler == null) {
+            if (removeFastHandler != null) {
+                removeHandler = removeFromRemoveFast(this.key, removeFastHandler)
+            } else if (this.key is OptionalValueKey<*,*>) {
+                removeHandler = {
+                    @Suppress("UNCHECKED_CAST")
+                    offerHandler(emptyOptional<Any>() as E)
+                };
+                removeFastHandler = {
+                    @Suppress("UNCHECKED_CAST")
+                    offerFastHandler(emptyOptional<Any>() as E)
+                }
+            } else {
+                // Default to non removable
+                removeHandler = failRemoveHandler
+                removeFastHandler = failRemoveFastHandler
+            }
+        }
+        if (removeFastHandler == null) {
+            removeFastHandler = removeFastFromRemove(this.key, removeHandler)
+        }
+
         // Generate missing retrieve handlers, at least
         // one must be specified
 
@@ -118,9 +132,7 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
         var getValueHandler = this.getValueHandler
 
         if (getHandler == null) {
-            if (getValueHandler == null) {
-                throw IllegalStateException("At least one get handler must be set")
-            }
+            checkNotNull(getValueHandler) { "At least one get handler must be set" }
             getHandler = getFromGetValue(this.key, getValueHandler)
         } else if (getValueHandler == null) {
             getValueHandler = getValueFromGet(this.key, getHandler)

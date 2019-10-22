@@ -159,9 +159,6 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
     @Nullable private AABB boundingBoxBase;
     @Nullable private AABB boundingBox;
 
-    @Nullable private volatile UUID creator;
-    @Nullable private volatile UUID notifier;
-
     @Nullable private LanternEntity vehicle;
     private final List<LanternEntity> passengers = new ArrayList<>();
 
@@ -195,18 +192,42 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
     }
 
     public void registerKeys() {
-        final LocalKeyRegistry<?> c = getKeyRegistry();
+        final LocalKeyRegistry<LanternEntity> c = getKeyRegistry().forHolder(LanternEntity.class);
         c.register(Keys.DISPLAY_NAME, Text.empty());
         c.register(Keys.CUSTOM_NAME_VISIBLE, true);
         c.register(Keys.TAGS, new HashSet<>());
         c.register(Keys.VELOCITY, Vector3d.ZERO);
         c.register(Keys.FIRE_TICKS, 0);
-        c.register(Keys.FALL_DISTANCE, 0f);
+        c.register(Keys.FALL_DISTANCE, 0.0);
         c.register(Keys.GLOWING, false);
         c.register(Keys.INVISIBLE, false);
         c.register(Keys.INVULNERABLE, false);
         c.register(Keys.HAS_GRAVITY, true);
+        c.register(Keys.CREATOR);
+        c.register(Keys.NOTIFIER);
         c.register(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
+        c.registerProvider(Keys.IS_ON_GROUND, builder -> builder.get(holder -> holder.onGround));
+        // TODO: Setting base vehicle?
+        c.registerProvider(Keys.BASE_VEHICLE, builder -> builder.get(holder -> Optional.ofNullable(holder.getBaseVehicle())));
+        c.registerProvider(Keys.PASSENGERS, builder -> {
+            builder.get(LanternEntity::getPassengers);
+            builder.removeFast(entity -> {
+                entity.clearPassengers();
+                return true;
+            });
+            // TODO: Offering
+        });
+        c.registerProvider(Keys.VEHICLE, builder -> {
+            builder.get(LanternEntity::getVehicle);
+            builder.offerFast((entity, vehicle) -> {
+                entity.setVehicle(vehicle.orElse(null));
+                return true;
+            });
+            builder.removeFast(entity -> {
+                entity.setVehicle(null);
+                return true;
+            });
+        });
     }
 
     /**
@@ -220,13 +241,13 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
     }
 
     public Vector3d getDirectionVector() {
-        final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
+        final Vector3d rotation = get(Keys.HEAD_ROTATION).orElse(this.rotation);
         // Invert the x direction because west and east are swapped
         return Quaternions.fromAxesAnglesDeg(rotation.mul(1, -1, 1)).getDirection();
     }
 
     public Vector3d getHorizontalDirectionVector() {
-        final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
+        final Vector3d rotation = get(Keys.HEAD_ROTATION).orElse(this.rotation);
         // Invert the x direction because west and east are swapped
         return Quaternions.fromAxesAnglesDeg(rotation.mul(0, 1, 0)).getDirection().mul(-1, 1, 1);
     }
@@ -335,7 +356,6 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         this.lastChunkCoords = coords;
     }
 
-    @Override
     public boolean isOnGround() {
         return this.onGround;
     }
@@ -552,14 +572,12 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         return true;
     }
 
-    @Override
     public List<Entity> getPassengers() {
         synchronized (this.passengers) {
             return ImmutableList.copyOf(this.passengers);
         }
     }
 
-    @Override
     public boolean hasPassenger(Entity entity) {
         checkNotNull(entity, "entity");
         synchronized (this.passengers) {
@@ -568,14 +586,12 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         }
     }
 
-    @Override
     public boolean addPassenger(Entity entity) {
         checkNotNull(entity, "entity");
         final LanternEntity entity1 = (LanternEntity) entity;
         return entity1.getVehicle0() == null && entity1.setVehicle(this);
     }
 
-    @Override
     public void removePassenger(Entity entity) {
         checkNotNull(entity, "entity");
         final LanternEntity entity1 = (LanternEntity) entity;
@@ -585,7 +601,6 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         entity1.setVehicle(null);
     }
 
-    @Override
     public void clearPassengers() {
         synchronized (this.passengers) {
             for (LanternEntity passenger : new ArrayList<>(this.passengers)) {
@@ -594,14 +609,12 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         }
     }
 
-    @Override
     public Optional<Entity> getVehicle() {
         synchronized (this.passengers) {
             return Optional.ofNullable(this.vehicle);
         }
     }
 
-    @Override
     public boolean setVehicle(@Nullable Entity entity) {
         synchronized (this.passengers) {
             if (this.vehicle == entity) {
@@ -640,7 +653,7 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         }
     }
 
-    @Override
+    @Nullable
     public LanternEntity getBaseVehicle() {
         synchronized (this.passengers) {
             LanternEntity lastEntity = this;
@@ -819,26 +832,6 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
             }
         }
         return true;
-    }
-
-    @Override
-    public Optional<UUID> getCreator() {
-        return Optional.ofNullable(this.creator);
-    }
-
-    @Override
-    public Optional<UUID> getNotifier() {
-        return Optional.ofNullable(this.notifier);
-    }
-
-    @Override
-    public void setCreator(@Nullable UUID uuid) {
-        this.creator = uuid;
-    }
-
-    @Override
-    public void setNotifier(@Nullable UUID uuid) {
-        this.notifier = uuid;
     }
 
     @Override

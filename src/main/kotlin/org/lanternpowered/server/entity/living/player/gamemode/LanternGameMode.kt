@@ -35,6 +35,6 @@ import org.spongepowered.api.text.translation.Translatable
 
 class LanternGameMode(
         key: CatalogKey, translationPart: String, override val internalId: Int,
-        val abilityApplier: DataHolder.() -> Unit
+        val abilityApplier: DataHolder.Mutable.() -> Unit
 ) : DefaultCatalogType(key), GameMode, InternalCatalogType,
         Translatable by Translated("gameMode.$translationPart")

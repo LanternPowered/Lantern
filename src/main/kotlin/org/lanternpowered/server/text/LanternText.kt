@@ -28,7 +28,8 @@ package org.lanternpowered.server.text
 import com.google.common.base.Objects
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterators
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.ext.uncheckedCast
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextColor
@@ -42,9 +43,9 @@ import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
 import org.spongepowered.api.text.action.ShiftClickAction
-import java.util.ArrayList
-import java.util.Collections
-import java.util.Optional
+import java.util.*
+import java.util.regex.Pattern
+import kotlin.streams.toList
 
 abstract class LanternText(
         private val format: TextFormat,
@@ -69,6 +70,62 @@ abstract class LanternText(
     override fun concat(other: Text): Text = toBuilder().append(other).build()
     override fun trim(): Text = toBuilder().trim().build()
     override fun getContentVersion(): Int = 1
+
+    override fun replace(oldValue: Pattern, newValue: Text): Text
+            = replace(oldValue, newValue, false)
+
+    override fun replace(oldValue: String, newValue: Text): Text
+            = replace(oldValue, newValue, false)
+
+    override fun replace(oldValue: String, newValue: Text, lossy: Boolean): Text
+            = replace(Pattern.compile(oldValue, Pattern.LITERAL), newValue, lossy)
+
+    override fun replace(oldValue: Pattern, newValue: Text, lossy: Boolean): Text {
+        // recursively call the function on child elements and produce something ready to return
+        var text = if (this.children.isEmpty()) this else
+            this.toBuilder().removeAll().append(this.children.stream()
+                    .map { child -> child.replace(oldValue, newValue, lossy) }.toList()).build()
+
+        var plain = text.toPlainSingle()
+        var matcher = oldValue.matcher(plain)
+        if (!matcher.find()) {
+            if (lossy) {
+                // will assimilating children find it?
+                plain = text.toPlain()
+                matcher = oldValue.matcher(plain)
+                if (matcher.find()) {
+                    // lossy mode required
+                    text = text.toBuilder().removeAll().build()
+                } else {
+                    return text
+                }
+            } else {
+                return text
+            }
+        }
+        if (matcher.hitEnd()) {
+            // the entire component matches; no replacement necessary
+            return reformat(Text.builder()).append(newValue).append(text.children).build()
+        }
+        val builder = Text.builder()
+        // split and interleave
+        val parts = oldValue.split(plain, -1)
+        for (i in 0..parts.size - 2) {
+            builder.append(Text.of(parts[i]))
+            builder.append(newValue)
+        }
+        builder.append(Text.of(parts.last()))
+        builder.append(text.children)
+        return reformat(builder).build()
+    }
+
+    private fun reformat(builder: TextBuilder): TextBuilder {
+        builder.format(this.format)
+        this.clickAction?.let { builder.onClick(it) }
+        this.shiftClickAction?.let { builder.onShiftClick(it) }
+        this.hoverAction?.let { builder.onHover(it) }
+        return builder
+    }
 
     override fun withChildren() = Iterable {
         if (this.children.isEmpty()) Iterators.singletonIterator(this) else TextIterator(this)
@@ -174,11 +231,17 @@ abstract class LanternText(
             children.forEach { this.children.add(thePos++, it) }
         }
 
+        override fun remove(index: Int) = apply { this.children.removeAt(index) }
         override fun remove(vararg children: Text) = apply { this.children.removeAll(children.asList()) }
         override fun remove(children: Collection<Text>) = apply { this.children.removeAll(children) }
         override fun remove(children: Iterable<Text>) = apply { this.children.removeAll(children) }
         override fun remove(children: Iterator<Text>) = apply { this.children.removeAll(children.asSequence()) }
         override fun removeAll() = apply { this.children.clear() }
+
+        override fun removeLastChild() = apply {
+            if (this.children.isNotEmpty())
+                this.children.removeAt(this.children.size - 1)
+        }
 
         override fun trim() = apply {
             val front = this.children.iterator()

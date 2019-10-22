@@ -105,7 +105,6 @@ import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -117,6 +116,7 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.server.ServerWorld;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -126,6 +126,7 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
@@ -168,7 +169,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
-public class LanternWorld implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer {
+public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -328,7 +329,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     /**
      * Enables whether the spawn volume should be generated and keeping it loaded.
-     * 
+     *
      * @param keepSpawnLoaded keep spawn loaded
      */
     void enableSpawnArea(boolean keepSpawnLoaded) {
@@ -363,7 +364,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     /**
      * Gets the players that are currently in this world.
-     * 
+     *
      * @return The players
      */
     @Override
@@ -399,7 +400,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
 
     /**
      * Gets the chunk manager of this world.
-     * 
+     *
      * @return the chunk manager.
      */
     public LanternChunkManager getChunkManager() {

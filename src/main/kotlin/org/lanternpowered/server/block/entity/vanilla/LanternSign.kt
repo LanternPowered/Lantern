@@ -44,6 +44,7 @@ class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
         initializeSubject()
     }
 
+    override fun getName() = this.identifier
     override fun getIdentifier() = "Sign[x=${location.blockX},y=${location.blockY},z=${location.blockZ}]"
     override fun getPermissionDefault(permission: String) = Tristate.TRUE
 

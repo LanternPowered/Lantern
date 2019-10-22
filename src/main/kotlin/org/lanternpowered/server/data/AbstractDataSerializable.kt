@@ -23,24 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text.channel
+package org.lanternpowered.server.data
 
-import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.ext.*
-import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.text.channel.MessageChannel
-import org.spongepowered.api.text.channel.MessageReceiver
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataSerializable
+import org.spongepowered.api.data.persistence.Queries
 
-/**
- * A message channel that targets all [Player]s with the given permission.
- *
- * @param permission The permission node
- */
-class PlayerPermissionMessageChannel(private val permission: String) : MessageChannel {
+abstract class AbstractDataSerializable : DataSerializable {
 
-    override fun getMembers(): Collection<MessageReceiver> {
-        return Lantern.server.onlinePlayers.stream()
-                .filter { player: Player -> player.hasPermission(this.permission) }
-                .toImmutableSet()
-    }
+    override fun toContainer(): DataContainer = DataContainer.createNew()
+            .set(Queries.CONTENT_VERSION, this.contentVersion)
 }

@@ -76,8 +76,8 @@ license {
         name = rootProject.name
         urla = rootProject.url
         organizationa = rootProject.organization
-        urlb = rootProject.api.url
-        organizationb = rootProject.api.organization
+        urlb = 'https://www.spongepowered.org' // rootProject.api.url
+        organizationb = 'SpongePowered' // rootProject.api.organization
     }
 }
 

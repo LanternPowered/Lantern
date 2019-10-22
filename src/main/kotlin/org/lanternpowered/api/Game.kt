@@ -30,5 +30,5 @@ typealias GameRegistry = org.spongepowered.api.GameRegistry
 typealias GameState = org.spongepowered.api.GameState
 typealias MinecraftVersion = org.spongepowered.api.MinecraftVersion
 typealias Platform = org.spongepowered.api.Platform
-typealias Server = org.spongepowered.api.Server
+typealias Server = org.spongepowered.api.server.Server
 typealias Sponge = org.spongepowered.api.Sponge

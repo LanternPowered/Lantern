@@ -57,7 +57,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.slot.SlotIndex;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.math.vector.Vector3d;
@@ -131,7 +130,6 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
     @Override
     public void serialize(T entity, DataView dataView) {
         super.serialize(entity, dataView);
-        dataView.remove(HEAD_ROTATION);
         final LanternWorld world = entity.getWorld();
         final UUID uniqueId = world != null ? world.getUniqueId() :
                 entity.getUserWorld() != null ? entity.getUserWorld().getUniqueId() : null;
@@ -140,6 +138,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
 
     @Override
     public void serializeValues(T player, SimpleValueContainer valueContainer, DataView dataView) {
+        valueContainer.remove(Keys.HEAD_ROTATION);
         valueContainer.remove(Keys.IS_SPRINTING);
         valueContainer.remove(Keys.IS_SNEAKING);
         valueContainer.remove(LanternKeys.ACTIVE_HAND);
@@ -282,7 +281,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         for (Slot slot : slots) {
             ((ISlot) slot).peek().ifNotEmpty(stack -> {
                 final DataView itemView = ItemStackStore.INSTANCE.serialize(stack);
-                itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, InventoryProperties.SLOT_INDEX).get().getIndex());
+                itemView.set(SLOT, enderChestInventory.getProperty(slot, InventoryProperties.SLOT_INDEX).get().byteValue());
                 itemViews.add(itemView);
             });
         }
@@ -294,7 +293,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         for (DataView itemView : itemViews) {
             final int slot = itemView.getByte(SLOT).get() & 0xff;
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
-            enderChestInventory.set(SlotIndex.of(slot), itemStack);
+            enderChestInventory.set(slot, itemStack);
         }
     }
 
@@ -308,9 +307,9 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             final LanternItemStack itemStack = ItemStackStore.INSTANCE.deserialize(itemView);
 
             if (slot >= 0 && slot < mainInventory.capacity()) {
-                mainInventory.set(SlotIndex.of(slot), itemStack);
+                mainInventory.set(slot, itemStack);
             } else if (slot >= 100 && slot - 100 < equipmentInventory.capacity()) {
-                equipmentInventory.set(SlotIndex.of(slot - 100), itemStack);
+                equipmentInventory.set(slot - 100, itemStack);
             } else if (slot == 150) {
                 offHandSlot.set(itemStack);
             }
@@ -339,7 +338,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
 
     private static void serializeSlot(Inventory parent, Slot slot, int indexOffset,
             ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
-        final int index = parent.getProperty(slot, InventoryProperties.SLOT_INDEX).get().getIndex();
+        final int index = parent.getProperty(slot, InventoryProperties.SLOT_INDEX).get();
         serializeSlot(index + indexOffset, slot, itemStackSerializer, views);
     }
 

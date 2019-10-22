@@ -48,6 +48,7 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.registry.util.RegistrationDependency
 import org.spongepowered.api.util.Color
 import org.spongepowered.api.util.Direction
+import org.spongepowered.math.vector.Vector3d
 import java.util.OptionalInt
 
 @RegistrationDependency(

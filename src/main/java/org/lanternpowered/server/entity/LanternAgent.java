@@ -25,15 +25,13 @@
  */
 package org.lanternpowered.server.entity;
 
-import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.ai.Goal;
 import org.spongepowered.api.entity.ai.GoalType;
 import org.spongepowered.api.entity.living.Agent;
 
 import java.util.Optional;
 import java.util.UUID;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class LanternAgent extends LanternLiving implements Agent {
 
@@ -42,15 +40,13 @@ public abstract class LanternAgent extends LanternLiving implements Agent {
     }
 
     @Override
-    public Optional<Entity> getTarget() {
-        return Optional.empty();
+    public void registerKeys() {
+        super.registerKeys();
+        getKeyRegistry().register(Keys.TARGET_ENTITY, Optional.empty());
     }
 
     @Override
-    public void setTarget(@Nullable Entity target) {
-    }
-
-    @Override public <T extends Agent> Optional<Goal<T>> getGoal(GoalType type) {
+    public <T extends Agent> Optional<Goal<T>> getGoal(GoalType type) {
         return Optional.empty();
     }
 }

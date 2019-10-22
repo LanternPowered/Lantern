@@ -28,6 +28,9 @@
 
 package org.lanternpowered.api.world
 
+import org.spongepowered.math.vector.Vector3d
+import org.spongepowered.math.vector.Vector3i
+
 /**
  * Shorter name alias for [BlockPosition].
  */

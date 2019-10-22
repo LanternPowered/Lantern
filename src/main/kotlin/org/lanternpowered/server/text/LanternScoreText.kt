@@ -66,7 +66,7 @@ class LanternScoreText : LanternText, ScoreText {
             .addFirstValue(this.score)
             .add("override", this.override)
 
-    class Builder : LanternText.AbstractBuilder<Builder>, ScoreText.Builder {
+    class Builder : AbstractBuilder<Builder>, ScoreText.Builder {
 
         private var score: Score? = null
         private var override: String? = null

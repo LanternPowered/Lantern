@@ -33,6 +33,7 @@ import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
 
@@ -98,7 +99,7 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
         return registration
     }
 
-    private fun <V : Value<E>, E : Any> register(
+    private fun <V : Value<E>, E : Any> registerProvider0(
             key: Key<V>, fn: LanternLocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit): LocalKeyRegistration<V, E, H> {
         checkRegistration(key)
         val builder = LanternLocalDataProviderBuilder<V, E, H>(key)
@@ -111,12 +112,17 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
 
     override fun <V : Value<E>, E : Any> registerProvider(
             key: Key<V>, fn: LocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit): LocalKeyRegistration<V, E, H> {
-        return register(key, fn)
+        return registerProvider0(key, fn)
     }
 
     override fun <V : Value<E>, E : Any> registerProvider(
             key: Key<V>, fn: BiConsumer<LocalJDataProviderBuilder<V, E, H>, Key<V>>): LocalKeyRegistration<V, E, H> {
-        return register(key, fn::accept)
+        return registerProvider0(key, fn::accept)
+    }
+
+    override fun <V : Value<E>, E : Any> registerProvider(
+            key: Key<V>, fn: Consumer<LocalJDataProviderBuilder<V, E, H>>): LocalKeyRegistration<V, E, H> {
+        return registerProvider0(key) { fn.accept(this) }
     }
 
     override fun copy(): LocalKeyRegistry<H> {

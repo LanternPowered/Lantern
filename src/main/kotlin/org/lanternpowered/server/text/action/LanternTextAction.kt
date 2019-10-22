@@ -26,6 +26,7 @@
 package org.lanternpowered.server.text.action
 
 import org.lanternpowered.api.ext.*
+import org.spongepowered.api.command.CommandCause
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
@@ -61,8 +62,8 @@ abstract class LanternShiftClickAction<R> internal constructor(): LanternTextAct
 
 data class OpenUrlClickAction(override val result: URL) : LanternClickAction<URL>(), ClickAction.OpenUrl
 data class ChangePageClickAction(override val result: Int) : LanternClickAction<Int>(), ClickAction.ChangePage
-data class ExecuteCallbackClickAction(override val result: Consumer<CommandSource>) :
-        LanternClickAction<Consumer<CommandSource>>(), ClickAction.ExecuteCallback
+data class ExecuteCallbackClickAction(override val result: Consumer<CommandCause>) :
+        LanternClickAction<Consumer<CommandCause>>(), ClickAction.ExecuteCallback
 data class RunCommandClickAction(override val result: String) : LanternClickAction<String>(), ClickAction.RunCommand
 data class SuggestCommandClickAction(override val result: String) : LanternClickAction<String>(), ClickAction.SuggestCommand
 
@@ -113,9 +114,9 @@ class ChangePageClickActionBuilder : LanternTextActionBuilder<
 }
 
 class ExecuteCallbackClickActionBuilder : LanternTextActionBuilder<
-        ClickAction.ExecuteCallback, Consumer<CommandSource>, ClickAction.ExecuteCallback.Builder>(), ClickAction.ExecuteCallback.Builder {
-    override fun callback(callback: Consumer<CommandSource>) = result(callback)
-    override fun build(result: Consumer<CommandSource>) = ExecuteCallbackClickAction(result)
+        ClickAction.ExecuteCallback, Consumer<CommandCause>, ClickAction.ExecuteCallback.Builder>(), ClickAction.ExecuteCallback.Builder {
+    override fun callback(callback: Consumer<CommandCause>) = result(callback)
+    override fun build(result: Consumer<CommandCause>) = ExecuteCallbackClickAction(result)
 }
 
 class RunCommandClickActionBuilder : LanternTextActionBuilder<
@@ -164,7 +165,7 @@ class InsertTextShiftClickActionBuilder : LanternTextActionBuilder<
 data class ShowEntityRef(
         internal val uniqueId: UUID,
         internal val name: String,
-        internal val type: EntityType?
+        internal val type: EntityType<*>?
 ) : HoverAction.ShowEntity.Ref {
     override fun getUniqueId() = this.uniqueId
     override fun getName() = this.name
@@ -175,7 +176,7 @@ class ShowEntityRefBuilder : HoverAction.ShowEntity.Ref.Builder {
 
     private var uniqueId: UUID? = null
     private var name: String? = null
-    private var type: EntityType? = null
+    private var type: EntityType<*>? = null
 
     override fun from(value: HoverAction.ShowEntity.Ref) = apply {
         value as ShowEntityRef
@@ -192,7 +193,7 @@ class ShowEntityRefBuilder : HoverAction.ShowEntity.Ref.Builder {
 
     override fun uniqueId(uniqueId: UUID) = apply { this.uniqueId = uniqueId }
     override fun name(name: String) = apply { this.name = name }
-    override fun type(type: EntityType?) = apply { this.type = type }
+    override fun type(type: EntityType<*>?) = apply { this.type = type }
 
     override fun build(): HoverAction.ShowEntity.Ref {
         val uniqueId = checkNotNull(this.uniqueId) { "The uniqueId must be set" }

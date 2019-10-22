@@ -39,11 +39,11 @@ import java.util.regex.Pattern;
 
 public final class LanternRconConnection extends AbstractProxySubject implements RconConnection {
 
-    public static final String NAME_FORMAT = "Rcon[%s]";
-    public static final Pattern NAME_PATTERN = Pattern.compile('^' + String.format(NAME_FORMAT, "(.+)") + '$');
+    public static final String IDENTIFIER_FORMAT = "Rcon[%s]";
+    public static final Pattern IDENTIFIER_PATTERN = Pattern.compile('^' + String.format(IDENTIFIER_FORMAT, "(.+)") + '$');
 
     private final StringBuffer buffer = new StringBuffer();
-    private final String name;
+    private final String identifier;
 
     private final InetSocketAddress address;
     private final InetSocketAddress virtualHost;
@@ -52,7 +52,7 @@ public final class LanternRconConnection extends AbstractProxySubject implements
     private volatile boolean authorized;
 
     LanternRconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.name = String.format(NAME_FORMAT, address.getHostName());
+        this.identifier = String.format(IDENTIFIER_FORMAT, address.getHostName());
         this.virtualHost = virtualHost;
         this.address = address;
         initializeSubject();
@@ -77,11 +77,6 @@ public final class LanternRconConnection extends AbstractProxySubject implements
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
     public void sendMessage(Text message) {
         this.buffer.append(message.toPlain()).append('\n');
     }
@@ -97,7 +92,7 @@ public final class LanternRconConnection extends AbstractProxySubject implements
 
     @Override
     public String getIdentifier() {
-        return getName();
+        return this.identifier;
     }
 
     @Override

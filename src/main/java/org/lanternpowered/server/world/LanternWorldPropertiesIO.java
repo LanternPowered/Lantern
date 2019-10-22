@@ -262,7 +262,7 @@ final class LanternWorldPropertiesIO {
             if (dimensionTypeId.equalsIgnoreCase(OVERWORLD)) {
                 properties.setDimensionType(DimensionTypes.OVERWORLD);
             } else if (dimensionTypeId.equalsIgnoreCase(NETHER)) {
-                properties.setDimensionType(DimensionTypes.NETHER);
+                properties.setDimensionType(DimensionTypes.THE_NETHER);
             } else if (dimensionTypeId.equalsIgnoreCase(END)) {
                 properties.setDimensionType(DimensionTypes.THE_END);
             } else {

@@ -83,6 +83,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
         this.internalId = data.internalId
         this.dataContainer = data.dataContainer
 
+        // TODO
         keysToProperty = null as ImmutableMap<Key<out Value<*>>, StateProperty<*>>
         propertyValueTable = ImmutableTable.of()
         values = ImmutableSet.of()
@@ -120,8 +121,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(data: StateDat
                 last = next
             }
         } else {
-            val list = ArrayList<T>(stateProperty.possibleValues)
-            list.sort()
+            val list = (stateProperty as IStateProperty<T,*>).sortedPossibleValues
             val it = list.iterator()
             while (it.hasNext()) {
                 if (it.next() === value) {

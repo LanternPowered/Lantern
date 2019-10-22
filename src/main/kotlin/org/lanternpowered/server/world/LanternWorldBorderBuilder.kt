@@ -26,6 +26,7 @@
 package org.lanternpowered.server.world
 
 import org.spongepowered.api.world.WorldBorder
+import org.spongepowered.math.vector.Vector3d
 import java.time.Duration
 
 class LanternWorldBorderBuilder : WorldBorder.Builder {

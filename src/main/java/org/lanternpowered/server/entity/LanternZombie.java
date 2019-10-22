@@ -58,8 +58,4 @@ public class LanternZombie extends LanternAgent implements Zombie, AbstractArmor
     public CarriedInventory<? extends Carrier> getInventory() {
         return this.equipmentInventory;
     }
-
-    @Override
-    public void setScaleForAge() {
-    }
 }

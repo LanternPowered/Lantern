@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play
 
 import org.lanternpowered.server.network.message.Message
+import org.spongepowered.math.vector.Vector3i
 
 data class MessagePlayInUpdateJigsawBlock(
         val position: Vector3i,

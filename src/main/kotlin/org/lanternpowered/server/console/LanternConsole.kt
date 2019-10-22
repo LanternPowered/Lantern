@@ -45,6 +45,7 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo.Implementation
 import org.lanternpowered.server.text.LanternTexts
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.ThreadHelper
+import org.spongepowered.api.SystemSubject
 import org.spongepowered.api.command.exception.CommandException
 import org.spongepowered.api.command.manager.CommandManager
 import org.spongepowered.api.plugin.PluginContainer
@@ -62,7 +63,7 @@ import java.nio.file.Path
 import java.time.Duration
 
 @Singleton
-object LanternConsole : SimpleTerminalConsole(), ProxySubject, Console {
+object LanternConsole : SimpleTerminalConsole(), ProxySubject, SystemSubject {
 
     @JvmField internal val redirectFqcns = mutableSetOf(
             PrintStream::class.java.name, LoggerPrintStream::class.java.name, PrettyPrinter::class.java.name)

@@ -28,6 +28,8 @@ package org.lanternpowered.server.network.vanilla.message.type.play
 import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.util.Direction
+import org.spongepowered.math.vector.Vector3d
+import org.spongepowered.math.vector.Vector3i
 
 data class MessagePlayInPlayerBlockPlacement(
         val position: Vector3i,

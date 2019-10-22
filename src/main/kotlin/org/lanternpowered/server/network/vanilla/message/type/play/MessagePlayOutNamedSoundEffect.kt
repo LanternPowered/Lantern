@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play
 
 import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.effect.sound.SoundCategory
+import org.spongepowered.math.vector.Vector3d
 
 data class MessagePlayOutNamedSoundEffect(
         val type: String,

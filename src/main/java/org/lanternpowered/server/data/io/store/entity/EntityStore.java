@@ -55,17 +55,13 @@ public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolder
     private static final DataQuery POSITION = DataQuery.of("Pos");
     private static final DataQuery VELOCITY = DataQuery.of("Motion");
     private static final DataQuery ROTATION = DataQuery.of("Rotation");
+    private static final DataQuery HEAD_ROTATION = DataQuery.of("HeadRotation"); // Lantern
     private static final DataQuery SCALE = DataQuery.of("Scale"); // Lantern
     private static final DataQuery FALL_DISTANCE = DataQuery.of("FallDistance");
     private static final DataQuery FIRE_TICKS = DataQuery.of("Fire");
     private static final DataQuery UNIQUE_ID_MOST = DataQuery.of("UUIDMost");
     private static final DataQuery UNIQUE_ID_LEAST = DataQuery.of("UUIDLeast");
     static final DataQuery UNIQUE_ID = DataQuery.of("UUID");
-    private static final DataQuery OLD_UNIQUE_ID_MOST = DataQuery.of("PersistentIDMSB");
-    private static final DataQuery OLD_UNIQUE_ID_LEAST = DataQuery.of("PersistentIDLSB");
-    // A field that will be converted if present
-    private static final DataQuery BUKKIT_MAX_HEALTH = DataQuery.of("Bukkit.MaxHealth");
-    private static final DataQuery OLD_HEALTH = DataQuery.of("HealF");
     private static final DataQuery HEALTH = DataQuery.of("Health");
     private static final DataQuery REMAINING_AIR = DataQuery.of("Air");
     private static final DataQuery MAX_AIR = DataQuery.of("maxAir");
@@ -100,22 +96,10 @@ public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolder
 
     @Override
     public UUID deserializeUniqueId(DataView dataView) {
-        Optional<Long> uuidMost = dataView.getLong(UNIQUE_ID_MOST);
-        Optional<Long> uuidLeast = dataView.getLong(UNIQUE_ID_LEAST);
+        final Optional<Long> uuidMost = dataView.getLong(UNIQUE_ID_MOST);
+        final Optional<Long> uuidLeast = dataView.getLong(UNIQUE_ID_LEAST);
         if (uuidMost.isPresent() && uuidLeast.isPresent()) {
             return new UUID(uuidMost.get(), uuidLeast.get());
-        } else {
-            // Try to convert from an older format
-            uuidMost = dataView.getLong(OLD_UNIQUE_ID_MOST);
-            uuidLeast = dataView.getLong(OLD_UNIQUE_ID_LEAST);
-            if (uuidMost.isPresent() && uuidLeast.isPresent()) {
-                return new UUID(uuidMost.get(), uuidLeast.get());
-            } else {
-                final Optional<String> uuidString = dataView.getString(UNIQUE_ID);
-                if (uuidString.isPresent()) {
-                    return UUID.fromString(uuidString.get());
-                }
-            }
         }
         return UUID.randomUUID();
     }
@@ -129,7 +113,6 @@ public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolder
     @Override
     public void deserialize(T entity, DataView dataView) {
         entity.setPosition(fromDoubleList(dataView.getDoubleList(POSITION).get()));
-        entity.setVelocity(fromDoubleList(dataView.getDoubleList(VELOCITY).get()));
         dataView.getDoubleList(SCALE).ifPresent(list -> entity.setScale(fromDoubleList(list)));
         final List<Float> rotationList = dataView.getFloatList(ROTATION).get();
         // Yaw, Pitch, Roll (X, Y, Z) - Index 0 and 1 are swapped!
@@ -163,6 +146,7 @@ public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolder
         // Here will we remove all the vanilla properties and delegate the
         // rest through the default serialization system
         valueContainer.remove(Keys.VELOCITY).ifPresent(v -> dataView.set(VELOCITY, toDoubleList(v)));
+        valueContainer.remove(Keys.HEAD_ROTATION).ifPresent(v -> dataView.set(HEAD_ROTATION, toDoubleList(v)));
         valueContainer.remove(Keys.FIRE_TICKS).ifPresent(v -> dataView.set(FIRE_TICKS, v));
         valueContainer.remove(Keys.FALL_DISTANCE).ifPresent(v -> dataView.set(FALL_DISTANCE, v));
         valueContainer.remove(Keys.HEALTH).ifPresent(v -> dataView.set(HEALTH, v.floatValue()));
@@ -175,7 +159,7 @@ public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolder
         valueContainer.remove(Keys.CUSTOM_NAME_VISIBLE).ifPresent(v -> dataView.set(CUSTOM_NAME_VISIBLE, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.INVULNERABLE).ifPresent(v -> dataView.set(INVULNERABLE, (byte) (v ? 1 : 0)));
         valueContainer.remove(LanternKeys.PORTAL_COOLDOWN_TICKS).ifPresent(v -> dataView.set(PORTAL_COOLDOWN_TICKS, v));
-        valueContainer.remove(Keys.AI_ENABLED).ifPresent(v -> dataView.set(NO_AI, (byte) (v ? 0 : 1)));
+        valueContainer.remove(Keys.IS_AI_ENABLED).ifPresent(v -> dataView.set(NO_AI, (byte) (v ? 0 : 1)));
         valueContainer.remove(Keys.PERSISTENT).ifPresent(v -> dataView.set(PERSISTENT, (byte) (v ? 1 : 0)));
         valueContainer.remove(LanternKeys.CAN_PICK_UP_LOOT).ifPresent(v -> dataView.set(CAN_PICK_UP_LOOT, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataView.set(CUSTOM_NAME, LanternTexts.toLegacy(v)));
@@ -201,21 +185,17 @@ public class EntityStore<T extends LanternEntity> extends LocalMutableDataHolder
 
     @Override
     public void deserializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
+        dataView.getDoubleList(VELOCITY).ifPresent(v -> valueContainer.set(Keys.VELOCITY, fromDoubleList(v)));
+        dataView.getDoubleList(HEAD_ROTATION).ifPresent(v -> valueContainer.set(Keys.HEAD_ROTATION, fromDoubleList(v)));
         dataView.getInt(FIRE_TICKS).ifPresent(v -> valueContainer.set(Keys.FIRE_TICKS, v));
         dataView.getDouble(FALL_DISTANCE).ifPresent(v -> valueContainer.set(Keys.FALL_DISTANCE, v));
         dataView.getInt(REMAINING_AIR).ifPresent(v -> valueContainer.set(Keys.REMAINING_AIR, v));
-        // The health
-        Optional<Double> health = dataView.getDouble(HEALTH);
-        if (!health.isPresent()) {
-            // Try to convert old data
-            health = dataView.getDouble(OLD_HEALTH);
-        }
-        health.ifPresent(v -> valueContainer.set(Keys.HEALTH, v));
+        dataView.getDouble(HEALTH).ifPresent(v -> valueContainer.set(Keys.HEALTH, v));
         dataView.getString(DISPLAY_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
         dataView.getInt(CUSTOM_NAME_VISIBLE).ifPresent(v -> valueContainer.set(Keys.CUSTOM_NAME_VISIBLE, v > 0));
         dataView.getInt(INVULNERABLE).ifPresent(v -> valueContainer.set(Keys.INVULNERABLE, v > 0));
         dataView.getInt(PORTAL_COOLDOWN_TICKS).ifPresent(v -> valueContainer.set(LanternKeys.PORTAL_COOLDOWN_TICKS, v));
-        dataView.getInt(NO_AI).ifPresent(v -> valueContainer.set(Keys.AI_ENABLED, v == 0));
+        dataView.getInt(NO_AI).ifPresent(v -> valueContainer.set(Keys.IS_AI_ENABLED, v == 0));
         dataView.getInt(PERSISTENT).ifPresent(v -> valueContainer.set(Keys.PERSISTENT, v > 0));
         dataView.getView(SPONGE_DATA).ifPresent(view -> {
             view.getInt(MAX_AIR).ifPresent(v -> valueContainer.set(Keys.MAX_AIR, v));

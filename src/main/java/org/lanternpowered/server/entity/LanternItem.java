@@ -89,7 +89,7 @@ public class LanternItem extends LanternEntity implements Item {
     public void registerKeys() {
         super.registerKeys();
         final LocalKeyRegistry<?> c = getKeyRegistry();
-        c.register(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty());
+        c.register(Keys.ITEM_STACK_SNAPSHOT, ItemStackSnapshot.empty());
         c.register(Keys.PICKUP_DELAY, 10);
         c.register(Keys.DESPAWN_DELAY, 6000);
         c.register(LanternKeys.GRAVITY_FACTOR, 0.002);
@@ -151,7 +151,7 @@ public class LanternItem extends LanternEntity implements Item {
 
     private void pulsePhysics() {
         // Get the current velocity
-        Vector3d velocity = getVelocity();
+        Vector3d velocity = require(Keys.VELOCITY);
         // Update the position based on the velocity
         setPosition(getPosition().add(velocity));
 
@@ -187,7 +187,7 @@ public class LanternItem extends LanternEntity implements Item {
         if (entities.isEmpty()) {
             return;
         }
-        final LanternItemStack stack = (LanternItemStack) get(Keys.REPRESENTED_ITEM).map(ItemStackSnapshot::createStack).get();
+        final LanternItemStack stack = (LanternItemStack) require(Keys.ITEM_STACK_SNAPSHOT).createStack();
         if (stack.isEmpty()) {
             remove();
             return;
@@ -239,7 +239,7 @@ public class LanternItem extends LanternEntity implements Item {
             }
         }
         if (stack.isNotEmpty()) {
-            offer(Keys.REPRESENTED_ITEM, stack.toWrappedSnapshot());
+            offer(Keys.ITEM_STACK_SNAPSHOT, stack.toWrappedSnapshot());
         } else {
             remove();
         }
@@ -259,7 +259,7 @@ public class LanternItem extends LanternEntity implements Item {
     @Nullable
     private CombineData combineItemStacks(int pickupDelay, int despawnDelay) {
         // Remove items with no item stack
-        final ItemStackSnapshot itemStackSnapshot1 = get(Keys.REPRESENTED_ITEM).orElse(null);
+        final ItemStackSnapshot itemStackSnapshot1 = get(Keys.ITEM_STACK_SNAPSHOT).orElse(null);
         if (itemStackSnapshot1 == null || itemStackSnapshot1.isEmpty()) {
             remove();
             return null;
@@ -282,7 +282,7 @@ public class LanternItem extends LanternEntity implements Item {
             if (pickupDelay1 == NO_PICKUP_DELAY) {
                 continue;
             }
-            final ItemStackSnapshot itemStackSnapshot2 = entity.get(Keys.REPRESENTED_ITEM).get();
+            final ItemStackSnapshot itemStackSnapshot2 = entity.require(Keys.ITEM_STACK_SNAPSHOT);
             int quantity2 = itemStackSnapshot2.getQuantity();
             // Don't bother stacks that are already filled and
             // make sure that the stacks can be merged
@@ -306,10 +306,10 @@ public class LanternItem extends LanternEntity implements Item {
                 itemStack2.setQuantity(quantity2);
 
                 // The snapshot can be wrapped
-                entity.offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack2));
+                entity.offer(Keys.ITEM_STACK_SNAPSHOT, LanternItemStackSnapshot.wrap(itemStack2));
             } else {
                 // The other entity is completely drained and will be removed
-                entity.offer(Keys.REPRESENTED_ITEM, ItemStackSnapshot.empty());
+                entity.offer(Keys.ITEM_STACK_SNAPSHOT, ItemStackSnapshot.empty());
                 entity.remove();
             }
             // The item stack has changed
@@ -329,7 +329,7 @@ public class LanternItem extends LanternEntity implements Item {
         }
         causeStack.popCauseFrame(frame);
         if (itemStack1 != null) {
-            offer(Keys.REPRESENTED_ITEM, LanternItemStackSnapshot.wrap(itemStack1));
+            offer(Keys.ITEM_STACK_SNAPSHOT, LanternItemStackSnapshot.wrap(itemStack1));
             return new CombineData(pickupDelay, despawnDelay);
         }
         return null;

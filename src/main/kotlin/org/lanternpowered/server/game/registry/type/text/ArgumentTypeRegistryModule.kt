@@ -35,6 +35,8 @@ import org.spongepowered.api.registry.util.RegistrationDependency
 import org.spongepowered.api.text.selector.ArgumentHolder
 import org.spongepowered.api.text.selector.ArgumentType
 import org.spongepowered.api.text.selector.ArgumentTypes
+import org.spongepowered.math.vector.Vector3d
+import org.spongepowered.math.vector.Vector3i
 import java.util.HashMap
 
 @RegistrationDependency(SelectorFactoryRegistryModule::class)

@@ -54,10 +54,10 @@ public class LanternHuman extends LanternAgent implements Human, AbstractArmorEq
     public void registerKeys() {
         super.registerKeys();
 
-        final LocalKeyRegistry c = getKeyRegistry();
-        c.registerNonRemovable(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
-        c.registerNonRemovable(LanternKeys.POSE, Pose.STANDING);
-        c.registerNonRemovable(Keys.SKIN, LanternProfileProperty.EMPTY_TEXTURES);
+        final LocalKeyRegistry<?> c = getKeyRegistry();
+        c.register(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
+        c.register(LanternKeys.POSE, Pose.STANDING);
+        c.register(Keys.SKIN, LanternProfileProperty.EMPTY_TEXTURES);
     }
 
     @Override

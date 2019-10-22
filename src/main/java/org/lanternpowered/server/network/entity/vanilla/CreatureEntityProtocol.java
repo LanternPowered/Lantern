@@ -28,9 +28,9 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3d;
 
 public abstract class CreatureEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
@@ -49,9 +49,9 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
+        final Vector3d headRot = this.entity.get(Keys.HEAD_ROTATION).orElse(null);
         final Vector3d pos = this.entity.getPosition();
-        final Vector3d vel = this.entity.getVelocity();
+        final Vector3d vel = this.entity.get(Keys.VELOCITY).orElse(Vector3d.ZERO);
 
         final double yaw = rot.getY();
         final double pitch = headRot != null ? headRot.getX() : rot.getX();

@@ -77,6 +77,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Console;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameState;
+import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.manager.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -121,7 +122,7 @@ public class LanternGame implements Game {
      * Gets the current time in ticks. This method is similar to
      * {@link System#currentTimeMillis()} but the unit is converted
      * to ticks.
-     * 
+     *
      * @return The current time in ticks
      */
     public static long currentTimeTicks() {
@@ -364,7 +365,7 @@ public class LanternGame implements Game {
 
     /**
      * Gets the plugin container that represents the minecraft server.
-     * 
+     *
      * @return The plugin container
      */
     public PluginContainer getMinecraftPlugin() {
@@ -400,7 +401,7 @@ public class LanternGame implements Game {
 
     /**
      * Gets the {@link GlobalConfig}.
-     * 
+     *
      * @return The global configuration
      */
     public GlobalConfig getGlobalConfig() {
@@ -409,7 +410,7 @@ public class LanternGame implements Game {
 
     /**
      * Gets the {@link OpsConfig}.
-     * 
+     *
      * @return The ops configuration
      */
     public UserConfig<OpsEntry> getOpsConfig() {
@@ -425,7 +426,7 @@ public class LanternGame implements Game {
 
     /**
      * Gets the logger of the game.
-     * 
+     *
      * @return The logger
      */
     public Logger getLogger() {
@@ -447,7 +448,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public Console getConsole() {
+    public SystemSubject getSystemSubject() {
         return LanternConsole.INSTANCE;
     }
 
@@ -540,7 +541,7 @@ public class LanternGame implements Game {
 
     /**
      * Gets the {@link LanternChannelRegistrar}.
-     * 
+     *
      * @return The channel registrar
      */
     public LanternChannelRegistrar getChannelRegistrar() {
@@ -549,7 +550,7 @@ public class LanternGame implements Game {
 
     /**
      * Gets the {@link LanternGameProfileManager}.
-     * 
+     *
      * @return The game profile manager
      */
     public LanternGameProfileManager getGameProfileManager() {

@@ -78,7 +78,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
     @Override
     public void registerKeys() {
         super.registerKeys();
-        getKeyRegistry().register(Keys.IS_WEATHER_EFFECT, false);
+        getKeyRegistry().register(Keys.IS_HARMFUL, true);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
                 frame.pushCause(this);
 
                 final List<Entity> entities;
-                if (isEffect()) {
+                if (get(Keys.IS_HARMFUL).orElse(true)) {
                     entities = new ArrayList<>();
                 } else {
                     // Move the entity strike region to the lightning position

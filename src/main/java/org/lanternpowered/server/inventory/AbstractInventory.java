@@ -316,7 +316,7 @@ public abstract class AbstractInventory implements IInventory, PropertyHolderBas
     }
 
     @Override
-    public Translation getName() {
+    public Translation getNameTranslation() {
         if (this.name != null) {
             return this.name;
         }

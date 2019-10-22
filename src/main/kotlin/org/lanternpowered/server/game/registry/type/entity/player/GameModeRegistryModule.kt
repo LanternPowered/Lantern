@@ -39,7 +39,7 @@ object GameModeRegistryModule : InternalPluginCatalogRegistryModule<GameMode>(Ga
     fun get(): GameModeRegistryModule = this
 
     override fun registerDefaults() {
-        val register = { id: String, translationPart: String, internalId: Int, abilityApplier: DataHolder.() -> Unit ->
+        val register = { id: String, translationPart: String, internalId: Int, abilityApplier: DataHolder.Mutable.() -> Unit ->
             register(LanternGameMode(CatalogKey.minecraft(id), translationPart, internalId, abilityApplier)) }
         register("not_set", "notSet", -1) {}
         register("survival", "survival", 0) {

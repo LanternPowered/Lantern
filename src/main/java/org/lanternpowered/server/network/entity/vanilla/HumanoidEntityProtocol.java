@@ -27,10 +27,10 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
@@ -47,8 +47,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
     private HandPreference lastDominantHand = HandPreferences.RIGHT;
@@ -63,9 +61,9 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final int entityId = getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
+        final Vector3d headRot = this.entity.get(Keys.HEAD_ROTATION).orElse(null);
         final Vector3d pos = this.entity.getPosition();
-        final Vector3d vel = this.entity.getVelocity();
+        final Vector3d vel = this.entity.get(Keys.VELOCITY).orElse(Vector3d.ZERO);
 
         final double yaw = rot.getY();
         final double pitch = headRot != null ? headRot.getX() : rot.getX();

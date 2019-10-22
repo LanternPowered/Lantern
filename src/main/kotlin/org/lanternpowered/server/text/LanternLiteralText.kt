@@ -58,7 +58,7 @@ class LanternLiteralText : LanternText, LiteralText {
     override fun toStringHelper() = super.toStringHelper()
             .addFirstValue(this.content)
 
-    class Builder : LanternText.AbstractBuilder<Builder>, LiteralText.Builder {
+    class Builder : AbstractBuilder<Builder>, LiteralText.Builder {
 
         private var content: String
 

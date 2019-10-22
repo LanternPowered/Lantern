@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.inventory
 
-import com.google.common.base.MoreObjects
-import com.google.common.base.Preconditions.checkNotNull
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalDataHolderHelper
@@ -169,7 +167,6 @@ class LanternItemStack private constructor(
      * @return Is similar
      */
     fun similarTo(that: ItemStackSnapshot): Boolean {
-        checkNotNull(that, "that")
         return similarTo((that as LanternItemStackSnapshot).unwrap())
     }
 
@@ -183,7 +180,6 @@ class LanternItemStack private constructor(
      * @return Is similar
      */
     fun similarTo(that: ItemStack): Boolean {
-        checkNotNull(that, "that")
         val emptyA = isEmpty
         val emptyB = that.isEmpty
         return if (emptyA != emptyB) {
@@ -199,7 +195,7 @@ class LanternItemStack private constructor(
 
     companion object {
 
-        private val empty: LanternItemStack = null
+        private val empty by lazy { LanternItemStack(ItemTypes.AIR) }
 
         /**
          * Gets a empty [ItemStack] if the specified [ItemStack]
@@ -209,9 +205,8 @@ class LanternItemStack private constructor(
          * @return A empty or the provided item stack
          */
         @JvmStatic
-        fun orEmpty(itemStack: ItemStack?): LanternItemStack {
-            return if (itemStack == null) empty else itemStack as LanternItemStack?
-        }
+        fun orEmpty(itemStack: ItemStack?): LanternItemStack
+            = if (itemStack == null) this.empty else itemStack as LanternItemStack
 
         /**
          * Gets a empty [ItemStack].
@@ -223,9 +218,8 @@ class LanternItemStack private constructor(
          * @return The empty item stack
          */
         @JvmStatic
-        fun empty(): LanternItemStack {
-            return empty
-        }
+        fun empty(): LanternItemStack
+            = this.empty
 
         @JvmStatic
         fun isEmpty(itemStack: ItemStack?): Boolean {

@@ -34,6 +34,7 @@ import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.function.BiConsumer
+import java.util.function.Consumer
 
 /**
  * Represents a collection of [KeyRegistration]s with
@@ -164,6 +165,15 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      */
     abstract fun <V : Value<E>, E : Any> registerProvider(
             key: Key<V>, fn: BiConsumer<LocalJDataProviderBuilder<V, E, H>, Key<V>>): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] with the local data provider to this local key registry.
+     *
+     * @param key The key to register
+     * @return The key registration
+     */
+    abstract fun <V : Value<E>, E : Any> registerProvider(
+            key: Key<V>, fn: Consumer<LocalJDataProviderBuilder<V, E, H>>): LocalKeyRegistration<V, E, H>
 
     /**
      * Removes the registration for the given [Key].

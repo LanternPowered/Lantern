@@ -31,6 +31,7 @@ import org.lanternpowered.server.network.message.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.decodeDirection
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement
 import org.spongepowered.api.data.type.HandTypes
+import org.spongepowered.math.vector.Vector3d
 
 class CodecPlayInPlayerBlockPlacement : Codec<MessagePlayInPlayerBlockPlacement> {
 

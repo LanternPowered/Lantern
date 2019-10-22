@@ -94,7 +94,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternLiving extends LanternEntity implements Living {
+public class LanternLiving extends LanternEntity implements Living, AbstractProjectileSource {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
             .add(EntityEffectTypes.HURT, new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
@@ -151,7 +151,8 @@ public class LanternLiving extends LanternEntity implements Living {
                 });
         c.register(Keys.ABSORPTION, 0.0).minimum(0.0).maximum(1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
-        c.registerProvider(Keys.IS_SNEAKING, (builder, key) -> {
+        c.register(Keys.LAST_ATTACKER);
+        c.registerProvider(Keys.IS_SNEAKING, builder -> {
             builder.supportedBy(entity -> entity.supports(LanternKeys.POSE));
             builder.offer((entity, element) -> {
                 final Pose pose = entity.get(LanternKeys.POSE).get();
@@ -163,6 +164,13 @@ public class LanternLiving extends LanternEntity implements Living {
                 return DataTransactionResult.successNoData();
             });
             builder.get((entity) -> entity.get(LanternKeys.POSE).orElse(null) == Pose.SNEAKING);
+        });
+        c.registerProvider(Keys.HEAD_ROTATION, builder -> {
+            builder.get(LanternLiving::getHeadRotation);
+            builder.offerFast((entity, element) -> {
+                entity.setHeadRotation(element);
+                return true;
+            });
         });
     }
 
@@ -245,7 +253,7 @@ public class LanternLiving extends LanternEntity implements Living {
                 frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
                 // Spawn a experience orb with the experience value
                 LanternWorld.handleEntitySpawning(EntityTypes.EXPERIENCE_ORB, getTransform(),
-                        entity -> entity.offer(Keys.CONTAINED_EXPERIENCE, exp));
+                        entity -> entity.offer(Keys.EXPERIENCE, exp));
             }
 
             frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM);
@@ -261,7 +269,7 @@ public class LanternLiving extends LanternEntity implements Living {
                     final List<EntitySpawningEntry> entries = itemStackSnapshots.stream()
                             .filter(snapshot -> !snapshot.isEmpty())
                             .map(snapshot -> new EntitySpawningEntry(EntityTypes.ITEM, transform, entity -> {
-                                entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+                                entity.offer(Keys.ITEM_STACK_SNAPSHOT, snapshot);
                                 entity.offer(Keys.PICKUP_DELAY, 15);
                             }))
                             .collect(Collectors.toList());
@@ -350,27 +358,15 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     @Override
-    public Optional<Entity> getLastAttacker() {
-        return Optional.ofNullable(this.lastAttacker);
-    }
-
-    @Override
-    public void setLastAttacker(@Nullable Entity entity) {
-        this.lastAttacker = entity;
-    }
-
-    @Override
     public OptionalDouble getLastDamage() {
-        return this.lastAttacker == null ? OptionalDouble.empty() : OptionalDouble.of(this.lastAttackDamage);
+        return get(Keys.LAST_ATTACKER).isPresent() ? OptionalDouble.empty() : OptionalDouble.of(this.lastAttackDamage);
     }
 
-    @Override
     public Vector3d getHeadRotation() {
         return this.headRotation;
     }
 
-    @Override
-    public void setHeadRotation(Vector3d rotation) {
+    protected void setHeadRotation(Vector3d rotation) {
         setRawHeadRotation(rotation);
     }
 
@@ -412,7 +408,8 @@ public class LanternLiving extends LanternEntity implements Living {
             yawDeg = 270 + (90 - yawDeg);
         }
 
-        setHeadRotation(new Vector3d(pitchDeg, yawDeg, getHeadRotation().getZ()));
+        final Vector3d headRotation = get(Keys.HEAD_ROTATION).get();
+        offer(Keys.HEAD_ROTATION, new Vector3d(pitchDeg, yawDeg, headRotation.getZ()));
         setRotation(new Vector3d(pitchDeg, yawDeg, getRotation().getZ()));
     }
 
@@ -469,7 +466,7 @@ public class LanternLiving extends LanternEntity implements Living {
                     final BoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
                     final double value = exhaustion.get() + (double) deltaTicks * 0.005 * (potionEffect.getAmplifier() + 1.0);
                     offer(Keys.EXHAUSTION, Math.min(value, exhaustion.getMaxValue()));
-                } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(FoodData.class)) {
+                } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(Keys.SATURATION)) {
                     final int amount = potionEffect.getAmplifier() + 1;
                     final int food = Math.min(get(Keys.FOOD_LEVEL).get() + amount, get(LanternKeys.MAX_FOOD_LEVEL).get());
                     offer(Keys.FOOD_LEVEL, food);
@@ -481,7 +478,7 @@ public class LanternLiving extends LanternEntity implements Living {
     }
 
     private void pulseFood() {
-        if (!supports(FoodData.class) || get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
+        if (!supports(Keys.FOOD_LEVEL) || get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
             return;
         }
         final Difficulty difficulty = getWorld().getDifficulty();

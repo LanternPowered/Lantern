@@ -23,14 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("UNCHECKED_CAST")
+
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.ext.*
+import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 
 class ValueKeyBuilder<E : Any, V : Value<E>> : ValueKeyBuilderBase<E, V, ValueKeyBuilder<E, V>, KeyBuilder<V>>(), KeyBuilder<V> {
+
+    override fun <V : BoundedValue<E>, E : Comparable<E>> KeyBuilder<V>.range(range: ClosedRange<E>) = apply {
+        this as ValueKeyBuilder<E, V>
+        setMinValue(range.start)
+        setMaxValue(range.endInclusive)
+    }
+
+    override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.maximum(value: E)
+            = apply { (this as ValueKeyBuilder<E, V>).setMaxValue(value) }
+
+    override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.maximum(supplier: () -> E)
+            = apply { (this as ValueKeyBuilder<E, V>).setMaxValueSupplier(supplier) }
+
+    override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(value: E)
+            = apply { (this as ValueKeyBuilder<E, V>).setMinValue(value) }
+
+    override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(supplier: () -> E)
+            = apply { (this as ValueKeyBuilder<E, V>).setMinValueSupplier(supplier) }
+
+    override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.comparator(comparator: Comparator<in E>)
+            = apply { (this as ValueKeyBuilder<E, V>).setComparator(comparator) }
 
     override fun <N : Value<*>> type(token: TypeToken<N>): KeyBuilder<N> = apply { setType(token.uncheckedCast()) }.uncheckedCast()
 

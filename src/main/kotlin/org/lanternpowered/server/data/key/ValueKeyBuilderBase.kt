@@ -28,8 +28,6 @@ package org.lanternpowered.server.data.key
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.builder.BaseBuilder
-import org.lanternpowered.api.x.data.XBoundedKeyBuilder
-import org.lanternpowered.api.x.data.XKeyBuilder
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.data.value.CopyHelper
 import org.spongepowered.api.CatalogKey
@@ -40,8 +38,7 @@ import org.spongepowered.api.data.value.Value
 import java.util.Comparator
 import java.util.Optional
 
-open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key<V>, R>> : AbstractCatalogBuilder<Key<V>, R>(),
-        XKeyBuilder<V, E>, XBoundedKeyBuilder<V, E> {
+open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key<V>, R>> : AbstractCatalogBuilder<Key<V>, R>() {
 
     private var typeToken: TypeToken<V>? = null
 
@@ -57,15 +54,15 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
 
     override fun key(key: CatalogKey): B = apply { super.key(key) }.uncheckedCast()
 
-    override fun setMinValue(minValue: E) = setMinValueSupplier { CopyHelper.copy(minValue) }
-    override fun setMinValueSupplier(supplier: () -> E) { this.minimumValueSupplier = supplier }
+    protected fun setMinValue(minValue: E) = setMinValueSupplier { CopyHelper.copy(minValue) }
+    protected fun setMinValueSupplier(supplier: () -> E) { this.minimumValueSupplier = supplier }
 
-    override fun setMaxValue(maxValue: E) = setMaxValueSupplier { CopyHelper.copy(maxValue) }
-    override fun setMaxValueSupplier(supplier: () -> E) { this.maximumValueSupplier = supplier }
+    protected fun setMaxValue(maxValue: E) = setMaxValueSupplier { CopyHelper.copy(maxValue) }
+    protected fun setMaxValueSupplier(supplier: () -> E) { this.maximumValueSupplier = supplier }
 
-    override fun setComparator(comparator: Comparator<in E>) { this.comparator = comparator }
+    protected fun setComparator(comparator: Comparator<in E>) { this.comparator = comparator }
 
-    override fun setRequireExplicitRegistration() { this.requiresExplicitRegistration = true }
+    protected fun setRequireExplicitRegistration() { this.requiresExplicitRegistration = true }
 
     override fun build(key: CatalogKey): Key<V> {
         val valueType = checkNotNull(this.typeToken) { "The type must be set" }

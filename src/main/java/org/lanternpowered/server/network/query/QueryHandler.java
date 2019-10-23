@@ -56,7 +56,6 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.SimpleRemoteConnection;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -98,17 +97,17 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         this.queryServer.getGame().getLogger().error("Error in query handling", cause);
     }
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+    public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) {
         final ByteBuf buf = msg.content();
         if (buf.readableBytes() < 7) {
             return;
@@ -206,7 +205,7 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         }
 
         final List<String> playerNames = server.getOnlinePlayers()
-                .stream().map(CommandSource::getName).collect(Collectors.toList());
+                .stream().map(Player::getName).collect(Collectors.toList());
         final Cause cause = Cause.of(EventContext.empty(),
                 new SimpleRemoteConnection((InetSocketAddress) ctx.channel().remoteAddress(), null));
 

@@ -44,8 +44,6 @@ abstract class AbstractStateProperty<T : Comparable<T>, V>(
         override val keyValueTransformer: StateKeyValueTransformer<T, V>
 ) : DefaultCatalogType(key), IStateProperty<T, V> {
 
-    override var sortedPossibleValues: List<T> = ImmutableList.sortedCopyOf(this.possibleValues)
-
     private val predicate = Predicate<T> { this.possibleValues.contains(it) }
 
     override fun getPossibleValues() = this.possibleValues

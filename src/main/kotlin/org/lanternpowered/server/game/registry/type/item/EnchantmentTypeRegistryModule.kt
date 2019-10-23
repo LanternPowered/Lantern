@@ -27,6 +27,7 @@
 
 package org.lanternpowered.server.game.registry.type.item
 
+import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
@@ -40,7 +41,7 @@ import org.spongepowered.api.item.enchantment.EnchantmentTypes
 object EnchantmentTypeRegistryModule : InternalPluginCatalogRegistryModule<EnchantmentType>(EnchantmentTypes::class) {
 
     private inline fun register(id: String, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) {
-        register(LanternEnchantmentTypeBuilder().id(id).name(tr(name)).apply(fn).build())
+        register(LanternEnchantmentTypeBuilder().key(CatalogKeys.activePlugin(id)).name(tr(name)).apply(fn).build())
     }
 
     override fun registerDefaults() {

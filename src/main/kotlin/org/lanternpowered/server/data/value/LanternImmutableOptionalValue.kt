@@ -37,6 +37,8 @@ class LanternImmutableOptionalValue<E : Any>(
         key: Key<out OptionalValue<E>>, value: Optional<E>
 ) : LanternValue<Optional<E>>(key, value), OptionalValue.Immutable<E> {
 
+    override fun isPresent(): Boolean = this.value.isPresent
+
     override fun getKey() = super.getKey().uncheckedCast<Key<out OptionalValue<E>>>()
 
     override fun get(): Optional<E> = CopyHelper.copy(super.get())

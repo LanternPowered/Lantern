@@ -161,7 +161,7 @@ public class WeatherBuilder implements CopyableBuilder<LanternWeather, WeatherBu
         checkNotNull(pluginId, "pluginId");
         checkNotNull(name, "name");
         checkNotNull(id, "id");
-        return new LanternWeather(CatalogKeys.of(pluginId, id, name), this.action, this.aliases,
+        return new LanternWeather(CatalogKeys.of(pluginId, id), this.action, this.aliases,
                 new UnmodifiableOptionValueMap(this.options), this.weight, this.duration);
     }
 }

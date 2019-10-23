@@ -97,8 +97,11 @@ inline fun <T> immutableListOf(): ImmutableList<T> = ImmutableList.of()
 inline fun <T> immutableListOf(vararg args: T) = args.asList().toImmutableList()
 inline fun <T> immutableSetOf(vararg args: T) = args.asList().toImmutableSet()
 
-inline fun <T> immutableListBuilderOf() = ImmutableList.builder<T>()
-inline fun <T> immutableSetBuilderOf() = ImmutableSet.builder<T>()
+inline fun <T> immutableListBuilderOf(): ImmutableList.Builder<T> = ImmutableList.builder<T>()
+inline fun <T> immutableSetBuilderOf(): ImmutableSet.Builder<T> = ImmutableSet.builder<T>()
+
+inline fun <K, V> immutableMapOf(): ImmutableMap<K, V> = ImmutableMap.of()
+inline fun <K, V> immutableMapBuilderOf(): ImmutableMap.Builder<K, V> = ImmutableMap.builder()
 
 inline fun <reified K : Enum<K>, V> enumMapOf(): MutableMap<K, V> = EnumMap(K::class.java)
 

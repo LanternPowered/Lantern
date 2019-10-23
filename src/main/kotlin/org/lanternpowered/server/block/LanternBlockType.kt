@@ -23,25 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.fluid
+package org.lanternpowered.server.block
 
-import org.lanternpowered.server.state.AbstractState
-import org.lanternpowered.server.state.StateBuilder
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.data.property.LocalPropertyHolder
+import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.server.state.AbstractStateContainer
+import org.spongepowered.api.block.BlockSoundGroup
 import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.fluid.FluidState
-import org.spongepowered.api.fluid.FluidType
+import org.spongepowered.api.block.BlockType
+import org.spongepowered.api.data.property.Property
+import org.spongepowered.api.item.ItemType
+import org.spongepowered.api.state.StateProperty
+import org.spongepowered.api.text.translation.Translation
+import java.util.Optional
 
-class LanternFluidState(
-        builder: StateBuilder<FluidState>
-) : AbstractState<FluidState, FluidType>(builder), FluidState {
+class LanternBlockType(
+        private val key: CatalogKey,
+        stateProperties: Iterable<StateProperty<*>>,
+        override val propertyRegistry: LocalPropertyRegistry<out LocalPropertyHolder>
+) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalPropertyHolder {
 
-    override fun getType() = this.stateContainer
+    override fun getKey(): CatalogKey = this.key
 
-    override fun isEmpty(): Boolean {
+    override fun getTranslation(): Translation {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun getBlock(): BlockState {
+    override fun getItem(): Optional<ItemType> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun setUpdateRandomly(updateRandomly: Boolean) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun getSoundGroup(): BlockSoundGroup {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun doesUpdateRandomly(): Boolean {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

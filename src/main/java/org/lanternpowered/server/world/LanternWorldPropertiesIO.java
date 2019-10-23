@@ -236,7 +236,7 @@ final class LanternWorldPropertiesIO {
         final DataView lanternDataView = spongeDataView == null ? null : spongeDataView.getView(LANTERN).orElse(null);
 
         properties.setLastPlayedTime(dataView.getLong(LAST_PLAYED).get());
-        properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
+        properties.generateStructures = dataView.getInt(MAP_FEATURES).get() > 0;
         properties.setInitialized(dataView.getInt(INITIALIZED).get() > 0);
         dataView.getInt(DIFFICULTY_LOCKED).ifPresent(v -> properties.setDifficultyLocked(v > 0));
 
@@ -510,7 +510,7 @@ final class LanternWorldPropertiesIO {
         dataView.set(DIFFICULTY, ((LanternDifficulty) properties.getDifficulty()).getInternalId());
         dataView.set(DIFFICULTY_LOCKED, (byte) (properties.isDifficultyLocked() ? 1 : 0));
         dataView.set(GAME_MODE, ((LanternGameMode) properties.getGameMode()).getInternalId());
-        dataView.set(MAP_FEATURES, (byte) (properties.mapFeatures ? 1 : 0));
+        dataView.set(MAP_FEATURES, (byte) (properties.generateStructures ? 1 : 0));
         final LanternWorldBorder border = properties.getWorldBorder();
         dataView.set(BORDER_CENTER_X, border.centerX);
         dataView.set(BORDER_CENTER_Z, border.centerZ);

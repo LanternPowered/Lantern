@@ -26,29 +26,159 @@
 package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableList
+import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import com.google.common.collect.ImmutableTable
+import com.google.common.collect.Lists
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ext.immutableMapBuilderOf
+import org.lanternpowered.api.ext.immutableSetBuilderOf
+import org.lanternpowered.api.ext.toImmutableList
 import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataQuery
+import org.spongepowered.api.data.persistence.DataView
+import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 import org.spongepowered.api.state.StateProperty
+import java.util.LinkedHashMap
+import java.util.Optional
 
-abstract class AbstractStateContainer<S : State<S>>(containerData: StateContainerData<S>) : StateContainer<S> {
+abstract class AbstractStateContainer<S : State<S>>(
+        baseKey: CatalogKey, stateProperties: Iterable<StateProperty<*>>, constructor: (StateBuilder<S>) -> S
+) : StateContainer<S> {
 
-    val keys: ImmutableSet<Key<*>>
+    // The lookup to convert between key <--> state property
+    val keysToProperty: ImmutableMap<Key<out Value<*>>, StateProperty<*>>
+    private val validStates: ImmutableList<S>
 
     init {
-        keys = ImmutableSet.of()
+        val properties = stateProperties.toMutableList()
+        properties.sortBy { property -> property.getName() }
+
+        val keysToPropertyBuilder = ImmutableMap.builder<Key<out Value<*>>, StateProperty<*>>()
+        for (property in properties) {
+            keysToPropertyBuilder.put((property as IStateProperty<*,*>).valueKey, property)
+        }
+        this.keysToProperty = keysToPropertyBuilder.build()
+
+        val cartesianProductInput = properties.map { property ->
+            property.getPossibleValues().map { comparable ->
+                @Suppress("UNCHECKED_CAST")
+                val valueKey = (property as IStateProperty<*,*>).valueKey as Key<Value<Any>>
+                val value = Value.immutableOf(valueKey, comparable as Any).asImmutable()
+                Triple(property, comparable, value)
+            }
+        }
+        val cartesianProduct = Lists.cartesianProduct(cartesianProductInput)
+        val stateBuilders = mutableListOf<LanternStateBuilder<S>>()
+
+        // A map with as the key the property values map and as value the state
+        val stateByValuesMap = LinkedHashMap<Map<*, *>, S>()
+
+        for ((internalId, list) in cartesianProduct.withIndex()) {
+            val stateValuesBuilder = immutableMapBuilderOf<StateProperty<*>, Comparable<*>>()
+            val immutableValuesBuilder = immutableSetBuilderOf<Value.Immutable<*>>()
+
+            for ((property, comparable, value) in list) {
+                stateValuesBuilder.put(property, comparable)
+                immutableValuesBuilder.add(value)
+            }
+
+            val stateValues = stateValuesBuilder.build()
+            val immutableValues = immutableValuesBuilder.build()
+            val key = buildKey(baseKey, stateValues)
+            val dataContainer = buildDataContainer(baseKey, stateValues)
+
+            @Suppress("LeakingThis")
+            stateBuilders += LanternStateBuilder(key, dataContainer, this, stateValues, immutableValues, internalId)
+        }
+
+        // There are no properties, so just add
+        // the single state of this container
+        if (properties.isEmpty()) {
+            val dataContainer = buildDataContainer(baseKey, ImmutableMap.of())
+
+            @Suppress("LeakingThis")
+            stateBuilders += LanternStateBuilder(baseKey, dataContainer, this, ImmutableMap.of(), ImmutableSet.of(), 0)
+        }
+
+        this.validStates = stateBuilders.map {
+            val state = constructor(it)
+            stateByValuesMap[it.stateValues] = state
+            state
+        }.toImmutableList()
+
+        for (state in this.validStates) {
+            val tableBuilder = ImmutableTable.builder<StateProperty<*>, Comparable<*>, S>()
+            for (property in properties) {
+                @Suppress("UNCHECKED_CAST")
+                property as StateProperty<Comparable<Comparable<*>>>
+                for (value in property.possibleValues) {
+                    if (value == state.getStateProperty(property).get())
+                        continue
+                    val valueByProperty = HashMap<StateProperty<*>, Any>(state.statePropertyMap)
+                    valueByProperty[property] = value
+                    tableBuilder.put(property, value, checkNotNull(stateByValuesMap[valueByProperty]))
+                }
+            }
+            @Suppress("UNCHECKED_CAST")
+            (state as AbstractState<S,*>).propertyValueTable = tableBuilder.build()
+        }
+
+        // Call the completion
+        for (stateBuilder in stateBuilders) {
+            stateBuilder.whenCompleted.forEach { it() }
+        }
     }
 
-    override fun getValidStates(): ImmutableList<S> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    companion object {
+
+        private val NAME = DataQuery.of("Name")
+        private val PROPERTIES = DataQuery.of("Properties")
     }
 
-    override fun getDefaultState(): S {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun buildDataContainer(baseKey: CatalogKey, values: Map<StateProperty<*>, Comparable<*>>): DataContainer {
+        val dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
+        dataContainer[NAME] = baseKey.toString()
+
+        if (values.isEmpty())
+            return dataContainer
+
+        val propertiesView = dataContainer.createView(PROPERTIES)
+        for ((property, comparable) in values) {
+            propertiesView[DataQuery.of(property.getName())] = comparable
+        }
+
+        return dataContainer
     }
 
-    override fun getStateProperties(): Collection<StateProperty<*>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    private fun buildKey(baseKey: CatalogKey, values: Map<StateProperty<*>, Comparable<*>>): CatalogKey {
+        if (values.isEmpty())
+            return baseKey
+
+        val builder = StringBuilder()
+        builder.append(baseKey.value).append('[')
+
+        val propertyValues = mutableListOf<String>()
+        for ((property, comparable) in values) {
+            val value = if (comparable is Enum) comparable.name else comparable.toString()
+            propertyValues.add(property.getName() + '=' + value.toLowerCase())
+        }
+
+        builder.append(propertyValues.joinToString(separator = ","))
+        builder.append(']')
+
+        return CatalogKey(baseKey.namespace, builder.toString())
     }
+
+    override fun getValidStates(): ImmutableList<S> = this.validStates
+
+    override fun getDefaultState(): S = this.validStates[0]
+
+    override fun getStateProperties(): Collection<StateProperty<*>> = this.keysToProperty.values
+
+    override fun getStatePropertyByName(statePropertyId: String): Optional<StateProperty<*>>
+            = this.defaultState.getStatePropertyByName(statePropertyId)
 }

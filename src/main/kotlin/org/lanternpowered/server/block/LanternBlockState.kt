@@ -27,23 +27,24 @@ package org.lanternpowered.server.block
 
 import org.lanternpowered.server.data.property.DirectionRelativePropertyHolderBase
 import org.lanternpowered.server.state.AbstractState
-import org.lanternpowered.server.state.StateData
+import org.lanternpowered.server.state.StateBuilder
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.world.Location
 
-class LanternBlockState(data: StateData<BlockState>) : AbstractState<BlockState, BlockType>(data), BlockState, DirectionRelativePropertyHolderBase {
-
-    override fun snapshotFor(location: Location): BlockSnapshot {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+class LanternBlockState(
+        builder: StateBuilder<BlockState>
+) : AbstractState<BlockState, BlockType>(builder), BlockState, DirectionRelativePropertyHolderBase {
 
     override fun getType() = this.stateContainer
 
-    override fun getFluidState(): FluidState {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun snapshotFor(location: Location): BlockSnapshot {
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
+    override fun getFluidState(): FluidState {
+        TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+    }
 }

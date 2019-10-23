@@ -28,8 +28,8 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -40,8 +40,6 @@ import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.GameRegistry;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -54,7 +52,6 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gamerule.GameRule;
 import org.spongepowered.api.world.gamerule.GameRules;
 import org.spongepowered.api.world.gen.GeneratorType;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.teleport.PortalAgentType;
 import org.spongepowered.api.world.teleport.PortalAgentTypes;
@@ -69,8 +66,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class LanternWorldProperties implements WorldProperties {
 
@@ -97,9 +92,6 @@ public final class LanternWorldProperties implements WorldProperties {
     // The portal agent type
     private LanternPortalAgentType portalAgentType = (LanternPortalAgentType) PortalAgentTypes.DEFAULT;
 
-    // The world generator modifiers
-    ImmutableSet<WorldGeneratorModifier> generatorModifiers = ImmutableSet.of();
-
     private final GameRuleContainer gameRules = new GameRuleContainer()
             .addGameRuleListener(GameRules.REDUCED_DEBUG_INFO, value -> {
                 getWorld().ifPresent(world -> world.broadcast(() -> new MessagePlayOutSetReducedDebug(value)));
@@ -118,7 +110,7 @@ public final class LanternWorldProperties implements WorldProperties {
     private boolean initialized;
     private boolean generateBonusChest;
     private boolean commandsAllowed;
-    boolean mapFeatures;
+    boolean generateStructures;
 
     private final TimeData timeData = new TimeData();
     private final WeatherData weatherData = new WeatherData();
@@ -138,9 +130,13 @@ public final class LanternWorldProperties implements WorldProperties {
         this.name = name;
     }
 
+    @Override
+    public String getDirectoryName() {
+        return this.worldConfig.getPath().getParent().getFileName().toString();
+    }
+
     public void loadConfig() throws IOException {
         this.worldConfig.load();
-        updateWorldGenModifiers(this.worldConfig.getGeneration().getGenerationModifiers());
     }
 
     public void update(LanternWorldArchetype worldArchetype) throws IOException {
@@ -149,37 +145,19 @@ public final class LanternWorldProperties implements WorldProperties {
         this.portalAgentType = worldArchetype.getPortalAgentType();
         setGeneratorType(worldArchetype.getGeneratorType());
         this.worldConfig.getGeneration().setGeneratorSettings(worldArchetype.getGeneratorSettings());
-        this.generateBonusChest = worldArchetype.doesGenerateBonusChest();
-        this.mapFeatures = worldArchetype.usesMapFeatures();
+        this.generateStructures = worldArchetype.areStructuresEnabled();
         setSeed(worldArchetype.getSeed());
         this.worldConfig.setGameMode(worldArchetype.getGameMode());
         this.worldConfig.setAllowPlayerRespawns(worldArchetype.allowPlayerRespawns());
         this.worldConfig.setDifficulty(worldArchetype.getDifficulty());
         this.worldConfig.setKeepSpawnLoaded(worldArchetype.doesKeepSpawnLoaded());
         this.worldConfig.setDoesWaterEvaporate(worldArchetype.waterEvaporates());
-        setGeneratorModifiers(worldArchetype.getGeneratorModifiers());
         setEnabled(worldArchetype.isEnabled());
         this.worldConfig.setPVPEnabled(worldArchetype.isPVPEnabled());
         setBuildHeight(worldArchetype.getBuildHeight());
         this.worldConfig.setHardcore(worldArchetype.isHardcore());
         this.worldConfig.setLowHorizon(worldArchetype.getGeneratorType() instanceof AbstractFlatGeneratorType);
         this.worldConfig.save();
-    }
-
-    public void updateWorldGenModifiers(List<String> modifiers) {
-        final ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
-        final GameRegistry registry = Sponge.getRegistry();
-        for (String modifier : modifiers) {
-            Optional<WorldGeneratorModifier> genModifier = registry.getType(
-                    WorldGeneratorModifier.class, CatalogKey.resolve(modifier));
-            if (genModifier.isPresent()) {
-                genModifiers.add(genModifier.get());
-            } else {
-                Lantern.getLogger().error("World generator modifier with id " + modifier +
-                        " not found. Missing plugin?");
-            }
-        }
-        this.generatorModifiers = genModifiers.build();
     }
 
     /**
@@ -267,7 +245,7 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public boolean loadOnStartup() {
+    public boolean doesLoadOnStartup() {
         return this.worldConfig.loadOnStartup();
     }
 
@@ -460,13 +438,8 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public boolean usesMapFeatures() {
-        return this.mapFeatures;
-    }
-
-    @Override
-    public void setMapFeaturesEnabled(boolean state) {
-        this.mapFeatures = state;
+    public void setStructuresEnabled(boolean state) {
+        this.generateStructures = state;
     }
 
     @Override
@@ -518,15 +491,6 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public boolean doesGenerateBonusChest() {
-        return this.generateBonusChest;
-    }
-
-    public void setGenerateBonusChest(boolean generateBonusChest) {
-        this.generateBonusChest = generateBonusChest;
-    }
-
-    @Override
     public <V> void setGameRule(GameRule<V> gameRule, V value) {
         this.gameRules.setGameRule(gameRule, value);
     }
@@ -563,22 +527,6 @@ public final class LanternWorldProperties implements WorldProperties {
      */
     public void setAdditionalProperties(DataContainer additionalProperties) {
         this.additionalProperties = checkNotNull(additionalProperties, "additionalProperties");
-    }
-
-    @Override
-    public Collection<WorldGeneratorModifier> getGeneratorModifiers() {
-        return this.generatorModifiers;
-    }
-
-    @Override
-    public void setGeneratorModifiers(Collection<WorldGeneratorModifier> modifiers) {
-        this.generatorModifiers = ImmutableSet.copyOf(this.generatorModifiers);
-        final List<String> genModifiers = this.worldConfig.getGeneration().getGenerationModifiers();
-        genModifiers.clear();
-        genModifiers.addAll(modifiers.stream()
-                .map(CatalogType::getKey)
-                .map(CatalogKey::toString)
-                .collect(Collectors.toList()));
     }
 
     @Override

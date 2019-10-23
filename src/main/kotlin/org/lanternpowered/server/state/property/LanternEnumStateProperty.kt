@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.state.property
 
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
@@ -37,6 +38,8 @@ import java.util.Optional
 internal class LanternEnumStateProperty<E : Enum<E>>(
         key: CatalogKey, valueClass: Class<E>, possibleValues: ImmutableSet<E>, valueKey: Key<out Value<E>>
 ) : AbstractStateProperty<E, E>(key, valueClass, possibleValues, valueKey, identityStateKeyValueTransformer()), EnumStateProperty<E> {
+
+    override var sortedPossibleValues: List<E> = ImmutableList.sortedCopyOf(this.possibleValues)
 
     override fun parseValue(value: String): Optional<E> {
         for (enumValue in valueClass.enumConstants) {

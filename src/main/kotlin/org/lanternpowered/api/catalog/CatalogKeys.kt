@@ -29,7 +29,6 @@ import org.lanternpowered.api.Sponge
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.plugin.PluginContainer
-import org.lanternpowered.api.x.catalog.XCatalogKey
 
 object CatalogKeys {
 
@@ -55,7 +54,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun activePlugin(value: String): XCatalogKey {
+    fun activePlugin(value: String): CatalogKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
         return CatalogKey(plugin.id, value)
@@ -69,10 +68,10 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun activePlugin(value: String, name: String): XCatalogKey {
+    fun activePlugin(value: String, name: String): CatalogKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return CatalogKey(plugin.id, value, name)
+        return CatalogKey(plugin.id, value)
     }
 
     /**
@@ -83,18 +82,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun of(namespace: String, value: String): XCatalogKey = CatalogKey(namespace, value)
-
-    /**
-     * Creates a named catalog key.
-     *
-     * @param namespace The namespace
-     * @param value The value
-     * @param name The name
-     * @return A new catalog key
-     */
-    @JvmStatic
-    fun of(namespace: String, value: String, name: String): XCatalogKey = CatalogKey(namespace, value, name)
+    fun of(namespace: String, value: String): CatalogKey = CatalogKey(namespace, value)
 
     /**
      * Creates a catalog key with the namespace of lantern.
@@ -103,17 +91,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun lantern(value: String): XCatalogKey = CatalogKey(LANTERN_NAMESPACE, value)
-
-    /**
-     * Creates a named catalog key with the namespace of lantern.
-     *
-     * @param value The value
-     * @param name The name
-     * @return A new catalog key
-     */
-    @JvmStatic
-    fun lantern(value: String, name: String): XCatalogKey = CatalogKey(LANTERN_NAMESPACE, value, name)
+    fun lantern(value: String): CatalogKey = CatalogKey(LANTERN_NAMESPACE, value)
 
     /**
      * Creates a catalog key with the namespace of sponge.
@@ -122,17 +100,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun sponge(value: String): XCatalogKey = CatalogKey(SPONGE_NAMESPACE, value)
-
-    /**
-     * Creates a named catalog key with the namespace of sponge.
-     *
-     * @param value The value
-     * @param name The name
-     * @return A new catalog key
-     */
-    @JvmStatic
-    fun sponge(value: String, name: String = value): XCatalogKey = CatalogKey(SPONGE_NAMESPACE, value, name)
+    fun sponge(value: String): CatalogKey = CatalogKey(SPONGE_NAMESPACE, value)
 
     /**
      * Creates a named catalog key with the namespace of minecraft.
@@ -141,23 +109,13 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun minecraft(value: String): XCatalogKey = CatalogKey(MINECRAFT_NAMESPACE, value)
-
-    /**
-     * Creates a catalog key with the namespace of minecraft.
-     *
-     * @param value The value
-     * @param name The name
-     * @return A new catalog key
-     */
-    @JvmStatic
-    fun minecraft(value: String, name: String = value): XCatalogKey = CatalogKey(MINECRAFT_NAMESPACE, value, name)
+    fun minecraft(value: String): CatalogKey = CatalogKey(MINECRAFT_NAMESPACE, value)
 
     /**
      * Resolves a catalog key from the given value.
      */
     @JvmStatic
     fun resolve(value: String): CatalogKey {
-        return Sponge.getRegistry().resolveKey(value) as XCatalogKey
+        return Sponge.getRegistry().resolveKey(value) as CatalogKey
     }
 }

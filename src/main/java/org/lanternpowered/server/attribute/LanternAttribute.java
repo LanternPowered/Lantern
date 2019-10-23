@@ -44,7 +44,7 @@ public class LanternAttribute extends DefaultCatalogType {
     private final double def;
 
     LanternAttribute(String id, Text name, double max, double min, double def, Predicate<DataHolder> targets) {
-        super(CatalogKeys.activePlugin(id, name.toPlain()));
+        super(CatalogKeys.activePlugin(id));
 
         this.name = checkNotNull(name, "name");
         this.targets = checkNotNull(targets, "targets");

@@ -43,7 +43,7 @@ class LanternGameRuleBuilder<V : Any> : AbstractNamedCatalogBuilder<GameRule<V>,
 
     override fun defaultValue(defaultValue: V) = apply {
         check(this.valueType != null) { "The value type must be set before the default value" }
-        this.defaultValue = checkNotNull(defaultValue) { "defaultValue" }
+        this.defaultValue = defaultValue
     }
 
     override fun build(key: CatalogKey, name: Translation): GameRule<V> {

@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.state.property
 
+import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.emptyOptional
 import org.lanternpowered.server.state.StateKeyValueTransformer
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.Key
@@ -39,6 +40,8 @@ internal class LanternBooleanStateProperty<T>(
         key: CatalogKey, valueKey: Key<out Value<T>>, keyValueTransformer: StateKeyValueTransformer<Boolean, T>
 ) : AbstractStateProperty<Boolean, T>(key, Boolean::class.java, this.states, valueKey, keyValueTransformer), BooleanStateProperty {
 
+    override val sortedPossibleValues: List<Boolean> get() = sortedStates
+
     override fun parseValue(value: String): Optional<Boolean> {
         return when (value.toLowerCase()) {
             "true" -> OptBool.TRUE
@@ -49,5 +52,6 @@ internal class LanternBooleanStateProperty<T>(
 
     companion object {
         private val states = ImmutableSet.of(true, false)
+        private val sortedStates = ImmutableList.of(false, true)
     }
 }

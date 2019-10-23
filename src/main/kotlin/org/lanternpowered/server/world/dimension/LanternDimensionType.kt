@@ -68,7 +68,6 @@ class LanternDimensionType<T : LanternDimension>(
     }
 
     override fun hasSkylight() = this.hasSkylight
-    override fun getDirectoryName() = "DIM" + this.internalId
 
     override fun getDimensionClass() = this.dimensionClass
     override fun toStringHelper() = super.toStringHelper()

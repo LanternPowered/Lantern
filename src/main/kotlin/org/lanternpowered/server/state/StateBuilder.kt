@@ -29,10 +29,13 @@ import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 
 /**
- * Represents the data of a [State].
+ * Represents the builder of a [State].
  */
-interface StateData<S : State<S>> {
+interface StateBuilder<S : State<S>> {
 
-    val stateContainer: StateContainer<S>
-
+    /**
+     * Is called when all the states of the
+     * [StateContainer] are initialized.
+     */
+    fun whenCompleted(fn: () -> Unit)
 }

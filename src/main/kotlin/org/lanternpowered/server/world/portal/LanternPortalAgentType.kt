@@ -44,7 +44,7 @@ class LanternPortalAgentType<T : PortalAgent>(
      * @return The portal agent instance
      */
     fun newPortalAgent(world: LanternWorld): T {
-        return this.supplier.invoke(world, this)
+        return this.supplier(world, this)
     }
 
     override fun getPortalAgentClass() = this.portalAgentClass

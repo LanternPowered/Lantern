@@ -51,6 +51,7 @@ import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.Queries;
 import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.state.StateProperty;
 import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -341,7 +342,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
      * Cycles to the next possible value of the block trait and returns
      * the new block state. Will return absent if the block trait or
      * the value isn't supported.
-     * 
+     *
      * @param blockTrait the block trait
      * @return the block state if successful
      */
@@ -411,7 +412,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
 
     /**
      * Gets whether this block state the specified trait supports.
-     * 
+     *
      * @param blockTrait the block trait
      * @return whether the block trait is supported
      */
@@ -421,7 +422,7 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
 
     /**
      * Gets whether this block state the specified trait supports.
-     * 
+     *
      * @param blockTrait the block trait
      * @param value the value
      * @return whether the block trait and value are supported
@@ -497,17 +498,17 @@ public final class LanternBlockState extends AbstractCatalogType implements Cata
      */
     public static BlockState deserialize(DataView dataView) {
         final String id = dataView.getString(NAME).get();
-        final BlockType blockType = BlockRegistryModule.get().getById(id).get();
+        final BlockType blockType = BlockRegistryModule.get().get(CatalogKey.resolve(id)).get();
 
         BlockState blockState = blockType.getDefaultState();
         final DataView properties = dataView.getView(PROPERTIES).orElse(null);
         if (properties != null) {
             for (Map.Entry<DataQuery, Object> entry : properties.getValues(false).entrySet()) {
-                final BlockTrait trait = blockState.getTrait(entry.getKey().toString()).orElse(null);
-                if (trait != null) {
-                    final Object value = trait.parseValue(entry.getValue().toString()).orElse(null);
+                final StateProperty stateProperty = blockState.getStatePropertyByName(entry.getKey().toString()).orElse(null);
+                if (stateProperty != null) {
+                    final Comparable value = (Comparable) stateProperty.parseValue(entry.getValue().toString()).orElse(null);
                     if (value != null) {
-                        final BlockState newState = blockState.withTrait(trait, value).orElse(null);
+                        final BlockState newState = (BlockState) blockState.withStateProperty(stateProperty, value).orElse(null);
                         if (newState != null) {
                             blockState = newState;
                         }

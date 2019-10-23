@@ -74,7 +74,6 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -90,6 +89,7 @@ import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.translation.locale.Locales;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.World;
@@ -991,7 +991,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         final Cause cause = Cause.builder().append(this).build(EventContext.builder().add(EventContextKeys.PLAYER, this.player).build());
         final Transform fromTransform = this.player.getTransform();
         final ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
-                fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);
+                fromTransform, fromTransform, world, world, this, messageFormatter, this.gameProfile, this.player, false);
 
         if (kickReason != null) {
             loginEvent.setCancelled(true);
@@ -1014,7 +1014,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         final Transform toTransform = loginEvent.getToTransform();
-        world = (LanternWorld) toTransform.getWorld();
+        world = (LanternWorld) loginEvent.getToWorld();
         final WorldConfig config = world.getProperties().getConfig();
 
         // Update the game mode if necessary

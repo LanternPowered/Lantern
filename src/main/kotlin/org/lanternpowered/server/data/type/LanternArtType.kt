@@ -32,10 +32,11 @@ import org.spongepowered.api.data.type.ArtType
 
 class LanternArtType(
         key: CatalogKey,
+        name: String,
         override val internalId: Int,
         private val width: Int,
         private val height: Int
-): DefaultCatalogType(key), ArtType, InternalCatalogType {
+): DefaultCatalogType.Named(key, name), ArtType, InternalCatalogType {
 
     override fun getHeight(): Int = this.height
     override fun getWidth(): Int = this.width

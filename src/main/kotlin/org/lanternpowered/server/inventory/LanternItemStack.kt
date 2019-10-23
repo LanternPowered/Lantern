@@ -115,7 +115,7 @@ class LanternItemStack private constructor(
     fun toSnapshot(): ItemStackSnapshot = createSnapshot()
 
     fun toWrappedSnapshot(): ItemStackSnapshot {
-        return if (isEmpty && empty != null) {
+        return if (isEmpty) {
             ItemStackSnapshot.empty()
         } else LanternItemStackSnapshot(this)
     }

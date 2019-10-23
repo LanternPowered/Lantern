@@ -36,7 +36,7 @@ class ArtTypeRegistryModule : DefaultCatalogRegistryModule<ArtType>(ArtTypes::cl
     override fun registerDefaults() {
         var internalId = 0
         fun register(id: String, name: String, width: Int, height: Int) =
-                register(LanternArtType(CatalogKeys.minecraft(id, name), internalId++, width, height))
+                register(LanternArtType(CatalogKeys.minecraft(id), name, internalId++, width, height))
 
         register("alban", "Alban", 1, 1)
         register("aztec", "Aztec", 1, 1)

@@ -41,8 +41,8 @@ import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
 import org.spongepowered.api.advancement.criteria.trigger.Trigger;
-import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.persistence.DataBuilder;
+import org.spongepowered.api.data.persistence.DataSerializable;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.event.advancement.CriterionEvent;
 
@@ -191,6 +191,11 @@ public class LanternTriggerBuilder<C extends FilteredTriggerConfiguration> imple
         checkNotNull(name, "name");
         this.name = name;
         return this;
+    }
+
+    @Override
+    public Trigger.Builder<C> from(Trigger<C> value) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

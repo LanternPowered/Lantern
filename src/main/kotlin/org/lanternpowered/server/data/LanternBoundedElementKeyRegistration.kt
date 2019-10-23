@@ -41,7 +41,15 @@ internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any
     private var minimum: (H.() -> E?)? = null
     private var maximum: (H.() -> E?)? = null
 
-    override fun minimum(minimum: E) = minimum { CopyHelper.copy(minimum) }
+    override fun minimum(minimum: E) = apply {
+        // If a copy will exactly be the same, eliminate
+        // the redundant copy call
+        if (CopyHelper.copy(minimum) === minimum) {
+            minimum { minimum }
+        } else {
+            minimum { CopyHelper.copy(minimum) }
+        }
+    }
 
     override fun minimum(minimum: H.() -> E) = apply {
         this.minimum = minimum
@@ -51,7 +59,15 @@ internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any
         this.minimum = { get(minimum).orNull() }
     }
 
-    override fun maximum(maximum: E) = maximum { CopyHelper.copy(maximum) }
+    override fun maximum(maximum: E)  = apply {
+        // If a copy will exactly be the same, eliminate
+        // the redundant copy call
+        if (CopyHelper.copy(maximum) === maximum) {
+            maximum { maximum }
+        } else {
+            maximum { CopyHelper.copy(maximum) }
+        }
+    }
 
     override fun maximum(maximum: H.() -> E) = apply {
         this.maximum = maximum

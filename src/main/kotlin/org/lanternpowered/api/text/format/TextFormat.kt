@@ -28,7 +28,7 @@
 
 package org.lanternpowered.api.text.format
 
-import org.lanternpowered.api.Lantern
+import org.lanternpowered.server.text.format.LanternTextStyle
 
 typealias TextColor = org.spongepowered.api.text.format.TextColor
 typealias TextColors = org.spongepowered.api.text.format.TextColors
@@ -49,7 +49,7 @@ inline fun TextStyle(
         underline: Boolean? = null,
         strikethrough: Boolean? = null,
         obfuscated: Boolean? = null
-): TextStyle = Lantern.registry.textFactory.style(bold, italic, underline, strikethrough, obfuscated)
+): TextStyle = LanternTextStyle(bold, italic, underline, strikethrough, obfuscated)
 
 /**
  * Constructs a new [TextFormat].

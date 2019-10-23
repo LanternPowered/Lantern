@@ -29,7 +29,7 @@ import org.lanternpowered.server.data.type.LanternTreeType
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.spongepowered.api.CatalogKey
 
-object TreeTypeRegistryModule : DefaultCatalogRegistryModule<TreeType>(TreeTypes::class) {
+object TreeTypeRegistryModule : DefaultCatalogRegistryModule<LanternTreeType>() {
 
     override fun registerDefaults() {
         fun register(id: String) = register(LanternTreeType(CatalogKey.minecraft(id), "tree.$id"))

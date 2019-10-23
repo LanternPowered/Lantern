@@ -73,7 +73,6 @@ public final class FinalFieldClassTransformer implements ClassTransformer {
         return classWriter.toByteArray();
     }
 
-    @SuppressWarnings("unchecked")
     static final class FinalFieldClassVisitor extends ClassVisitor {
 
         FinalFieldClassVisitor(ClassVisitor classVisitor) {

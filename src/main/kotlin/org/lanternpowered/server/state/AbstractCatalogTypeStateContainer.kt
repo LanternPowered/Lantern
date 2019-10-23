@@ -23,26 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:JvmName("CatalogKeys")
-package org.lanternpowered.api.ext
+package org.lanternpowered.server.state
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeyBuilder
-import org.lanternpowered.api.x.catalog.XCatalogKey
-import org.lanternpowered.api.x.catalog.XCatalogKeyBuilder
+import org.lanternpowered.api.catalog.CatalogType
+import org.spongepowered.api.state.State
+import org.spongepowered.api.state.StateProperty
 
-/**
- * Represents a readable version of catalog key value.
- */
-val CatalogKey.name: String get() = (this as XCatalogKey).name
+abstract class AbstractCatalogTypeStateContainer<S : State<S>>(
+        private val key: CatalogKey, stateProperties: Iterable<StateProperty<*>>, constructor: (StateBuilder<S>) -> S
+) : AbstractStateContainer<S>(key, stateProperties, constructor), CatalogType {
 
-/**
- * Constructs a new [CatalogKey] with the same namespace
- * and value as this one but with the given name.
- */
-fun CatalogKey.withName(name: String) = (this as XCatalogKey).withName(name)
-
-/**
- * Sets the readable version of the catalog key value.
- */
-fun CatalogKeyBuilder.name(name: String): XCatalogKeyBuilder = (this as XCatalogKeyBuilder).name(name)
+    override fun getKey() = this.key
+}

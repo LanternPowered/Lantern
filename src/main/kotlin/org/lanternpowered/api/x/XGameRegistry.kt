@@ -32,7 +32,7 @@ import kotlin.reflect.KClass
 
 interface XGameRegistry : GameRegistry {
 
-    fun getTextFactory(): XTextFactory
+    val textFactory: XTextFactory
 
     override fun <T : BaseBuilder<*, in T>> createBuilder(builderClass: Class<T>): T
 

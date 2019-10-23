@@ -37,6 +37,8 @@ class LanternMutableOptionalValue<E : Any>(
         key: Key<out OptionalValue<E>>, value: Optional<E>
 ) : LanternValue<Optional<E>>(key, value), OptionalValue.Mutable<E> {
 
+    override fun isPresent(): Boolean = this.value.isPresent
+
     override fun getKey() = super.getKey().uncheckedCast<Key<out OptionalValue<E>>>()
 
     override fun orElse(defaultValue: E): Value.Mutable<E> {

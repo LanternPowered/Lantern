@@ -30,14 +30,12 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.text.translation.FixedTranslation
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
-import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.world.DimensionType
 import org.spongepowered.api.world.DimensionTypes
 import org.spongepowered.api.world.SerializationBehavior
@@ -57,7 +55,6 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     private lateinit var gameMode: GameMode
     private lateinit var difficulty: Difficulty
     private lateinit var portalAgentType: LanternPortalAgentType<*>
-    private lateinit var generatorModifiers: Collection<WorldGeneratorModifier>
     private lateinit var serializationBehavior: SerializationBehavior
     private lateinit var dimensionType: LanternDimensionType<*>
 
@@ -72,8 +69,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     private var hardcore = false
     private var enabled = false
     private var loadsOnStartup = false
-    private var usesMapFeatures = false
-    private var generateBonusChest = false
+    private var generateStructures = true
     private var commandsAllowed = false // No builder method available
     private var pvpEnabled = false
     private var generateSpawnOnLoad = false
@@ -90,12 +86,10 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.enabled = archetype.isEnabled
         this.gameMode = archetype.gameMode
         this.keepsSpawnLoaded = archetype.keepsSpawnLoaded
-        this.usesMapFeatures = archetype.usesMapFeatures()
-        this.generatorModifiers = archetype.generatorModifiers
         this.dimensionType = archetype.dimensionType
         this.generatorType = archetype.generatorType
         this.generatorSettings = archetype.generatorSettings
-        this.generateBonusChest = archetype.doesGenerateBonusChest()
+        this.generateStructures = archetype.areStructuresEnabled()
         this.commandsAllowed = archetype.areCommandsAllowed()
         this.waterEvaporates = archetype.waterEvaporates
         this.buildHeight = archetype.buildHeight
@@ -113,13 +107,11 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.enabled = properties.isEnabled
         this.gameMode = properties.gameMode
         this.keepsSpawnLoaded = properties.doesKeepSpawnLoaded()
-        this.usesMapFeatures = properties.usesMapFeatures()
         this.seed = properties.seed
-        this.generatorModifiers = properties.generatorModifiers
         this.dimensionType = properties.dimensionType
         this.generatorType = properties.generatorType
         this.generatorSettings = properties.generatorSettings.copy()
-        this.generateBonusChest = properties.doesGenerateBonusChest()
+        this.generateStructures = properties.areStructuresEnabled()
         this.waterEvaporates = properties.doesWaterEvaporate()
         this.buildHeight = properties.buildHeight
         this.pvpEnabled = properties.isPVPEnabled
@@ -137,24 +129,13 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     override fun generator(type: GeneratorType) = apply { this.generatorType = type }
     override fun dimension(type: DimensionType) = apply { this.dimensionType = type as LanternDimensionType<*> }
     override fun difficulty(difficulty: Difficulty) = apply { this.difficulty = difficulty }
-    override fun usesMapFeatures(enabled: Boolean) = apply { this.usesMapFeatures = enabled }
+    override fun generateStructures(state: Boolean) = apply { this.generateStructures = state }
     override fun hardcore(enabled: Boolean) = apply { this.hardcore = enabled }
     override fun generatorSettings(settings: DataContainer) = apply { this.generatorSettings = settings }
     override fun portalAgent(type: PortalAgentType) = apply { this.portalAgentType = type as LanternPortalAgentType<*> }
     override fun pvp(enabled: Boolean) = apply { this.pvpEnabled = enabled }
     override fun commandsAllowed(state: Boolean) = apply { this.commandsAllowed = state }
-    override fun generateBonusChest(state: Boolean) = apply { this.generateBonusChest = state }
     override fun serializationBehavior(behavior: SerializationBehavior) = apply { this.serializationBehavior = behavior }
-
-    override fun generatorModifiers(vararg modifiers: WorldGeneratorModifier) = apply {
-        val entries = hashSetOf<WorldGeneratorModifier>()
-        val registry = GeneratorModifierRegistryModule
-        for (modifier in modifiers) {
-            check(registry.get(modifier.key).isPresent) { "Modifier not registered: ${modifier.key} of type ${modifier.javaClass.name}" }
-            entries.add(modifier)
-        }
-        this.generatorModifiers = entries
-    }
 
     fun waterEvaporates(evaporates: Boolean) = apply { this.waterEvaporates = evaporates }
 
@@ -163,15 +144,8 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.buildHeight = buildHeight
     }
 
-    override fun build(key: CatalogKey, name: Translation) = throw UnsupportedOperationException("Overridden")
-
-    override fun build(): WorldArchetype {
-        val key = this.key ?: run {
-            val plugin = CauseStack.currentOrEmpty().first<PluginContainer>()
-            val pluginId = plugin?.id ?: "unknown"
-            CatalogKey.of(pluginId, UUID.randomUUID().toString())
-        }
-        val name = this.name ?: FixedTranslation(key.value)
+    override fun build(key: CatalogKey): WorldArchetype {
+        val name = FixedTranslation(key.value)
         return LanternWorldArchetype(key, name,
                 allowPlayerRespawns = this.allowPlayerRespawns,
                 buildHeight = this.buildHeight,
@@ -180,10 +154,9 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
                 dimensionType = this.dimensionType,
                 enabled = this.enabled,
                 gameMode = this.gameMode,
-                generateBonusChest = this.generateBonusChest,
+                generateStructures = this.generateStructures,
                 generateSpawnOnLoad = this.generateSpawnOnLoad,
                 generatorSettings = this.generatorSettings,
-                generatorModifiers = this.generatorModifiers,
                 generatorType = this.generatorType,
                 hardcore = this.hardcore,
                 isSeedRandomized = this.seed == null,
@@ -193,13 +166,11 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
                 serializationBehavior = this.serializationBehavior,
                 portalAgentType = this.portalAgentType,
                 pvpEnabled = this.pvpEnabled,
-                usesMapFeatures = this.usesMapFeatures,
                 waterEvaporates = this.waterEvaporates
         )
     }
 
     override fun reset() = apply {
-        this.usesMapFeatures = true
         this.gameMode = GameModes.SURVIVAL
         this.difficulty = Difficulties.NORMAL
         this.portalAgentType = PortalAgentTypes.DEFAULT as LanternPortalAgentType<*>
@@ -208,10 +179,9 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.loadsOnStartup = false
         this.generateSpawnOnLoad = true
         this.enabled = true
-        this.generateBonusChest = false
+        this.generateStructures = true
         this.commandsAllowed = true
         this.dimensionType = DimensionTypes.OVERWORLD as LanternDimensionType<*>
-        this.generatorModifiers = emptySet()
         this.seed = null
         this.generatorType = null
         this.generatorSettings = null

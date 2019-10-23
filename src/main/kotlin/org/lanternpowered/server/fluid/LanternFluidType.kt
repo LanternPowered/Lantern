@@ -25,29 +25,13 @@
  */
 package org.lanternpowered.server.fluid
 
-import com.google.common.collect.ImmutableList
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.data.property.PropertyHolderBase
+import org.lanternpowered.server.state.AbstractCatalogTypeStateContainer
 import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.state.StateProperty
 
 class LanternFluidType(
-        key: CatalogKey, override val internalId: Int
-) : DefaultCatalogType(key), FluidType, PropertyHolderBase, InternalCatalogType {
-
-    override fun getDefaultState(): FluidState {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getStateProperties(): MutableCollection<StateProperty<*>> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getValidStates(): ImmutableList<FluidState> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-}
+        key: CatalogKey, stateProperties: Iterable<StateProperty<*>>
+) : AbstractCatalogTypeStateContainer<FluidState>(key, stateProperties, ::LanternFluidState), FluidType, PropertyHolderBase

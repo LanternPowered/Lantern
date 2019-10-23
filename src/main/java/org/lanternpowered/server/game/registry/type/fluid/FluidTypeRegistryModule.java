@@ -31,6 +31,8 @@ import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModu
 import org.spongepowered.api.fluid.FluidType;
 import org.spongepowered.api.fluid.FluidTypes;
 
+import java.util.Collections;
+
 public class FluidTypeRegistryModule extends InternalPluginCatalogRegistryModule<FluidType> {
 
     private static final FluidTypeRegistryModule INSTANCE = new FluidTypeRegistryModule();
@@ -45,7 +47,7 @@ public class FluidTypeRegistryModule extends InternalPluginCatalogRegistryModule
 
     @Override
     public void registerDefaults() {
-        register(new LanternFluidType(CatalogKeys.minecraft("water", "Water"), 0));
-        register(new LanternFluidType(CatalogKeys.minecraft("lava", "Lava"), 1));
+        register(new LanternFluidType(CatalogKeys.minecraft("water", "Water"), Collections.emptyList()));
+        register(new LanternFluidType(CatalogKeys.minecraft("lava", "Lava"), Collections.emptyList()));
     }
 }

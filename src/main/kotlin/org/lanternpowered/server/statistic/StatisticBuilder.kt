@@ -72,7 +72,6 @@ interface StatisticBuilder : NamedCatalogBuilder<XStatistic, StatisticBuilder> {
         override fun category(category: StatisticCategory): ForCatalogType<C>
         override fun criterion(criterion: Criterion?): ForCatalogType<C>
         override fun translation(translation: Translation): ForCatalogType<C>
-        override fun id(id: String): ForCatalogType<C>
         override fun key(key: CatalogKey): ForCatalogType<C>
         override fun name(name: String): ForCatalogType<C>
         override fun name(translation: Translation): ForCatalogType<C>

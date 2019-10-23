@@ -43,7 +43,7 @@ interface IStateProperty<S : Comparable<S>, V> : StateProperty<S> {
     /**
      * A list where the values are sorted by their natural ordering.
      */
-    var sortedPossibleValues: List<S>
+    val sortedPossibleValues: List<S>
 
     /**
      * The [StateKeyValueTransformer] to transform between state and key value types.

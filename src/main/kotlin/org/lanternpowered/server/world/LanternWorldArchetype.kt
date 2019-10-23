@@ -44,7 +44,6 @@ internal data class LanternWorldArchetype(
         private val gameMode: GameMode,
         private val dimensionType: LanternDimensionType<*>,
         private val generatorType: GeneratorType?,
-        private val generatorModifiers: Collection<WorldGeneratorModifier>,
         private val generatorSettings: DataContainer?,
         private val difficulty: Difficulty,
         private val serializationBehavior: SerializationBehavior,
@@ -52,9 +51,8 @@ internal data class LanternWorldArchetype(
         private val hardcore: Boolean,
         private val enabled: Boolean,
         private val loadsOnStartup: Boolean,
-        private val usesMapFeatures: Boolean,
         private val pvpEnabled: Boolean,
-        private val generateBonusChest: Boolean,
+        private val generateStructures: Boolean,
         private val commandsAllowed: Boolean,
         private val generateSpawnOnLoad: Boolean,
         private val isSeedRandomized: Boolean,
@@ -67,22 +65,20 @@ internal data class LanternWorldArchetype(
 
     override fun getDifficulty() = this.difficulty
     override fun isEnabled() = this.enabled
-    override fun loadOnStartup() = this.loadsOnStartup
+    override fun doesLoadOnStartup() = this.loadsOnStartup
     override fun doesKeepSpawnLoaded() = this.keepsSpawnLoaded ?: this.dimensionType.keepSpawnLoaded
     override fun doesGenerateSpawnOnLoad() = this.generateSpawnOnLoad
     override fun getSeed() = this.seed
     override fun isSeedRandomized() = this.isSeedRandomized
     override fun getGameMode() = this.gameMode
     override fun getGeneratorType() = this.generatorType ?: this.dimensionType.defaultGeneratorType
-    override fun getGeneratorModifiers() = this.generatorModifiers
-    override fun usesMapFeatures() = this.usesMapFeatures
     override fun isHardcore() = this.hardcore
     override fun areCommandsAllowed() = this.commandsAllowed
-    override fun doesGenerateBonusChest() = this.generateBonusChest
     override fun getDimensionType() = this.dimensionType
     override fun getPortalAgentType() = this.portalAgentType
     override fun getSerializationBehavior() = this.serializationBehavior
     override fun isPVPEnabled() = this.pvpEnabled
+    override fun areStructuresEnabled() = this.generateStructures
     override fun getGeneratorSettings(): DataContainer = this.generatorSettings?.copy() ?: getGeneratorType().generatorSettings
 
     fun allowPlayerRespawns() = this.allowPlayerRespawns ?: this.dimensionType.allowsPlayerRespawns

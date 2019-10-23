@@ -25,39 +25,27 @@
  */
 package org.lanternpowered.server.catalog
 
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.catalog.CatalogKeyBuilder
 import org.lanternpowered.api.plugin.PluginContainer
-import org.lanternpowered.api.x.catalog.XCatalogKey
-import org.lanternpowered.api.x.catalog.XCatalogKeyBuilder
 
-class LanternCatalogKeyBuilder : XCatalogKeyBuilder {
+class LanternCatalogKeyBuilder : CatalogKeyBuilder {
 
     private var namespace: String? = null
     private var value: String? = null
-    private var name: String? = null
 
-    override fun name(name: String): XCatalogKeyBuilder = apply { this.name = name }
-    override fun namespace(namespace: String): XCatalogKeyBuilder = apply { this.namespace = namespace }
-    override fun namespace(container: PluginContainer): XCatalogKeyBuilder = namespace(container.id)
+    override fun namespace(namespace: String): CatalogKeyBuilder = apply { this.namespace = namespace }
+    override fun namespace(container: PluginContainer): CatalogKeyBuilder = namespace(container.id)
+    override fun value(value: String): CatalogKeyBuilder = apply { this.value = value }
 
-    override fun value(value: String): XCatalogKeyBuilder = apply {
-        this.value = value
-        this.name = null
-    }
-
-    override fun build(): XCatalogKey {
+    override fun build(): CatalogKey {
         val namespace = checkNotNull(this.namespace) { "The namespace must be set" }
         val value = checkNotNull(this.value) { "The value must be set" }
-        val name = this.name
-        // There is no need to create a named key if the objects are equal
-        if (name !== null && value !== name) {
-            return NamedCatalogKey(namespace, value, name)
-        }
         return LanternCatalogKey(namespace, value)
     }
 
-    override fun reset(): XCatalogKeyBuilder = apply {
+    override fun reset(): CatalogKeyBuilder = apply {
         this.namespace = null
         this.value = null
-        this.name = null
     }
 }

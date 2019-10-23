@@ -54,8 +54,8 @@ public final class LanternEventContextKeyBuilder<T> implements EventContextKey.B
     }
 
     @Override
-    public LanternEventContextKeyBuilder<T> id(CatalogKey id) {
-        this.id = checkNotNull(id, "id");
+    public LanternEventContextKeyBuilder<T> key(CatalogKey key) {
+        this.id = checkNotNull(key, "id");
         return this;
     }
 
@@ -70,14 +70,9 @@ public final class LanternEventContextKeyBuilder<T> implements EventContextKey.B
         checkState(this.id != null, "The id must be set");
         checkState(this.typeToken != null, "The type must be set");
         final LanternEventContextKey<T> contextKey = new LanternEventContextKey<>(
-                CatalogKeys.of(this.id.getNamespace(), this.id.getValue(), this.name == null ? this.id.getValue() : this.name), this.typeToken);
+                CatalogKeys.of(this.id.getNamespace(), this.id.getValue()), this.typeToken);
         EventContextKeysModule.get().registerAdditionalCatalog(contextKey);
         return contextKey;
-    }
-
-    @Override
-    public LanternEventContextKeyBuilder<T> from(EventContextKey<T> value) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Cannot create a new EventContextKey based on another key!");
     }
 
     @Override

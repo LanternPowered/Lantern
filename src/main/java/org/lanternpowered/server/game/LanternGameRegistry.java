@@ -648,7 +648,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(new DefaultGameRulesRegistryModule())
                 .registerModule(Difficulty.class, DifficultyRegistryModule.get())
                 .registerModule(DimensionType.class, new DimensionTypeRegistryModule())
-                .registerModule(WorldGeneratorModifier.class, GeneratorModifierRegistryModule.INSTANCE)
                 .registerModule(GeneratorType.class, new GeneratorTypeRegistryModule())
                 .registerModule(PortalAgentType.class, new PortalAgentTypeRegistryModule())
                 .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())

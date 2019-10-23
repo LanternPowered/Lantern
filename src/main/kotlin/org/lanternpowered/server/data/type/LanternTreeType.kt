@@ -30,4 +30,4 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.text.translation.Translatable
 
-class LanternTreeType(key: CatalogKey, translationKey: String) : DefaultCatalogType(key), TreeType, Translatable by Translated(translationKey)
+class LanternTreeType(key: CatalogKey, translationKey: String) : DefaultCatalogType(key), Translatable by Translated(translationKey)

@@ -27,7 +27,6 @@ package org.lanternpowered.server.catalog
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeys
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.translation.Translation
 import org.spongepowered.api.NamedCatalogType
 
@@ -38,7 +37,6 @@ open class DefaultCatalogType(key: CatalogKey) : AbstractCatalogType() {
     init {
         check(key.namespace.isNotEmpty()) { "plugin id (key namespace) cannot be empty" }
         check(key.value.isNotEmpty()) { "id (key value) cannot be empty" }
-        check(key.name.isNotEmpty()) { "name cannot be empty" }
         this.key = key
     }
 

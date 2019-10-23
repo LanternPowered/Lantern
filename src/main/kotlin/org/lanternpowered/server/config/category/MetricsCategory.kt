@@ -27,33 +27,21 @@ package org.lanternpowered.server.config.category
 
 import ninja.leaping.configurate.objectmapping.Setting
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.plugin.PluginContainer
-import java.util.HashMap
+import org.spongepowered.api.util.Tristate
+import java.util.*
 
 @ConfigSerializable
 class MetricsCategory {
 
-    @field:Setting(value = "default-permission", comment = "Determines whether plugins that are newly added are allowed to perform\n"
-            + "data/metric collection by default. Plugins detected by Sponge will be added "
-            + "to the \"plugin-permissions\" section with this value.\n\n"
-            + "Set to true to enable metric gathering by default, false otherwise.")
-    var isGloballyEnabled = false
+    @field:Setting(value = "global-state", comment = "The global collection state that should be respected " +
+            "by all plugins that have no specified collection state. If undefined then it is treated as disabled.")
+    var globalState = Tristate.UNDEFINED
         private set
 
-    @field:Setting(value = "plugin-permissions", comment = "Provides (or revokes) permission for metric gathering on a per plugin basis.\n"
-            + "Entries should be in the format \"plugin-id=<true|false>\".\n\n"
-            + "Deleting an entry from this list will reset it to the default specified in\n"
-            + "\"default-permission\"")
-    private val perPluginPermissions = HashMap<String, Boolean>()
+    @Setting(value = "plugin-states", comment = "Plugin-specific collection states that override the global collection state.")
+    private val pluginStates = HashMap<String, Tristate>()
 
-    /**
-     * Gets the plugin permissions map.
-     */
-    val pluginPermissions = this.perPluginPermissions.toImmutableMap()
-
-    /**
-     * Gets the permissions for the given [PluginContainer].
-     */
-    fun getPluginPermission(container: PluginContainer): Boolean? = this.perPluginPermissions[container.id]
+    fun getCollectionState(container: PluginContainer): Tristate
+            = this.pluginStates[container.id] ?: Tristate.UNDEFINED
 }

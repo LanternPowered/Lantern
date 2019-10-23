@@ -26,10 +26,9 @@
 package org.lanternpowered.server.catalog
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.x.catalog.XCatalogKey
 import java.util.Objects
 
-open class LanternCatalogKey(private val namespace: String, private val value: String) : XCatalogKey {
+open class LanternCatalogKey(private val namespace: String, private val value: String) : CatalogKey {
 
     override fun getNamespace(): String = this.namespace
     override fun getValue(): String = this.value

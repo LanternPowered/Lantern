@@ -52,14 +52,16 @@ object DataRegistrar {
     }
 
     private fun registerPropertyStores() {
-        registerLuminancePropertyStore(Properties.BLOCK_LUMINANCE, LightTypes.BLOCK)
-        registerLuminancePropertyStore(Properties.SKY_LUMINANCE, LightTypes.SKY)
+        // TODO: Fix these
+        //registerLuminancePropertyStore(Properties.BLOCK_LUMINANCE, LightTypes.BLOCK)
+        //registerLuminancePropertyStore(Properties.SKY_LUMINANCE, LightTypes.SKY)
         registerDominantHandPropertyStore()
         registerBlockTemperaturePropertyStore()
         registerTemperaturePropertyStore()
         registerFuelBurnTimePropertyStore()
     }
 
+    /*
     private fun registerLuminancePropertyStore(property: Property<Double>, lightType: LightType) {
         GlobalPropertyRegistry.registerProvider(property) {
             forHolder<Location> {
@@ -70,6 +72,7 @@ object DataRegistrar {
             }
         }
     }
+    */
 
     private fun registerBlockTemperaturePropertyStore() {
         GlobalPropertyRegistry.registerProvider(Properties.BLOCK_TEMPERATURE) {

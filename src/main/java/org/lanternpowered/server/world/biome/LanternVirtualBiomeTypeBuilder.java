@@ -116,7 +116,7 @@ public class LanternVirtualBiomeTypeBuilder implements VirtualBiomeType.Builder 
             pluginId = "minecraft";
         }
         final LanternVirtualBiomeType biomeType = new LanternVirtualBiomeType(
-                CatalogKeys.of(pluginId, id, this.name), this.settingsBuilder, this.persisted);
+                CatalogKeys.of(pluginId, id), this.settingsBuilder, this.persisted);
         biomeType.setHumidity(this.humidity);
         biomeType.setTemperature(this.temperature);
         return biomeType;

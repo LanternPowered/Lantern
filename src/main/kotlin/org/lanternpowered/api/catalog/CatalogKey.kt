@@ -27,9 +27,6 @@
 
 package org.lanternpowered.api.catalog
 
-import org.lanternpowered.api.x.catalog.XCatalogKey
-import org.lanternpowered.api.x.catalog.XCatalogKeyBuilder
-
 typealias CatalogKey = org.spongepowered.api.CatalogKey
 typealias CatalogKeyBuilder = org.spongepowered.api.CatalogKey.Builder
 
@@ -37,20 +34,12 @@ typealias CatalogKeyBuilder = org.spongepowered.api.CatalogKey.Builder
  * Constructs a new [CatalogKey].
  */
 @JvmName("catalogKeyOf")
-inline fun CatalogKey(namespace: String, value: String): XCatalogKey {
+inline fun CatalogKey(namespace: String, value: String): CatalogKey {
     return CatalogKeyBuilder().namespace(namespace).value(value).build()
-}
-
-/**
- * Constructs a new named [CatalogKey].
- */
-@JvmName("catalogKeyOf")
-inline fun CatalogKey(namespace: String, value: String, name: String): XCatalogKey {
-    return CatalogKeyBuilder().namespace(namespace).value(value).name(name).build()
 }
 
 /**
  * Constructs a new [CatalogKeyBuilder].
  */
 @JvmName("builder")
-inline fun CatalogKeyBuilder(): XCatalogKeyBuilder = CatalogKey.builder() as XCatalogKeyBuilder
+inline fun CatalogKeyBuilder(): CatalogKeyBuilder = CatalogKey.builder()

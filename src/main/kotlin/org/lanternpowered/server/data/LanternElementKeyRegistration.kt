@@ -27,6 +27,7 @@ package org.lanternpowered.server.data
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.value.CopyHelper
 import org.lanternpowered.server.data.value.ValueFactory
 import org.lanternpowered.server.util.function.TriConsumer
 import org.spongepowered.api.data.DataHolder
@@ -68,7 +69,12 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
     override fun addChangeListener(listener: TriConsumer<H, E?, E?>) = apply { super.addChangeListener(listener) }
 
     override fun copy(): LanternLocalKeyRegistration<V, E, H> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val copy = LanternElementKeyRegistration<V, E, H>(this.key)
+        copy.backing = CopyHelper.copy(this.backing)
+        copy.removable = this.removable
+        copy.validator = this.validator
+        this.changeListeners?.let { copy.changeListeners = ArrayList(it) }
+        return copy
     }
 
     protected open fun validate(holder: H, element: E): Boolean {

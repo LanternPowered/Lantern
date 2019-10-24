@@ -137,5 +137,9 @@ internal class LanternLocalProviderKeyRegistration<V : Value<E>, E : Any, H : Da
         override fun <I : DataHolder.Immutable<I>> without(immutable: I) = provider.without(immutable)
     }
 
-    override fun copy() = TODO()
+    override fun copy(): LanternLocalKeyRegistration<V, E, H> {
+        val copy = LanternLocalProviderKeyRegistration<V, E, H>(this.key, this.provider)
+        this.changeListeners?.let { copy.changeListeners = ArrayList(it) }
+        return copy
+    }
 }

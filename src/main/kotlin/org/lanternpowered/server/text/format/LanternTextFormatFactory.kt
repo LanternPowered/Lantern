@@ -34,8 +34,8 @@ object LanternTextFormatFactory : XTextFormatFactory {
     override fun format(color: TextColor, style: TextStyle) =
             LanternTextFormat(color, style)
 
-    override fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikethrough: Boolean?, obfuscated: Boolean?) =
-            LanternTextStyle(bold, italic, underline, strikethrough, obfuscated)
+    override fun style(bold: Boolean?, italic: Boolean?, underline: Boolean?, strikeThrough: Boolean?, obfuscated: Boolean?) =
+            LanternTextStyle(bold, italic, underline, strikeThrough, obfuscated)
 
     override fun emptyFormat() = LanternTextFormat.EMPTY
 }

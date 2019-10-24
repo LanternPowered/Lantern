@@ -26,6 +26,7 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.Key
@@ -68,7 +69,7 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
     }
 
     override fun <V : Value<E>, E : Any> register(key: Key<V>): ElementKeyRegistration<V, E, H> {
-        return if (key.valueToken.isSubtypeOf(BoundedValue::class.java)) {
+        return if (key is BoundedValueKey<*,*>) {
             registerBoundedElement(key.uncheckedCast<Key<BoundedValue<Any>>>()).uncheckedCast()
         } else {
             registerElement(key)
@@ -76,7 +77,7 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
     }
 
     override fun <V : Value<E>, E : Any> register(key: Key<V>, initialElement: E): ElementKeyRegistration<V, E, H> {
-        return if (key.valueToken.isSubtypeOf(BoundedValue::class.java)) {
+        return if (key is BoundedValueKey<*,*>) {
             registerBoundedElement(key.uncheckedCast<Key<BoundedValue<Any>>>()).uncheckedCast()
         } else {
             registerElement(key)
@@ -126,7 +127,11 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
     }
 
     override fun copy(): LocalKeyRegistry<H> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val copy = LanternLocalKeyRegistry<H>()
+        for ((key, registration) in this.map) {
+            copy.map[key] = (registration as LanternLocalKeyRegistration<*, *, H>).copy()
+        }
+        return copy
     }
 
     override fun remove(key: Key<*>) {

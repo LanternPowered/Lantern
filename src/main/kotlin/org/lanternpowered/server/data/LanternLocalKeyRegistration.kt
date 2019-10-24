@@ -57,5 +57,5 @@ internal abstract class LanternLocalKeyRegistration<V : Value<E>, E : Any, H : D
      *
      * @return The created copy
      */
-    protected abstract fun copy(): LanternLocalKeyRegistration<V, E, H>
+    abstract fun copy(): LanternLocalKeyRegistration<V, E, H>
 }

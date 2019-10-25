@@ -68,13 +68,15 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
     override fun addChangeListener(listener: H.() -> Unit) = apply { super.addChangeListener(listener) }
     override fun addChangeListener(listener: TriConsumer<H, E?, E?>) = apply { super.addChangeListener(listener) }
 
-    override fun copy(): LanternLocalKeyRegistration<V, E, H> {
-        val copy = LanternElementKeyRegistration<V, E, H>(this.key)
+    protected fun copyTo(copy: LanternElementKeyRegistration<V, E, H>) {
         copy.backing = CopyHelper.copy(this.backing)
         copy.removable = this.removable
         copy.validator = this.validator
         this.changeListeners?.let { copy.changeListeners = ArrayList(it) }
-        return copy
+    }
+
+    override fun copy(): LanternLocalKeyRegistration<V, E, H> {
+        return LanternElementKeyRegistration<V, E, H>(this.key).also(::copyTo)
     }
 
     protected open fun validate(holder: H, element: E): Boolean {

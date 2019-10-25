@@ -39,6 +39,15 @@ interface BoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHo
     operator fun invoke(fn: BoundedElementKeyRegistration<V, E, H>.() -> Unit) = apply(fn)
 
     /**
+     * Sets the value range of this key registration.
+     *
+     * @param range The value range
+     * @return This registration, for chaining
+     */
+    fun <V : BoundedValue<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
+            .range(range: ClosedRange<E>): BoundedElementKeyRegistration<V, E, H>
+
+    /**
      * Sets the minimum value of this key registration.
      *
      * @param minimum The minimum value

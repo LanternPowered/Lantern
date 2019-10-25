@@ -41,6 +41,13 @@ internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any
     private var minimum: (H.() -> E?)? = null
     private var maximum: (H.() -> E?)? = null
 
+    override fun <V : BoundedValue<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
+            .range(range: ClosedRange<E>) = apply {
+        this as LanternBoundedElementKeyRegistration<V, E, H>
+        minimum(range.start)
+        maximum(range.endInclusive)
+    }
+
     override fun minimum(minimum: E) = apply {
         // If a copy will exactly be the same, eliminate
         // the redundant copy call
@@ -109,4 +116,12 @@ internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any
     override fun addChangeListener(listener: H.(newValue: E?) -> Unit) = apply { super.addChangeListener(listener) }
     override fun addChangeListener(listener: H.() -> Unit) = apply { super.addChangeListener(listener) }
     override fun addChangeListener(listener: TriConsumer<H, E?, E?>) = apply { super.addChangeListener(listener) }
+
+    override fun copy(): LanternLocalKeyRegistration<V, E, H> {
+        val copy = LanternBoundedElementKeyRegistration<V, E, H>(this.key)
+        copyTo(copy)
+        copy.minimum = this.minimum
+        copy.maximum = this.maximum
+        return copy
+    }
 }

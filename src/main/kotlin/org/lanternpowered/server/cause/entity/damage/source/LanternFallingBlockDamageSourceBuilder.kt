@@ -32,24 +32,43 @@ import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamage
 class LanternFallingBlockDamageSourceBuilder : AbstractEntityDamageSourceBuilder<FallingBlockDamageSource, FallingBlockDamageSource.Builder>(),
         FallingBlockDamageSource.Builder {
 
-    internal var fallingBlockData: ImmutableFallingBlockData? = null
+    internal var canPlace: Boolean? = null
+    internal var fallTime: Int? = null
+    internal var hurtsEnemies: Boolean? = null
+    internal var maxDamage: Double? = null
+    internal var damagePerBlock: Double? = null
+    internal var canDropAsItem: Boolean? = null
 
     override fun entity(entity: Entity): LanternFallingBlockDamageSourceBuilder {
         check(entity is FallingBlock) { "Entity source must be a falling block and not ${entity::class.java.simpleName}" }
         return super.entity(entity) as LanternFallingBlockDamageSourceBuilder
     }
 
-    override fun fallingBlock(fallingBlockData: ImmutableFallingBlockData): FallingBlockDamageSource.Builder =
-            apply { this.fallingBlockData = fallingBlockData }
+    override fun places(canPlace: Boolean) = apply { this.canPlace = canPlace }
+    override fun fallTime(time: Int) = apply { this.fallTime = time }
+    override fun hurtsEntities(hurts: Boolean) = apply { this.hurtsEnemies = hurts }
+    override fun maxDamage(damage: Double) = apply { this.maxDamage = damage }
+    override fun damagePerBlock(damagePer: Double) = apply { this.damagePerBlock = damagePer }
 
-    override fun from(value: FallingBlockDamageSource): FallingBlockDamageSource.Builder = apply {
+    override fun from(value: FallingBlockDamageSource) = apply {
         super.from(value)
-        this.fallingBlockData = value.fallingBlockData
+        value as LanternFallingBlockDamageSource
+        this.canPlace = value.canPlace
+        this.fallTime = value.fallTime
+        this.hurtsEnemies = value.hurtsEnemies
+        this.maxDamage = value.maxDamage
+        this.damagePerBlock = value.damagePerBlock
+        this.canDropAsItem = value.canDropAsItem
     }
 
     override fun reset(): FallingBlockDamageSource.Builder = apply {
         super.reset()
-        this.fallingBlockData = null
+        this.canPlace = null
+        this.fallTime = null
+        this.hurtsEnemies = null
+        this.maxDamage = null
+        this.damagePerBlock = null
+        this.canDropAsItem = null
     }
 
     override fun build(): FallingBlockDamageSource {

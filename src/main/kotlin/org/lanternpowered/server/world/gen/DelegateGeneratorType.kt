@@ -31,6 +31,7 @@ import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.gen.GeneratorType
+import org.spongepowered.api.world.gen.TerrainGenerator
 
 class DelegateGeneratorType(key: CatalogKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {
 
@@ -71,9 +72,8 @@ class DelegateGeneratorType(key: CatalogKey, generatorType: GeneratorType) : Def
         return this.seaLevel
     }
 
-    override fun getName(): String = this.generatorType.name
     override fun getGeneratorSettings(): DataContainer = this.generatorType.generatorSettings
-    override fun createGenerator(world: World): WorldGenerator = this.generatorType.createGenerator(world)
+    override fun createGenerator(world: World): TerrainGenerator<*> = this.generatorType.createGenerator(world)
 
     override fun toStringHelper() = super.toStringHelper()
                 .add("backing", this.generatorType.key)

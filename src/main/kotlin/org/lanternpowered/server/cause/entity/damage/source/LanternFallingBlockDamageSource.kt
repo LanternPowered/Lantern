@@ -25,14 +25,38 @@
  */
 package org.lanternpowered.server.cause.entity.damage.source
 
+import org.lanternpowered.api.ext.immutableValueOf
+import org.spongepowered.api.block.BlockState
+import org.spongepowered.api.data.Keys
+import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.entity.FallingBlock
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource
 
 internal class LanternFallingBlockDamageSource(builder: LanternFallingBlockDamageSourceBuilder) :
         LanternEntityDamageSource(builder), FallingBlockDamageSource {
 
-    private val fallingBlockData: ImmutableFallingBlockData = builder.fallingBlockData ?: source.fallingBlockData.asImmutable()
+    internal val canPlace = builder.canPlace ?: source.require(Keys.CAN_PLACE_AS_BLOCK)
+    internal val fallTime = builder.fallTime ?: source.require(Keys.FALL_TIME)
+    internal val hurtsEnemies = builder.hurtsEnemies ?: source.require(Keys.CAN_HURT_ENTITIES)
+    internal val maxDamage = builder.maxDamage ?: source.require(Keys.MAX_FALL_DAMAGE)
+    internal val damagePerBlock = builder.damagePerBlock ?: source.require(Keys.DAMAGE_PER_BLOCK)
+    internal val canDropAsItem = builder.canDropAsItem ?: source.require(Keys.CAN_DROP_AS_ITEM)
 
-    override fun getSource(): FallingBlock = super.getSource() as FallingBlock
-    override fun getFallingBlockData(): ImmutableFallingBlockData = this.fallingBlockData
+    private val blockStateValue: Value.Immutable<BlockState> = source.blockState().asImmutable()
+    private val canPlaceValue by lazy { immutableValueOf(Keys.CAN_PLACE_AS_BLOCK, this.canPlace) }
+    private val fallTimeValue by lazy { immutableValueOf(Keys.FALL_TIME, this.fallTime) }
+    private val hurtsEnemiesValue by lazy { immutableValueOf(Keys.CAN_HURT_ENTITIES, this.hurtsEnemies) }
+    private val maxDamageValue by lazy { immutableValueOf(Keys.MAX_FALL_DAMAGE, this.maxDamage) }
+    private val damagePerBlockValue by lazy { immutableValueOf(Keys.DAMAGE_PER_BLOCK, this.damagePerBlock) }
+    private val canDropAsItemValue by lazy { immutableValueOf(Keys.CAN_DROP_AS_ITEM, this.canDropAsItem) }
+
+    override fun blockState() = this.blockStateValue
+    override fun fallDamagePerBlock() = this.damagePerBlockValue
+    override fun maxFallDamage() = this.maxDamageValue
+    override fun canPlaceAsBlock() = this.canPlaceValue
+    override fun canDropAsItem() = this.canDropAsItemValue
+    override fun fallTime() = this.fallTimeValue
+    override fun canHurtEntities() = this.hurtsEnemiesValue
+
+    override fun getSource() = super.getSource() as FallingBlock
 }

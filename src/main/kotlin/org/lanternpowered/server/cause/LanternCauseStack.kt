@@ -235,12 +235,14 @@ class LanternCauseStack : CauseStack {
     }
 
     override fun <T> getContext(key: CauseContextKey<T>): Optional<T> {
-        return Optional.ofNullable(key.allowedType.cast(this.ctx[key]))
+        @Suppress("UNCHECKED_CAST")
+        return Optional.ofNullable(this.ctx[key] as T)
     }
 
     override fun <T> removeContext(key: CauseContextKey<T>): Optional<T> {
         this.cachedCtx = null
-        val existing = key.allowedType.cast(this.ctx.remove(key))
+        @Suppress("UNCHECKED_CAST")
+        val existing = this.ctx.remove(key) as T
         if (existing != null && !this.frames.isEmpty()) {
             val frame = this.frames.peek()
             if (!frame.isNew(key)) {

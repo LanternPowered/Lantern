@@ -60,8 +60,8 @@ object EventContextKeysModule : AdditionalPluginCatalogRegistryModule<EventConte
                             (key as LanternEventContextKey<*>).allowedTypeToken != typeToken }.orElse(true)) {
                     continue
                 }
-                val name = id.split("_").joinToString(separator = " ") { s -> s[0].toUpperCase() + s.substring(1) }
-                register(LanternEventContextKey(CatalogKey(pluginId, id, name), typeToken))
+                // val name = id.split("_").joinToString(separator = " ") { s -> s[0].toUpperCase() + s.substring(1) }
+                register(LanternEventContextKey(CatalogKey(pluginId, id), typeToken))
             }
         }
 

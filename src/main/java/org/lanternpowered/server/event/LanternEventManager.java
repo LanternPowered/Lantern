@@ -220,7 +220,7 @@ public class LanternEventManager implements EventManager {
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"rawtypes" })
     private <T extends Event> List<RegisteredListener<?>> bakeHandlers(EventType<T> eventType) {
         final List<RegisteredListener<?>> handlers = new ArrayList<>();
         final Set<Class<? super T>> types = TypeToken.of(eventType.getType()).getTypes().rawTypes();
@@ -282,7 +282,7 @@ public class LanternEventManager implements EventManager {
     private final Set<Class<?>> keyEventTypes = TypeToken.of(ChangeDataHolderEvent.ValueChange.class).getTypes().rawTypes().stream()
             .filter(Event.class::isAssignableFrom).collect(Collectors.toSet());
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "rawtypes" })
     private void register(List<RegisteredListener<?>> listeners) {
         synchronized (this.lock) {
             listeners = listeners.stream()

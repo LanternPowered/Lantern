@@ -32,11 +32,11 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.Tuple;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public final class LanternEventHelper {
     private static List<EntitySpawningEntry> toSpawningEntries(Iterable<Tuple<ItemStackSnapshot, Transform>> entries) {
         return Streams.stream(entries)
                 .map(tuple -> new EntitySpawningEntry(EntityTypes.ITEM, tuple.getSecond(), entity -> {
-                    entity.offer(Keys.REPRESENTED_ITEM, tuple.getFirst());
+                    entity.offer(Keys.ITEM_STACK_SNAPSHOT, tuple.getFirst());
                     entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
                 }))
                 .collect(Collectors.toList());
@@ -69,14 +69,14 @@ public final class LanternEventHelper {
 
     public static Optional<Entity> handlePreDroppedItemSpawning(Transform transform, ItemStackSnapshot snapshot) {
         return LanternWorld.handlePreEntitySpawning(EntityTypes.ITEM, transform, entity -> {
-            entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+            entity.offer(Keys.ITEM_STACK_SNAPSHOT, snapshot);
             entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
         });
     }
 
     public static void handleDroppedItemSpawning(Transform transform, ItemStackSnapshot snapshot) {
         LanternWorld.handleEntitySpawning(EntityTypes.ITEM, transform, entity -> {
-            entity.offer(Keys.REPRESENTED_ITEM, snapshot);
+            entity.offer(Keys.ITEM_STACK_SNAPSHOT, snapshot);
             entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
         }, SpongeEventFactory::createDropItemEventDispense);
     }

@@ -114,6 +114,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
             '-Xuse-experimental=kotlin.contracts.ExperimentalContracts',
             '-Xuse-experimental=kotlin.ExperimentalStdlibApi',
             '-XXLanguage:+InlineClasses',
+            '-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes',
             '-Xjvm-default=enable'
     ]
 }

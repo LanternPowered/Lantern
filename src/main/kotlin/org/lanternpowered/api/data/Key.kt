@@ -32,9 +32,14 @@ import org.spongepowered.api.data.value.Value
 
 typealias Key<V> = org.spongepowered.api.data.Key<V>
 
+@Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS)
+@DslMarker
+annotation class KeyBuilderDsl
+
 /**
  * A builder class for [Key]s.
  */
+@KeyBuilderDsl
 interface KeyBuilder<V : Value<*>> : CatalogBuilder<Key<V>, KeyBuilder<V>> {
 
     /**
@@ -61,7 +66,7 @@ interface KeyBuilder<V : Value<*>> : CatalogBuilder<Key<V>, KeyBuilder<V>> {
     /**
      * Sets the minimum value supplier of the bounded value [Key].
      */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(supplier: () -> E): KeyBuilder<V>
+    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(supplier: @KeyBuilderDsl () -> E): KeyBuilder<V>
 
     /**
      * Sets the maximum value of the bounded value [Key].
@@ -71,12 +76,13 @@ interface KeyBuilder<V : Value<*>> : CatalogBuilder<Key<V>, KeyBuilder<V>> {
     /**
      * Sets the maximum value supplier of the bounded value [Key].
      */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.maximum(supplier: () -> E): KeyBuilder<V>
+    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.maximum(supplier: @KeyBuilderDsl () -> E): KeyBuilder<V>
 
     /**
      * Sets the comparator of the bounded value [Key].
      */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.comparator(comparator: Comparator<in E>): KeyBuilder<V>
+    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.comparator(
+            comparator: @KeyBuilderDsl Comparator<in E>): KeyBuilder<V>
 
     /**
      * Enables the requirement that the key is registered explicitly on a value collection.

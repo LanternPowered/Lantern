@@ -28,15 +28,13 @@
 package org.lanternpowered.server.data.property
 
 import com.google.common.collect.ImmutableMap
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.LocalDataDsl
+import org.lanternpowered.api.ext.orNull
+import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.data.property.PropertyHolder
-import java.util.Optional
-import java.util.OptionalDouble
-import java.util.OptionalInt
+import java.util.*
 
-@LocalDataDsl
+@PropertyDsl
 interface PropertyHolderBase : PropertyHolder {
 
     @JvmDefault

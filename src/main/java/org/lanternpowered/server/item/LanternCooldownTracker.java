@@ -61,7 +61,7 @@ public class LanternCooldownTracker implements CooldownTracker {
             return false;
         }
         final CooldownEvent.Set event = SpongeEventFactory.createCooldownEventSet(CauseStack.current().getCurrentCause(),
-                ticks, ticks, itemType, time <= 0 ? OptionalInt.empty() : OptionalInt.of((int) time), this.player);
+                ticks, ticks, itemType, this.player, time <= 0 ? OptionalInt.empty() : OptionalInt.of((int) time));
         Sponge.getEventManager().post(event);
         if (event.isCancelled()) {
             return false;

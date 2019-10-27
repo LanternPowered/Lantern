@@ -27,7 +27,7 @@ package org.lanternpowered.server.block
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.data.property.LocalPropertyHolder
-import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.state.AbstractStateContainer
 import org.spongepowered.api.block.BlockSoundGroup
 import org.spongepowered.api.block.BlockState
@@ -46,7 +46,7 @@ class LanternBlockType(
         private val translation: Translation,
         val blockEntityProvider: (() -> BlockEntity)?,
         stateProperties: Iterable<StateProperty<*>>,
-        override val propertyRegistry: LocalPropertyRegistry<out LocalPropertyHolder>
+        override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>
 ) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalPropertyHolder {
 
     private val defaultSoundGroup: BlockSoundGroup = getProperty(BlockProperties.BLOCK_SOUND_GROUP).orElse(BlockSoundGroups.STONE)

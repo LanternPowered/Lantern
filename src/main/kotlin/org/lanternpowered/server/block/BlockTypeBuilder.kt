@@ -33,7 +33,7 @@ import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.block.property.FlammableInfo
 import org.lanternpowered.server.block.state.BlockStateProperties
-import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.item.ItemTypeBuilder
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
@@ -162,11 +162,11 @@ interface BlockTypeBuilder {
 }
 
 @BlockTypeBuilderDsl
-abstract class BlockTypePropertyRegistryBuilder : LocalPropertyRegistry<BlockType>() {
+abstract class BlockTypePropertyRegistryBuilder : PropertyRegistry<BlockType>() {
 
     /**
      * Applies properties to a block state, applied properties here will
      * override the default properties provided by [BlockType].
      */
-    abstract fun forStates(fn: LocalPropertyRegistry<BlockState>.() -> Unit)
+    abstract fun forStates(fn: PropertyRegistry<BlockState>.() -> Unit)
 }

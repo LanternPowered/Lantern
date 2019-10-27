@@ -25,19 +25,42 @@
  */
 package org.lanternpowered.server.block
 
+import org.lanternpowered.api.data.property.Property
 import org.lanternpowered.api.data.property.PropertyHolder
-import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.api.data.property.PropertyProvider
+import org.lanternpowered.server.data.property.PropertyProviderBuilder
 import org.lanternpowered.server.data.property.PropertyRegistry
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 
 class LanternBlockTypePropertyRegistryBuilder(
-        val backing: LocalPropertyRegistry<BlockType>
-) : BlockTypePropertyRegistryBuilder(), PropertyRegistry<BlockType> by backing {
+        val backing: PropertyRegistry<BlockType>
+) : BlockTypePropertyRegistryBuilder() {
 
-    override fun forStates(fn: LocalPropertyRegistry<BlockState>.() -> Unit) {
+    override fun forStates(fn: PropertyRegistry<BlockState>.() -> Unit) {
         forHolder(fn)
     }
 
     override fun <H : PropertyHolder> forHolder(holderType: Class<H>) = this.backing.forHolder(holderType)
+
+    override val providers: Map<Property<*>, PropertyProvider<*>>
+        get() = this.backing.providers
+
+    override fun <V : Any> register(property: Property<V>, constant: V) {
+        this.backing.register(property, constant)
+    }
+
+    override fun <V : Any> registerProvider(
+            property: Property<V>, propertyProvider: PropertyProvider<V>) {
+        this.backing.registerProvider(property, propertyProvider)
+    }
+
+    override fun <V : Any> registerProvider(
+            property: Property<V>, fn: PropertyProviderBuilder<V, BlockType>.(property: Property<V>) -> Unit) {
+        this.backing.registerProvider(property, fn)
+    }
+
+    override fun <V : Any> getProvider(property: Property<V>) = this.backing.getProvider(property)
+    override fun getIntProvider(property: Property<Int>) = this.backing.getIntProvider(property)
+    override fun getDoubleProvider(property: Property<Double>) = this.backing.getDoubleProvider(property)
 }

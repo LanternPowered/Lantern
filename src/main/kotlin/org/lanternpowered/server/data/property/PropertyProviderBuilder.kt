@@ -31,12 +31,11 @@ import org.lanternpowered.api.ext.optional
 import org.lanternpowered.api.ext.typeTokenOf
 import org.lanternpowered.api.util.Direction
 import org.lanternpowered.api.util.TypeToken
-import org.lanternpowered.server.data.LocalDataDsl
 import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
 import org.spongepowered.api.data.property.PropertyHolder
-import java.util.Optional
+import java.util.*
 
-@LocalDataDsl
+@PropertyDsl
 abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
 
     /**
@@ -61,7 +60,8 @@ abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
      * @param fn The builder function to apply
      * @return This builder targeting the specified holder type, for chaining
      */
-    fun <N : H> forHolder(holderType: TypeToken<N>, fn: PropertyProviderBuilder<V, N>.() -> Unit) = forHolder(holderType).apply(fn)
+    fun <N : H> forHolder(holderType: TypeToken<N>, fn: PropertyProviderBuilder<V, N>.() -> Unit)
+            = forHolder(holderType).apply(fn)
 
     /**
      * Gets this builder as a builder to target the given
@@ -74,7 +74,8 @@ abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
      * @return This builder targeting the specified holder type, for chaining
      */
     @JvmSynthetic
-    inline fun <reified N : H> forHolder(fn: PropertyProviderBuilder<V, N>.() -> Unit = {}) = forHolder(typeTokenOf<N>()).apply(fn)
+    inline fun <reified N : H> forHolder(fn: PropertyProviderBuilder<V, N>.() -> Unit = {})
+            = forHolder(typeTokenOf<N>()).apply(fn)
 
     /**
      * Gets this builder as a builder to target the given
@@ -93,7 +94,7 @@ abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
      * @param fn The function to set
      * @return This builder, for chaining
      */
-    inline fun get(crossinline fn: H.() -> V?) = getOptional { fn().optional() }
+    inline fun get(crossinline fn: @PropertyDsl H.() -> V?) = getOptional { fn().optional() }
 
     /**
      * Sets the get function for the current holder type [H].
@@ -101,7 +102,7 @@ abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
      * @param fn The function to set
      * @return This builder, for chaining
      */
-    abstract fun getOptional(fn: H.() -> Optional<V>): PropertyProviderBuilder<V, H>
+    abstract fun getOptional(fn: @PropertyDsl H.() -> Optional<V>): PropertyProviderBuilder<V, H>
 
     /**
      * Sets the direction based get function for the current holder type [H].
@@ -109,7 +110,7 @@ abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
      * @param fn The function to set
      * @return This builder, for chaining
      */
-    inline fun <H> PropertyProviderBuilder<V, H>.get(crossinline fn: H.(direction: Direction) -> V?):
+    inline fun <H> PropertyProviderBuilder<V, H>.get(crossinline fn: @PropertyDsl H.(direction: Direction) -> V?):
             PropertyProviderBuilder<V, H> where H : PropertyHolder, H : DirectionRelativePropertyHolder {
         return getOptional { direction -> fn(direction).optional() }
     }
@@ -121,6 +122,7 @@ abstract class PropertyProviderBuilder<V : Any, H : PropertyHolder> {
      * @return This builder, for chaining
      */
     @JvmSynthetic
-    abstract fun <H> PropertyProviderBuilder<V, H>.getOptional(fn: H.(direction: Direction) -> Optional<V>):
-            PropertyProviderBuilder<V, H> where H : PropertyHolder, H : DirectionRelativePropertyHolder
+    abstract fun <H> PropertyProviderBuilder<V, H>.getOptional(
+            fn: @PropertyDsl H.(direction: Direction) -> Optional<V>
+    ): PropertyProviderBuilder<V, H> where H : PropertyHolder, H : DirectionRelativePropertyHolder
 }

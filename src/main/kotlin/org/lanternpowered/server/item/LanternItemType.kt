@@ -25,62 +25,32 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.data.Key
+import org.lanternpowered.api.ext.optional
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.behavior.Behavior
-import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
+import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.data.LocalKeyRegistry
+import org.lanternpowered.server.data.property.LocalPropertyHolder
 import org.lanternpowered.server.data.property.PropertyRegistry
+import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.block.BlockType
 
-/**
- * Constructs a new [ItemType].
- */
-fun itemTypeOf(key: CatalogKey, fn: ItemTypeBuilder.() -> Unit): ItemType {
-    return LanternItemTypeBuilder().apply(fn).build(key)
+class LanternItemType(
+        key: CatalogKey,
+        private val nameFunction: ItemStack.() -> Translation,
+        private val blockType: BlockType?,
+        private val maxStackQuantity: Int,
+        private val valueKeyRegistry: LocalKeyRegistry<ItemStack>,
+        val behaviorPipeline: BehaviorPipeline<Behavior>,
+        override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>
+) : DefaultCatalogType(key), ItemType, LocalPropertyHolder {
+
+    private val name by lazy { this.nameFunction(ItemStack.of(this)) }
+
+    override fun getTranslation() = this.name
+    override fun getBlock() = this.blockType.optional()
+    override fun getMaxStackQuantity() = this.maxStackQuantity
 }
-
-@Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS)
-@DslMarker
-annotation class ItemTypeBuilderDsl
-
-@ItemTypeBuilderDsl
-interface ItemTypeBuilder {
-
-    fun name(name: String)
-    fun name(name: Translation)
-    fun name(fn: @ItemTypeBuilderDsl ItemStack.() -> Translation)
-
-    /**
-     * Sets the maximum stack quantity.
-     */
-    fun maxStackQuantity(quantity: Int)
-
-    /**
-     * Applies properties to the [ItemType].
-     */
-    fun properties(fn: ItemTypePropertyRegistryBuilder.() -> Unit)
-
-    /**
-     * Applies behaviors to the [ItemType].
-     */
-    fun behaviors(fn: @ItemTypeBuilderDsl MutableBehaviorPipeline<Behavior>.() -> Unit)
-
-    /**
-     * Applies a function that can be used to register
-     * [Key]s on [ItemStack]s of the built item type.
-     */
-    fun valueKeys(fn: @ItemTypeBuilderDsl LocalKeyRegistry<ItemStack>.() -> Unit)
-}
-
-@ItemTypeBuilderDsl
-abstract class ItemTypePropertyRegistryBuilder : PropertyRegistry<ItemType>() {
-
-    /**
-     * Applies properties based on the [ItemStack] of the target [ItemType].
-     */
-    abstract fun forStack(fn: PropertyRegistry<ItemStack>.() -> Unit)
-}
-

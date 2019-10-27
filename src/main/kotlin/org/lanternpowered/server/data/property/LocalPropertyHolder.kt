@@ -25,8 +25,10 @@
  */
 package org.lanternpowered.server.data.property
 
-import org.lanternpowered.api.ext.*
-import org.spongepowered.api.data.property.Property
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.ext.asUnmodifiableMap
+import org.lanternpowered.api.ext.orNull
+import org.lanternpowered.api.ext.uncheckedCast
 import java.util.Optional
 import java.util.OptionalDouble
 import java.util.OptionalInt
@@ -34,17 +36,18 @@ import java.util.OptionalInt
 interface LocalPropertyHolder : PropertyHolderBase {
 
     /**
-     * Gets the [LocalPropertyRegistry].
+     * Gets the local [PropertyRegistry].
      *
-     * @return The property registry
+     * @return The local property registry
      */
-    val propertyRegistry: LocalPropertyRegistry<out LocalPropertyHolder>
+    val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>
 
     /**
      * A convenient extension that applies changes as the caller type.
      */
     @JvmDefault
-    fun <H : LocalPropertyHolder> H.propertyRegistry(fn: LocalPropertyRegistry<H>.() -> Unit): LocalPropertyRegistry<H> {
+    fun <H : LocalPropertyHolder> H.propertyRegistry(
+            fn: PropertyRegistry<H>.() -> Unit): PropertyRegistry<H> {
         return this.propertyRegistry.forHolderUnchecked<H>().apply(fn)
     }
 

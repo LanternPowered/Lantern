@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.property
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
+import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.data.property.DoublePropertyProvider
 import org.lanternpowered.api.data.property.IntPropertyProvider
 import org.lanternpowered.api.data.property.Property
@@ -38,7 +39,7 @@ import java.util.ArrayList
 import java.util.Comparator
 import java.util.concurrent.ConcurrentHashMap
 
-open class LanternPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H> {
+open class LanternPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H>() {
 
     private val propertyProviders = HashMultimap.create<Property<*>, PropertyProvider<*>>()
     private val cachedDelegates = ConcurrentHashMap<Property<*>, PropertyProvider<*>>()
@@ -63,11 +64,16 @@ open class LanternPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H> {
             return cachedProvidersMap
         }
 
+    override fun <H : PropertyHolder> forHolder(holderType: Class<H>): PropertyRegistry<H> {
+        return LocalPropertyRegistryDelegate(typeTokenOf(holderType), this)
+    }
+
     private fun <V : Any> constructDelegate(property: Property<V>): PropertyProvider<V> {
         return constructDelegate(property, this.propertyProviders[property].uncheckedCast())
     }
 
-    protected open fun <V : Any> constructDelegate(property: Property<V>, propertyProviders: Collection<PropertyProvider<V>>): PropertyProvider<V> {
+    protected open fun <V : Any> constructDelegate(
+            property: Property<V>, propertyProviders: Collection<PropertyProvider<V>>): PropertyProvider<V> {
         if (propertyProviders.size == 1) {
             return propertyProviders.iterator().next()
         }
@@ -89,7 +95,8 @@ open class LanternPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H> {
         this.cachedDelegates.remove(property)
     }
 
-    override fun <V : Any> registerProvider(property: Property<V>, fn: PropertyProviderBuilder<V, H>.(property: Property<V>) -> Unit) {
+    override fun <V : Any> registerProvider(
+            property: Property<V>, fn: PropertyProviderBuilder<V, H>.(property: Property<V>) -> Unit) {
         val builder = LanternPropertyProviderBaseBuilder<V, H>()
         builder.fn(property)
         registerProvider(property, builder.build())
@@ -110,4 +117,37 @@ open class LanternPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H> {
 
     override fun getIntProvider(property: Property<Int>) = getProvider(property) as IntPropertyProvider
     override fun getDoubleProvider(property: Property<Double>) = getProvider(property) as DoublePropertyProvider
+}
+
+private class LocalPropertyRegistryDelegate<H : PropertyHolder>(
+        val holderType: TypeToken<H>,
+        val backing: PropertyRegistry<*>
+) : PropertyRegistry<H>() {
+
+    override val providers: Map<Property<*>, PropertyProvider<*>>
+        get() = this.backing.providers
+
+    override fun <H : PropertyHolder> forHolder(holderType: Class<H>) = this.backing.forHolder(holderType)
+
+    override fun <V : Any> register(property: Property<V>, constant: V) {
+        this.backing.register(property, constant)
+    }
+
+    override fun <V : Any> registerProvider(
+            property: Property<V>, propertyProvider: PropertyProvider<V>) {
+        this.backing.registerProvider(property, propertyProvider)
+    }
+
+    override fun <V : Any> registerProvider(
+            property: Property<V>, fn: PropertyProviderBuilder<V, H>.(property: Property<V>) -> Unit) {
+        val baseBuilder = LanternPropertyProviderBaseBuilder<V, H>()
+        val builder = LanternPropertyProviderBuilder(this.holderType, baseBuilder)
+        builder.fn(property)
+        registerProvider(property, baseBuilder.build())
+    }
+
+    override fun <V : Any> getProvider(property: Property<V>) = this.backing.getProvider(property)
+    override fun getIntProvider(property: Property<Int>) = this.backing.getIntProvider(property)
+    override fun getDoubleProvider(property: Property<Double>) = this.backing.getDoubleProvider(property)
+
 }

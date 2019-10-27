@@ -40,28 +40,29 @@ import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.data.property.Properties
 import org.spongepowered.api.item.inventory.InventoryProperties
+import org.spongepowered.api.registry.AdditionalCatalogRegistryModule
 import java.lang.reflect.Modifier
 import java.util.ArrayList
 import java.util.Comparator
 import kotlin.reflect.KClass
 
-object LanternGlobalPropertyRegistry : AdditionalPluginCatalogRegistryModule<Property<*>>(), GlobalPropertyRegistry,
-        PropertyRegistry<PropertyHolder> by BackingRegistry {
+object LanternGlobalPropertyRegistry : LanternPropertyRegistry<PropertyHolder>(), GlobalPropertyRegistry,
+        AdditionalCatalogRegistryModule<Property<*>> by AdditionalPluginCatalogRegistryModule<Property<*>>() {
 
-    private object BackingRegistry : LanternPropertyRegistry<PropertyHolder>() {
-
-        override fun <V : Any> constructDelegate(property: Property<V>, propertyProviders: Collection<PropertyProvider<V>>): PropertyProvider<V> {
-            val stores = ArrayList(propertyProviders)
-            stores.sortWith(Comparator.comparing(PropertyProvider<V>::getPriority))
-            val immutableStores = ImmutableList.copyOf(stores)
-            val valueType = property.valueType.rawType
-            if (valueType == Int::class.java) {
-                return GlobalIntPropertyProviderDelegate(property.uncheckedCast(), immutableStores.uncheckedCast()).uncheckedCast()
-            } else if (valueType == Double::class.java) {
-                return GlobalDoublePropertyProviderDelegate(property.uncheckedCast(), immutableStores.uncheckedCast()).uncheckedCast()
-            }
-            return GlobalPropertyProviderDelegate(property.uncheckedCast(), immutableStores)
+    override fun <V : Any> constructDelegate(
+            property: Property<V>, propertyProviders: Collection<PropertyProvider<V>>): PropertyProvider<V> {
+        val stores = ArrayList(propertyProviders)
+        stores.sortWith(Comparator.comparing(PropertyProvider<V>::getPriority))
+        val immutableStores = ImmutableList.copyOf(stores)
+        val valueType = property.valueType.rawType
+        if (valueType == Int::class.java) {
+            return GlobalIntPropertyProviderDelegate(
+                    property.uncheckedCast(), immutableStores.uncheckedCast()).uncheckedCast()
+        } else if (valueType == Double::class.java) {
+            return GlobalDoublePropertyProviderDelegate(
+                    property.uncheckedCast(), immutableStores.uncheckedCast()).uncheckedCast()
         }
+        return GlobalPropertyProviderDelegate(property.uncheckedCast(), immutableStores)
     }
 
     override fun registerDefaults() {

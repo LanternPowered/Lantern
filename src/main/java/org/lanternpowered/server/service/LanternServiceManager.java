@@ -36,7 +36,6 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.service.ProvisioningException;
 import org.spongepowered.api.service.ServiceManager;
@@ -50,21 +49,11 @@ public class LanternServiceManager implements ServiceManager {
 
     private final ConcurrentMap<Class<?>, ProviderRegistration<?>> providers =
             new MapMaker().concurrencyLevel(3).makeMap();
-    private final PluginManager pluginManager;
     private final EventManager eventManager;
 
-    /**
-     * Construct a simple {@link ServiceManager}.
-     *
-     * @param pluginManager The plugin manager to get the
-     *            {@link PluginContainer} for a given plugin
-     * @param eventManager The event manager
-     */
     @Inject
-    public LanternServiceManager(PluginManager pluginManager, EventManager eventManager) {
-        checkNotNull(pluginManager, "pluginManager");
+    public LanternServiceManager(EventManager eventManager) {
         checkNotNull(eventManager, "eventManager");
-        this.pluginManager = pluginManager;
         this.eventManager = eventManager;
     }
 
@@ -73,23 +62,15 @@ public class LanternServiceManager implements ServiceManager {
     }
 
     @Override
-    public <T> void setProvider(Object plugin, Class<T> service, T provider) {
+    public <T> void setProvider(PluginContainer plugin, Class<T> service, T provider) {
         checkNotNull(plugin, "plugin");
         checkNotNull(service, "service");
         checkNotNull(provider, "provider");
 
-        final Optional<PluginContainer> containerOptional = this.pluginManager.fromInstance(plugin);
-        if (!containerOptional.isPresent()) {
-            throw new IllegalArgumentException(
-                    "The provided plugin object does not have an associated plugin container "
-                            + "(in other words, is 'plugin' actually your plugin object?)");
-        }
-
-        final PluginContainer container = containerOptional.get();
-        final ProviderRegistration<T> newProvider = new Provider<>(container, service, provider);
+        final ProviderRegistration<T> newProvider = new Provider<>(plugin, service, provider);
         final ProviderRegistration<?> oldProvider = this.providers.put(service, newProvider);
         try (CauseStack.Frame frame = CauseStack.currentOrEmpty().pushCauseFrame()) {
-            frame.pushCause(container);
+            frame.pushCause(plugin);
             frame.addContext(EventContextKeys.SERVICE_MANAGER, this);
 
             this.eventManager.post(SpongeEventFactory.createChangeServiceProviderEvent(frame.getCurrentCause(),

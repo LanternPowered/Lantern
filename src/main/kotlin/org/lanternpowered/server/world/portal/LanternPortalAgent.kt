@@ -23,4 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class) package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.world.portal
+
+import org.spongepowered.api.world.Location
+import org.spongepowered.api.world.teleport.PortalAgent
+import org.spongepowered.api.world.teleport.PortalAgentType
+import java.util.Optional
+
+abstract class LanternPortalAgent(private val portalAgentType: PortalAgentType) : PortalAgent {
+
+    private var searchRadius: Int = 0
+    private var creationRadius: Int = 0
+
+    override fun getSearchRadius() = this.searchRadius
+
+    override fun setSearchRadius(radius: Int) = apply {
+        this.searchRadius = radius
+    }
+
+    override fun getCreationRadius() = this.creationRadius
+
+    override fun setCreationRadius(radius: Int) = apply {
+        this.creationRadius = radius
+    }
+
+    override fun findOrCreatePortal(targetLocation: Location): Optional<Location> {
+        val optLoc = this.findPortal(targetLocation)
+        return if (optLoc.isPresent) optLoc else this.createPortal(targetLocation)
+    }
+
+    override fun getType(): PortalAgentType = this.portalAgentType
+}

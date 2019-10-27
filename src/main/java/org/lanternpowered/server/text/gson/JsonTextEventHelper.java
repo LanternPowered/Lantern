@@ -28,6 +28,8 @@ package org.lanternpowered.server.text.gson;
 import static org.lanternpowered.server.util.UncheckedThrowables.throwUnchecked;
 
 import com.google.gson.JsonParseException;
+import kotlin.text.MatchResult;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -37,7 +39,7 @@ import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.lanternpowered.server.text.translation.TranslationContext;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -58,9 +60,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class JsonTextEventHelper {
 
@@ -91,12 +90,12 @@ final class JsonTextEventHelper {
                 break;
             case "run_command":
                 // Check for a valid click action callback
-                final Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(value.trim().toLowerCase());
-                if (matcher.matches()) {
-                    final UUID uniqueId = UUID.fromString(matcher.group(1));
-                    final Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.get().getCallbackForUUID(uniqueId);
-                    if (callback.isPresent()) {
-                        return TextActions.executeCallback(callback.get());
+                final MatchResult result = LanternClickActionCallbacks.INSTANCE.getCommandPattern().matchEntire(value.trim().toLowerCase());
+                if (result != null) {
+                    final UUID uniqueId = UUID.fromString(result.getGroupValues().get(1));
+                    final Consumer<CommandCause> callback = LanternClickActionCallbacks.INSTANCE.getCallbackForUUID(uniqueId);
+                    if (callback != null) {
+                        return TextActions.executeCallback(callback);
                     }
                 }
                 return TextActions.runCommand(value);
@@ -163,9 +162,9 @@ final class JsonTextEventHelper {
                 return new RawAction("open_url", url.toExternalForm());
             }
         } else if (clickAction instanceof ClickAction.ExecuteCallback) {
-            final UUID uniqueId = LanternClickActionCallbacks.get().getOrCreateIdForCallback(
+            final UUID uniqueId = LanternClickActionCallbacks.INSTANCE.getOrCreateIdForCallback(
                     ((ClickAction.ExecuteCallback) clickAction).getResult());
-            return new RawAction("run_command", LanternClickActionCallbacks.COMMAND_BASE + uniqueId.toString());
+            return new RawAction("run_command", LanternClickActionCallbacks.commandBase + uniqueId.toString());
         } else if (clickAction instanceof ClickAction.RunCommand) {
             return new RawAction("run_command", ((ClickAction.RunCommand) clickAction).getResult());
         } else if (clickAction instanceof ClickAction.SuggestCommand) {

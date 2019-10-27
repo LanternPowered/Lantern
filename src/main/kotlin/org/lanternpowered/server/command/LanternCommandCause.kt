@@ -23,26 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.portal;
+package org.lanternpowered.server.command
 
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.teleport.PortalAgentType;
+import org.spongepowered.api.command.CommandCause
+import org.spongepowered.api.event.cause.Cause
 
-import java.util.Optional;
+class LanternCommandCause(private val cause: Cause) : CommandCause {
+    override fun getCause() = this.cause
+}
 
-public final class EmptyPortalAgent extends LanternPortalAgent {
-
-    public EmptyPortalAgent(PortalAgentType portalAgentType) {
-        super(portalAgentType);
-    }
-
-    @Override
-    public Optional<Location> findPortal(Location targetLocation) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<Location> createPortal(Location targetLocation) {
-        return Optional.empty();
-    }
+object LanternCommandCauseFactory : CommandCause.Factory {
+    override fun create(cause: Cause) = LanternCommandCause(cause)
 }

@@ -25,6 +25,12 @@
  */
 package org.lanternpowered.server.data
 
+import org.lanternpowered.api.ext.emptyOptionalDouble
+import org.lanternpowered.api.ext.emptyOptionalInt
+import org.lanternpowered.api.ext.emptyOptionalLong
+import org.lanternpowered.api.ext.optionalDouble
+import org.lanternpowered.api.ext.optionalInt
+import org.lanternpowered.api.ext.optionalLong
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.ValueContainer
@@ -41,15 +47,15 @@ interface ValueContainerBase : ValueContainer {
 
     @JvmDefault
     override fun getInt(key: Key<out Value<Int>>): OptionalInt =
-            get(key).map { OptionalInt.of(it) }.orElseGet { OptionalInt.empty() }
+            get(key).map { it.optionalInt() }.orElseGet { emptyOptionalInt() }
 
     @JvmDefault
     override fun getDouble(key: Key<out Value<Double>>): OptionalDouble =
-            get(key).map<OptionalDouble> { OptionalDouble.of(it) }.orElseGet { OptionalDouble.empty() }
+            get(key).map { it.optionalDouble() }.orElseGet { emptyOptionalDouble() }
 
     @JvmDefault
     override fun getLong(key: Key<out Value<Long>>): OptionalLong =
-            get(key).map<OptionalLong> { OptionalLong.of(it) }.orElseGet { OptionalLong.empty() }
+            get(key).map { it.optionalLong() }.orElseGet { emptyOptionalLong() }
 
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E>
 

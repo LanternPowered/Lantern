@@ -26,13 +26,14 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
 import com.google.common.collect.ImmutableMap;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import kotlin.text.MatchResult;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.server.command.LanternCommandCause;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
@@ -45,7 +46,8 @@ import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -87,15 +89,20 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         final String message0 = message.getMessage();
 
         // Check for a valid click action callback
-        final Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(message0);
-        if (matcher.matches()) {
-            final UUID uniqueId = UUID.fromString(matcher.group(1));
-            final Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.get().getCallbackForUUID(uniqueId);
-            if (callback.isPresent()) {
-                callback.get().accept(player);
+        final MatchResult result = LanternClickActionCallbacks.INSTANCE.getCommandPattern().matchEntire(message0);
+        if (result != null) {
+            final UUID uniqueId = UUID.fromString(result.getGroupValues().get(1));
+            final Consumer<CommandCause> callback = LanternClickActionCallbacks.INSTANCE.getCallbackForUUID(uniqueId);
+            if (callback != null) {
+                final CauseStack causeStack = CauseStack.current();
+                try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
+                    frame.addContext(EventContextKeys.PLAYER, player);
+                    final CommandCause commandCause = new LanternCommandCause(frame.getCurrentCause());
+                    callback.accept(commandCause);
+                }
             } else {
-                player.sendMessage(error(t("The callback you provided was not valid. Keep in mind that callbacks will expire "
-                        + "after 10 minutes, so you might want to consider clicking faster next time!")));
+                player.sendMessage(t("The callback you provided was not valid. Keep in mind that callbacks will expire "
+                        + "after 10 minutes, so you might want to consider clicking faster next time!"));
             }
             return;
         }

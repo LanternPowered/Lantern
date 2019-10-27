@@ -157,7 +157,7 @@ public final class LegacyTexts {
             final Object[] args0 = new Object[args.size()];
             for (int i = 0; i < args0.length; i++) {
                 Object object = args.get(i);
-                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
+                if (object instanceof TextRepresentable) {
                     if (object instanceof Text) {
                         // Ignore
                     } else if (object instanceof Text.Builder) {

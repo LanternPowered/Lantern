@@ -27,7 +27,8 @@
 
 package org.lanternpowered.server.data.property
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.ext.typeTokenOf
 import org.lanternpowered.api.util.Direction
 import org.lanternpowered.api.util.TypeToken
 import org.lanternpowered.server.data.LocalDataDsl

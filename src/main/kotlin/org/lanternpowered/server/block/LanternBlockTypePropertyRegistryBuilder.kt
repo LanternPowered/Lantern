@@ -23,32 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.pregen;
+package org.lanternpowered.server.block
 
-import org.spongepowered.api.event.EventListener;
-import org.spongepowered.api.event.world.ChunkPreGenerationEvent;
-import org.spongepowered.api.world.ChunkPreGenerate;
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.server.data.property.PropertyRegistry
+import org.spongepowered.api.block.BlockState
+import org.spongepowered.api.block.BlockType
 
-import java.util.List;
-import java.util.UUID;
-import java.util.function.Consumer;
+class LanternBlockTypePropertyRegistryBuilder(
+        val backing: LocalPropertyRegistry<BlockType>
+) : BlockTypePropertyRegistryBuilder(), PropertyRegistry<BlockType> by backing {
 
-public class LanternChunkPreGenerateListener implements EventListener<ChunkPreGenerationEvent> {
-
-    private final List<Consumer<ChunkPreGenerationEvent>> listeners;
-    private final UUID task;
-
-    LanternChunkPreGenerateListener(UUID task, List<Consumer<ChunkPreGenerationEvent>> listeners) {
-        this.task = task;
-        this.listeners = listeners;
+    override fun forStates(fn: LocalPropertyRegistry<BlockState>.() -> Unit) {
+        forHolder(fn)
     }
 
-    @Override
-    public void handle(ChunkPreGenerationEvent event) throws Exception {
-        ChunkPreGenerate preGenerate = event.getChunkPreGenerate();
-        if (preGenerate instanceof LanternChunkPreGenerateTask &&
-                ((LanternChunkPreGenerateTask) preGenerate).getSpongeTask().getUniqueId().equals(task)) {
-            this.listeners.forEach(x -> x.accept(event));
-        }
-    }
+    override fun <H : PropertyHolder> forHolder(holderType: Class<H>) = this.backing.forHolder(holderType)
 }

@@ -31,6 +31,7 @@ import org.spongepowered.api.util.OptBool
 import java.util.Optional
 import java.util.OptionalDouble
 import java.util.OptionalInt
+import java.util.OptionalLong
 
 /**
  * Gets a empty [Optional].
@@ -46,6 +47,11 @@ inline fun emptyOptionalInt(): OptionalInt = OptionalInt.empty()
  * Gets a empty [OptionalDouble].
  */
 inline fun emptyOptionalDouble(): OptionalDouble = OptionalDouble.empty()
+
+/**
+ * Gets a empty [OptionalLong].
+ */
+inline fun emptyOptionalLong(): OptionalLong = OptionalLong.empty()
 
 /**
  * Unwraps the [Optional] value.
@@ -104,6 +110,18 @@ inline fun Double.optionalDouble(): OptionalDouble = OptionalDouble.of(this)
  */
 @JvmName("optionalOfNullable")
 inline fun Double?.optionalDouble(): OptionalDouble = if (this == null) OptionalDouble.empty() else OptionalDouble.of(this)
+
+/**
+ * Wraps the long into an [OptionalLong].
+ */
+@JvmName("optionalOf")
+inline fun Long.optionalLong(): OptionalLong = OptionalLong.of(this)
+
+/**
+ * Wraps the long into an [OptionalLong].
+ */
+@JvmName("optionalOfNullable")
+inline fun Long?.optionalLong(): OptionalLong = if (this == null) OptionalLong.empty() else OptionalLong.of(this)
 
 /**
  * Transforms this [Optional] into a [OptionalInt].

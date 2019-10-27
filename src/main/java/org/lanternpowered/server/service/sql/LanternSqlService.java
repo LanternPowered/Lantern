@@ -31,9 +31,9 @@ import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.CloseableService;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.sql.SqlService;
 
@@ -50,8 +50,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of a SQL-using service.
@@ -126,15 +124,9 @@ public class LanternSqlService implements SqlService, CloseableService {
     }
 
     @Override
-    public DataSource getDataSource(@Nullable Object plugin, String jdbcConnection) throws SQLException {
+    public DataSource getDataSource(PluginContainer plugin, String jdbcConnection) throws SQLException {
         jdbcConnection = getConnectionUrlFromAlias(jdbcConnection).orElse(jdbcConnection);
-        PluginContainer container = null;
-        if (plugin != null) {
-            container = Sponge.getPluginManager().fromInstance(plugin).orElseThrow(() -> new IllegalArgumentException(
-                    "The provided plugin object does not have an associated plugin container"
-                            + " (in other words, is 'plugin' actually your plugin object?"));
-        }
-        final ConnectionInfo info = ConnectionInfo.fromUrl(container, jdbcConnection);
+        final ConnectionInfo info = ConnectionInfo.fromUrl(plugin, jdbcConnection);
         return this.connectionCache.get(info);
     }
 

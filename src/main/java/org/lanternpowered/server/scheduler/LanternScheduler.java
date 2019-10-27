@@ -113,7 +113,6 @@ public class LanternScheduler implements Scheduler {
         this.tasksByUniqueId.remove(task.getUniqueId());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public LanternScheduledTask submit(Task task) {
         return submit(task, (executor, scheduledTask, runnable) -> {

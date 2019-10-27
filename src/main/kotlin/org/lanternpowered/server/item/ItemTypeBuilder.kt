@@ -23,8 +23,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data
+package org.lanternpowered.server.item
+
+import org.lanternpowered.api.data.Key
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.item.ItemType
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.server.data.LocalKeyRegistry
+import org.lanternpowered.server.data.property.LocalPropertyRegistry
+
+fun itemTypeOf(key: CatalogKey, fn: ItemTypeBuilder.() -> Unit): ItemType {
+    TODO()
+}
 
 @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS)
 @DslMarker
-annotation class LocalDataDsl
+annotation class ItemTypeBuilderDsl
+
+@ItemTypeBuilderDsl
+interface ItemTypeBuilder {
+
+    fun name(name: String)
+    fun name(name: Translation)
+
+    /**
+     * Sets the maximum stack quantity.
+     */
+    fun maxStackQuantity(quantity: Int)
+
+    /**
+     * Applies properties to the [ItemType].
+     */
+    fun properties(fn: ItemTypePropertyRegistryBuilder.() -> Unit)
+
+    /**
+     * Applies a function that can be used to register
+     * [Key]s on [ItemStack]s of the built item type.
+     */
+    fun valueKeys(fn: @ItemTypeBuilderDsl LocalKeyRegistry<ItemStack>.() -> Unit)
+}
+
+@ItemTypeBuilderDsl
+abstract class ItemTypePropertyRegistryBuilder : LocalPropertyRegistry<ItemType>() {
+
+    /**
+     * Applies properties based on the [ItemStack] of the target [ItemType].
+     */
+    abstract fun forStack(fn: LocalPropertyRegistry<ItemStack>.() -> Unit)
+}
+

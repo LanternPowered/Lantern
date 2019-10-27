@@ -23,5 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.block.state;
+package org.lanternpowered.server.world.gen
+
+import org.spongepowered.api.world.gen.TerrainGenerator
+import org.spongepowered.api.world.gen.TerrainGeneratorConfig
+
+open class LanternTerrainGenerator<C : TerrainGeneratorConfig>(
+        private val generationSettings: C
+) : TerrainGenerator<C> {
+
+    override fun getGenerationSettings(): C = this.generationSettings
+}

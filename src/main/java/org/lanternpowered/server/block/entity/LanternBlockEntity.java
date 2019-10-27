@@ -51,7 +51,7 @@ import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
-public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDataHolder, PropertyHolderBase {
+public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDataHolder {
 
     private LanternBlockEntityType blockEntityType;
     private final LocalKeyRegistry<? extends LanternBlockEntity> localKeyRegistry = LocalKeyRegistry.of();

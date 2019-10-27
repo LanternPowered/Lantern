@@ -41,10 +41,6 @@ class LanternShulkerBox : ContainerBlockEntity<ChestInventory>() {
 
     init {
         this.protocolType = BlockEntityProtocolTypes.DEFAULT
-    }
-
-    public override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(Keys.DISPLAY_NAME)

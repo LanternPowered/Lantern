@@ -23,32 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.translation;
+package org.lanternpowered.server.world.portal
 
-import org.lanternpowered.server.block.TranslationProvider;
-import org.lanternpowered.server.block.state.BlockStateProperties;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.text.translation.TranslationManager;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
+import org.lanternpowered.api.ext.emptyOptional
+import org.spongepowered.api.world.Location
+import org.spongepowered.api.world.teleport.PortalAgentType
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.Optional
 
-public class SpongeTranslationProvider implements TranslationProvider {
+class EmptyPortalAgent(portalAgentType: PortalAgentType) : LanternPortalAgent(portalAgentType) {
 
-    private final Translation dryTranslation;
-    private final Translation wetTranslation;
-
-    public SpongeTranslationProvider() {
-        final TranslationManager manager = Lantern.getRegistry().getTranslationManager();
-        this.dryTranslation = manager.get("tile.sponge.dry.name");
-        this.wetTranslation = manager.get("tile.sponge.wet.name");
-    }
-
-    @Override
-    public Translation get(BlockState blockState, @Nullable Location location, @Nullable Direction face) {
-        return blockState.getStateProperty(BlockStateProperties.IS_WET).get() ? this.wetTranslation : this.dryTranslation;
-    }
+    override fun findPortal(targetLocation: Location): Optional<Location> = emptyOptional()
+    override fun createPortal(targetLocation: Location): Optional<Location> = emptyOptional()
 }

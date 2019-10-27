@@ -23,5 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.world.portal;
+package org.lanternpowered.server.item
+
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.item.ItemType
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.server.data.property.PropertyRegistry
+
+class LanternItemTypePropertyRegistryBuilder(
+        val backing: LocalPropertyRegistry<ItemType>
+) : ItemTypePropertyRegistryBuilder(), PropertyRegistry<ItemType> by backing {
+
+    override fun forStack(fn: LocalPropertyRegistry<ItemStack>.() -> Unit) {
+        forHolder(fn)
+    }
+
+    override fun <H : PropertyHolder> forHolder(holderType: Class<H>) = this.backing.forHolder(holderType)
+}

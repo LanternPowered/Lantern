@@ -40,6 +40,7 @@ import java.util.function.Consumer
  * Represents a collection of [KeyRegistration]s with
  * optionally bound element holders.
  */
+@LocalDataDsl
 abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistration<*, *, H>> {
 
     companion object {

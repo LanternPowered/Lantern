@@ -31,14 +31,17 @@ import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import com.google.common.collect.Lists
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.ext.immutableMapBuilderOf
 import org.lanternpowered.api.ext.immutableSetBuilderOf
 import org.lanternpowered.api.ext.toImmutableList
+import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.registry.CatalogRegistryModule
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 import org.spongepowered.api.state.StateProperty
@@ -137,6 +140,33 @@ abstract class AbstractStateContainer<S : State<S>>(
 
         private val NAME = DataQuery.of("Name")
         private val PROPERTIES = DataQuery.of("Properties")
+
+        fun <T, S : State<S>> deserializeState(dataView: DataView, registry: CatalogRegistryModule<T>):
+                S where T : CatalogType, T : StateContainer<S> {
+            val id = dataView.getString(NAME).get()
+            val catalogType = registry.get(CatalogKey.resolve(id)).get()
+
+            var state = catalogType.defaultState
+            val properties = dataView.getView(PROPERTIES).orElse(null)
+            if (properties != null) {
+                for ((key, rawValue) in properties.getValues(false)) {
+                    val stateProperty = state.getStatePropertyByName(key.toString()).orElse(null)
+                    if (stateProperty != null) {
+                        val value = stateProperty.parseValue(rawValue.toString()).orElse(null)
+                        if (value != null) {
+                            @Suppress("UNCHECKED_CAST")
+                            stateProperty as StateProperty<Comparable<Comparable<*>>>
+                            val newState = state.withStateProperty(stateProperty, value.uncheckedCast()).orElse(null)
+                            if (newState != null) {
+                                state = newState
+                            }
+                        }
+                    }
+                }
+            }
+
+            return state
+        }
     }
 
     private fun buildDataContainer(baseKey: CatalogKey, values: Map<StateProperty<*>, Comparable<*>>): DataContainer {

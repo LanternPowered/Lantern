@@ -27,10 +27,12 @@
 
 package org.lanternpowered.server.data.property
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.uncheckedCast
+import org.lanternpowered.server.data.LocalDataDsl
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.spongepowered.api.data.property.PropertyHolder
 
+@LocalDataDsl
 abstract class LocalPropertyRegistry<H : PropertyHolder> : PropertyRegistry<H> {
 
     /**

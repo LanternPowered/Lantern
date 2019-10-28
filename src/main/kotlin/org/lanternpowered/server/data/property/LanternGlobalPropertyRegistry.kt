@@ -46,7 +46,7 @@ import java.util.ArrayList
 import java.util.Comparator
 import kotlin.reflect.KClass
 
-object LanternGlobalPropertyRegistry : LanternPropertyRegistry<PropertyHolder>(), GlobalPropertyRegistry,
+object LanternGlobalPropertyRegistry : LanternPropertyRegistry<PropertyHolder>(),
         AdditionalCatalogRegistryModule<Property<*>> by AdditionalPluginCatalogRegistryModule<Property<*>>() {
 
     override fun <V : Any> constructDelegate(

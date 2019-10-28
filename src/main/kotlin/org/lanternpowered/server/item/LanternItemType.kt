@@ -40,7 +40,7 @@ import org.spongepowered.api.block.BlockType
 
 class LanternItemType(
         key: CatalogKey,
-        private val nameFunction: ItemStack.() -> Translation,
+        val nameFunction: ItemStack.() -> Translation,
         private val blockType: BlockType?,
         private val maxStackQuantity: Int,
         private val valueKeyRegistry: LocalKeyRegistry<ItemStack>,

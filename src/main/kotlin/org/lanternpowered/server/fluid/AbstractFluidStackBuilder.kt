@@ -25,22 +25,30 @@
  */
 package org.lanternpowered.server.fluid
 
-import org.lanternpowered.api.ext.*
+import org.spongepowered.api.data.DataHolder
+import org.spongepowered.api.data.DataHolderBuilder
+import org.spongepowered.api.data.DataManipulator
+import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
-import org.spongepowered.api.data.persistence.DataBuilder
-import org.spongepowered.api.data.persistence.DataSerializable
 import org.spongepowered.api.data.persistence.DataView
+import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.fluid.FluidStack
 import org.spongepowered.api.fluid.FluidStackSnapshot
 import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.fluid.FluidTypes
 import java.util.Optional
 
-abstract class AbstractFluidStackBuilder<T : DataSerializable, B : DataBuilder<T>> internal constructor(type: Class<T>) :
-        AbstractDataBuilder<T>(type, 1) {
+abstract class AbstractFluidStackBuilder<T : DataHolder, B : DataHolderBuilder<T, B>> internal constructor(type: Class<T>) :
+        AbstractDataBuilder<T>(type, 1), DataHolderBuilder<T, B> {
 
     private var fluidStack: LanternFluidStack? = null
     private var fluidTypeSet: Boolean = false
+
+    @Suppress("UNCHECKED_CAST")
+    private inline fun apply(fn: () -> Unit): B {
+        fn()
+        return this as B
+    }
 
     fun fluidStack(fluidType: FluidType?): LanternFluidStack {
         var fluidStack = this.fluidStack
@@ -61,35 +69,48 @@ abstract class AbstractFluidStackBuilder<T : DataSerializable, B : DataBuilder<T
         return fluidStack
     }
 
-    fun fluid(fluidType: FluidType): B = apply {
+    fun fluid(fluidType: FluidType) = apply {
         fluidStack(fluidType)
-    }.uncheckedCast()
+    }
 
-    fun volume(volume: Int): B = apply {
+    fun volume(volume: Int) = apply {
         fluidStack(null).volume = volume
-    }.uncheckedCast()
+    }
+
+    override fun add(itemData: DataManipulator) = apply {
+        val itemStack = fluidStack(null)
+        itemData.values.forEach { itemStack.offerFastNoEvents(it) }
+    }
+
+    override fun add(value: Value<*>) = apply {
+        fluidStack(null).offerFastNoEvents(value)
+    }
+
+    override fun <V : Any> add(key: Key<out Value<V>>, value: V) = apply {
+        fluidStack(null).offerFastNoEvents(key, value)
+    }
 
     fun buildStack(): LanternFluidStack {
         check(this.fluidTypeSet) { "The fluid type must be set" }
         return fluidStack(null).copy()
     }
 
-    fun from(fluidStackSnapshot: FluidStackSnapshot): B = apply {
+    fun from(fluidStackSnapshot: FluidStackSnapshot) = apply {
         this.fluidStack = fluidStackSnapshot.createStack() as LanternFluidStack
         this.fluidTypeSet = true
-    }.uncheckedCast()
+    }
 
-    fun from(value: FluidStack): B = apply {
+    fun from(value: FluidStack) = apply {
         this.fluidStack = value.copy() as LanternFluidStack
         this.fluidTypeSet = true
-    }.uncheckedCast()
+    }
 
-    override fun reset(): B = apply {
+    override fun reset() = apply {
         this.fluidStack = null
         this.fluidTypeSet = false
-    }.uncheckedCast()
+    }
 
     override fun buildContent(container: DataView): Optional<T> {
-        throw UnsupportedOperationException("TODO")
+        TODO()
     }
 }

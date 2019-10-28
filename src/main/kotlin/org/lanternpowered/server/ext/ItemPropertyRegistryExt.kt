@@ -28,7 +28,7 @@ package org.lanternpowered.server.ext
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.ItemType
-import org.lanternpowered.server.data.property.LocalPropertyRegistry
+import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.item.ItemProperties
 import org.spongepowered.api.data.property.Properties
 import org.spongepowered.api.data.type.ArmorType
@@ -36,130 +36,130 @@ import org.spongepowered.api.data.type.ToolType
 import org.spongepowered.api.effect.sound.music.MusicDisc
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
-fun <H : ItemType> LocalPropertyRegistry<H>.applicablePotionEffects(vararg effects: PotionEffect) {
+fun <H : ItemType> PropertyRegistry<H>.applicablePotionEffects(vararg effects: PotionEffect) {
     register(Properties.APPLICABLE_POTION_EFFECTS, effects.toImmutableList())
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.applicablePotionEffects(effects: List<PotionEffect>) {
+fun <H : ItemType> PropertyRegistry<H>.applicablePotionEffects(effects: List<PotionEffect>) {
     register(Properties.APPLICABLE_POTION_EFFECTS, effects.toImmutableList())
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.applicablePotionEffects(fn: H.() -> List<PotionEffect>) {
+fun <H : ItemType> PropertyRegistry<H>.applicablePotionEffects(fn: H.() -> List<PotionEffect>) {
     registerProvider(Properties.APPLICABLE_POTION_EFFECTS) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.replenishedFood(replenishedFood: Double) {
+fun <H : ItemType> PropertyRegistry<H>.replenishedFood(replenishedFood: Double) {
     register(Properties.REPLENISHED_FOOD, replenishedFood)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.replenishedFood(fn: H.() -> Double) {
+fun <H : ItemType> PropertyRegistry<H>.replenishedFood(fn: H.() -> Double) {
     registerProvider(Properties.REPLENISHED_FOOD) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.saturation(saturation: Double) {
+fun <H : ItemType> PropertyRegistry<H>.saturation(saturation: Double) {
     register(Properties.REPLENISHED_SATURATION, saturation)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.saturation(fn: H.() -> Double) {
+fun <H : ItemType> PropertyRegistry<H>.saturation(fn: H.() -> Double) {
     registerProvider(Properties.REPLENISHED_SATURATION) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.healthRestoration(health: Double) {
+fun <H : ItemType> PropertyRegistry<H>.healthRestoration(health: Double) {
     register(ItemProperties.HEALTH_RESTORATION, health)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.healthRestoration(fn: H.() -> Double) {
+fun <H : ItemType> PropertyRegistry<H>.healthRestoration(fn: H.() -> Double) {
     registerProvider(ItemProperties.HEALTH_RESTORATION) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.useLimit(limit: Int) {
+fun <H : ItemType> PropertyRegistry<H>.useLimit(limit: Int) {
     register(Properties.USE_LIMIT, limit)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.useLimit(fn: H.() -> Int) {
+fun <H : ItemType> PropertyRegistry<H>.useLimit(fn: H.() -> Int) {
     registerProvider(Properties.USE_LIMIT) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.useDuration(duration: Int) {
+fun <H : ItemType> PropertyRegistry<H>.useDuration(duration: Int) {
     register(ItemProperties.MINIMUM_USE_DURATION, duration)
     register(ItemProperties.MAXIMUM_USE_DURATION, duration)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.useDuration(duration: IntRange) {
+fun <H : ItemType> PropertyRegistry<H>.useDuration(duration: IntRange) {
     register(ItemProperties.MINIMUM_USE_DURATION, duration.start)
     register(ItemProperties.MAXIMUM_USE_DURATION, duration.endInclusive)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.cooldown(cooldown: Int) {
+fun <H : ItemType> PropertyRegistry<H>.cooldown(cooldown: Int) {
     register(ItemProperties.USE_COOLDOWN, cooldown)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.cooldown(fn: H.() -> Int) {
+fun <H : ItemType> PropertyRegistry<H>.cooldown(fn: H.() -> Int) {
     registerProvider(ItemProperties.USE_COOLDOWN) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.alwaysConsumable(alwaysConsumable: Boolean) {
+fun <H : ItemType> PropertyRegistry<H>.alwaysConsumable(alwaysConsumable: Boolean) {
     register(ItemProperties.IS_ALWAYS_CONSUMABLE, alwaysConsumable)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.alwaysConsumable(fn: H.() -> Boolean) {
+fun <H : ItemType> PropertyRegistry<H>.alwaysConsumable(fn: H.() -> Boolean) {
     registerProvider(ItemProperties.IS_ALWAYS_CONSUMABLE) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.dualWieldable(dualWield: Boolean) {
+fun <H : ItemType> PropertyRegistry<H>.dualWieldable(dualWield: Boolean) {
     register(ItemProperties.IS_DUAL_WIELDABLE, dualWield)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.dualWieldable(fn: H.() -> Boolean) {
+fun <H : ItemType> PropertyRegistry<H>.dualWieldable(fn: H.() -> Boolean) {
     registerProvider(ItemProperties.IS_DUAL_WIELDABLE) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.toolType(toolType: ToolType) {
+fun <H : ItemType> PropertyRegistry<H>.toolType(toolType: ToolType) {
     register(Properties.TOOL_TYPE, toolType)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.toolType(fn: H.() -> ToolType) {
+fun <H : ItemType> PropertyRegistry<H>.toolType(fn: H.() -> ToolType) {
     registerProvider(Properties.TOOL_TYPE) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.armorType(armorType: ArmorType) {
+fun <H : ItemType> PropertyRegistry<H>.armorType(armorType: ArmorType) {
     register(Properties.ARMOR_TYPE, armorType)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.armorType(fn: H.() -> ArmorType) {
+fun <H : ItemType> PropertyRegistry<H>.armorType(fn: H.() -> ArmorType) {
     registerProvider(Properties.ARMOR_TYPE) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.equipmentType(equipmentType: EquipmentType) {
+fun <H : ItemType> PropertyRegistry<H>.equipmentType(equipmentType: EquipmentType) {
     register(Properties.EQUIPMENT_TYPE, equipmentType)
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.equipmentType(fn: H.() -> EquipmentType) {
+fun <H : ItemType> PropertyRegistry<H>.equipmentType(fn: H.() -> EquipmentType) {
     registerProvider(Properties.EQUIPMENT_TYPE) {
         get(fn)
     }
 }
 
-fun <H : ItemType> LocalPropertyRegistry<H>.musicDisc(musicDisc: MusicDisc) {
+fun <H : ItemType> PropertyRegistry<H>.musicDisc(musicDisc: MusicDisc) {
     register(Properties.MUSIC_DISC, musicDisc)
 }

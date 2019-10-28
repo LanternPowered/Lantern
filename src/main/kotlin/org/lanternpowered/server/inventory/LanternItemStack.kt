@@ -93,7 +93,7 @@ class LanternItemStack private constructor(
             .set(DataQueries.QUANTITY, this.quantity)
 
     override fun getTranslation(): Translation {
-        return (type as LanternItemType).translationProvider.get(this.itemType, this)
+        return (this.type as LanternItemType).nameFunction(this)
     }
 
     override fun getType(): ItemType = if (this.quantity == 0) ItemTypes.AIR else this.itemType

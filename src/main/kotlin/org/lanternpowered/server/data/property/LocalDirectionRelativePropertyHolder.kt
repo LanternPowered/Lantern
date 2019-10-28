@@ -33,7 +33,7 @@ import java.util.OptionalInt
 
 interface LocalDirectionRelativePropertyHolder : LocalPropertyHolder, DirectionRelativePropertyHolderBase {
 
-    override val propertyRegistry: LocalPropertyRegistry<out LocalDirectionRelativePropertyHolder>
+    override val propertyRegistry: PropertyRegistry<out LocalDirectionRelativePropertyHolder>
 
     @JvmDefault
     override fun <V : Any> getProperty(direction: Direction, property: Property<V>): Optional<V> {

@@ -25,16 +25,16 @@
  */
 package org.lanternpowered.server.state
 
+import org.spongepowered.api.data.DataHolderBuilder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
-import org.spongepowered.api.data.persistence.DataBuilder
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.State
 import kotlin.reflect.KClass
 
-abstract class AbstractStateBuilder<S : State<S>, B : DataBuilder.Immutable<S, B>>(
+abstract class AbstractStateBuilder<S : State<S>, B : DataHolderBuilder.Immutable<S, B>>(
         private val stateType: KClass<S>, supportedVersion: Int = 1
-) : AbstractDataBuilder<S>(stateType.java, supportedVersion), DataBuilder.Immutable<S, B> {
+) : AbstractDataBuilder<S>(stateType.java, supportedVersion), DataHolderBuilder.Immutable<S, B> {
 
     private var state: S? = null
 

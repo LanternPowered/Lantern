@@ -77,7 +77,7 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
         itemData.values.forEach { itemStack.offerFastNoEvents(it) }
     }
 
-    override fun <V : Value<E>, E : Any> add(value: V) = apply {
+    override fun add(value: Value<*>) = apply {
         itemStack(null).offerFastNoEvents(value)
     }
 
@@ -98,11 +98,16 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
     }
 
     override fun fromContainer(container: DataView): ItemStack.Builder {
-        throw UnsupportedOperationException("TODO")
+        TODO()
     }
 
     override fun fromBlockSnapshot(blockSnapshot: BlockSnapshot): ItemStack.Builder {
-        throw UnsupportedOperationException("TODO")
+        TODO()
+    }
+
+    override fun reset() = apply {
+        this.itemTypeSet = false
+        this.itemStack = null
     }
 
     override fun build(): ItemStack {
@@ -111,6 +116,6 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
     }
 
     override fun buildContent(container: DataView): Optional<ItemStack> {
-        throw UnsupportedOperationException("TODO")
+        TODO()
     }
 }

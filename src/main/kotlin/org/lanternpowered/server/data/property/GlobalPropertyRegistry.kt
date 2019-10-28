@@ -25,12 +25,43 @@
  */
 package org.lanternpowered.server.data.property
 
-import org.spongepowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.data.property.DoublePropertyProvider
+import org.lanternpowered.api.data.property.IntPropertyProvider
+import org.lanternpowered.api.data.property.Property
+import org.lanternpowered.api.data.property.PropertyHolder
+import org.lanternpowered.api.data.property.PropertyProvider
 
-interface GlobalPropertyRegistry : PropertyRegistry<PropertyHolder> {
+/**
+ * The global property registry.
+ */
+object GlobalPropertyRegistry : PropertyRegistry<PropertyHolder>() {
 
-    /**
-     * The instance of the global registry.
-     */
-    companion object : GlobalPropertyRegistry by LanternGlobalPropertyRegistry
+    override val providers: Map<Property<*>, PropertyProvider<*>>
+        get() = LanternGlobalPropertyRegistry.providers
+
+    override fun <H : PropertyHolder> forHolder(holderType: Class<H>): PropertyRegistry<H>
+            = LanternGlobalPropertyRegistry.forHolder(holderType)
+
+    override fun <V : Any> register(property: Property<V>, constant: V) {
+        LanternGlobalPropertyRegistry.register(property, constant)
+    }
+
+    override fun <V : Any> registerProvider(
+            property: Property<V>, propertyProvider: PropertyProvider<V>) {
+        LanternGlobalPropertyRegistry.registerProvider(property, propertyProvider)
+    }
+
+    override fun <V : Any> registerProvider(
+            property: Property<V>, fn: PropertyProviderBuilder<V, PropertyHolder>.(property: Property<V>) -> Unit) {
+        LanternGlobalPropertyRegistry.registerProvider(property, fn)
+    }
+
+    override fun <V : Any> getProvider(property: Property<V>): PropertyProvider<V>
+            = LanternGlobalPropertyRegistry.getProvider(property)
+
+    override fun getIntProvider(property: Property<Int>): IntPropertyProvider
+            = LanternGlobalPropertyRegistry.getIntProvider(property)
+
+    override fun getDoubleProvider(property: Property<Double>): DoublePropertyProvider
+            = LanternGlobalPropertyRegistry.getDoubleProvider(property)
 }

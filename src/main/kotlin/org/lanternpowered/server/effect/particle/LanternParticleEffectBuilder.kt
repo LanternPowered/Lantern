@@ -77,7 +77,6 @@ class LanternParticleEffectBuilder : AbstractDataBuilder<ParticleEffect>(Particl
     }
 
     override fun reset(): ParticleEffect.Builder = apply {
-        super.reset()
         this.type = null
         this.options.clear()
     }

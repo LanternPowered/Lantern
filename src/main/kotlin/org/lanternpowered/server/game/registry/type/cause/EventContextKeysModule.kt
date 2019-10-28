@@ -57,7 +57,7 @@ object EventContextKeysModule : AdditionalPluginCatalogRegistryModule<EventConte
                 val id = field.name.toLowerCase()
                 // Filter duplicates
                 if (!get(CatalogKey(pluginId, id)).map { key: EventContextKey<*> ->
-                            (key as LanternEventContextKey<*>).allowedTypeToken != typeToken }.orElse(true)) {
+                            (key as LanternEventContextKey<*>).allowedType != typeToken }.orElse(true)) {
                     continue
                 }
                 // val name = id.split("_").joinToString(separator = " ") { s -> s[0].toUpperCase() + s.substring(1) }

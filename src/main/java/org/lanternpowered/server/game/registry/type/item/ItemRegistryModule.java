@@ -958,6 +958,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                         .add(useDuration(32))
                         .add(replenishedFood(2))
                         .add(saturation(1.2))
+                        // TODO: Chance based hunger
                         .add(applicableEffects(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))
@@ -981,6 +982,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                         .add(useDuration(32))
                         .add(replenishedFood(4))
                         .add(saturation(0.8))
+                        // TODO: Chance based hunger
                         .add(applicableEffects(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .behaviors(pipeline -> pipeline
                         .add(new ConsumableInteractionBehavior()))

@@ -35,6 +35,7 @@ import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.data.property.PropertyRegistry
+import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.block.BlockType
 
 class LanternItemTypeBuilder : ItemTypeBuilder {
@@ -82,8 +83,8 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
     fun build(key: CatalogKey): ItemType {
         var nameFunction = this.nameFunction
         if (nameFunction == null) {
-            val unknown = FixedTranslation("Unknown")
-            nameFunction = { unknown }
+            val def = tr("item.${key.namespace}.${key.value}")
+            nameFunction = { def }
         }
 
         val properties = PropertyRegistry.of<ItemType>()

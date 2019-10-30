@@ -184,7 +184,7 @@ public final class PropertyProviders {
     public static PropertyProviderCollection instrument(InstrumentType constant) {
         return PropertyProviderCollection.constant(BlockProperties.REPRESENTED_INSTRUMENT, constant);
     }
-    
+
     public static PropertyProviderCollection blockSoundGroup(BlockSoundGroup blockSoundGroup) {
         return PropertyProviderCollection.constant(BlockProperties.BLOCK_SOUND_GROUP, blockSoundGroup);
     }

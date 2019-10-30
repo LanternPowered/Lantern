@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.ext
+package org.lanternpowered.server.ext.properties
 
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.ext.*
@@ -96,8 +96,8 @@ fun <H : ItemType> PropertyRegistry<H>.useDuration(duration: Int) {
 }
 
 fun <H : ItemType> PropertyRegistry<H>.useDuration(duration: IntRange) {
-    register(ItemProperties.MINIMUM_USE_DURATION, duration.start)
-    register(ItemProperties.MAXIMUM_USE_DURATION, duration.endInclusive)
+    register(ItemProperties.MINIMUM_USE_DURATION, duration.first)
+    register(ItemProperties.MAXIMUM_USE_DURATION, duration.last)
 }
 
 fun <H : ItemType> PropertyRegistry<H>.cooldown(cooldown: Int) {
@@ -158,8 +158,4 @@ fun <H : ItemType> PropertyRegistry<H>.equipmentType(fn: H.() -> EquipmentType) 
     registerProvider(Properties.EQUIPMENT_TYPE) {
         get(fn)
     }
-}
-
-fun <H : ItemType> PropertyRegistry<H>.musicDisc(musicDisc: MusicDisc) {
-    register(Properties.MUSIC_DISC, musicDisc)
 }

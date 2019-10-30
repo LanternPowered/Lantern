@@ -31,8 +31,6 @@ package org.lanternpowered.api.ext
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectType
-import java.util.ArrayList
-import java.util.HashMap
 
 inline fun potionEffectOf(type: PotionEffectType, amplifier: Int, duration: Int, ambient: Boolean = false, particles: Boolean = true): PotionEffect =
         PotionEffect.builder().potionType(type).amplifier(amplifier).duration(duration).ambient(ambient).particles(particles).build()
@@ -41,11 +39,11 @@ inline fun potionEffectOf(type: PotionEffectType, amplifier: Int, duration: Int,
 inline fun PotionEffectBuilder.ambient(ambient: Boolean = true): PotionEffectBuilder = ambience(ambient)
 
 fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<PotionEffect> {
-    val effectsByType = HashMap<PotionEffectType, PotionEffect>()
+    val effectsByType = mutableMapOf<PotionEffectType, PotionEffect>()
     for (effect in this) {
         effectsByType[effect.type] = effect
     }
-    val result = ArrayList<PotionEffect>()
+    val result = mutableListOf<PotionEffect>()
     for (effect in that) {
         val other = effectsByType.remove(effect.type)
         if (other != null) {

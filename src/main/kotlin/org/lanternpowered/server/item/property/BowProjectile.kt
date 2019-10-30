@@ -23,32 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.property;
+package org.lanternpowered.server.item.property
 
-public final class FlammableInfo implements Comparable<FlammableInfo> {
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.spongepowered.api.entity.EntityType
+import org.spongepowered.api.entity.projectile.Projectile
 
-    private final int encouragement;
-    private final int flammability;
-
-    public FlammableInfo(int encouragement, int flammability) {
-        this.encouragement = encouragement;
-        this.flammability = flammability;
-    }
-
-    public int getEncouragement() {
-        return this.encouragement;
-    }
-
-    public int getFlammability() {
-        return this.flammability;
-    }
-
-    @Override
-    public int compareTo(FlammableInfo o) {
-        int r = Integer.compare(this.encouragement, o.encouragement);
-        if (r != 0) {
-            return r;
-        }
-        return Integer.compare(this.flammability, o.flammability);
-    }
-}
+data class BowProjectile<P : Projectile>(
+        val entityType: EntityType<P>,
+        val populator: P.(itemStack: ItemStack) -> Unit
+)

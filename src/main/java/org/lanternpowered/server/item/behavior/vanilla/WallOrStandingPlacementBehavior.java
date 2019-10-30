@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla;
 
+import kotlin.Lazy;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.ContextKeys;
@@ -47,6 +48,14 @@ import java.util.function.Supplier;
 
 @SuppressWarnings("ConstantConditions")
 public class WallOrStandingPlacementBehavior extends InteractWithBlockItemBaseBehavior {
+
+    public static WallOrStandingPlacementBehavior ofTypes(
+            Lazy<BlockType> wallTypeSupplier,
+            Lazy<BlockType> standingTypeSupplier) {
+        return new WallOrStandingPlacementBehavior(
+                () -> wallTypeSupplier.getValue().getDefaultState(),
+                () -> standingTypeSupplier.getValue().getDefaultState());
+    }
 
     public static WallOrStandingPlacementBehavior ofTypes(
             Supplier<BlockType> wallTypeSupplier,
@@ -76,7 +85,7 @@ public class WallOrStandingPlacementBehavior extends InteractWithBlockItemBaseBe
     protected boolean place(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
         final Location loc = context.getContext(ContextKeys.BLOCK_LOCATION).get();
         final Direction face = context.getContext(ContextKeys.INTERACTION_FACE).orElse(Direction.UP);
-        final Location solidFaceLoc = loc.getBlockRelative(face.getOpposite());
+        final Location solidFaceLoc = loc.relativeToBlock(face.getOpposite());
         final boolean isSolidMaterial = solidFaceLoc.getProperty(BlockProperties.IS_SOLID_MATERIAL).get();
         if (!isSolidMaterial) {
             return false;

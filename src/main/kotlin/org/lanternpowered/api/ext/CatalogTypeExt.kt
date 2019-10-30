@@ -31,7 +31,16 @@ import org.lanternpowered.api.catalog.CatalogType
 
 inline fun <reified T : CatalogType> catalogOf(key: CatalogKey): T? =
         Sponge.getRegistry().getType(T::class.java, key).orNull()
+
+inline fun <reified T : CatalogType> requireCatalogOf(key: CatalogKey): T =
+        Sponge.getRegistry().getType(T::class.java, key)
+                .orElseThrow { IllegalArgumentException("No ${T::class.java.name} with key: $key") }
+
 inline fun <reified T : CatalogType> catalogOf(id: String): T? =
-        Sponge.getRegistry().getType(T::class.java, CatalogKey.resolve(id)).orNull()
+        catalogOf(CatalogKey.resolve(id))
+
+inline fun <reified T : CatalogType> requireCatalogOf(id: String): T =
+        requireCatalogOf(CatalogKey.resolve(id))
+
 inline fun <reified T : CatalogType> allCatalogsOf(): Collection<T> =
         Sponge.getRegistry().getAllOf(T::class.java)

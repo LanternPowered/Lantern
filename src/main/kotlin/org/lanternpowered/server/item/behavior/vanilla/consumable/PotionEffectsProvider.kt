@@ -25,25 +25,22 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla.consumable
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.item.PropertyProvider
+import org.lanternpowered.api.ext.immutableListOf
+import org.lanternpowered.api.ext.merge
+import org.lanternpowered.api.ext.orNull
+import org.lanternpowered.api.ext.toImmutableSet
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.effect.potion.PotionEffect
-import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
 
-class PotionEffectsProvider : PropertyProvider<Collection<PotionEffect>> {
-
-    override fun get(itemType: ItemType, itemStack: ItemStack?): Collection<PotionEffect> {
-        if (itemStack == null) return emptyList()
-        val potionType = itemStack.get(Keys.POTION_TYPE).orNull()
-        // The base potion effects based on the potion type
-        var potionEffects = potionType?.effects
-        // Add extra customizable potion effects
-        val extraPotionEffects = itemStack.get(Keys.POTION_EFFECTS).orNull()
-        if (extraPotionEffects != null) {
-            potionEffects = potionEffects?.merge(extraPotionEffects) ?: extraPotionEffects
-        }
-        return potionEffects?.toImmutableSet() ?: immutableListOf()
+val PotionEffectsProvider: ItemStack.() -> Collection<PotionEffect> = {
+    val potionType = get(Keys.POTION_TYPE).orNull()
+    // The base potion effects based on the potion type
+    var potionEffects = potionType?.effects
+    // Add extra customizable potion effects
+    val extraPotionEffects = get(Keys.POTION_EFFECTS).orNull()
+    if (extraPotionEffects != null) {
+        potionEffects = potionEffects?.merge(extraPotionEffects) ?: extraPotionEffects
     }
+    potionEffects?.toImmutableSet() ?: immutableListOf()
 }

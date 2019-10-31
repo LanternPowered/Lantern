@@ -104,7 +104,7 @@ import kotlin.random.Random
 )
 object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTypes::class) {
 
-    override fun <A : ItemType> register(catalogType: A): A {
+    public override fun <A : ItemType> register(catalogType: A): A {
         return super.register(catalogType).also {
             NetworkItemTypeRegistry.register(catalogType)
         }

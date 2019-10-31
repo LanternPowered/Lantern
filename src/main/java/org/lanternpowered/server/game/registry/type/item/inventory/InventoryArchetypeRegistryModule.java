@@ -27,14 +27,13 @@ package org.lanternpowered.server.game.registry.type.item.inventory;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
-import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
 import org.lanternpowered.server.inventory.UnknownInventoryArchetype;
 import org.lanternpowered.server.inventory.sponge.SpongeInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
+import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -45,7 +44,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 
-@RegistrationDependency({ ClientContainerRegistryModule.class, EquipmentTypeRegistryModule.class, ItemRegistryModule.class,
+@RegistrationDependency({ ClientContainerRegistryModule.class, EquipmentTypeRegistryModule.class, ItemTypeRegistry.class,
         QueryOperationRegistryModule.class })
 public class InventoryArchetypeRegistryModule extends DefaultCatalogRegistryModule<InventoryArchetype> {
 

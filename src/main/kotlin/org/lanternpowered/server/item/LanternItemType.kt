@@ -35,6 +35,7 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.data.property.LocalPropertyHolder
 import org.lanternpowered.server.data.property.PropertyRegistry
+import org.lanternpowered.server.item.appearance.ItemAppearance
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.block.BlockType
 
@@ -45,7 +46,8 @@ class LanternItemType(
         private val maxStackQuantity: Int,
         private val valueKeyRegistry: LocalKeyRegistry<ItemStack>,
         val behaviorPipeline: BehaviorPipeline<Behavior>,
-        override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>
+        override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>,
+        val appearance: ItemAppearance? = null // TODO: When custom item types get implemented
 ) : DefaultCatalogType(key), ItemType, LocalPropertyHolder {
 
     private val name by lazy { this.nameFunction(ItemStack.of(this)) }

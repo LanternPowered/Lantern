@@ -164,7 +164,6 @@ import org.lanternpowered.server.game.registry.type.extra.AccessoryRegistryModul
 import org.lanternpowered.server.game.registry.type.fluid.FluidTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemStackComparatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
@@ -205,6 +204,7 @@ import org.lanternpowered.server.inventory.LanternInventoryBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
 import org.lanternpowered.server.inventory.query.LanternQueryTransformationBuilder;
 import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResult;
+import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
@@ -627,7 +627,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(EntityEffectType.class, new EntityEffectTypeRegistryModule())
                 .registerModule(GameMode.class, GameModeRegistryModule.get())
                 .registerModule(EquipmentType.class, new EquipmentTypeRegistryModule())
-                .registerModule(ItemType.class, ItemRegistryModule.get())
+                .registerModule(ItemType.class, ItemTypeRegistry.INSTANCE)
                 .registerModule(CollisionRule.class, new CollisionRuleRegistryModule())
                 .registerModule(Criterion.class, new CriterionRegistryModule())
                 .registerModule(DisplaySlot.class, new DisplaySlotRegistryModule())
@@ -682,7 +682,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(StatisticCategory.class, StatisticCategoryRegistry.INSTANCE)
                 // Advancements
                 .registerModule(AdvancementTree.class, AdvancementTreeRegistryModule.get())
-                .registerModule(Advancement.class, AdvancementRegistryModule.get())
+                .registerModule(Advancement.class, AdvancementRegistryModule.INSTANCE)
                 .registerModule(AdvancementType.class, new AdvancementTypeRegistryModule())
                 .registerModule(Trigger.class, (AdditionalPluginCatalogRegistryModule) TriggerRegistryModule.get())
                 .registerModule(new AdvancementTreeLayoutModule())

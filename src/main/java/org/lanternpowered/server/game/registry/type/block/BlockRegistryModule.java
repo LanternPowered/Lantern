@@ -76,9 +76,9 @@ import org.lanternpowered.server.data.type.RedstoneConnectionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.InternalIDRegistries;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.InventorySnapshot;
+import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.behavior.vanilla.SlabItemInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.TorchInteractionBehavior;
 import org.spongepowered.api.block.BlockState;
@@ -133,7 +133,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         final BlockStateRegistryModule blockStateRegistryModule = Lantern.getRegistry()
                 .getRegistryModule(BlockStateRegistryModule.class).get();
         blockType.getAllBlockStates().forEach(blockStateRegistryModule::registerState);
-        blockType.getItem().ifPresent(itemType -> ItemRegistryModule.get().register(itemType));
+        blockType.getItem().ifPresent(ItemTypeRegistry.INSTANCE::register);
         Lantern.getGame().getPropertyRegistry().registerBlockPropertyStores(type.getPropertyProviderCollection());
     }
 

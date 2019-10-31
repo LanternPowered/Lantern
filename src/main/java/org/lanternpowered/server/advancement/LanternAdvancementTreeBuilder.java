@@ -61,7 +61,7 @@ public class LanternAdvancementTreeBuilder extends AbstractNamedCatalogBuilder<A
     @Override
     public AdvancementTree.Builder rootAdvancement(Advancement rootAdvancement) {
         checkNotNull(rootAdvancement, "rootAdvancement");
-        final AdvancementRegistryModule registry = AdvancementRegistryModule.get();
+        final AdvancementRegistryModule registry = AdvancementRegistryModule.INSTANCE;
         checkState(rootAdvancement.equals(registry.get(rootAdvancement.getKey()).orElse(null)),
                 "The root advancement must be registered.");
         checkState(!rootAdvancement.getParent().isPresent(),

@@ -29,17 +29,21 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.living.humanoid.player.CooldownEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+import java.util.OptionalInt;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -84,4 +88,23 @@ public class LanternEventFactory {
             DataHolder.@NonNull Mutable targetHolder) {
         return SpongeEventFactory.createChangeDataHolderEventValueChange(cause, originalChanges, targetHolder);
     }
+
+    public static CooldownEvent.@NonNull End createCooldownEventEnd(
+            @NonNull Cause cause,
+            @NonNull ItemType itemType,
+            @NonNull Player player) {
+        return SpongeEventFactory.createCooldownEventEnd(cause, itemType, player);
+    }
+
+    public static CooldownEvent.Set createCooldownEventSet(
+            @NonNull Cause cause,
+            int originalNewCooldown,
+            int newCooldown,
+            @NonNull ItemType itemType,
+            @NonNull Player player,
+            @NonNull OptionalInt startingCooldown) {
+        return SpongeEventFactory.createCooldownEventSet(
+                cause, originalNewCooldown, newCooldown, itemType, player, startingCooldown);
+    }
+
 }

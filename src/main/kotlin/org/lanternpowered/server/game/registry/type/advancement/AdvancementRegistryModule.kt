@@ -26,22 +26,13 @@
 package org.lanternpowered.server.game.registry.type.advancement
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule
+import org.lanternpowered.server.item.ItemTypeRegistry
 import org.spongepowered.api.advancement.Advancement
 import org.spongepowered.api.registry.util.RegistrationDependency
 
 @RegistrationDependency(
         AdvancementTypeRegistryModule::class,
-        ItemRegistryModule::class,
+        ItemTypeRegistry::class,
         TriggerRegistryModule::class
 )
-object AdvancementRegistryModule : AdditionalPluginCatalogRegistryModule<Advancement>() {
-
-    /**
-     * Gets the [AdvancementRegistryModule].
-     *
-     * @return The advancement registry module
-     */
-    @JvmStatic
-    fun get(): AdvancementRegistryModule = this
-}
+object AdvancementRegistryModule : AdditionalPluginCatalogRegistryModule<Advancement>()

@@ -33,8 +33,8 @@ import org.lanternpowered.server.data.io.store.data.LocalMutableDataHolderStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
@@ -102,7 +102,7 @@ public final class ItemStackStore extends LocalMutableDataHolderStore<LanternIte
 
         final BannerItemTypeSerializer bannerSerializer = new BannerItemTypeSerializer();
         final ShulkerBoxItemObjectSerializer shulkerBoxSerializer = new ShulkerBoxItemObjectSerializer();
-        for (ItemType itemType : ItemRegistryModule.get().getAll()) {
+        for (ItemType itemType : ItemTypeRegistry.INSTANCE.getAll()) {
             if (itemType.getKey().getValue().equals(CatalogKey.MINECRAFT_NAMESPACE)) {
                 final String value = itemType.getKey().getValue();
                 if (value.endsWith("shulker_box")) {
@@ -125,7 +125,7 @@ public final class ItemStackStore extends LocalMutableDataHolderStore<LanternIte
     @Override
     public LanternItemStack deserialize(DataView dataView) throws InvalidDataException {
         final String identifier = dataView.getString(IDENTIFIER).get();
-        final ItemType itemType = ItemRegistryModule.get().get(CatalogKey.resolve(identifier)).orElseThrow(
+        final ItemType itemType = ItemTypeRegistry.INSTANCE.get(CatalogKey.resolve(identifier)).orElseThrow(
                 () -> new InvalidDataException("There is no item type with the id: " + identifier));
         final LanternItemStack itemStack = new LanternItemStack(itemType);
         deserialize(itemStack, dataView);

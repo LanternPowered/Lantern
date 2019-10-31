@@ -33,8 +33,8 @@ import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule
 import org.lanternpowered.server.inventory.LanternItemStack
+import org.lanternpowered.server.item.ItemTypeRegistry
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.type.NotePitches
@@ -55,7 +55,7 @@ import java.util.OptionalInt
         ParticleOptionRegistryModule::class,
         NotePitchRegistryModule::class,
         BlockRegistryModule::class,
-        ItemRegistryModule::class,
+        ItemTypeRegistry::class,
         PotionEffectTypeRegistryModule::class,
         FireworkShapeRegistryModule::class
 )

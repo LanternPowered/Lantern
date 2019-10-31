@@ -33,6 +33,6 @@ data class RecipeBookState(
     companion object {
 
         @JvmField
-        val DEFAULT = RecipeBookState(false, false)
+        val DEFAULT = RecipeBookState(isCurrentlyOpen = false, isFilterActive = false)
     }
 }

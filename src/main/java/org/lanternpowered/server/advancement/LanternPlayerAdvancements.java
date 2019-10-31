@@ -156,7 +156,7 @@ public class LanternPlayerAdvancements {
         cleanup();
 
         // Load all the advancements into this progress tracker
-        final AdvancementRegistryModule registryModule = AdvancementRegistryModule.get();
+        final AdvancementRegistryModule registryModule = AdvancementRegistryModule.INSTANCE;
         for (Advancement advancement : registryModule.getAll()) {
             final LanternAdvancementProgress progress = get(advancement);
             // Update the visibility
@@ -205,7 +205,7 @@ public class LanternPlayerAdvancements {
     }
 
     private void loadProgress(Map<String, Map<String, Instant>> progressMap) {
-        for (Advancement advancement : AdvancementRegistryModule.get().getAll()) {
+        for (Advancement advancement : AdvancementRegistryModule.INSTANCE.getAll()) {
             final Map<String, Instant> entry = progressMap.get(advancement.getKey().toString());
             if (entry != null) {
                 get(advancement).loadProgress(entry);
@@ -225,7 +225,7 @@ public class LanternPlayerAdvancements {
     }
 
     private void loadProgressFromJson(JsonObject json) {
-        for (Advancement advancement : AdvancementRegistryModule.get().getAll()) {
+        for (Advancement advancement : AdvancementRegistryModule.INSTANCE.getAll()) {
             final JsonObject entry = json.getAsJsonObject(advancement.getKey().toString());
             if (entry != null) {
                 loadAdvancementProgressFromJson(get(advancement), entry);

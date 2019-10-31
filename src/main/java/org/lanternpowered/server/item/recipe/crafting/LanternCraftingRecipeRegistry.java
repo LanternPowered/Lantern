@@ -27,7 +27,7 @@ package org.lanternpowered.server.item.recipe.crafting;
 
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.recipe.AbstractRecipeRegistry;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.lanternpowered.server.util.ReflectionHelper;
@@ -48,7 +48,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-@RegistrationDependency({ ItemRegistryModule.class })
+@RegistrationDependency(ItemTypeRegistry.class)
 public class LanternCraftingRecipeRegistry extends AbstractRecipeRegistry<CraftingRecipe> implements ICraftingRecipeRegistry {
 
     @Override

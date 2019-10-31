@@ -25,11 +25,9 @@
  */
 package org.lanternpowered.server.item.recipe.smelting;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.recipe.AbstractRecipeRegistry;
 import org.lanternpowered.server.item.recipe.IIngredient;
 import org.spongepowered.api.data.Keys;
@@ -47,7 +45,9 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
 
-@RegistrationDependency({ ItemRegistryModule.class })
+import static com.google.common.base.Preconditions.checkNotNull;
+
+@RegistrationDependency(ItemTypeRegistry.class)
 public class LanternSmeltingRecipeRegistry extends AbstractRecipeRegistry<SmeltingRecipe> implements SmeltingRecipeRegistry {
 
     @Override

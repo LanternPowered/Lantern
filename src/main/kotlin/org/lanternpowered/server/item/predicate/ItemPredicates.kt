@@ -23,67 +23,70 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.predicate;
+package org.lanternpowered.server.item.predicate
 
-import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.lanternpowered.server.inventory.LanternItemStack
+import org.lanternpowered.server.inventory.LanternItemStackSnapshot
+import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
-import java.util.function.Predicate;
+import java.util.function.Predicate
 
-public final class ItemPredicates {
+object ItemPredicates {
 
     /**
-     * Constructs a {@link Predicate} that matches
-     * {@link ItemStack}s with the given {@link ItemStack}.
+     * Constructs a [Predicate] that matches
+     * [ItemStack]s with the given [ItemStack].
      *
-     * <p>The provided item stack is not copied, so modifying the
-     * stack will result in different predicate results.</p>
+     *
+     * The provided item stack is not copied, so modifying the
+     * stack will result in different predicate results.
      *
      * @param itemStack The item stack
      * @return The item predicate
      */
-    public static Predicate<ItemStack> similarItemStack(ItemStack itemStack) {
-        return similarItem(itemStack).asStackPredicate();
+    @JvmStatic
+    fun similarItemStack(itemStack: ItemStack): Predicate<ItemStack> {
+        return similarItem(itemStack).asStackPredicate()
     }
 
     /**
-     * Constructs a {@link Predicate} that matches
-     * {@link ItemStack}s with the given {@link ItemStack}.
+     * Constructs a [Predicate] that matches
+     * [ItemStack]s with the given [ItemStack].
      *
      * @param itemStackSnapshot The item stack snapshot
      * @return The item predicate
      */
-    public static Predicate<ItemStack> similarItemStack(ItemStackSnapshot itemStackSnapshot) {
-        return similarItem(itemStackSnapshot).asStackPredicate();
+    @JvmStatic
+    fun similarItemStack(itemStackSnapshot: ItemStackSnapshot): Predicate<ItemStack> {
+        return similarItem(itemStackSnapshot).asStackPredicate()
     }
 
     /**
-     * Constructs a {@link ItemPredicate} that matches
-     * items with the given {@link ItemStack}.
+     * Constructs a [ItemPredicate] that matches
+     * items with the given [ItemStack].
      *
-     * <p>The provided item stack is not copied, so modifying the
-     * stack will result in different predicate results.</p>
+     *
+     * The provided item stack is not copied, so modifying the
+     * stack will result in different predicate results.
      *
      * @param itemStack The item stack
      * @return The item predicate
      */
-    public static ItemPredicate similarItem(ItemStack itemStack) {
-        return new SimilarItemPredicate((LanternItemStack) itemStack);
+    @JvmStatic
+    fun similarItem(itemStack: ItemStack): ItemPredicate {
+        return SimilarItemPredicate(itemStack as LanternItemStack)
     }
 
     /**
-     * Constructs a {@link ItemPredicate} that matches
-     * items with the given {@link ItemStackSnapshot}.
+     * Constructs a [ItemPredicate] that matches
+     * items with the given [ItemStackSnapshot].
      *
      * @param itemStackSnapshot The item stack snapshot
      * @return The item predicate
      */
-    public static ItemPredicate similarItem(ItemStackSnapshot itemStackSnapshot) {
-        return new SimilarItemPredicate(((LanternItemStackSnapshot) itemStackSnapshot).unwrap());
-    }
-
-    private ItemPredicates() {
+    @JvmStatic
+    fun similarItem(itemStackSnapshot: ItemStackSnapshot): ItemPredicate {
+        return SimilarItemPredicate((itemStackSnapshot as LanternItemStackSnapshot).unwrap())
     }
 }

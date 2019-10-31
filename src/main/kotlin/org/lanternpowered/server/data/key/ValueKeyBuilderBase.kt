@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.uncheckedCast
 import org.lanternpowered.api.util.builder.BaseBuilder
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.data.value.CopyHelper
@@ -35,7 +35,6 @@ import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
-import java.util.Comparator
 import java.util.Optional
 
 open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key<V>, R>> : AbstractCatalogBuilder<Key<V>, R>() {
@@ -116,7 +115,7 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
             java.lang.Float::class.java -> Float.MAX_VALUE
             java.lang.Double::class.java -> Double.MAX_VALUE
             java.lang.Character::class.java -> Char.MAX_VALUE
-            java.lang.Boolean::class.java -> false
+            java.lang.Boolean::class.java -> true
             UByte::class.java -> UByte.MAX_VALUE
             UShort::class.java -> UShort.MAX_VALUE
             UInt::class.java -> UInt.MAX_VALUE

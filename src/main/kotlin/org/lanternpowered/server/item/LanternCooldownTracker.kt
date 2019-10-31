@@ -60,7 +60,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
             return false
         cooldown = event.newCooldown
         when {
-            ticks > 0 -> {
+            cooldown > 0 -> {
                 this.map[itemType] = current + cooldown
             }
             time > 0 -> {
@@ -84,10 +84,10 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
         if (time != -1L) {
             val current = LanternGame.currentTimeTicks()
             if (time > current) {
-                return OptionalInt.of((time - current).toInt())
+                return (time - current).toInt().optionalInt()
             }
         }
-        return OptionalInt.empty()
+        return emptyOptionalInt()
     }
 
     override fun hasCooldown(itemType: ItemType): Boolean {

@@ -23,5 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.item.predicate;
+package org.lanternpowered.server.item.predicate
+
+import org.lanternpowered.api.ext.itemStackOf
+import org.lanternpowered.server.inventory.LanternItemStack
+import org.spongepowered.api.item.ItemType
+import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.ItemStackSnapshot
+
+/**
+ * A [ItemPredicate] that tests whether the given
+ * [ItemStack] is similar to the target stack.
+ */
+internal class SimilarItemPredicate(private val itemStack: LanternItemStack) : ItemPredicate {
+
+    override fun test(stack: ItemStack) = this.itemStack.similarTo(stack)
+    override fun test(type: ItemType) = this.itemStack.similarTo(itemStackOf(type))
+    override fun test(stack: ItemStackSnapshot) = this.itemStack.similarTo(stack)
+}

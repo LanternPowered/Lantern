@@ -80,12 +80,12 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
         }
         Direction direction = null;
         if (facing == Direction.UP && location.getWorld().getProperty(
-                location.getBlockRelative(Direction.DOWN).getBlockPosition(), Direction.UP, BlockProperties.IS_SOLID_SIDE).orElse(false)) {
+                location.relativeToBlock(Direction.DOWN).getBlockPosition(), Direction.UP, BlockProperties.IS_SOLID_SIDE).orElse(false)) {
             direction = Direction.UP;
         }
         if (direction == null) {
             for (Direction dir : getHorizontalDirections(player.getHorizontalDirectionVector())) {
-                if (location.getWorld().getProperty(location.getBlockRelative(dir.getOpposite()).getBlockPosition(),
+                if (location.getWorld().getProperty(location.relativeToBlock(dir.getOpposite()).getBlockPosition(),
                         dir, BlockProperties.IS_SOLID_SIDE).orElse(false)) {
                     direction = dir;
                     break;
@@ -104,7 +104,7 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
             return builder.blockState(BlockTypes.TORCH.getDefaultState());
         } else {
             return builder.blockState(BlockTypes.WALL_TORCH.getDefaultState()
-                    .withTrait(BlockStateProperties.HORIZONTAL_FACING, direction).get());
+                    .withStateProperty(BlockStateProperties.HORIZONTAL_FACING, direction).get());
         }
     }
 
@@ -118,7 +118,7 @@ public class TorchInteractionBehavior implements InteractWithItemBehavior {
         if (location.getWorld().getProperty(location.getBlockPosition(), BlockProperties.IS_REPLACEABLE).get()) {
             builder = tryPlaceAt(player, location);
         } else {
-            final Location relLocation = location.getBlockRelative(face.getOpposite());
+            final Location relLocation = location.relativeToBlock(face.getOpposite());
             if (relLocation.getWorld().getProperty(relLocation.getBlockPosition(), BlockProperties.IS_REPLACEABLE).get()) {
                 // Check if the clicked face is solid, if so, place the block there
                 if (face != Direction.UP && location.getWorld().getProperty(

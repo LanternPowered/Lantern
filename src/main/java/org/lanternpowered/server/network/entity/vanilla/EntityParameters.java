@@ -547,11 +547,6 @@ public final class EntityParameters {
 
         public static final ParameterTypeCollection PARAMETERS = TameableAnimal.PARAMETERS.copy();
 
-        /**
-         * 0 - maxHealth, only works when tamed
-         */
-        public static final ParameterType<Float> TAIL_ROTATION = PARAMETERS.newParameterType(ParameterValueTypes.FLOAT);
-
         public static final ParameterType<Boolean> IS_BEGGING = PARAMETERS.newParameterType(ParameterValueTypes.BOOLEAN);
 
         public static final ParameterType<Integer> COLLAR_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INT);

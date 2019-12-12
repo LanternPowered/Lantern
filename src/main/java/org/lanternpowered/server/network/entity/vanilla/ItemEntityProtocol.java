@@ -45,14 +45,14 @@ public class ItemEntityProtocol<E extends LanternEntity> extends ObjectEntityPro
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.Item.ITEM, this.entity.get(Keys.REPRESENTED_ITEM)
+        parameterList.add(EntityParameters.Item.ITEM, this.entity.get(Keys.ITEM_STACK_SNAPSHOT)
                 .map(ItemStackSnapshot::createStack).orElseGet(() -> ItemStack.of(ItemTypes.APPLE, 1)));
     }
 
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final ItemStackSnapshot itemStackSnapshot = this.entity.get(Keys.REPRESENTED_ITEM).orElse(null);
+        final ItemStackSnapshot itemStackSnapshot = this.entity.get(Keys.ITEM_STACK_SNAPSHOT).orElse(null);
         if (!Objects.equals(this.lastItemStackSnapshot, itemStackSnapshot)) {
             // Ignore the NoAI tag, isn't used on the client
             parameterList.add(EntityParameters.Item.ITEM, itemStackSnapshot.createStack());

@@ -34,6 +34,7 @@ import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.math.vector.Vector3f;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -120,7 +121,15 @@ public final class EntityParameters {
          */
         public static final ParameterType<Integer> ARROWS_IN_ENTITY = PARAMETERS.newParameterType(ParameterValueTypes.INT);
 
-        public static final ParameterType<Optional<BlockState>> UNKNOWN = PARAMETERS.newParameterType(ParameterValueTypes.OPTIONAL_BLOCK_STATE);
+        /**
+         * Additional yellow hearts.
+         */
+        public static final ParameterType<Integer> ADDITIONAL_HEARTS = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        /**
+         * The sleeping location, if sleeping.
+         */
+        public static final ParameterType<Optional<Vector3i>> SLEEPING_LOCATION = PARAMETERS.newParameterType(ParameterValueTypes.OPTIONAL_VECTOR_3I);
 
         private Living() {
         }

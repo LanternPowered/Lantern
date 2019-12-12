@@ -200,11 +200,13 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
         return this.user;
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
-    public Optional<UUID> getWorldUniqueId() {
-        return getWorld() != null ? Optional.of(getWorld().getUniqueId()) :
-                this.userWorld != null ? Optional.of(this.userWorld.getUniqueId()) : Optional.empty();
+    public UUID getWorldUniqueId() {
+        if (getWorld() != null)
+            return getWorld().getUniqueId();
+        if (this.userWorld != null)
+            return this.userWorld.getUniqueId();
+        throw new IllegalStateException("Unknown user world.");
     }
 
     @Override

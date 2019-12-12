@@ -523,7 +523,9 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);
         outbound.bind(CodecPlayOutOpenHorseWindow.class, MessagePlayOutOpenHorseWindow.class);
         outbound.bind(CodecInOutKeepAlive.class, MessageInOutKeepAlive.class);
-        outbound.bind(CodecPlayOutChunkData.class, MessagePlayOutChunkData.class);
+        final CodecRegistration<MessagePlayOutChunkData, CodecPlayOutChunkData> codecPlayOutChunkData = outbound.bind(CodecPlayOutChunkData.class);
+        codecPlayOutChunkData.bind(MessagePlayOutChunkData.Init.class);
+        codecPlayOutChunkData.bind(MessagePlayOutChunkData.Update.class);
         final CodecRegistration<Message, CodecPlayOutEffect> codecPlayOutEntityEffect = outbound.bind(CodecPlayOutEffect.class);
         codecPlayOutEntityEffect.bind(MessagePlayOutEffect.class);
         codecPlayOutEntityEffect.bind(MessagePlayOutRecord.class);

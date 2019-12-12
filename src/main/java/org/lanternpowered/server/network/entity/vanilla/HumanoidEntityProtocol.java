@@ -69,13 +69,14 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(entityId, this.entity.getUniqueId(),
-                pos, wrapAngle(yaw), wrapAngle(pitch), fillSpawnParameters()));
+                pos, wrapAngle(yaw), wrapAngle(pitch)));
         if (headRot != null) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
         }
         if (!vel.equals(Vector3d.ZERO)) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
         }
+        spawnWithMetadata(context);
         spawnWithEquipment(context);
     }
 

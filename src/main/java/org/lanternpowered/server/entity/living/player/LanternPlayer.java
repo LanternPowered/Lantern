@@ -125,6 +125,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -145,7 +146,6 @@ import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.server.ServerPlayer;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.BookView;
@@ -162,11 +162,11 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.chunk.ChunkTicketManager;
+import org.spongepowered.api.world.dimension.DimensionTypes;
 import org.spongepowered.api.world.gamerule.GameRules;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
@@ -495,7 +495,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // The player has joined the server
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon));
+                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon, 0L));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
@@ -553,11 +553,11 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
                                 DimensionTypes.THE_NETHER : DimensionTypes.OVERWORLD);
-                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, lowHorizon));
+                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, lowHorizon, 0L));
                     }
                 }
                 // Send a respawn message
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon));
+                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon, 0L));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
             // Send the first chunks

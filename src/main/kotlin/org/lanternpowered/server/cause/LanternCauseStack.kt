@@ -74,7 +74,7 @@ class LanternCauseStack : CauseStack {
 
     override fun popCause(): Any {
         if (this.cause.size <= this.minDepth) {
-            throw IllegalStateException("Cause stack corruption, tried to pop more objects off than were pushed since last frame (Size was "
+            error("Cause stack corruption, tried to pop more objects off than were pushed since last frame (Size was "
                     + this.cause.size + " but mid depth is " + this.minDepth + ")")
         }
         this.cachedCause = null

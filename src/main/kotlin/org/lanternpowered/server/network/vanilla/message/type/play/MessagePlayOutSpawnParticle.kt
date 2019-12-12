@@ -27,11 +27,12 @@ package org.lanternpowered.server.network.vanilla.message.type.play
 
 import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3f
 
 data class MessagePlayOutSpawnParticle @JvmOverloads constructor(
         val particleId: Int,
-        val position: Vector3f,
+        val position: Vector3d,
         val offset: Vector3f,
         val data: Float,
         val quantity: Int,

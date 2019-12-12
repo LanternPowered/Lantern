@@ -60,7 +60,8 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
         final int entityTypeId = NetworkIDs.REGISTRY.require(getMobType());
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnMob(getRootEntityId(), this.entity.getUniqueId(), entityTypeId,
-                pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel, fillSpawnParameters()));
+                pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel));
+        spawnWithMetadata(context);
         spawnWithEquipment(context);
     }
 }

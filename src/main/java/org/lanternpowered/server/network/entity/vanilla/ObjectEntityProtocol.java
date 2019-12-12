@@ -29,9 +29,8 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3d;
 
 public abstract class ObjectEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
@@ -52,17 +51,14 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
 
         final Vector3d rot = this.entity.getRotation();
         final Vector3d pos = this.entity.getPosition();
-        final Vector3d vel = this.entity.getVelocity();
+        final Vector3d vel = this.entity.get(Keys.VELOCITY).orElse(Vector3d.ZERO);
 
         double yaw = rot.getY();
         double pitch = rot.getX();
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnObject(entityId, this.entity.getUniqueId(),
                 NetworkIDs.REGISTRY.require(getObjectType()), getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
-        final ParameterList parameterList = fillSpawnParameters();
-        if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
-        }
+        spawnWithMetadata(context);
     }
 
     @Override

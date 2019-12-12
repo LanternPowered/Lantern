@@ -430,9 +430,15 @@ public final class ObservedChunkManager implements WorldEventListener {
             if (biomes) {
                 biomesArray = chunk.getBiomes();
                 // TODO: Only allow non-custom biome types to be send and maybe the ones supported by forge mods?
+                // TODO: 3d biomes
             }
 
-            messages.add(0, new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
+            if (biomesArray != null) {
+                messages.add(0, new MessagePlayOutChunkData.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
+            } else {
+                messages.add(0, new MessagePlayOutChunkData.Update(this.coords.getX(), this.coords.getY(), msgSections));
+            }
+
             return messages;
         }
 

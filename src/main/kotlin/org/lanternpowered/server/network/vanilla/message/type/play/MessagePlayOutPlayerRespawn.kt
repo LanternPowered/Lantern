@@ -27,10 +27,11 @@ package org.lanternpowered.server.network.vanilla.message.type.play
 
 import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
-import org.spongepowered.api.world.DimensionType
+import org.spongepowered.api.world.dimension.DimensionType
 
 data class MessagePlayOutPlayerRespawn(
         val gameMode: GameMode,
         val dimensionType: DimensionType,
-        val lowHorizon: Boolean
+        val lowHorizon: Boolean,
+        val seed: Long
 ) : Message

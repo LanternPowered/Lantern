@@ -23,46 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play
+package org.lanternpowered.server.network.vanilla.message.codec.play
 
-import org.lanternpowered.server.network.message.Message
-import org.spongepowered.api.entity.living.player.gamemode.GameMode
-import org.spongepowered.api.world.dimension.DimensionType
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.message.codec.Codec
+import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob
+import kotlin.math.min
 
-data class MessagePlayOutPlayerJoinGame(
-        /**
-         * The game mode of the player.
-         */
-        val gameMode: GameMode,
-        /**
-         * The dimension type of the world this player is currently in.
-         */
-        val dimensionType: DimensionType,
-        /**
-         * The entity id of the player.
-         */
-        val entityId: Int,
-        /**
-         * The size of the player list.
-         */
-        val playerListSize: Int,
-        /**
-         * Whether reduced debug should be used, no idea what this will do,
-         * maybe less information in the f3 screen?
-         */
-        val reducedDebug: Boolean,
-        /**
-         * Whether the hardcore mode is enabled.
-         */
-        val isHardcore: Boolean,
-        val lowHorizon: Boolean,
-        val viewDistance: Int,
-        /**
-         * Whether the respawn screen on death is shown.
-         */
-        val enableRespawnScreen: Boolean,
-        /**
-         * The seed of the world.
-         */
-        val seed: Long
-) : Message
+class CodecPlayOutSpawnMob : Codec<MessagePlayOutSpawnMob> {
+
+    override fun encode(context: CodecContext, message: MessagePlayOutSpawnMob): ByteBuffer {
+        return context.byteBufAlloc().buffer().apply {
+            writeVarInt(message.entityId)
+            writeUniqueId(message.uniqueId)
+            writeVarInt(message.mobType)
+            writeVector3d(message.position)
+            writeByte(message.yaw)
+            writeByte(message.pitch)
+            writeByte(message.headPitch)
+            val velocity = message.velocity
+            writeShort(min(velocity.x * 8000.0, Short.MAX_VALUE.toDouble()).toShort())
+            writeShort(min(velocity.y * 8000.0, Short.MAX_VALUE.toDouble()).toShort())
+            writeShort(min(velocity.z * 8000.0, Short.MAX_VALUE.toDouble()).toShort())
+        }
+    }
+}

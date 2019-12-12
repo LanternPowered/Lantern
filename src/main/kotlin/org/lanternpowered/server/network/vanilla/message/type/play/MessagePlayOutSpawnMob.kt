@@ -23,26 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
+import org.lanternpowered.server.network.message.Message
+import org.spongepowered.math.vector.Vector3d
+import java.util.UUID
 
-public final class CodecPlayOutSpawnPlayer implements Codec<MessagePlayOutSpawnPlayer> {
-
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnPlayer message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(message.getEntityId());
-        buf.writeUniqueId(message.getUniqueId());
-        buf.writeVector3d(message.getPosition());
-        buf.writeByte((byte) message.getYaw());
-        buf.writeByte((byte) message.getPitch());
-        context.write(buf, ContextualValueTypes.PARAMETER_LIST, message.getParameterList());
-        return buf;
-    }
-}
+data class MessagePlayOutSpawnMob(
+        val entityId: Int,
+        val uniqueId: UUID,
+        val mobType: Int,
+        val position: Vector3d,
+        val yaw: Byte,
+        val pitch: Byte,
+        val headPitch: Byte,
+        val velocity: Vector3d
+) : Message

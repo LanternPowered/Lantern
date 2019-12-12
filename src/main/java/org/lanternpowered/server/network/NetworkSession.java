@@ -91,8 +91,8 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.dimension.DimensionTypes;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.io.IOException;
@@ -906,7 +906,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // messages will be send afterwards with the proper values
         send(new MessagePlayOutPlayerJoinGame(GameModes.SURVIVAL, DimensionTypes.OVERWORLD,
                 this.player.getNetworkId(), getServer().getMaxPlayers(), false, false, false,
-                this.player.getServerViewDistance()));
+                this.player.getServerViewDistance(), true, 0L));
     }
 
     /**

@@ -23,54 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.message.type.play
 
-import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.math.vector.Vector3d;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
+import org.lanternpowered.server.network.message.Message
+import org.lanternpowered.server.util.collect.array.VariableValueArray
+import org.spongepowered.api.data.persistence.DataView
 
-import java.util.UUID;
+sealed class MessagePlayOutChunkData(
+        val x: Int,
+        val z: Int,
+        val sections: Array<Section?>
+) : Message {
 
-public final class MessagePlayOutSpawnPlayer implements Message {
+    class Init(x: Int, z: Int, sections: Array<Section?>, val biomes: IntArray) : MessagePlayOutChunkData(x, z, sections)
 
-    private final int entityId;
-    private final UUID uniqueId;
-    private final Vector3d position;
-    private final int yaw;
-    private final int pitch;
-    private final ParameterList parameterList;
+    class Update(x: Int, z: Int, sections: Array<Section?>) : MessagePlayOutChunkData(x, z, sections)
 
-    public MessagePlayOutSpawnPlayer(int entityId, UUID uniqueId, Vector3d position, int yaw, int pitch,
-            ParameterList parameterList) {
-        this.parameterList = parameterList;
-        this.entityId = entityId;
-        this.uniqueId = uniqueId;
-        this.position = position;
-        this.pitch = pitch;
-        this.yaw = yaw;
-    }
-
-    public int getEntityId() {
-        return this.entityId;
-    }
-
-    public UUID getUniqueId() {
-        return this.uniqueId;
-    }
-
-    public Vector3d getPosition() {
-        return this.position;
-    }
-
-    public int getYaw() {
-        return this.yaw;
-    }
-
-    public int getPitch() {
-        return this.pitch;
-    }
-
-    public ParameterList getParameterList() {
-        return this.parameterList;
-    }
+    /**
+     * Represents the data of chunk section.
+     *
+     * Notes:
+     * - If bitsPerValue is smaller then 4 bits, the client will round up to 4
+     * - When bitsPerValue is greater then 8 bits, the client will use the global palette
+     */
+    class Section(
+            val types: VariableValueArray,
+            val palette: IntArray?,
+            val nonAirBlockCount: Int,
+            val blockEntities: Short2ObjectMap<DataView>
+    )
 }

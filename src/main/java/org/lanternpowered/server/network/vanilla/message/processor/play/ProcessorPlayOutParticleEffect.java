@@ -398,10 +398,10 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         private final int particleId;
         private final Vector3f offsetData;
         private final int count;
-        @Nullable private final MessagePlayOutSpawnParticle.Data extra;
+        private final MessagePlayOutSpawnParticle.@Nullable Data extra;
 
         private CachedParticleMessage(int particleId, Vector3f offsetData, int count,
-                @Nullable MessagePlayOutSpawnParticle.Data extra) {
+                MessagePlayOutSpawnParticle.@Nullable Data extra) {
             this.particleId = particleId;
             this.offsetData = offsetData;
             this.count = count;
@@ -410,7 +410,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
         @Override
         public void process(Vector3d position, List<Message> output) {
-            output.add(new MessagePlayOutSpawnParticle(this.particleId, position.toFloat(),
+            output.add(new MessagePlayOutSpawnParticle(this.particleId, position,
                     this.offsetData, 0f, this.count, this.extra));
         }
     }
@@ -421,10 +421,10 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         private final Vector3f offsetData;
         private final Vector3f offset;
         private final int count;
-        @Nullable private final MessagePlayOutSpawnParticle.Data extra;
+        private final MessagePlayOutSpawnParticle.@Nullable Data extra;
 
         private CachedOffsetParticleMessage(int particleId, Vector3f offsetData, Vector3f offset, int count,
-                @Nullable MessagePlayOutSpawnParticle.Data extra) {
+                MessagePlayOutSpawnParticle.@Nullable Data extra) {
             this.particleId = particleId;
             this.offsetData = offsetData;
             this.offset = offset;
@@ -438,7 +438,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
             if (this.offset.equals(Vector3f.ZERO)) {
                 final MessagePlayOutSpawnParticle message = new MessagePlayOutSpawnParticle(
-                        this.particleId, position.toFloat(), this.offsetData, 1f, 0, this.extra);
+                        this.particleId, position, this.offsetData, 1f, 0, this.extra);
                 for (int i = 0; i < this.count; i++) {
                     output.add(message);
                 }
@@ -456,7 +456,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                     final double py0 = py + (random.nextFloat() * 2f - 1f) * oy;
                     final double pz0 = pz + (random.nextFloat() * 2f - 1f) * oz;
 
-                    output.add(new MessagePlayOutSpawnParticle(this.particleId, new Vector3f(px0, py0, pz0),
+                    output.add(new MessagePlayOutSpawnParticle(this.particleId, new Vector3d(px0, py0, pz0),
                             this.offsetData, 1f, 0, this.extra));
                 }
             }

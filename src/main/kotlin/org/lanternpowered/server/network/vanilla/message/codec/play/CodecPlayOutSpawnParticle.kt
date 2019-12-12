@@ -38,7 +38,7 @@ class CodecPlayOutSpawnParticle : Codec<MessagePlayOutSpawnParticle> {
         return context.byteBufAlloc().buffer(baseLength).apply {
             writeInt(message.particleId)
             writeBoolean(message.isLongDistance)
-            writeVector3f(message.position)
+            writeVector3d(message.position)
             writeVector3f(message.offset)
             writeFloat(message.data)
             writeInt(message.quantity)

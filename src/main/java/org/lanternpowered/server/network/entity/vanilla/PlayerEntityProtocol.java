@@ -128,7 +128,8 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             parameterList.add(EntityParameters.Ageable.IS_BABY, true);
         }
         context.sendToAll(() -> new MessagePlayOutSpawnMob(this.passengerStack[index], UUID.randomUUID(), type, getEntity().getPosition(),
-                (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO, parameterList));
+                (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO));
+        context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[index], parameterList));
     }
 
     private void sendPassengers(EntityProtocolUpdateContext context, int index, int... indexes) {

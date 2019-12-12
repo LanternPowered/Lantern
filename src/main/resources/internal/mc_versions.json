@@ -1138,5 +1138,149 @@
     {
         "version": 486,
         "name": "1.14.3-pre1"
+    },
+    {
+        "version": 487,
+        "name": "1.14.3-pre2"
+    },
+    {
+        "version": 488,
+        "name": "1.14.3-pre3"
+    },
+    {
+        "version": 489,
+        "name": "1.14.3-pre4"
+    },
+    {
+        "version": 490,
+        "name": "1.14.3"
+    },
+    {
+        "version": 491,
+        "name": "1.14.4-pre1"
+    },
+    {
+        "version": 492,
+        "name": "1.14.4-pre2"
+    },
+    {
+        "version": 493,
+        "name": "1.14.4-pre3"
+    },
+    {
+        "version": 494,
+        "name": "1.14.4-pre4"
+    },
+    {
+        "version": 495,
+        "name": "1.14.4-pre5"
+    },
+    {
+        "version": 496,
+        "name": "1.14.4-pre6"
+    },
+    {
+        "version": 497,
+        "name": "1.14.4-pre7"
+    },
+    {
+        "version": 498,
+        "name": "1.14.4"
+    },
+    {
+        "version": 500,
+        "name": "1.14.3 - Combat Test"
+    },
+    {
+        "version": 550,
+        "name": "19w34a"
+    },
+    {
+        "version": 551,
+        "name": "19w35a"
+    },
+    {
+        "version": 552,
+        "name": "19w36a"
+    },
+    {
+        "version": 553,
+        "name": "19w37a"
+    },
+    {
+        "version": 554,
+        "name": "19w38a"
+    },
+    {
+        "version": 555,
+        "name": "19w38b"
+    },
+    {
+        "version": 556,
+        "name": "19w39a"
+    },
+    {
+        "version": 557,
+        "name": "19w40a"
+    },
+    {
+        "version": 558,
+        "name": "19w41a"
+    },
+    {
+        "version": 559,
+        "name": "19w42a"
+    },
+    {
+        "version": 560,
+        "name": "19w44a"
+    },
+    {
+        "version": 561,
+        "name": "19w45a"
+    },
+    {
+        "version": 562,
+        "name": "19w45b"
+    },
+    {
+        "version": 563,
+        "name": "19w46a"
+    },
+    {
+        "version": 564,
+        "name": "19w46b"
+    },
+    {
+        "version": 565,
+        "name": "1.15-pre1"
+    },
+    {
+        "version": 566,
+        "name": "1.15-pre2"
+    },
+    {
+        "version": 567,
+        "name": "1.15-pre3"
+    },
+    {
+        "version": 569,
+        "name": "1.15-pre4"
+    },
+    {
+        "version": 570,
+        "name": "1.15-pre5"
+    },
+    {
+        "version": 571,
+        "name": "1.15-pre6"
+    },
+    {
+        "version": 572,
+        "name": "1.15-pre7"
+    },
+    {
+        "version": 573,
+        "name": "1.15"
     }
 ]

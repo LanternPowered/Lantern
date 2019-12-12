@@ -33,6 +33,7 @@ import org.lanternpowered.server.network.message.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import kotlin.experimental.or
+import kotlin.math.min
 
 class CodecPlayOutPlayerJoinGame : Codec<MessagePlayOutPlayerJoinGame> {
 
@@ -46,10 +47,12 @@ class CodecPlayOutPlayerJoinGame : Codec<MessagePlayOutPlayerJoinGame> {
             }
             writeByte(gameMode)
             writeInt((message.dimensionType as LanternDimensionType<*>).internalId)
-            writeByte(Math.min(message.playerListSize, 255).toByte())
+            writeLong(message.seed)
+            writeByte(min(message.playerListSize, 255).toByte())
             writeString(if (message.lowHorizon) "flat" else "default")
             writeVarInt(message.viewDistance)
             writeBoolean(message.reducedDebug)
+            writeBoolean(message.enableRespawnScreen)
         }
     }
 

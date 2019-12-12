@@ -116,7 +116,6 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.server.ServerWorld;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -128,16 +127,17 @@ import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.BlockChangeFlag;
-import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.chunk.Chunk;
 import org.spongepowered.api.world.chunk.ChunkPreGenerate;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.dimension.Dimension;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.gamerule.GameRule;
 import org.spongepowered.api.world.gen.WorldGenerator;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.teleport.PortalAgent;
 import org.spongepowered.api.world.weather.Weather;
@@ -435,7 +435,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
     @Override
     public void removeScheduledUpdate(int x, int y, int z, ScheduledBlockUpdate update) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override

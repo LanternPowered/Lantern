@@ -50,15 +50,16 @@ public final class CodecPlayOutUpdateBlockEntity implements Codec<MessagePlayOut
             "minecraft:command_block",
             "minecraft:beacon",
             "minecraft:skull",
-            "minecraft:flower_pot",
+            "minecraft:conduit",
             "minecraft:banner",
             "minecraft:structure_block",
             "minecraft:end_gateway",
             "minecraft:sign",
-            "minecraft:shulker_box",
+            "", // Unused
             "minecraft:bed",
             "minecraft:jigsaw",
-            "minecraft:campfire"
+            "minecraft:campfire",
+            "minecraft:beehive"
     );
 
     @Override

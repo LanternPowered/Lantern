@@ -30,8 +30,7 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.world.LanternWorld
 import org.spongepowered.api.service.context.Context
-import org.spongepowered.api.world.Dimension
-import org.spongepowered.api.world.DimensionType
+import org.spongepowered.api.world.dimension.DimensionType
 import org.spongepowered.api.world.gen.GeneratorType
 import java.util.function.BiFunction
 
@@ -53,9 +52,9 @@ class LanternDimensionType<T : LanternDimension>(
 ) : DefaultCatalogType.Named(key, name), DimensionType, InternalCatalogType {
 
     /**
-     * The shared [Context] for all the [Dimension]s of this type.
+     * The shared [Context] for all the dimensions of this type.
      */
-    val dimensionContext = Context(Context.DIMENSION_KEY, this.key.toString())
+    private val context = Context(Context.DIMENSION_KEY, this.key.toString())
 
     /**
      * Creates a new dimension instance for the specified world.
@@ -68,8 +67,8 @@ class LanternDimensionType<T : LanternDimension>(
     }
 
     override fun hasSkylight() = this.hasSkylight
+    override fun getContext() = this.context
 
-    override fun getDimensionClass() = this.dimensionClass
     override fun toStringHelper() = super.toStringHelper()
             .add("dimensionClass", this.dimensionClass.name)
 }

@@ -25,10 +25,8 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 
-import java.util.Optional;
 import java.util.UUID;
 
 interface IUser extends User {
@@ -46,11 +44,5 @@ interface IUser extends User {
     @Override
     default String getIdentifier() {
         return getProfile().getUniqueId().toString();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    default Optional<CommandSource> getCommandSource() {
-        return (Optional) getPlayer();
     }
 }

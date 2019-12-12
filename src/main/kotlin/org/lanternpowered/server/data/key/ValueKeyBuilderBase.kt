@@ -71,14 +71,14 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
             valueType.isSubtypeOf(OptionalValue::class.java) -> OptionalValueKey(key, valueType.uncheckedCast(),
                     elementType.uncheckedCast<TypeToken<Optional<Any>>>(), this.requiresExplicitRegistration).uncheckedCast()
             valueType.isSubtypeOf(BoundedValue::class.java) -> {
-                val minimumValueSupplier = this.minimumValueSupplier ?: getDefaultMin(elementType.rawType) ?: throw IllegalStateException(
+                val minimumValueSupplier = this.minimumValueSupplier ?: getDefaultMin(elementType.rawType) ?: error(
                         "The minimal value supplier isn't set")
-                val maximumValueSupplier = this.maximumValueSupplier ?: getDefaultMax(elementType.rawType) ?: throw IllegalStateException(
+                val maximumValueSupplier = this.maximumValueSupplier ?: getDefaultMax(elementType.rawType) ?: error(
                         "The maximum value supplier isn't set")
                 val comparator = this.comparator ?: run {
                     if (elementType.isSubtypeOf(Comparable::class.java)) {
                         comparableComparator.uncheckedCast<Comparator<in E>>()
-                    } else throw IllegalStateException("The comparator must be set for non comparable types.")
+                    } else error("The comparator must be set for non comparable types.")
                 }
                 BoundedValueKey(key, valueType.uncheckedCast<TypeToken<BoundedValue<E>>>(), elementType.uncheckedCast(),
                         this.requiresExplicitRegistration, minimumValueSupplier.uncheckedCast(), maximumValueSupplier.uncheckedCast(),

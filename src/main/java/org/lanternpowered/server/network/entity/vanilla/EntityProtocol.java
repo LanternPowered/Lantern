@@ -67,8 +67,6 @@ import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.query.QueryOperation;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -90,6 +88,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                         EquipmentTypes.HEADWEAR
                 };
 
+        /*
+
+        TODO: Fix this
+
         private final static QueryOperation<?>[] EQUIPMENT_QUERIES;
 
         static {
@@ -99,6 +101,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                         PropertyMatcher.of(InventoryProperties.EQUIPMENT_TYPE, EQUIPMENT_TYPES[i]));
             }
         }
+        */
     }
 
     private long lastX;
@@ -134,12 +137,22 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(getRootEntityId()));
     }
 
+    protected void spawnWithMetadata(EntityProtocolUpdateContext context) {
+        final ParameterList parameterList = new DefaultParameterList();
+        spawn(parameterList);
+        if (!parameterList.isEmpty()) {
+            context.sendToAll(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), parameterList));
+        }
+    }
+
     protected void spawnWithEquipment(EntityProtocolUpdateContext context) {
         if (this.entity.isOnGround()) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityRelativeMove(getRootEntityId(), 0, 0, 0, true));
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
+            // TODO: Fix
+            /*
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
                 final LanternItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek();
                 final int slotIndex = i;
@@ -147,13 +160,14 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
                 }
             }
+            */
         }
     }
 
     @Override
     protected void update(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity instanceof Living ? ((Living) this.entity).getHeadRotation() : null;
+        final Vector3d headRot = this.entity.get(Keys.HEAD_ROTATION).orElse(null);
         final Vector3d pos = this.entity.getPosition();
 
         final long xu = (long) (pos.getX() * 4096);
@@ -219,7 +233,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                 }
             }
         }
-        final Vector3d velocity = this.entity.getVelocity();
+        final Vector3d velocity = this.entity.get(Keys.VELOCITY).orElse(Vector3d.ZERO);
         final double vx = velocity.getX();
         final double vy = velocity.getY();
         final double vz = velocity.getZ();
@@ -238,6 +252,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
+            /*
+            TODO: Fix
             for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
                 final ItemStack itemStack = inventory.query(Holder.EQUIPMENT_QUERIES[i]).first().peek();
                 final ItemStack oldItemStack = this.lastEquipment.get(i);
@@ -247,6 +263,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                     context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
                 }
             }
+            */
         }
         // TODO: Update attributes
     }

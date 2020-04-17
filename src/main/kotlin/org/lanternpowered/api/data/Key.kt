@@ -81,8 +81,14 @@ interface KeyBuilder<V : Value<*>> : CatalogBuilder<Key<V>, KeyBuilder<V>> {
     /**
      * Sets the comparator of the bounded value [Key].
      */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.comparator(
+    fun <V : Value<E>, E : Any> KeyBuilder<V>.comparator(
             comparator: @KeyBuilderDsl Comparator<in E>): KeyBuilder<V>
+
+    /**
+     * Sets the comparator of the bounded value [Key].
+     */
+    fun <V : Value<E>, E : Any> KeyBuilder<V>.includesTester(
+            tester: @KeyBuilderDsl (E, E) -> Boolean): KeyBuilder<V>
 
     /**
      * Enables the requirement that the key is registered explicitly on a value collection.

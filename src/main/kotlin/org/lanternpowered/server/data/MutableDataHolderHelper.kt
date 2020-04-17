@@ -105,16 +105,16 @@ object MutableDataHolderHelper {
         return false
     }
 
-    fun <E : Any> offerFast(store: MutableDataHolder, key: Key<out Value<E>>, element: E): Boolean {
+    fun <V : Value<E>, E : Any> offerFast(store: MutableDataHolder, key: Key<V>, element: E): Boolean {
         val hasListeners = hasListeners(store, key)
         return if (hasListeners) offer(store, key, element).isSuccessful else store.offerFastNoEvents(key, element)
     }
 
-    fun <E : Any> offer(store: MutableDataHolder, key: Key<out Value<E>>, element: E): DataTransactionResult {
+    fun <V : Value<E>, E : Any> offer(store: MutableDataHolder, key: Key<V>, element: E): DataTransactionResult {
         return offer(store, key, element) { hasListeners(store, key) }
     }
 
-    fun <E : Any> offer(store: MutableDataHolder, key: Key<out Value<E>>, element: E, hasListeners: () -> Boolean): DataTransactionResult {
+    fun <V : Value<E>, E : Any> offer(store: MutableDataHolder, key: Key<V>, element: E, hasListeners: () -> Boolean): DataTransactionResult {
         return processDataTransactionResult(store, store.offerNoEvents(key, element), hasListeners)
     }
 

@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.emptyOptional
-import org.lanternpowered.server.data.key.OptionalValueKey
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
@@ -106,15 +104,6 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
         if (removeHandler == null) {
             if (removeFastHandler != null) {
                 removeHandler = removeFromRemoveFast(this.key, removeFastHandler)
-            } else if (this.key is OptionalValueKey<*,*>) {
-                removeHandler = {
-                    @Suppress("UNCHECKED_CAST")
-                    offerHandler(emptyOptional<Any>() as E)
-                };
-                removeFastHandler = {
-                    @Suppress("UNCHECKED_CAST")
-                    offerFastHandler(emptyOptional<Any>() as E)
-                }
             } else {
                 // Default to non removable
                 removeHandler = failRemoveHandler

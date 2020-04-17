@@ -47,7 +47,7 @@ class LanternMutableMapValue<K, V>(key: Key<out MapValue<K, V>>, value: MutableM
 
     override fun transform(function: Function<MutableMap<K, V>, MutableMap<K, V>>) = set(function.apply(get()))
 
-    override fun copy() = LanternMutableMapValue(this.key, CopyHelper.copyAsMutable(this.value))
+    override fun copy() = LanternMutableMapValue(this.key, CopyHelper.copyMap(this.value))
 
-    override fun asImmutable() = LanternImmutableMapValue(this.key, CopyHelper.copyAsMutable(this.value))
+    override fun asImmutable(): MapValue.Immutable<K, V> = this.key.valueConstructor.getImmutable(this.value).asImmutable()
 }

@@ -70,7 +70,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase, PropertyHolderBa
         if (localRegistration != null) {
             return localRegistration.dataProvider<V, E>().getValue(this)
         }
-        return super.getValue(key)
+        return super<DataHolderBase>.getValue(key)
     }
 
     @JvmDefault
@@ -79,7 +79,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase, PropertyHolderBa
         if (localRegistration != null) {
             return localRegistration.dataProvider<Value<E>, E>().get(this)
         }
-        return super.get(key)
+        return super<DataHolderBase>.get(key)
     }
 
     @JvmDefault

@@ -26,18 +26,14 @@
 package org.lanternpowered.server.data.value
 
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
-import java.util.function.Function
+import org.spongepowered.api.data.value.Value
 
-class LanternImmutableBoundedValue<E : Any>(
-        key: Key<out BoundedValue<E>>, value: E, min: () -> E, max: () -> E
-) : LanternBoundedValue<E>(key, value, min, max), BoundedValue.Immutable<E> {
+internal class SimpleValueConstructor<V : Value<E>, E : Any>(
+        private val key: Key<V>,
+        private val mutableConstructor: (Key<V>, E) -> V,
+        private val immutableConstructor: (Key<V>, E) -> V
+) : ValueConstructor<V, E> {
 
-    override fun get(): E = CopyHelper.copy(super.get())
-
-    override fun with(value: E): BoundedValue.Immutable<E> = this.key.valueConstructor.getImmutable(value, this.min, this.max).asImmutable()
-
-    override fun transform(function: Function<E, E>) = with(function.apply(get()))
-
-    override fun asMutable() = LanternMutableBoundedValue(this.key, CopyHelper.copy(value), this.min, this.max)
+    override fun getMutable(element: E) = this.mutableConstructor(this.key, element)
+    override fun getRawImmutable(element: E) = this.immutableConstructor(this.key, element)
 }

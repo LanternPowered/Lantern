@@ -69,13 +69,6 @@ inline fun Boolean.optional(): Optional<Boolean> = OptBool.of(this)
 inline fun Boolean?.optional(): Optional<Boolean> = OptBool.of(this)
 
 /**
- * Wraps the value into an [Optional]. Could be nullable
- * or not, there's no guarantees.
- */
-@JvmName("optionalOfUnknown")
-inline fun <T> T.optional(): Optional<T> = Optional.ofNullable(this)
-
-/**
  * Wraps the value into an [Optional].
  */
 @JvmName("optionalOf")

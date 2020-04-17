@@ -26,12 +26,12 @@
 package org.lanternpowered.server.fluid
 
 import org.lanternpowered.api.util.ToStringHelper
-import org.lanternpowered.server.data.MutableBackedLocalImmutableDataHolder
+import org.lanternpowered.server.data.MutableBackedSerializableLocalImmutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.fluid.FluidStackSnapshot
 
 class LanternFluidStackSnapshot internal constructor(fluidStack: LanternFluidStack) : FluidStackSnapshot,
-        MutableBackedLocalImmutableDataHolder<FluidStackSnapshot, LanternFluidStack>(fluidStack) {
+        MutableBackedSerializableLocalImmutableDataHolder<FluidStackSnapshot, LanternFluidStack>(fluidStack) {
 
     override fun getFluid() = this.backingDataHolder.fluid
     override fun getVolume() = this.backingDataHolder.volume

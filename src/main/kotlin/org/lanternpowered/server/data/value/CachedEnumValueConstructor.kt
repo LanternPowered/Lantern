@@ -23,36 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.key
+package org.lanternpowered.server.data.value
 
-import com.google.common.reflect.TypeParameter
-import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
-import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
-import java.util.Optional
 
-/**
- * Represents the [ValueKey] of a [OptionalValue].
- */
-class OptionalValueKey<V : OptionalValue<E>, E : Any>(
-        key: CatalogKey, valueToken: TypeToken<V>, elementToken: TypeToken<Optional<E>>, requiresExplicitRegistration: Boolean
-) : ValueKey<V, Optional<E>>(key, valueToken, elementToken, requiresExplicitRegistration) {
+internal class CachedEnumValueConstructor<V : Value<E>, E : Any>(
+        private val original: ValueConstructor<V, E>, enumType: Class<E>
+) : ValueConstructor<V, E> {
 
-    val unwrappedKey = run {
-        val unwrappedElementToken = elementToken.resolveType(optionalElementParameter).uncheckedCast<TypeToken<E>>()
-        val unwrappedValueToken = createValueToken(unwrappedElementToken)
-        val unwrappedKey = CatalogKey.of(key.namespace, key.value + "_non_optional")
+    private val immutableValues = enumType.enumConstants.asSequence()
+            .map { this.original.getImmutable(it) }
+            .toList()
 
-        OptionalUnwrappedValueKey(unwrappedKey, unwrappedValueToken, unwrappedElementToken, this)
-    }
-
-    companion object {
-
-        private val optionalElementParameter = Optional::class.java.typeParameters[0]
-
-        private fun <E : Any> createValueToken(elementToken: TypeToken<E>) =
-                object : TypeToken<Value<E>>() {}.where(object : TypeParameter<E>() {}, elementToken)
-    }
+    override fun getMutable(element: E): V = this.original.getMutable(element)
+    override fun getImmutable(element: E) = getRawImmutable(element)
+    override fun getRawImmutable(element: E) = this.immutableValues[(element as Enum<*>).ordinal]
 }

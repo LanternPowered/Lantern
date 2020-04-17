@@ -35,13 +35,13 @@ import java.util.function.Function
 class ImmutableDataManipulator(map: MutableMap<Key<*>, Any>) : AbstractDataManipulator(map), DataManipulator.Immutable {
 
     override fun <E : Any> with(value: Value<E>): DataManipulator.Immutable {
-        val mapCopy = CopyHelper.copyAsMutable(this.map)
+        val mapCopy = CopyHelper.copyMap(this.map)
         mapCopy[value.key] = value.get()
         return ImmutableDataManipulator(mapCopy)
     }
 
     override fun <E : Any> with(key: Key<out Value<E>>, value: E): DataManipulator.Immutable {
-        val mapCopy = CopyHelper.copyAsMutable(this.map)
+        val mapCopy = CopyHelper.copyMap(this.map)
         mapCopy[key] = value
         return ImmutableDataManipulator(mapCopy)
     }
@@ -50,7 +50,7 @@ class ImmutableDataManipulator(map: MutableMap<Key<*>, Any>) : AbstractDataManip
         if (key !in this.map) {
             return this
         }
-        val mapCopy = CopyHelper.copyAsMutable(this.map)
+        val mapCopy = CopyHelper.copyMap(this.map)
         mapCopy.remove(key)
         return ImmutableDataManipulator(mapCopy)
     }
@@ -59,14 +59,14 @@ class ImmutableDataManipulator(map: MutableMap<Key<*>, Any>) : AbstractDataManip
         if (key !in this.map) {
             return this
         }
-        val mapCopy = CopyHelper.copyAsMutable(this.map)
+        val mapCopy = CopyHelper.copyMap(this.map)
         mapCopy[key] = function.apply(this.map[key].uncheckedCast())
         return ImmutableDataManipulator(mapCopy)
     }
 
     override fun copy() = this
 
-    override fun asMutableCopy() = MutableDataManipulator(CopyHelper.copyAsMutable(this.map))
+    override fun asMutableCopy() = MutableDataManipulator(CopyHelper.copyMap(this.map))
 
     override fun asMutable() = asMutableCopy()
 }

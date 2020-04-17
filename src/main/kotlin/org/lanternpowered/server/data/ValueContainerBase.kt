@@ -78,6 +78,4 @@ interface ValueContainerBase : ValueContainer {
 
     @JvmDefault
     override fun <E : Any> require(key: Key<out Value<E>>): E = super.require(key)
-
-    override fun copy(): ValueContainer
 }

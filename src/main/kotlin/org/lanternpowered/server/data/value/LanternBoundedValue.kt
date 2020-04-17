@@ -25,22 +25,22 @@
  */
 package org.lanternpowered.server.data.value
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.uncheckedCast
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
-import java.util.Comparator
-import java.util.Objects
+import java.util.*
 
 abstract class LanternBoundedValue<E : Any> protected constructor(
-        key: Key<out BoundedValue<E>>, value: E, protected val min: E, protected val max: E, private val comparator: Comparator<E>
+        key: Key<out BoundedValue<E>>, value: E, protected val min: () -> E, protected val max: () -> E
 ) : LanternValue<E>(key, value), BoundedValue<E> {
 
-    override fun getKey() = super.getKey().uncheckedCast<Key<out BoundedValue<E>>>()
+    override fun getKey() = super.getKey().uncheckedCast<BoundedValueKey<out BoundedValue<E>, E>>()
 
-    override fun getMinValue() = this.min
-    override fun getMaxValue() = this.max
-    override fun getComparator() = this.comparator
+    override fun getMinValue() = this.min()
+    override fun getMaxValue() = this.max()
+    override fun getComparator() = this.key.elementComparator
 
     override fun hashCode() = Objects.hash(this.key, this.value, this.min, this.max, this.comparator)
 
@@ -48,7 +48,7 @@ abstract class LanternBoundedValue<E : Any> protected constructor(
         if (this === other) {
             return true
         }
-        if (other == null || javaClass != other.javaClass) {
+        if (other == null || this.javaClass != other.javaClass) {
             return false
         }
         other as LanternBoundedValue<*>?

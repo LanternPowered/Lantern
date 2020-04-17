@@ -23,21 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value
+package org.lanternpowered.server.data
 
-import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
-import java.util.function.Function
+import org.spongepowered.api.data.SerializableDataHolder
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataView
 
-class LanternImmutableBoundedValue<E : Any>(
-        key: Key<out BoundedValue<E>>, value: E, min: () -> E, max: () -> E
-) : LanternBoundedValue<E>(key, value, min, max), BoundedValue.Immutable<E> {
+interface SerializableForwardingDataHolder : CopyableForwardingDataHolder, SerializableDataHolder {
 
-    override fun get(): E = CopyHelper.copy(super.get())
+    override val delegateDataHolder: SerializableDataHolder
 
-    override fun with(value: E): BoundedValue.Immutable<E> = this.key.valueConstructor.getImmutable(value, this.min, this.max).asImmutable()
+    @JvmDefault
+    override fun getContentVersion() = this.delegateDataHolder.contentVersion
 
-    override fun transform(function: Function<E, E>) = with(function.apply(get()))
+    @JvmDefault
+    override fun toContainer(): DataContainer = this.delegateDataHolder.toContainer()
 
-    override fun asMutable() = LanternMutableBoundedValue(this.key, CopyHelper.copy(value), this.min, this.max)
+    @JvmDefault
+    override fun validateRawData(container: DataView) = this.delegateDataHolder.validateRawData(container)
+
+    @JvmDefault
+    override fun copy(): SerializableForwardingDataHolder
 }

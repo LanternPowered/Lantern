@@ -25,20 +25,24 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalUnwrappedValueKey
+import org.lanternpowered.api.ext.mutableCollectionOf
+import org.lanternpowered.api.ext.orNull
+import org.lanternpowered.api.ext.removeAll
+import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.CollectionValue
 import org.spongepowered.api.data.value.MapValue
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.ValueContainer
+import java.util.Optional
 import java.util.function.Function
+import kotlin.collections.set
 import kotlin.reflect.KProperty
 
+@Suppress("UNCHECKED_CAST")
 interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
 
     /**
@@ -49,11 +53,25 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
             MutableDataHolderProperty<H, E> = MutableKeyElementProperty(this)
 
     /**
+     * Gets a element delegate for the given [Key].
+     */
+    @JvmDefault
+    override operator fun <V : Value<E>, E : Any, H : DataHolder> Optional<out Key<V>>.provideDelegate(thisRef: H, property: KProperty<*>):
+            MutableDataHolderProperty<H, E> = get().provideDelegate(thisRef, property)
+
+    /**
      * Gets a value delegate for the given [Key].
      */
     @JvmDefault
     override fun <V : Value<E>, E : Any, H : DataHolder> value(key: Key<V>):
             MutableDataHolderProperty<H, V> = MutableKeyValueProperty(key)
+
+    /**
+     * Gets a value delegate for the given [Key].
+     */
+    @JvmDefault
+    override fun <V : Value<E>, E : Any, H : DataHolder> value(key: Optional<out Key<V>>):
+            MutableDataHolderProperty<H, V> = value(key.get())
 
     /**
      * Gets a optional element delegate for the given [Key].
@@ -63,19 +81,25 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
             MutableDataHolderProperty<H, E?> = MutableKeyOptionalElementProperty(key)
 
     /**
+     * Gets a optional element delegate for the given [Key].
+     */
+    @JvmDefault
+    override fun <V : Value<E>, E : Any, H : DataHolder> optional(key: Optional<out Key<V>>):
+            MutableDataHolderProperty<H, E?> = optional(key.get())
+
+    /**
      * Gets a optional value delegate for the given [Key].
      */
     @JvmDefault
     override fun <V : Value<E>, E : Any, H : DataHolder> optionalValue(key: Key<V>):
             MutableDataHolderProperty<H, V?> = MutableKeyOptionalValueProperty(key)
 
+    /**
+     * Gets a optional value delegate for the given [Key].
+     */
     @JvmDefault
-    override fun setRawData(dataView: DataView) {
-        DataHelper.deserializeRawData(dataView, this)
-    }
-
-    @JvmDefault
-    override fun validateRawData(dataView: DataView): Boolean = true
+    override fun <V : Value<E>, E : Any, H : DataHolder> optionalValue(key: Optional<out Key<V>>):
+            MutableDataHolderProperty<H, V?> = optionalValue(key.get())
 
     /**
      * A fast equivalent of [transform] which
@@ -114,11 +138,6 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
      */
     @JvmDefault
     fun <E : Any> offerFastNoEvents(key: Key<out Value<E>>, element: E): Boolean {
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*,*>) {
-            return offerFastNoEvents(key.wrappedKey.uncheckedCast(), element.optional())
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key]
         if (globalRegistration != null) {
@@ -135,11 +154,6 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
 
     @JvmDefault
     fun <E : Any> offerNoEvents(key: Key<out Value<E>>, element: E): DataTransactionResult {
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*,*>) {
-            return offerNoEvents(key.wrappedKey.uncheckedCast(), element.optional())
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key]
         if (globalRegistration != null) {
@@ -163,15 +177,8 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
 
     @JvmDefault
     fun <E : Any> offerFastNoEvents(value: Value<E>): Boolean {
-        val key = value.key
-
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*,*>) {
-            return offerFastNoEvents(key.wrappedKey.uncheckedCast(), value.get())
-        }
-
         // Check for a global registration
-        val globalRegistration = GlobalKeyRegistry[key]
+        val globalRegistration = GlobalKeyRegistry[value.key]
         if (globalRegistration != null) {
             return globalRegistration.dataProvider<Value<E>, E>().offerValueFast(this, value)
         }
@@ -180,21 +187,14 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
     }
 
     @JvmDefault
-    override fun <E : Any> offer(value: Value<E>): DataTransactionResult {
+    override fun offer(value: Value<*>): DataTransactionResult {
         return MutableDataHolderHelper.offer(this, value)
     }
 
     @JvmDefault
     fun <E : Any> offerNoEvents(value: Value<E>): DataTransactionResult {
-        val key = value.key
-
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*,*>) {
-            return offerNoEvents(key.wrappedKey.uncheckedCast(), value.get())
-        }
-
         // Check for a global registration
-        val globalRegistration = GlobalKeyRegistry[key]
+        val globalRegistration = GlobalKeyRegistry[value.key]
         if (globalRegistration != null) {
             return globalRegistration.dataProvider<Value<E>, E>().offerValue(this, value)
         }
@@ -315,11 +315,6 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
      */
     @JvmDefault
     fun removeFastNoEvents(key: Key<*>): Boolean {
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*,*>) {
-            return removeFastNoEvents(key.wrappedKey)
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key.uncheckedCast<Key<Value<Any>>>()]
         if (globalRegistration != null) {
@@ -336,11 +331,6 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
 
     @JvmDefault
     fun removeNoEvents(key: Key<*>): DataTransactionResult {
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*,*>) {
-            return removeNoEvents(key.wrappedKey)
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key.uncheckedCast<Key<Value<Any>>>()]
         if (globalRegistration != null) {

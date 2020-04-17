@@ -35,6 +35,7 @@ import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import java.util.function.Supplier
 
 /**
  * Represents a collection of [KeyRegistration]s with
@@ -90,12 +91,28 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract override operator fun <V : Value<E>, E : Any> get(key: Key<V>): LocalKeyRegistration<V, E, H>?
 
     /**
+     * Gets the [KeyRegistration] for the given [Key], if present.
+     *
+     * @param key The key to get the registration for
+     * @return The key registration, if found
+     */
+    override operator fun <V : Value<E>, E : Any> get(key: Supplier<out Key<V>>): LocalKeyRegistration<V, E, H>? = get(key.get())
+
+    /**
      * Gets the [ElementKeyRegistration] for the given [Key], if present.
      *
      * @param key The key to get the registration for
      * @return The key registration, if found
      */
     abstract fun <V : Value<E>, E : Any> getAsElement(key: Key<V>): ElementKeyRegistration<V, E, H>?
+
+    /**
+     * Gets the [ElementKeyRegistration] for the given [Key], if present.
+     *
+     * @param key The key to get the registration for
+     * @return The key registration, if found
+     */
+    fun <V : Value<E>, E : Any> getAsElement(key: Supplier<out Key<V>>): ElementKeyRegistration<V, E, H>? = getAsElement(key.get())
 
     /**
      * Registers the given [Key] to this local key registry.
@@ -108,6 +125,18 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @return The element key registration
      */
     abstract fun <V : Value<E>, E : Any> register(key: Key<V>): ElementKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] to this local key registry.
+     *
+     * By default are registrations registered using this
+     * method removable. This can be changed by explicitly
+     * calling [ElementKeyRegistration.nonRemovable].
+     *
+     * @param key The key to register
+     * @return The element key registration
+     */
+    fun <V : Value<E>, E : Any> register(key: Supplier<out Key<V>>): ElementKeyRegistration<V, E, H> = register(key.get())
 
     /**
      * Registers the given [Key] to this value
@@ -124,6 +153,21 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : Value<E>, E : Any> register(key: Key<V>, initialElement: E): ElementKeyRegistration<V, E, H>
 
     /**
+     * Registers the given [Key] to this value
+     * collection with the initial element.
+     *
+     * By default are registrations registered using this
+     * method non-removable. This can be changed by explicitly
+     * calling [ElementKeyRegistration.removable].
+     *
+     * @param key The key to register
+     * @param initialElement The initial element
+     * @return The element key registration
+     */
+    fun <V : Value<E>, E : Any> register(key: Supplier<out Key<V>>, initialElement: E): ElementKeyRegistration<V, E, H> =
+            register(key.get(), initialElement)
+
+    /**
      * Registers the given [Key] with bounded value to this local key registry.
      *
      * @param key The key to register
@@ -135,10 +179,28 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * Registers the given [Key] with bounded value to this local key registry.
      *
      * @param key The key to register
+     * @return The bounded element key registration
+     */
+    fun <V : BoundedValue<E>, E : Any> register(key: Supplier<out Key<V>>): BoundedElementKeyRegistration<V, E, H> = register(key.get())
+
+    /**
+     * Registers the given [Key] with bounded value to this local key registry.
+     *
+     * @param key The key to register
      * @param initialElement The initial element
      * @return The bounded element key registration
      */
     abstract fun <V : BoundedValue<E>, E : Any> register(key: Key<V>, initialElement: E): BoundedElementKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] with bounded value to this local key registry.
+     *
+     * @param key The key to register
+     * @param initialElement The initial element
+     * @return The bounded element key registration
+     */
+    fun <V : BoundedValue<E>, E : Any> register(key: Supplier<out Key<V>>, initialElement: E): BoundedElementKeyRegistration<V, E, H> =
+            register(key.get(), initialElement)
 
     /**
      * Registers the given [Key] with the data provider to this local key registry.
@@ -149,6 +211,15 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     abstract fun <V : Value<E>, E : Any> registerProvider(key: Key<V>, provider: DataProvider<V, E>): LocalKeyRegistration<V, E, H>
 
     /**
+     * Registers the given [Key] with the data provider to this local key registry.
+     *
+     * @param key The key to register
+     * @return The key registration
+     */
+    fun <V : Value<E>, E : Any> registerProvider(key: Supplier<out Key<V>>, provider: DataProvider<V, E>): LocalKeyRegistration<V, E, H> =
+            registerProvider(key.get(), provider)
+
+    /**
      * Registers the given [Key] with the local data provider to this local key registry.
      *
      * @param key The key to register
@@ -156,7 +227,19 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      */
     @JvmSynthetic
     abstract fun <V : Value<E>, E : Any> registerProvider(
-            key: Key<V>, fn: LocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit): LocalKeyRegistration<V, E, H>
+            key: Key<V>, fn: LocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit
+    ): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] with the local data provider to this local key registry.
+     *
+     * @param key The key to register
+     * @return The key registration
+     */
+    @JvmSynthetic
+    fun <V : Value<E>, E : Any> registerProvider(
+            key: Supplier<out Key<V>>, fn: LocalDataProviderBuilder<V, E, H>.(key: Key<V>) -> Unit
+    ): LocalKeyRegistration<V, E, H> = registerProvider(key.get(), fn)
 
     /**
      * Registers the given [Key] with the local data provider to this local key registry.
@@ -165,7 +248,18 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @return The key registration
      */
     abstract fun <V : Value<E>, E : Any> registerProvider(
-            key: Key<V>, fn: BiConsumer<LocalJDataProviderBuilder<V, E, H>, Key<V>>): LocalKeyRegistration<V, E, H>
+            key: Key<V>, fn: BiConsumer<LocalJDataProviderBuilder<V, E, H>, Key<V>>
+    ): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] with the local data provider to this local key registry.
+     *
+     * @param key The key to register
+     * @return The key registration
+     */
+    fun <V : Value<E>, E : Any> registerProvider(
+            key: Supplier<out Key<V>>, fn: BiConsumer<LocalJDataProviderBuilder<V, E, H>, Key<V>>
+    ): LocalKeyRegistration<V, E, H> = registerProvider(key.get(), fn)
 
     /**
      * Registers the given [Key] with the local data provider to this local key registry.
@@ -174,12 +268,28 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @return The key registration
      */
     abstract fun <V : Value<E>, E : Any> registerProvider(
-            key: Key<V>, fn: Consumer<LocalJDataProviderBuilder<V, E, H>>): LocalKeyRegistration<V, E, H>
+            key: Key<V>, fn: Consumer<LocalJDataProviderBuilder<V, E, H>>
+    ): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] with the local data provider to this local key registry.
+     *
+     * @param key The key to register
+     * @return The key registration
+     */
+    fun <V : Value<E>, E : Any> registerProvider(
+            key: Supplier<out Key<V>>, fn: Consumer<LocalJDataProviderBuilder<V, E, H>>
+    ): LocalKeyRegistration<V, E, H> = registerProvider(key.get(), fn)
 
     /**
      * Removes the registration for the given [Key].
      */
     abstract fun remove(key: Key<*>)
+
+    /**
+     * Removes the registration for the given [Key].
+     */
+    fun remove(key: Supplier<out Key<*>>) = remove(key.get())
 
     /**
      * Creates a copy of this [LocalKeyRegistry].

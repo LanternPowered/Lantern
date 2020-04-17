@@ -28,7 +28,7 @@ package org.lanternpowered.server.inventory
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalDataHolderHelper
-import org.lanternpowered.server.data.MutableBackedLocalImmutableDataHolder
+import org.lanternpowered.server.data.MutableBackedSerializableLocalImmutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.item.ItemType
@@ -36,7 +36,7 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
 class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack) :
-        MutableBackedLocalImmutableDataHolder<ItemStackSnapshot, LanternItemStack>(itemStack), ItemStackSnapshot {
+        MutableBackedSerializableLocalImmutableDataHolder<ItemStackSnapshot, LanternItemStack>(itemStack), ItemStackSnapshot {
 
     override fun getType(): ItemType = this.backingDataHolder.type
     override fun getQuantity(): Int = this.backingDataHolder.quantity

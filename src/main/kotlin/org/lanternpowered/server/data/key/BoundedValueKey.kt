@@ -26,15 +26,27 @@
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.server.data.value.BoundedValueConstructor
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.value.BoundedValue
+import java.util.function.BiPredicate
 
 /**
  * Represents the [ValueKey] of a [BoundedValue].
  */
 class BoundedValueKey<V : BoundedValue<E>, E : Any>(
-        key: CatalogKey, valueToken: TypeToken<V>, elementToken: TypeToken<E>, requiresExplicitRegistration: Boolean,
+        key: CatalogKey,
+        valueToken: TypeToken<V>,
+        elementToken: TypeToken<E>,
+        elementComparator: Comparator<in E>,
+        elementIncludesTester: BiPredicate<in E, in E>,
+        defaultElementSupplier: () -> E?,
+        requiresExplicitRegistration: Boolean,
         val minimum: () -> E,
-        val maximum: () -> E,
-        val comparator: Comparator<in E>
-) : ValueKey<V, E>(key, valueToken, elementToken, requiresExplicitRegistration)
+        val maximum: () -> E
+) : ValueKey<V, E>(key, valueToken, elementToken, elementComparator, elementIncludesTester,
+        defaultElementSupplier, requiresExplicitRegistration) {
+
+    override val valueConstructor: BoundedValueConstructor<V, E>
+        get() = super.valueConstructor as BoundedValueConstructor<V, E>
+}

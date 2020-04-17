@@ -27,18 +27,17 @@ package org.lanternpowered.server.data.value
 
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
-import java.util.Comparator
 import java.util.function.Function
 
 class LanternMutableBoundedValue<E : Any>(
-        key: Key<out BoundedValue<E>>, value: E, min: E, max: E, comparator: Comparator<E>
-) : LanternBoundedValue<E>(key, value, min, max, comparator), BoundedValue.Mutable<E> {
+        key: Key<out BoundedValue<E>>, value: E, min: () -> E, max: () -> E
+) : LanternBoundedValue<E>(key, value, min, max), BoundedValue.Mutable<E> {
 
-    override fun set(value: E) = LanternMutableBoundedValue(this.key, value, this.min, this.max, this.comparator)
+    override fun set(value: E) = LanternMutableBoundedValue(this.key, value, this.min, this.max)
 
     override fun transform(function: Function<E, E>) = set(function.apply(get()))
 
-    override fun asImmutable() =  LanternImmutableBoundedValue(this.key, CopyHelper.copy(this.value), this.min, this.max, this.comparator)
+    override fun asImmutable() =  LanternImmutableBoundedValue(this.key, CopyHelper.copy(this.value), this.min, this.max)
 
-    override fun copy() = LanternMutableBoundedValue(this.key, CopyHelper.copy(this.value), this.min, this.max, this.comparator)
+    override fun copy() = LanternMutableBoundedValue(this.key, CopyHelper.copy(this.value), this.min, this.max)
 }

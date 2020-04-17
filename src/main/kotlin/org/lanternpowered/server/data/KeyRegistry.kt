@@ -27,6 +27,7 @@ package org.lanternpowered.server.data
 
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
+import java.util.function.Supplier
 
 /**
  * Represents a base registry of [Key]s.
@@ -50,4 +51,12 @@ interface KeyRegistry<R : KeyRegistration<*,*>> {
      * @return The key registration, if present
      */
     operator fun <V : Value<E>, E : Any> get(key: Key<V>): R?
+
+    /**
+     * Gets the [KeyRegistration] for the given [Key], if present.
+     *
+     * @param key The key to get the registration for
+     * @return The key registration, if present
+     */
+    operator fun <V : Value<E>, E : Any> get(key: Supplier<out Key<V>>): R? = get(key.get())
 }

@@ -26,19 +26,22 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.key.ValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.WeightedCollectionValue
 import org.spongepowered.api.util.weighted.TableEntry
 import org.spongepowered.api.util.weighted.WeightedTable
 import java.util.Random
 
-class LanternMutableWeightedCollectionValue<E>(key: Key<out WeightedCollectionValue<E>>, value: WeightedTable<E>) : LanternCollectionValue.Mutable<TableEntry<E>, WeightedTable<E>, WeightedCollectionValue.Mutable<E>, WeightedCollectionValue.Immutable<E>>(key, value), WeightedCollectionValue.Mutable<E> {
+class LanternMutableWeightedCollectionValue<E>(key: Key<out WeightedCollectionValue<E>>, value: WeightedTable<E>)
+    : LanternCollectionValue.Mutable<TableEntry<E>, WeightedTable<E>, WeightedCollectionValue.Mutable<E>,
+        WeightedCollectionValue.Immutable<E>>(key, value), WeightedCollectionValue.Mutable<E> {
 
-    override fun getKey() = super.getKey().uncheckedCast<Key<out WeightedCollectionValue<E>>>()
+    override fun getKey() = super.getKey().uncheckedCast<ValueKey<WeightedCollectionValue<E>, WeightedTable<E>>>()
 
     override fun copy() = LanternMutableWeightedCollectionValue(this.key, CopyHelper.copyWeightedTable(this.value))
 
     override fun get(random: Random): List<E> = this.value.get(random)
 
-    override fun asImmutable() = LanternImmutableWeightedCollectionValue(this.key, CopyHelper.copyWeightedTable(this.value))
+    override fun asImmutable(): WeightedCollectionValue.Immutable<E> = this.key.valueConstructor.getImmutable(this.value).asImmutable()
 }

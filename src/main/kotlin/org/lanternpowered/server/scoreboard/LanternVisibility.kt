@@ -28,5 +28,9 @@ package org.lanternpowered.server.scoreboard
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.scoreboard.Visibility
+import org.spongepowered.api.text.translation.FixedTranslation
 
-class LanternVisibility(key: CatalogKey) : DefaultCatalogType(key), Visibility
+class LanternVisibility(key: CatalogKey) : DefaultCatalogType(key), Visibility {
+
+    override fun getTranslation() = FixedTranslation(this.key.value) // TODO
+}

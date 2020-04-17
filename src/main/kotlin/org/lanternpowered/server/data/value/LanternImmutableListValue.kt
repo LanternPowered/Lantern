@@ -36,7 +36,7 @@ class LanternImmutableListValue<E>(key: Key<out ListValue<E>>, value: MutableLis
 
     override fun withValue(value: MutableList<E>) = LanternImmutableListValue(this.key, value)
 
-    override fun get(): MutableList<E> = CopyHelper.copyListAsMutable(super.get())
+    override fun get(): MutableList<E> = CopyHelper.copyList(super.get())
 
     override fun get(index: Int) = this.value[index]
 

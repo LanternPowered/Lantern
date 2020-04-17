@@ -23,16 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.key
+package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
-import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.data.value.OptionalValue
-import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.SerializableDataHolder
+import org.spongepowered.api.data.persistence.DataView
 
-/**
- * Represents the [ValueKey] of a unwrapped [OptionalValue], is always tied to a [OptionalValueKey].
- */
-class OptionalUnwrappedValueKey<V : Value<E>, E : Any>(key: CatalogKey, valueToken: TypeToken<V>, elementToken: TypeToken<E>,
-        val wrappedKey: OptionalValueKey<out OptionalValue<E>, E>
-) : ValueKey<V, E>(key, valueToken, elementToken, true)
+interface SerializableImmutableDataHolder<I : SerializableDataHolder.Immutable<I>> :
+        CopyableImmutableDataHolder<I>, SerializableDataHolderBase, SerializableDataHolder.Immutable<I> {
+
+    override fun withRawData(container: DataView): I
+
+    @JvmDefault
+    override fun copy(): I = super.copy()
+}

@@ -28,7 +28,7 @@ package org.lanternpowered.server.entity.living.player;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Objects;
-import org.lanternpowered.server.data.ForwardingMutableDataHolder;
+import org.lanternpowered.server.data.MutableForwardingDataHolder;
 import org.lanternpowered.server.data.io.UserIO;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.permission.AbstractProxySubject;
@@ -50,7 +50,7 @@ import java.util.UUID;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class ProxyUser extends AbstractProxySubject implements IUser, ForwardingMutableDataHolder {
+public class ProxyUser extends AbstractProxySubject implements IUser, MutableForwardingDataHolder {
 
     private final UUID uniqueId;
     private GameProfile gameProfile;

@@ -26,15 +26,10 @@
 package org.lanternpowered.server.data
 
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalUnwrappedValueKey
-import org.lanternpowered.server.data.value.LanternImmutableValue
-import org.lanternpowered.server.data.value.LanternMutableValue
+import org.lanternpowered.api.ext.emptyOptional
+import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.persistence.Queries
-import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
 import kotlin.reflect.KProperty
@@ -49,10 +44,23 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
             DataHolderProperty<H, E> = KeyElementProperty(this)
 
     /**
+     * Gets a element delegate for the given [Key].
+     */
+    @JvmDefault
+    operator fun <V : Value<E>, E : Any, H : DataHolder> Optional<out Key<V>>.provideDelegate(thisRef: H, property: KProperty<*>):
+            DataHolderProperty<H, E> = get().provideDelegate(thisRef, property)
+
+    /**
      * Gets a value delegate for the given [Key].
      */
     @JvmDefault
     fun <V : Value<E>, E : Any, H : DataHolder> value(key: Key<V>): DataHolderProperty<H, V> = KeyValueProperty(key)
+
+    /**
+     * Gets a value delegate for the given [Key].
+     */
+    @JvmDefault
+    fun <V : Value<E>, E : Any, H : DataHolder> value(key: Optional<out Key<V>>): DataHolderProperty<H, V> = value(key.get())
 
     /**
      * Gets a optional element delegate for the given [Key].
@@ -61,26 +69,22 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
     fun <V : Value<E>, E : Any, H : DataHolder> optional(key: Key<V>): DataHolderProperty<H, E?> = OptionalKeyElementProperty(key)
 
     /**
+     * Gets a optional element delegate for the given [Key].
+     */
+    @JvmDefault
+    fun <V : Value<E>, E : Any, H : DataHolder> optional(key: Optional<out Key<V>>): DataHolderProperty<H, E?> = optional(key.get())
+
+    /**
      * Gets a optional value delegate for the given [Key].
      */
     @JvmDefault
     fun <V : Value<E>, E : Any, H : DataHolder> optionalValue(key: Key<V>): DataHolderProperty<H, V?> = OptionalKeyValueProperty(key)
 
     /**
-     * Gets the content version of this data holder. Defaults to `1`.
-     *
-     * @return The content version
+     * Gets a optional value delegate for the given [Key].
      */
     @JvmDefault
-    override fun getContentVersion(): Int = 1
-
-    @JvmDefault
-    override fun toContainer(): DataContainer {
-        val dataContainer = DataContainer.createNew()
-                .set(Queries.CONTENT_VERSION, this.contentVersion)
-        DataHelper.serializeRawData(dataContainer, this)
-        return dataContainer
-    }
+    fun <V : Value<E>, E : Any, H : DataHolder> optionalValue(key: Optional<out Key<V>>): DataHolderProperty<H, V?> = optionalValue(key.get())
 
     @JvmDefault
     override fun supports(key: Key<*>) = supportsKey(key.uncheckedCast<Key<Value<Any>>>())
@@ -90,10 +94,6 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
      */
     @JvmDefault
     private fun <V : Value<E>, E : Any> supportsKey(key: Key<V>): Boolean {
-        if (key is OptionalUnwrappedValueKey<*, *>) {
-            return supports(key.wrappedKey)
-        }
-
         val globalRegistration = GlobalKeyRegistry[key]
         if (globalRegistration != null) {
             return globalRegistration.anyDataProvider().isSupported(this)
@@ -102,34 +102,8 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
         return false
     }
 
-    /**
-     * Gets the [Value] for the unwrapped variant of a [OptionalValue] key.
-     */
-    @JvmDefault
-    private fun <E : Any, V : Value<E>> getOptionalUnwrappedValue(key: OptionalUnwrappedValueKey<V, E>): Optional<V> {
-        val optOptionalValue = getValue(key.wrappedKey)
-        if (!optOptionalValue.isPresent) {
-            return emptyOptional()
-        }
-        val optionalValue = optOptionalValue.get()
-        val optElement = optionalValue.get()
-        if (!optElement.isPresent) {
-            return emptyOptional()
-        }
-        val element = optElement.get()
-        return if (optionalValue is OptionalValue.Mutable<*>) {
-            LanternMutableValue(key, element).uncheckedCast<V>().optional()
-        } else {
-            LanternImmutableValue.cachedOf(key, element).uncheckedCast<V>().optional()
-        }
-    }
-
     @JvmDefault
     override fun <E : Any, V : Value<E>> getValue(key: Key<V>): Optional<V> {
-        if (key is OptionalUnwrappedValueKey<*, *>) {
-            return getOptionalUnwrappedValue(key.uncheckedCast())
-        }
-
         val globalRegistration = GlobalKeyRegistry[key]
         if (globalRegistration != null) {
             return globalRegistration.dataProvider<V, E>().getValue(this)
@@ -138,18 +112,8 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
         return emptyOptional()
     }
 
-    /**
-     * Gets the element for the unwrapped variant of a [OptionalValue] key.
-     */
-    @JvmDefault
-    private fun <E : Any> getOptionalUnwrappedElement(key: OptionalUnwrappedValueKey<*, E>) = get(key.wrappedKey).orElse(emptyOptional())
-
     @JvmDefault
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
-        if (key is OptionalUnwrappedValueKey<*, *>) {
-            return getOptionalUnwrappedElement(key.uncheckedCast())
-        }
-
         val globalRegistration = GlobalKeyRegistry[key]
         if (globalRegistration != null) {
             return globalRegistration.dataProvider<Value<E>, E>().get(this)

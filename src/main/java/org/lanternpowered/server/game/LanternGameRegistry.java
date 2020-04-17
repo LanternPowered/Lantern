@@ -76,7 +76,7 @@ import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
 import org.lanternpowered.server.data.key.ValueKeyRegistryModule;
 import org.lanternpowered.server.data.property.LanternPropertyBuilder;
-import org.lanternpowered.server.data.property.LanternPropertyMatcherBuilder;
+import org.lanternpowered.server.data.LanternKeyValueMatcherBuilder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
 import org.lanternpowered.server.data.type.LanternComparatorType;
@@ -531,7 +531,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(GameRule.Builder.class, LanternGameRuleBuilder::new)
                 // Properties
                 .registerBuilderSupplier(Property.class, (Supplier) LanternPropertyBuilder::new)
-                .registerBuilderSupplier(PropertyMatcher.class, (Supplier) LanternPropertyMatcherBuilder::new)
+                .registerBuilderSupplier(PropertyMatcher.class, (Supplier) LanternKeyValueMatcherBuilder::new)
                 // Text
                 .registerBuilderSupplier(ScoreText.Builder.class, LanternScoreText.Builder::new)
                 .registerBuilderSupplier(LiteralText.Builder.class, LanternLiteralText.Builder::new)

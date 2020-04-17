@@ -27,8 +27,9 @@
 
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalUnwrappedValueKey
+import org.lanternpowered.api.ext.emptyOptional
+import org.lanternpowered.api.ext.orNull
+import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.MergeFunction
@@ -47,11 +48,6 @@ interface ImmutableDataHolder<I : DataHolder.Immutable<I>> : DataHolderBase, Dat
     override fun with(value: Value<*>): Optional<I> {
         val key = value.key
 
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*, *>) {
-            return with(key.wrappedKey.uncheckedCast(), value.get().optional())
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key.uncheckedCast<Key<Value<Any>>>()]
         if (globalRegistration != null) {
@@ -63,11 +59,6 @@ interface ImmutableDataHolder<I : DataHolder.Immutable<I>> : DataHolderBase, Dat
 
     @JvmDefault
     override fun <E : Any> with(key: Key<out Value<E>>, value: E): Optional<I> {
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*, *>) {
-            return with(key.wrappedKey.uncheckedCast(), value.optional())
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key]
         if (globalRegistration != null) {
@@ -82,11 +73,6 @@ interface ImmutableDataHolder<I : DataHolder.Immutable<I>> : DataHolderBase, Dat
 
     @JvmDefault
     override fun without(key: Key<*>): Optional<I> {
-        // Optional unwrapped key handling
-        if (key is OptionalUnwrappedValueKey<*, *>) {
-            return without(key.wrappedKey.uncheckedCast<Key<*>>())
-        }
-
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key.uncheckedCast<Key<Value<Any>>>()]
         if (globalRegistration != null) {
@@ -97,7 +83,7 @@ interface ImmutableDataHolder<I : DataHolder.Immutable<I>> : DataHolderBase, Dat
     }
 
     @JvmDefault
-    override fun merge(that: I, function: MergeFunction): I {
+    override fun mergeWith(that: I, function: MergeFunction): I {
         var temp = this as I
         if (function == MergeFunction.REPLACEMENT_PREFERRED) {
             // There's no need to get old values here, everything
@@ -120,7 +106,4 @@ interface ImmutableDataHolder<I : DataHolder.Immutable<I>> : DataHolderBase, Dat
         }
         return temp
     }
-
-    @JvmDefault
-    override fun copy(): I = uncheckedCast()
 }

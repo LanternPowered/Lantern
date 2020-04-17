@@ -23,34 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value
+package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalValueKey
-import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.OptionalValue
-import org.spongepowered.api.data.value.Value
-import java.util.Optional
-import java.util.function.Function
-
-class LanternImmutableOptionalValue<E : Any>(
-        key: Key<out OptionalValue<E>>, value: Optional<E>
-) : LanternValue<Optional<E>>(key, value), OptionalValue.Immutable<E> {
-
-    override fun isPresent(): Boolean = this.value.isPresent
-
-    override fun getKey() = super.getKey().uncheckedCast<Key<out OptionalValue<E>>>()
-
-    override fun get(): Optional<E> = CopyHelper.copy(super.get())
-
-    override fun orElse(defaultValue: E): Value.Immutable<E> {
-        val unwrappedKey = (this.key as OptionalValueKey<*,*>).unwrappedKey.uncheckedCast<Key<out Value<E>>>()
-        return LanternImmutableValue(unwrappedKey, this.value.orElseGet { CopyHelper.copy(defaultValue) })
-    }
-
-    override fun with(value: Optional<E>) = LanternImmutableOptionalValue(this.key, CopyHelper.copy(value))
-
-    override fun transform(function: Function<Optional<E>, Optional<E>>) = with(function.apply(get()))
-
-    override fun asMutable() = LanternMutableOptionalValue(this.key, get())
-}
+interface SerializableLocalMutableDataHolder : CopyableLocalMutableDataHolder, SerializableMutableDataHolder

@@ -140,7 +140,7 @@ public class LanternScoreboard implements Scoreboard {
                 objective.getName());
         this.objectives.put(objective.getName(), objective);
         this.objectivesByCriterion.put(objective.getCriterion(), objective);
-        ((LanternObjective) objective).addScoreboard(this);
+        ((LanternObjective) objective).scoreboards.add(this);
         // Create the scoreboard objective on the client
         this.sendToPlayers(() -> this.createObjectiveInitMessages(objective));
     }
@@ -178,7 +178,7 @@ public class LanternScoreboard implements Scoreboard {
     }
 
     @Override
-    public Set<Objective> getObjectivesByCriteria(Criterion criteria) {
+    public Set<Objective> getObjectivesByCriterion(Criterion criteria) {
         return ImmutableSet.copyOf(this.objectivesByCriterion.get(checkNotNull(criteria, "criteria")));
     }
 
@@ -191,7 +191,7 @@ public class LanternScoreboard implements Scoreboard {
     public void removeObjective(Objective objective) {
         checkNotNull(objective, "objective");
         if (this.objectives.remove(objective.getName(), objective)) {
-            ((LanternObjective) objective).removeScoreboard(this);
+            ((LanternObjective) objective).scoreboards.remove(this);
             this.objectivesByCriterion.remove(objective.getCriterion(), objective);
             this.objectivesInSlot.entrySet().removeIf(entry -> entry.getValue().equals(objective));
             sendToPlayers(() -> Collections.singletonList(new MessagePlayOutScoreboardObjective.Remove(objective.getName())));

@@ -28,8 +28,7 @@ package org.lanternpowered.server.fluid
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalKeyRegistry
-import org.lanternpowered.server.data.LocalMutableDataHolder
-import org.lanternpowered.server.data.property.PropertyHolderBase
+import org.lanternpowered.server.data.SerializableLocalMutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
@@ -40,7 +39,7 @@ class LanternFluidStack private constructor(
         private val fluidType: FluidType,
         private var volume: Int,
         override val keyRegistry: LocalKeyRegistry<LanternFluidStack>
-) : FluidStack, PropertyHolderBase, LocalMutableDataHolder {
+) : FluidStack, SerializableLocalMutableDataHolder {
 
     constructor(fluidType: FluidType, volume: Int) : this(fluidType, volume, LocalKeyRegistry.of())
 

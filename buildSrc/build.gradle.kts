@@ -12,6 +12,6 @@ repositories {
 }
 
 dependencies {
-    implementation(group = "org.spongepowered", name = "spongegradle", version = "0.11.0-SNAPSHOT")
+    implementation(group = "org.spongepowered", name = "SpongeGradle", version = "0.11.3-SNAPSHOT")
     implementation(group = "org.lanternpowered", name = "lanterngradle", version = "1.0.2")
 }

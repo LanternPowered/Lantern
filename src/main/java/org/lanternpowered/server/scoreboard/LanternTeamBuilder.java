@@ -153,12 +153,12 @@ public class LanternTeamBuilder implements Team.Builder {
         this.displayName = null;
         this.prefix = Text.of();
         this.suffix = Text.of();
-        this.color = TextColors.NONE;
         this.allowFriendlyFire = false;
         this.showFriendlyInvisibles = false;
-        this.nameTagVisibility = Visibilities.ALWAYS;
-        this.deathMessageVisibility = Visibilities.ALWAYS;
-        this.collisionRule = CollisionRules.NEVER;
+        this.color(TextColors.NONE);
+        this.nameTagVisibility(Visibilities.ALWAYS);
+        this.deathTextVisibility(Visibilities.ALWAYS);
+        this.collisionRule(CollisionRules.NEVER);
         this.members = new HashSet<>();
         return this;
     }

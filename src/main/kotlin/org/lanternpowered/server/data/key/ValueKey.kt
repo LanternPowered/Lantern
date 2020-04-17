@@ -29,6 +29,7 @@ import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.server.data.value.ValueConstructorFactory
 import org.lanternpowered.server.event.RegisteredListener
 import org.lanternpowered.server.game.Lantern
 import org.spongepowered.api.CatalogKey
@@ -42,6 +43,7 @@ import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
 import org.spongepowered.api.plugin.PluginContainer
 import java.util.Objects
+import java.util.function.BiPredicate
 
 /**
  * Represents a [Key] that can be used to retrieve/offer data from [ValueContainer]s.
@@ -59,6 +61,9 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
         private val key: CatalogKey,
         private val valueToken: TypeToken<V>,
         private val elementToken: TypeToken<E>,
+        private val elementComparator: Comparator<in E>,
+        private val elementIncludesTester: BiPredicate<in E, in E>,
+        private val defaultElementSupplier: () -> E?,
         val requiresExplicitRegistration: Boolean
 ) : Key<V>, CatalogType {
 
@@ -68,6 +73,11 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
      * An unmodifiable list of all the registered value change event listeners.
      */
     val listeners = this.mutableListeners.asUnmodifiableList()
+
+    /**
+     * The value constructor of the key.
+     */
+    open val valueConstructor by lazy { ValueConstructorFactory.getConstructor(this) }
 
     private val hashCode = Objects.hash(this.valueToken, this.key, this.elementToken)
 
@@ -83,6 +93,8 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
     }
 
     override fun getKey() = this.key
+    override fun getElementComparator() = this.elementComparator
+    override fun getElementIncludesTester() = this.elementIncludesTester
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {

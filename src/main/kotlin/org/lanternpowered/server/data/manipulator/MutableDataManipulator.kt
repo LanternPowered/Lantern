@@ -36,10 +36,21 @@ import java.util.function.Predicate
 
 class MutableDataManipulator(map: MutableMap<Key<*>, Any> = mutableMapOf()) : AbstractDataManipulator(map), DataManipulator.Mutable {
 
-    override fun copyFrom(valueContainer: ValueContainer, predicate: Predicate<Key<*>>) = apply {
-        valueContainer.values.forEach { value ->
-            if (predicate.test(value.key)) {
-                set(value.key.uncheckedCast(), value.get())
+    override fun copyFrom(valueContainer: ValueContainer, overlap: MergeFunction, predicate: Predicate<Key<*>>) = apply {
+        if (overlap == MergeFunction.REPLACEMENT_PREFERRED) {
+            valueContainer.values.forEach { value ->
+                if (predicate.test(value.key)) {
+                    set(value.key.uncheckedCast(), value.get())
+                }
+            }
+        } else {
+            valueContainer.values.forEach { value ->
+                val key = value.key.uncheckedCast<Key<Value<Any>>>()
+                if (predicate.test(value.key)) {
+                    val original = getValue(key).orNull()
+                    val replacement = overlap.merge(original, value.uncheckedCast())
+                    set(key, replacement.get())
+                }
             }
         }
     }
@@ -58,7 +69,6 @@ class MutableDataManipulator(map: MutableMap<Key<*>, Any> = mutableMapOf()) : Ab
                 if (value != null) {
                     val original = getValue(key).orNull()
                     val replacement = overlap.merge(original, value.uncheckedCast())
-
                     set(key, replacement.get())
                 }
             }
@@ -93,9 +103,9 @@ class MutableDataManipulator(map: MutableMap<Key<*>, Any> = mutableMapOf()) : Ab
         this.map.remove(key)
     }
 
-    override fun copy() = MutableDataManipulator(CopyHelper.copyAsMutable(this.map))
+    override fun copy() = MutableDataManipulator(CopyHelper.copyMap(this.map))
 
     override fun asMutableCopy() = copy()
 
-    override fun asImmutable() = ImmutableDataManipulator(CopyHelper.copyAsMutable(this.map))
+    override fun asImmutable() = ImmutableDataManipulator(CopyHelper.copyMap(this.map))
 }

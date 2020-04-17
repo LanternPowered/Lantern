@@ -23,21 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value
+package org.lanternpowered.server.data
 
-import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
-import java.util.function.Function
+import org.spongepowered.api.data.SerializableDataHolder
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.Queries
 
-class LanternImmutableBoundedValue<E : Any>(
-        key: Key<out BoundedValue<E>>, value: E, min: () -> E, max: () -> E
-) : LanternBoundedValue<E>(key, value, min, max), BoundedValue.Immutable<E> {
+interface SerializableDataHolderBase : CopyableDataHolderBase, SerializableDataHolder {
 
-    override fun get(): E = CopyHelper.copy(super.get())
+    /**
+     * Gets the content version of this data holder. Defaults to `1`.
+     *
+     * @return The content version
+     */
+    @JvmDefault
+    override fun getContentVersion(): Int = 1
 
-    override fun with(value: E): BoundedValue.Immutable<E> = this.key.valueConstructor.getImmutable(value, this.min, this.max).asImmutable()
-
-    override fun transform(function: Function<E, E>) = with(function.apply(get()))
-
-    override fun asMutable() = LanternMutableBoundedValue(this.key, CopyHelper.copy(value), this.min, this.max)
+    @JvmDefault
+    override fun toContainer(): DataContainer {
+        val dataContainer = DataContainer.createNew()
+                .set(Queries.CONTENT_VERSION, this.contentVersion)
+        DataHelper.serializeRawData(dataContainer, this)
+        return dataContainer
+    }
 }

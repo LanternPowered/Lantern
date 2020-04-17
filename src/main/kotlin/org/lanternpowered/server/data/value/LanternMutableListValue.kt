@@ -26,13 +26,14 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.key.ValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.ListValue
 
 class LanternMutableListValue<E>(key: Key<out ListValue<E>>, value: MutableList<E>) :
         LanternCollectionValue.Mutable<E, MutableList<E>, ListValue.Mutable<E>, ListValue.Immutable<E>>(key, value), ListValue.Mutable<E> {
 
-    override fun getKey() = super.getKey().uncheckedCast<Key<out ListValue<E>>>()
+    override fun getKey() = super.getKey().uncheckedCast<ValueKey<ListValue<E>, List<E>>>()
 
     override fun get(index: Int) = this.value[index]
 
@@ -51,7 +52,7 @@ class LanternMutableListValue<E>(key: Key<out ListValue<E>>, value: MutableList<
 
     override fun set(index: Int, element: E) = apply { this.value[index] = element }
 
-    override fun asImmutable() = LanternImmutableListValue(this.key, CopyHelper.copyListAsMutable(this.value))
+    override fun asImmutable(): ListValue.Immutable<E> = this.key.valueConstructor.getImmutable(this.value).asImmutable()
 
-    override fun copy() = LanternMutableListValue(this.key, CopyHelper.copyListAsMutable(this.value))
+    override fun copy() = LanternMutableListValue(this.key, CopyHelper.copyList(this.value))
 }

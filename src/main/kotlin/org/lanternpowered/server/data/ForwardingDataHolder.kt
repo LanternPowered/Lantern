@@ -27,10 +27,7 @@ package org.lanternpowered.server.data
 
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.property.Property
 import org.spongepowered.api.data.value.Value
-import org.spongepowered.api.data.value.ValueContainer
 import java.util.Optional
 import java.util.OptionalDouble
 import java.util.OptionalInt
@@ -42,24 +39,6 @@ interface ForwardingDataHolder : DataHolder, ValueContainerBase {
      * The delegate [DataHolder].
      */
     val delegateDataHolder: DataHolder
-
-    @JvmDefault
-    override fun <V> getProperty(property: Property<V>): Optional<V> = this.delegateDataHolder.getProperty(property)
-
-    @JvmDefault
-    override fun getDoubleProperty(property: Property<Double>): OptionalDouble = this.delegateDataHolder.getDoubleProperty(property)
-
-    @JvmDefault
-    override fun getIntProperty(property: Property<Int>): OptionalInt = this.delegateDataHolder.getIntProperty(property)
-
-    @JvmDefault
-    override fun getProperties(): Map<Property<*>, *> = this.delegateDataHolder.properties
-
-    @JvmDefault
-    override fun getContentVersion(): Int = this.delegateDataHolder.contentVersion
-
-    @JvmDefault
-    override fun toContainer(): DataContainer = this.delegateDataHolder.toContainer()
 
     @JvmDefault
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> = this.delegateDataHolder.get(key)
@@ -90,9 +69,6 @@ interface ForwardingDataHolder : DataHolder, ValueContainerBase {
 
     @JvmDefault
     override fun supports(value: Value<*>): Boolean = this.delegateDataHolder.supports(value)
-
-    @JvmDefault
-    override fun copy(): ValueContainer = this.delegateDataHolder.copy()
 
     @JvmDefault
     override fun getKeys(): Set<Key<*>> = this.delegateDataHolder.keys

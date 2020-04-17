@@ -28,5 +28,9 @@ package org.lanternpowered.server.scoreboard
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.scoreboard.CollisionRule
+import org.spongepowered.api.text.translation.FixedTranslation
 
-class LanternCollisionRule(key: CatalogKey) : DefaultCatalogType(key), CollisionRule
+class LanternCollisionRule(key: CatalogKey) : DefaultCatalogType(key), CollisionRule {
+
+    override fun getTranslation() = FixedTranslation(this.key.value) // TODO
+}

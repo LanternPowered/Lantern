@@ -35,9 +35,6 @@ interface LocalImmutableDataHolder<I : DataHolder.Immutable<I>> : LocalDataHolde
 
     override val keyRegistry: LocalKeyRegistry<out LocalImmutableDataHolder<I>>
 
-    @JvmDefault
-    override fun getContentVersion(): Int = super<LocalDataHolder>.getContentVersion()
-
     /**
      * Gets a cache that can be used to cache the retrieved
      * [Value]s. Returns `null` by default which means that
@@ -45,9 +42,6 @@ interface LocalImmutableDataHolder<I : DataHolder.Immutable<I>> : LocalDataHolde
      */
     @JvmDefault
     val valueCache: ValueCache? get() = null
-
-    @JvmDefault
-    override fun copy(): I = uncheckedCast()
 
     @JvmDefault
     override fun <E : Any, V : Value<E>> getValue(key: Key<V>): Optional<V> {
@@ -74,7 +68,7 @@ interface LocalImmutableDataHolder<I : DataHolder.Immutable<I>> : LocalDataHolde
             return localRegistration.dataProvider<Value<Any>, Any>().withValue(uncheckedCast(), value.uncheckedCast())
         }
 
-        return super.with(value)
+        return super<ImmutableDataHolder>.with(value)
     }
 
     @JvmDefault
@@ -85,7 +79,7 @@ interface LocalImmutableDataHolder<I : DataHolder.Immutable<I>> : LocalDataHolde
             return localRegistration.dataProvider<Value<E>, E>().with(uncheckedCast(), value)
         }
 
-        return super.with(key, value)
+        return super<ImmutableDataHolder>.with(key, value)
     }
 
     @JvmDefault

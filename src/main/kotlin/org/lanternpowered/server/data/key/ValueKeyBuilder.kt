@@ -32,6 +32,7 @@ import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.ext.*
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
+import java.util.function.BiPredicate
 
 class ValueKeyBuilder<E : Any, V : Value<E>> : ValueKeyBuilderBase<E, V, ValueKeyBuilder<E, V>, KeyBuilder<V>>(), KeyBuilder<V> {
 
@@ -53,8 +54,11 @@ class ValueKeyBuilder<E : Any, V : Value<E>> : ValueKeyBuilderBase<E, V, ValueKe
     override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(supplier: () -> E)
             = apply { (this as ValueKeyBuilder<E, V>).setMinValueSupplier(supplier) }
 
-    override fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.comparator(comparator: Comparator<in E>)
+    override fun <V : Value<E>, E : Any> KeyBuilder<V>.comparator(comparator: Comparator<in E>)
             = apply { (this as ValueKeyBuilder<E, V>).setComparator(comparator) }
+
+    override fun <V : Value<E>, E : Any> KeyBuilder<V>.includesTester(tester: (E, E) -> Boolean)
+            = apply { (this as ValueKeyBuilder<E, V>).setIncludesTester(BiPredicate(tester)) }
 
     override fun <N : Value<*>> type(token: TypeToken<N>): KeyBuilder<N> = apply { setType(token.uncheckedCast()) }.uncheckedCast()
 

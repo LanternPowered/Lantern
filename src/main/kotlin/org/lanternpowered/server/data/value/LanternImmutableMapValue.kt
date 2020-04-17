@@ -33,7 +33,9 @@ import java.util.function.Predicate
 class LanternImmutableMapValue<K, V>(key: Key<out MapValue<K, V>>, value: MutableMap<K, V>) :
         LanternMapValue<K, V>(key, value), MapValue.Immutable<K, V> {
 
-    private fun withValue(value: MutableMap<K, V>) = LanternImmutableMapValue(this.key, value)
+    override fun get() = CopyHelper.copyMap(super.get())
+
+    private fun withValue(value: MutableMap<K, V>): MapValue.Immutable<K, V> = this.key.valueConstructor.getRawImmutable(value).asImmutable()
 
     override fun with(key: K, value: V): MapValue.Immutable<K, V> {
         val map = get()

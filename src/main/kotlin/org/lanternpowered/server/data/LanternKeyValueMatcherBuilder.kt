@@ -23,45 +23,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property
+package org.lanternpowered.server.data
 
-import org.lanternpowered.api.data.property.Property
-import org.lanternpowered.api.data.property.PropertyMatchOperator
-import org.lanternpowered.api.data.property.PropertyMatcher
-import org.lanternpowered.api.data.property.PropertyMatcherBuilder
+import org.lanternpowered.server.data.key.ValueKey
+import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.KeyValueMatcher
+import org.spongepowered.api.data.persistence.DataView
+import org.spongepowered.api.data.value.Value
+import java.util.Optional
 
 @Suppress("UNCHECKED_CAST")
-class LanternPropertyMatcherBuilder<V> : PropertyMatcherBuilder<V> {
+class LanternKeyValueMatcherBuilder<V : Any> : KeyValueMatcher.Builder<V> {
 
-    private lateinit var operator: PropertyMatchOperator
-    private var property: Property<V>? = null
+    private lateinit var operator: KeyValueMatcher.Operator
+    private var key: ValueKey<out Value<V>, V>? = null
     private var value: V? = null
 
     init {
         reset()
     }
 
-    override fun <NV> property(property: Property<NV>) = apply {
-        this.property = property as Property<V>
-    } as LanternPropertyMatcherBuilder<NV>
+    override fun <NV : Any> key(key: Key<out Value<NV>>) = apply {
+        this.key = key as ValueKey<out Value<V>, V>
+    } as LanternKeyValueMatcherBuilder<NV>
 
-    override fun operator(operator: PropertyMatchOperator) = apply { this.operator = operator }
-    override fun value(value: V?) = apply { this.value = value }
-
-    override fun build(): PropertyMatcher<V> {
-        val property = checkNotNull(this.property) { "The property must be set" }
-        return LanternPropertyMatcher(property, this.operator, this.value)
+    override fun value(value: Value<out V>?) = apply {
+        if (value != null) {
+            this.key = value.key as ValueKey<out Value<V>, V>
+            this.value = value.get()
+        } else {
+            this.value = null
+        }
     }
 
-    override fun from(value: PropertyMatcher<V>) = apply {
-        this.property = value.property
+    override fun operator(operator: KeyValueMatcher.Operator) = apply { this.operator = operator }
+    override fun value(value: V?) = apply { this.value = value }
+
+    override fun build(): KeyValueMatcher<V> {
+        val key = checkNotNull(this.key) { "The key must be set" }
+        return LanternKeyValueMatcher(key, this.operator, this.value)
+    }
+
+    override fun from(value: KeyValueMatcher<V>) = apply {
+        key(value.key)
         this.operator = value.operator
         this.value = value.value.orElse(null)
     }
 
     override fun reset() = apply {
-        this.operator = PropertyMatchOperator.EQUAL
-        this.property = null
+        this.operator = KeyValueMatcher.Operator.EQUAL
+        this.key = null
         this.value = null
+    }
+
+    override fun build(container: DataView): Optional<KeyValueMatcher<V>> {
+        TODO()
     }
 }

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.key.ValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.WeightedCollectionValue
 import org.spongepowered.api.util.weighted.TableEntry
@@ -36,9 +37,12 @@ class LanternImmutableWeightedCollectionValue<E>(key: Key<out WeightedCollection
         LanternCollectionValue.Immutable<TableEntry<E>, WeightedTable<E>, WeightedCollectionValue.Immutable<E>,
                 WeightedCollectionValue.Mutable<E>>(key, value), WeightedCollectionValue.Immutable<E> {
 
-    override fun getKey() = super.getKey().uncheckedCast<Key<out WeightedCollectionValue<E>>>()
+    override fun get() = CopyHelper.copyWeightedTable(super.get())
 
-    override fun withValue(value: WeightedTable<E>) = LanternImmutableWeightedCollectionValue(this.key, value)
+    override fun getKey() = super.getKey().uncheckedCast<ValueKey<WeightedCollectionValue<E>, WeightedTable<E>>>()
+
+    override fun withValue(value: WeightedTable<E>): WeightedCollectionValue.Immutable<E>
+            = this.key.valueConstructor.getImmutable(value).asImmutable()
 
     override fun get(random: Random): List<E> = this.value.get(random)
 

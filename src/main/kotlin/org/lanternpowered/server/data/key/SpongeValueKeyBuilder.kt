@@ -31,6 +31,7 @@ import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.Comparator
+import java.util.function.BiPredicate
 import java.util.function.Supplier
 
 class SpongeValueKeyBuilder<E : Any, V : Value<E>> : ValueKeyBuilderBase<E, V, SpongeValueKeyBuilder<E, V>, Key.Builder<E, V>>(),
@@ -48,4 +49,5 @@ class SpongeValueKeyBuilder<E : Any, V : Value<E>> : ValueKeyBuilderBase<E, V, S
     override fun maxValueSupplier(supplier: Supplier<out E>) = apply { setMaxValueSupplier(supplier::get) }
 
     override fun comparator(comparator: Comparator<in E>) = apply { setComparator(comparator) }
+    override fun includesTester(predicate: BiPredicate<in E, in E>?) = apply { setIncludesTester(predicate) }
 }

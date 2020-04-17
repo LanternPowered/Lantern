@@ -23,45 +23,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property
+package org.lanternpowered.server.data
 
-import org.lanternpowered.api.data.property.Property
-import org.lanternpowered.api.data.property.PropertyMatchOperator
-import org.lanternpowered.api.data.property.PropertyMatcher
+import org.lanternpowered.server.data.key.ValueKey
+import org.spongepowered.api.data.KeyValueMatcher
+import org.spongepowered.api.data.value.Value
 import java.util.Optional
 
-data class LanternPropertyMatcher<V>(
-        private val property: Property<V>,
-        private val operator: PropertyMatchOperator,
+data class LanternKeyValueMatcher<V : Any>(
+        private val key: ValueKey<out Value<V>, V>,
+        private val operator: KeyValueMatcher.Operator,
         private val value: V?
-) : PropertyMatcher<V> {
+) : AbstractDataSerializable(), KeyValueMatcher<V> {
 
-    override fun getProperty() = this.property
+    override fun getKey() = this.key
     override fun getOperator() = this.operator
     override fun getValue() = Optional.ofNullable(this.value)
 
+    override fun getContentVersion() = 1
+
     override fun matches(value: V?): Boolean {
         return when (this.operator) {
-            PropertyMatchOperator.EQUAL -> compare(value) == 0
-            PropertyMatchOperator.NOT_EQUAL -> compare(value) != 0
-            PropertyMatchOperator.GREATER -> compare(value) > 0
-            PropertyMatchOperator.GREATER_OR_EQUAL -> compare(value) >= 0
-            PropertyMatchOperator.LESS -> compare(value) < 0
-            PropertyMatchOperator.LESS_OR_EQUAL -> compare(value) <= 0
-            PropertyMatchOperator.INCLUDES -> includes(value)
-            PropertyMatchOperator.EXCLUDES -> !includes(value)
+            KeyValueMatcher.Operator.EQUAL -> compare(value) == 0
+            KeyValueMatcher.Operator.NOT_EQUAL -> compare(value) != 0
+            KeyValueMatcher.Operator.GREATER -> compare(value) > 0
+            KeyValueMatcher.Operator.GREATER_OR_EQUAL -> compare(value) >= 0
+            KeyValueMatcher.Operator.LESS -> compare(value) < 0
+            KeyValueMatcher.Operator.LESS_OR_EQUAL -> compare(value) <= 0
+            KeyValueMatcher.Operator.INCLUDES -> includes(value)
+            KeyValueMatcher.Operator.EXCLUDES -> !includes(value)
             else -> throw IllegalStateException("Unknown operator: $operator")
         }
     }
 
-    private fun includes(value: V?) = if (this.value == null || value == null) false else this.property.valueIncludesTester.test(this.value, value)
+    private fun includes(value: V?) = if (this.value == null || value == null) false else this.key.elementIncludesTester.test(this.value, value)
 
     private fun compare(value: V?): Int {
         return when {
             this.value == null && value == null -> 0
             this.value != null && value == null -> 1
             this.value == null -> -1
-            else -> -this.property.valueComparator.compare(this.value, value)
+            else -> -this.key.elementComparator.compare(this.value, value)
         }
     }
 }

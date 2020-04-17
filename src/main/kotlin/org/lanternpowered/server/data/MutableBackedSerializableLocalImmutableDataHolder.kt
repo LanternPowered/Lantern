@@ -27,7 +27,7 @@
 
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.optional
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.MergeFunction
@@ -35,7 +35,7 @@ import org.spongepowered.api.data.value.Value
 import java.util.Objects
 import java.util.Optional
 
-abstract class MutableBackedLocalImmutableDataHolder<I : DataHolder.Immutable<I>, M : LocalMutableDataHolder>(
+abstract class MutableBackedSerializableLocalImmutableDataHolder<I : DataHolder.Immutable<I>, M : SerializableLocalMutableDataHolder>(
         protected val backingDataHolder: M
 ) : LocalImmutableDataHolder<I> {
 
@@ -64,7 +64,7 @@ abstract class MutableBackedLocalImmutableDataHolder<I : DataHolder.Immutable<I>
 
     override fun merge(that: I, function: MergeFunction): I {
         val copy = this.backingDataHolder.copy() as M
-        copy.copyFromNoEvents((that as MutableBackedLocalImmutableDataHolder<*,*>).backingDataHolder, function)
+        copy.copyFromNoEvents((that as MutableBackedSerializableLocalImmutableDataHolder<*,*>).backingDataHolder, function)
         return withBacking(copy)
     }
 
@@ -72,7 +72,7 @@ abstract class MutableBackedLocalImmutableDataHolder<I : DataHolder.Immutable<I>
         if (other == null || other.javaClass != this.javaClass) {
             return false
         }
-        other as MutableBackedLocalImmutableDataHolder<*,*>
+        other as MutableBackedSerializableLocalImmutableDataHolder<*,*>
         return this.backingDataHolder == other.backingDataHolder
     }
 

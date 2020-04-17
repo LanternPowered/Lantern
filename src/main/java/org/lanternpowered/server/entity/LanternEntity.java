@@ -194,19 +194,19 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
     public void registerKeys() {
         final LocalKeyRegistry<LanternEntity> c = getKeyRegistry().forHolder(LanternEntity.class);
         c.register(Keys.DISPLAY_NAME, Text.empty());
-        c.register(Keys.CUSTOM_NAME_VISIBLE, true);
+        c.register(Keys.IS_CUSTOM_NAME_VISIBLE, true);
         c.register(Keys.TAGS, new HashSet<>());
         c.register(Keys.VELOCITY, Vector3d.ZERO);
         c.register(Keys.FIRE_TICKS, 0);
         c.register(Keys.FALL_DISTANCE, 0.0);
-        c.register(Keys.GLOWING, false);
-        c.register(Keys.INVISIBLE, false);
+        c.register(Keys.IS_GLOWING, false);
+        c.register(Keys.IS_INVISIBLE, false);
         c.register(Keys.INVULNERABLE, false);
-        c.register(Keys.HAS_GRAVITY, true);
+        c.register(Keys.IS_GRAVITY_AFFECTED, true);
         c.register(Keys.CREATOR);
         c.register(Keys.NOTIFIER);
         c.register(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
-        c.registerProvider(Keys.IS_ON_GROUND, builder -> builder.get(holder -> holder.onGround));
+        c.registerProvider(Keys.ON_GROUND, builder -> builder.get(holder -> holder.onGround));
         // TODO: Setting base vehicle?
         c.registerProvider(Keys.BASE_VEHICLE, builder -> builder.get(holder -> Optional.ofNullable(holder.getBaseVehicle())));
         c.registerProvider(Keys.PASSENGERS, builder -> {

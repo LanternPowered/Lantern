@@ -25,32 +25,16 @@
  */
 package org.lanternpowered.server.data.value
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.key.OptionalValueKey
-import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.Value
-import java.util.Optional
-import java.util.function.Function
 
-class LanternMutableOptionalValue<E : Any>(
-        key: Key<out OptionalValue<E>>, value: Optional<E>
-) : LanternValue<Optional<E>>(key, value), OptionalValue.Mutable<E> {
+internal class CachedBooleanValueConstructor(
+        private val original: ValueConstructor<Value<Boolean>, Boolean>
+) : ValueConstructor<Value<Boolean>, Boolean> {
 
-    override fun isPresent(): Boolean = this.value.isPresent
+    private val immutableValueTrue = this.original.getImmutable(true)
+    private val immutableValueFalse = this.original.getImmutable(false)
 
-    override fun getKey() = super.getKey().uncheckedCast<Key<out OptionalValue<E>>>()
-
-    override fun orElse(defaultValue: E): Value.Mutable<E> {
-        val unwrappedKey = (this.key as OptionalValueKey<*,*>).unwrappedKey.uncheckedCast<Key<out Value<E>>>()
-        return LanternMutableValue(unwrappedKey, this.value.orElse(defaultValue))
-    }
-
-    override fun transform(function: Function<Optional<E>, Optional<E>>) = set(function.apply(get()))
-
-    override fun asImmutable() = LanternImmutableOptionalValue(this.key, CopyHelper.copy(this.value))
-
-    override fun set(value: Optional<E>) = LanternMutableOptionalValue(this.key, CopyHelper.copy(value))
-
-    override fun copy() = LanternMutableOptionalValue(this.key, CopyHelper.copy(this.value))
+    override fun getMutable(element: Boolean) = this.original.getMutable(element)
+    override fun getImmutable(element: Boolean) = getRawImmutable(element)
+    override fun getRawImmutable(element: Boolean) = if (element) this.immutableValueTrue else this.immutableValueFalse
 }

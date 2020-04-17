@@ -26,13 +26,14 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.data.key.ValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.MapValue
 
 abstract class LanternMapValue<K, V> protected constructor(key: Key<out MapValue<K, V>>, value: MutableMap<K, V>) :
         LanternValue<MutableMap<K, V>>(key, value), MapValue<K, V> {
 
-    override fun getKey() = super.getKey().uncheckedCast<Key<out MapValue<K, V>>>()
+    override fun getKey() = super.getKey().uncheckedCast<ValueKey<MapValue<K, V>, Map<K, V>>>()
 
     override fun size() = this.value.size
 

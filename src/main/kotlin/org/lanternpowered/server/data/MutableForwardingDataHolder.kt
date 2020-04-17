@@ -28,29 +28,15 @@ package org.lanternpowered.server.data
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.CollectionValue
 import org.spongepowered.api.data.value.MapValue
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.ValueContainer
 
-interface ForwardingMutableDataHolder : ForwardingDataHolder, DataHolder.Mutable {
+interface MutableForwardingDataHolder : ForwardingDataHolder, DataHolder.Mutable {
 
     override val delegateDataHolder: DataHolder.Mutable
-
-    @JvmDefault
-    override fun validateRawData(container: DataView): Boolean {
-        return this.delegateDataHolder.validateRawData(container)
-    }
-
-    @JvmDefault
-    override fun setRawData(container: DataView) {
-        this.delegateDataHolder.setRawData(container)
-    }
-
-    @JvmDefault
-    override fun copy(): ValueContainer = super.copy()
 
     @JvmDefault
     override fun <E> offer(key: Key<out Value<E>>, value: E): DataTransactionResult =
@@ -81,7 +67,7 @@ interface ForwardingMutableDataHolder : ForwardingDataHolder, DataHolder.Mutable
             this.delegateDataHolder.offerSingle(key, valueKey, value)
 
     @JvmDefault
-    override fun <E : Any> offer(value: Value<E>): DataTransactionResult =
+    override fun offer(value: Value<*>): DataTransactionResult =
             this.delegateDataHolder.offer(value)
 
     @JvmDefault

@@ -41,12 +41,10 @@ abstract class LanternValue<E : Any> protected constructor(
     override fun hashCode() = Objects.hash(this.key, this.value)
 
     override fun equals(other: Any?): Boolean {
-        if (this === other) {
+        if (this === other)
             return true
-        }
-        if (other == null || javaClass != other.javaClass) {
+        if (other == null || javaClass != other.javaClass)
             return false
-        }
         other as LanternValue<*>
         return this.key == other.key && this.value == other.value
     }

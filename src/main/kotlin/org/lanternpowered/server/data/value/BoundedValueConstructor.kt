@@ -23,21 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+@file:Suppress("UNCHECKED_CAST")
+
 package org.lanternpowered.server.data.value
 
-import org.spongepowered.api.data.Key
+import org.lanternpowered.server.data.key.BoundedValueKey
+import org.lanternpowered.server.data.value.CopyHelper.copy
 import org.spongepowered.api.data.value.BoundedValue
-import java.util.function.Function
 
-class LanternImmutableBoundedValue<E : Any>(
-        key: Key<out BoundedValue<E>>, value: E, min: () -> E, max: () -> E
-) : LanternBoundedValue<E>(key, value, min, max), BoundedValue.Immutable<E> {
+class BoundedValueConstructor<V : BoundedValue<E>, E : Any> internal constructor(
+        private val key: BoundedValueKey<V, E>
+) : ValueConstructor<V, E> {
 
-    override fun get(): E = CopyHelper.copy(super.get())
+    override fun getMutable(element: E)
+            = getMutable(element, this.key.minimum, this.key.maximum)
 
-    override fun with(value: E): BoundedValue.Immutable<E> = this.key.valueConstructor.getImmutable(value, this.min, this.max).asImmutable()
+    fun getMutable(element: E, minimum: E, maximum: E)
+            = getMutable(element, CopyHelper.createSupplier(minimum), CopyHelper.createSupplier(maximum))
 
-    override fun transform(function: Function<E, E>) = with(function.apply(get()))
+    fun getMutable(element: E, minimum: () -> E, maximum: () -> E)
+            = LanternMutableBoundedValue(this.key, element, minimum, maximum) as V
 
-    override fun asMutable() = LanternMutableBoundedValue(this.key, CopyHelper.copy(value), this.min, this.max)
+    fun getImmutable(element: E, minimum: E, maximum: E)
+            = getImmutable(element, CopyHelper.createSupplier(minimum), CopyHelper.createSupplier(maximum))
+
+    fun getImmutable(element: E, minimum: () -> E, maximum: () -> E)
+            = getRawImmutable(copy(element), minimum, maximum)
+
+    override fun getRawImmutable(element: E)
+            = getRawImmutable(element, this.key.minimum, this.key.maximum)
+
+    fun getRawImmutable(element: E, minimum: () -> E, maximum: () -> E)
+            = LanternImmutableBoundedValue(this.key, element, minimum, maximum) as V
 }

@@ -25,33 +25,22 @@
  */
 package org.lanternpowered.server.data.value
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 
+@Suppress("UNCHECKED_CAST")
 object BoundedValueFactory : BoundedValue.Factory {
 
-    override fun <V : BoundedValue<E>, E : Any> mutableOf(key: Key<V>, element: E, minimum: E, maximum: E): V {
-        key as BoundedValueKey<*,*>
-        return LanternMutableBoundedValue(key, element, minimum, maximum, key.comparator.uncheckedCast()).uncheckedCast()
-    }
+    override fun <V : BoundedValue<E>, E : Any> mutableOf(key: Key<V>, element: E, minimum: E, maximum: E)
+            = (key as BoundedValueKey<V, E>).valueConstructor.getMutable(element, minimum, maximum)
 
-    override fun <V : BoundedValue<E>, E : Any> mutableOf(key: Key<V>, element: E): V {
-        key as BoundedValueKey<*,*>
-        return LanternMutableBoundedValue(key, element, key.minimum.uncheckedCast(),
-                key.maximum.uncheckedCast(), key.comparator.uncheckedCast()).uncheckedCast()
-    }
+    override fun <V : BoundedValue<E>, E : Any> mutableOf(key: Key<V>, element: E)
+            = (key as BoundedValueKey<V, E>).valueConstructor.getMutable(element)
 
-    override fun <V : BoundedValue<E>, E : Any> immutableOf(key: Key<V>, element: E, minimum: E, maximum: E): V {
-        key as BoundedValueKey<*,*>
-        return LanternImmutableBoundedValue(key, element, CopyHelper.copy(minimum), CopyHelper.copy(maximum),
-                key.comparator.uncheckedCast()).uncheckedCast()
-    }
+    override fun <V : BoundedValue<E>, E : Any> immutableOf(key: Key<V>, element: E, minimum: E, maximum: E)
+            = (key as BoundedValueKey<V, E>).valueConstructor.getImmutable(element, minimum, maximum)
 
-    override fun <V : BoundedValue<E>, E : Any> immutableOf(key: Key<V>, element: E): V {
-        key as BoundedValueKey<*,*>
-        return LanternImmutableBoundedValue(key, element, key.minimum.uncheckedCast(),
-                key.maximum.uncheckedCast(), key.comparator.uncheckedCast()).uncheckedCast()
-    }
+    override fun <V : BoundedValue<E>, E : Any> immutableOf(key: Key<V>, element: E)
+            = (key as BoundedValueKey<V, E>).valueConstructor.getImmutable(element)
 }

@@ -30,6 +30,7 @@ import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.util.Direction
 
 internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(private val key: Key<V>) {
 
@@ -42,7 +43,9 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
     protected var offerHandler: (DataHolder.Mutable.(element: E) -> DataTransactionResult)? = null
     protected var offerFastHandler: (DataHolder.Mutable.(element: E) -> Boolean)? = null
     protected var getHandler: (DataHolder.() -> E?)? = null
+    protected var getDirectionalHandler: (DataHolder.(direction: Direction) -> E?)? = null
     protected var getValueHandler: (DataHolder.() -> V?)? = null
+    protected var getValueDirectionalHandler: (DataHolder.(direction: Direction) -> V?)? = null
     protected var withHandler: (DataHolder.Immutable<*>.(element: E) -> DataHolder.Immutable<*>?)? = null
     protected var withValueHandler: (DataHolder.Immutable<*>.(value: V) -> DataHolder.Immutable<*>?)? = null
     protected var withoutHandler: (DataHolder.Immutable<*>.() -> DataHolder.Immutable<*>?)? = null
@@ -114,17 +117,51 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
             removeFastHandler = removeFastFromRemove(this.key, removeHandler)
         }
 
-        // Generate missing retrieve handlers, at least
+        // Generate missing get handlers, at least
         // one must be specified
 
-        var getHandler = this.getHandler
-        var getValueHandler = this.getValueHandler
+        val originalGetHandler = this.getHandler
+        val originalGetValueHandler = this.getValueHandler
+        val originalGetDirectionalHandler = this.getDirectionalHandler
+        val originalGetValueDirectionalHandler = this.getValueDirectionalHandler
+
+        val isDirectional = originalGetDirectionalHandler != null || originalGetValueDirectionalHandler != null
+
+        var getHandler = originalGetHandler
+        var getValueHandler = originalGetValueHandler
+        var getDirectionalHandler = originalGetDirectionalHandler
+        var getValueDirectionalHandler = originalGetValueDirectionalHandler
 
         if (getHandler == null) {
-            checkNotNull(getValueHandler) { "At least one get handler must be set" }
-            getHandler = getFromGetValue(this.key, getValueHandler)
-        } else if (getValueHandler == null) {
-            getValueHandler = getValueFromGet(this.key, getHandler)
+            getHandler = when {
+                originalGetValueHandler != null -> getFromGetValue(this.key, originalGetValueHandler)
+                originalGetDirectionalHandler != null -> getFromGetDirectional(this.key, originalGetDirectionalHandler)
+                else -> {
+                    checkNotNull(originalGetValueDirectionalHandler) { "At least one get handler must be set" }
+                    getFromGetValueDirectional(this.key, originalGetValueDirectionalHandler)
+                }
+            }
+        }
+
+        if (getValueHandler == null) {
+            getValueHandler = when {
+                originalGetHandler != null -> getValueFromGet(this.key, originalGetHandler)
+                originalGetValueDirectionalHandler != null -> getValueFromGetValueDirectional(this.key, originalGetValueDirectionalHandler)
+                else -> {
+                    checkNotNull(originalGetDirectionalHandler) { "At least one get handler must be set" }
+                    getValueFromGetDirectional(this.key, originalGetDirectionalHandler)
+                }
+            }
+        }
+
+        if (isDirectional) {
+            if (getDirectionalHandler == null) {
+                originalGetValueDirectionalHandler!!
+                getDirectionalHandler = getDirectionalFromGetValueDirectional(this.key, originalGetValueDirectionalHandler)
+            } else if (getValueDirectionalHandler == null) {
+                originalGetDirectionalHandler!!
+                getValueDirectionalHandler = getValueDirectionalFromGetDirectional(this.key, originalGetDirectionalHandler)
+            }
         }
 
         // Generate missing with handlers
@@ -145,9 +182,16 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
 
         val withoutHandler = this.withoutHandler ?: { null }
         val allowAsyncAccess = this.allowAsyncAccess ?: { false }
-        val alwaysAsyncAccess = alwaysAsyncAccess === allowAsyncAccess
 
-        return LanternDataProvider(this.key, alwaysAsyncAccess, allowAsyncAccess, supportedTester, removeHandler, removeFastHandler,
+        if (isDirectional) {
+            getDirectionalHandler!!
+            getValueDirectionalHandler!!
+            return LanternDirectionalDataProvider(this.key, allowAsyncAccess, supportedTester, removeHandler, removeFastHandler,
+                    offerValueHandler, offerValueFastHandler, offerHandler, offerFastHandler, getHandler, getValueHandler,
+                    getDirectionalHandler, getValueDirectionalHandler, withHandler, withValueHandler, withoutHandler)
+        }
+
+        return LanternDataProvider(this.key, allowAsyncAccess, supportedTester, removeHandler, removeFastHandler,
                 offerValueHandler, offerValueFastHandler, offerHandler, offerFastHandler, getHandler, getValueHandler, withHandler,
                 withValueHandler, withoutHandler)
     }
@@ -164,13 +208,43 @@ internal abstract class LanternDataProviderBuilderBase<V : Value<E>, E : Any>(pr
         }
     }
 
-    private fun <H>  getFromGetValue(key: Key<V>, handler: H.() -> V?): H.() -> E? {
+    private fun <H> getDirectionalFromGetValueDirectional(key: Key<V>, handler: H.(direction: Direction) -> V?): H.(direction: Direction) -> E? {
+        return { direction -> handler(direction)?.get() }
+    }
+
+    private fun <H> getValueDirectionalFromGetDirectional(key: Key<V>, handler: H.(direction: Direction) -> E?): H.(direction: Direction) -> V? {
+        return { direction ->
+            val element = handler(direction)
+            if (element != null) ValueFactory.mutableOf(key, element) else null
+        }
+    }
+
+    private fun <H> getFromGetValue(key: Key<V>, handler: H.() -> V?): H.() -> E? {
         return { handler()?.get() }
     }
 
-    private fun <H>  getValueFromGet(key: Key<V>, handler: H.() -> E?): H.() -> V? {
+    private fun <H> getFromGetDirectional(key: Key<V>, handler: H.(direction: Direction) -> E?): H.() -> E? {
+        return { handler(Direction.NONE) }
+    }
+
+    private fun <H> getFromGetValueDirectional(key: Key<V>, handler: H.(direction: Direction) -> V?): H.() -> E? {
+        return { handler(Direction.NONE)?.get() }
+    }
+
+    private fun <H> getValueFromGet(key: Key<V>, handler: H.() -> E?): H.() -> V? {
         return {
             val element = handler()
+            if (element != null) ValueFactory.mutableOf(key, element) else null
+        }
+    }
+
+    private fun <H> getValueFromGetValueDirectional(key: Key<V>, handler: H.(direction: Direction) -> V?): H.() -> V? {
+        return { handler(Direction.NONE) }
+    }
+
+    private fun <H> getValueFromGetDirectional(key: Key<V>, handler: H.(direction: Direction) -> E?): H.() -> V? {
+        return {
+            val element = handler(Direction.NONE)
             if (element != null) ValueFactory.mutableOf(key, element) else null
         }
     }

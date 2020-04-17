@@ -23,35 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property
+package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.util.Direction
-import org.lanternpowered.api.util.TypeToken
-import org.spongepowered.api.data.property.DirectionRelativePropertyHolder
-import org.spongepowered.api.data.property.PropertyHolder
+import org.spongepowered.api.data.DataHolder
+import org.spongepowered.api.data.DirectionRelativeDataProvider
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.util.Direction
 import java.util.Optional
 
-class LanternPropertyProviderBuilder<V : Any, H : PropertyHolder>(
-        private val holderType: TypeToken<H>,
-        private val base: LanternPropertyProviderBaseBuilder<V, in H>
-) : PropertyProviderBuilder<V, H>() {
+interface IDirectionalDataProvider<V : Value<E>, E : Any> : DirectionRelativeDataProvider<V, E>, IDataProvider<V, E> {
 
-    override fun <N : H> forHolder(holderType: TypeToken<N>): PropertyProviderBuilder<V, N> =
-            LanternPropertyProviderBuilder(holderType, this.base)
+    @JvmDefault
+    override fun isSupported(container: DataHolder): Boolean = super.isSupported(container)
 
-    override fun priority(priority: Int) = apply {
-        this.base.priority(priority)
-    }
+    @JvmDefault
+    override fun isSupported(dataHolder: DataHolder, direction: Direction): Boolean
 
-    override fun getOptional(fn: H.() -> Optional<V>) = apply {
-        this.base.getOptional(this.holderType, fn)
-    }
+    @JvmDefault
+    override fun getValue(container: DataHolder): Optional<V> = super<DirectionRelativeDataProvider>.getValue(container)
 
-    override fun <H> PropertyProviderBuilder<V, H>.getOptional(fn: H.(direction: Direction) -> Optional<V>):
-            PropertyProviderBuilder<V, H> where H : PropertyHolder, H : DirectionRelativePropertyHolder {
-        this@LanternPropertyProviderBuilder.base.getDirectionRelativeOptional(
-                this@LanternPropertyProviderBuilder.holderType.uncheckedCast(), fn)
-        return this
-    }
+    @JvmDefault
+    override fun get(container: DataHolder): Optional<E> = super.get(container)
 }

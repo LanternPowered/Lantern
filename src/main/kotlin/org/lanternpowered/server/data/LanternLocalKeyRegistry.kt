@@ -29,6 +29,7 @@ import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
+import org.spongepowered.api.data.DirectionRelativeDataProvider
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
@@ -94,7 +95,11 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
 
     override fun <V : Value<E>, E : Any> registerProvider(key: Key<V>, provider: DataProvider<V, E>): LocalKeyRegistration<V, E, H> {
         checkRegistration(key)
-        val dataProvider = if (provider is IDataProvider) provider else WrappedDataProvider(provider)
+        val dataProvider = when (provider) {
+            is IDataProvider -> provider
+            is DirectionRelativeDataProvider -> WrappedDirectionalDataProvider(provider)
+            else -> WrappedDataProvider(provider)
+        }
         val registration = LanternLocalProviderKeyRegistration<V, E, H>(key, dataProvider)
         this.map[key] = registration
         return registration

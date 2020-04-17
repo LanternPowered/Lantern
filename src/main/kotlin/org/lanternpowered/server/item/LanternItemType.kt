@@ -32,27 +32,31 @@ import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
 import org.lanternpowered.server.catalog.DefaultCatalogType
+import org.lanternpowered.server.data.LocalImmutableDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
-import org.lanternpowered.server.data.property.LocalPropertyHolder
-import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.item.appearance.ItemAppearance
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.block.BlockType
+import java.util.Optional
 
 class LanternItemType(
         key: CatalogKey,
         val nameFunction: ItemStack.() -> Translation,
         private val blockType: BlockType?,
         private val maxStackQuantity: Int,
-        private val valueKeyRegistry: LocalKeyRegistry<ItemStack>,
+        private val stackKeyRegistry: LocalKeyRegistry<ItemStack>,
+        override val keyRegistry: LocalKeyRegistry<out LocalImmutableDataHolder<ItemType>>,
         val behaviorPipeline: BehaviorPipeline<Behavior>,
-        override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>,
-        val appearance: ItemAppearance? = null // TODO: When custom item types get implemented
-) : DefaultCatalogType(key), ItemType, LocalPropertyHolder {
+        val appearance: ItemAppearance? = null // TODO: When custom item types get implemented,
+) : DefaultCatalogType(key), ItemType, LocalImmutableDataHolder<ItemType> {
 
     private val name by lazy { this.nameFunction(ItemStack.of(this)) }
 
     override fun getTranslation() = this.name
     override fun getBlock() = this.blockType.optional()
     override fun getMaxStackQuantity() = this.maxStackQuantity
+
+    override fun getContainer(): Optional<ItemType> {
+        TODO("Not yet implemented")
+    }
 }

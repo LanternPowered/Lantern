@@ -28,8 +28,10 @@ package org.lanternpowered.server.data
 import org.lanternpowered.api.ext.*
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
+import org.spongepowered.api.data.DirectionRelativeDataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.util.Direction
 
 internal class LanternLocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder>(key: Key<V>) :
         LanternDataProviderBuilderBase<V, E>(key), LocalDataProviderBuilder<V, E, H>, LocalJDataProviderBuilder<V, E, H> {
@@ -87,6 +89,16 @@ internal class LanternLocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHo
         this@LanternLocalDataProviderBuilder.withoutHandler = handler.uncheckedCast()
     }
 
+    override fun <H : DirectionRelativeDataHolder> LocalDataProviderBuilder<V, E, H>.getDirectional(
+            handler: H.(direction: Direction) -> E?) = apply {
+        this@LanternLocalDataProviderBuilder.getDirectionalHandler = handler.uncheckedCast()
+    }
+
+    override fun <H : DirectionRelativeDataHolder> LocalDataProviderBuilder<V, E, H>.getValueDirectional(
+            handler: H.(direction: Direction) -> V?) = apply {
+        this@LanternLocalDataProviderBuilder.getValueDirectionalHandler = handler.uncheckedCast()
+    }
+
     override fun removeFast(handler: H.() -> Boolean) = apply {
         this.removeFastHandler = handler.uncheckedCast()
     }
@@ -117,5 +129,13 @@ internal class LanternLocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHo
 
     override fun getValue(handler: H.() -> V?) = apply {
         this.getValueHandler = handler.uncheckedCast()
+    }
+
+    override fun getDirectional(handler: H.(direction: Direction) -> E?) = apply {
+        this.getDirectionalHandler = handler.uncheckedCast()
+    }
+
+    override fun getValueDirectional(handler: H.(direction: Direction) -> V?) = apply {
+        this.getValueDirectionalHandler = handler.uncheckedCast()
     }
 }

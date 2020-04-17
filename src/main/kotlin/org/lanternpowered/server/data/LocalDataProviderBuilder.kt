@@ -27,7 +27,9 @@ package org.lanternpowered.server.data
 
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
+import org.spongepowered.api.data.DirectionRelativeDataHolder
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.util.Direction
 
 /**
  * A builder to simplify the construction of [IDataProvider]s.
@@ -146,10 +148,20 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * Sets the get handler of this value processor, it will be called when someone attempts
      * to get a element from the [DataHolder].
      *
-     * @param handler The retrieve handler
+     * @param handler The get handler
      * @return This builder, for chaining
      */
     fun get(handler: H.() -> E?): LocalDataProviderBuilder<V, E, H>
+
+    /**
+     * Sets the directional get handler of this value processor, it will be called when someone attempts
+     * to get a element from the [DataHolder].
+     *
+     * @param handler The get directional handler
+     * @return This builder, for chaining
+     */
+    fun <H : DirectionRelativeDataHolder> LocalDataProviderBuilder<V, E, H>.getDirectional(
+            handler: H.(direction: Direction) -> E?): LocalDataProviderBuilder<V, E, H>
 
     /**
      * Sets the get handler of this value processor, it will be called when someone attempts
@@ -159,4 +171,14 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @return This builder, for chaining
      */
     fun getValue(handler: H.() -> V?): LocalDataProviderBuilder<V, E, H>
+
+    /**
+     * Sets the get handler of this value processor, it will be called when someone attempts
+     * to get a [Value] from the [DataHolder].
+     *
+     * @param handler The retrieve handler
+     * @return This builder, for chaining
+     */
+    fun <H : DirectionRelativeDataHolder> LocalDataProviderBuilder<V, E, H>.getValueDirectional(
+            handler: H.(direction: Direction) -> V?): LocalDataProviderBuilder<V, E, H>
 }

@@ -25,16 +25,15 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 
-internal class LanternDataProvider<V : Value<E>, E : Any>(
+internal open class LanternDataProvider<V : Value<E>, E : Any>(
         private val key: Key<V>,
-        private val alwaysAsyncAccess: Boolean,
         private val allowAsyncAccess: DataHolder.() -> Boolean,
         private val supportedByTester: DataHolder.() -> Boolean,
         private val removeHandler: DataHolder.Mutable.() -> DataTransactionResult,
@@ -66,9 +65,6 @@ internal class LanternDataProvider<V : Value<E>, E : Any>(
 
     override fun allowsAsynchronousAccess(container: DataHolder) =
             this.allowAsyncAccess(container)
-
-    override fun allowsAsynchronousAccess(token: TypeToken<out DataHolder>) =
-            this.alwaysAsyncAccess
 
     override fun get(container: DataHolder) =
             this.getHandler(container).optional()

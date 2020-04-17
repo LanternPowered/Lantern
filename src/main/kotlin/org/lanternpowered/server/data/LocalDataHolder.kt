@@ -50,7 +50,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase, PropertyHolderBa
     }
 
     @JvmDefault
-    override fun supports(key: Key<*>) = supportsKey(key.uncheckedCast<Key<Value<Any>>>())
+    override fun supports(key: Key<*>): Boolean = supportsKey(key.uncheckedCast<Key<Value<Any>>>())
 
     /**
      * Gets whether the [Key] is supported by this [LocalDataHolder].

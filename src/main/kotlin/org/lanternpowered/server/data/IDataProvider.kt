@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DataTransactionResult
@@ -40,12 +38,7 @@ interface IDataProvider<V : Value<E>, E : Any> : DataProvider<V, E> {
 
     override fun isSupported(container: DataHolder): Boolean
 
-    @JvmDefault
-    fun allowsAsynchronousAccess(container: DataHolder): Boolean {
-        return allowsAsynchronousAccess(container.javaClass.typeToken)
-    }
-
-    override fun allowsAsynchronousAccess(token: TypeToken<out DataHolder>): Boolean
+    override fun allowsAsynchronousAccess(container: DataHolder): Boolean
 
     @JvmDefault
     override fun getValue(container: DataHolder): Optional<V> = super.getValue(container)

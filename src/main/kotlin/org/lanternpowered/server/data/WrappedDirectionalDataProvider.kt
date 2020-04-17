@@ -23,39 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property
+package org.lanternpowered.server.data
 
-import com.google.common.collect.ImmutableList
-import org.lanternpowered.api.data.property.DirectionRelativePropertyHolder
-import org.lanternpowered.api.data.property.PropertyHolder
-import org.lanternpowered.api.data.property.PropertyProvider
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.util.Direction
-import java.util.Optional
+import org.spongepowered.api.data.DirectionRelativeDataProvider
+import org.spongepowered.api.data.value.Value
 
-open class PropertyProviderDelegate<V : Any> internal constructor(
-        internal val providers: ImmutableList<PropertyProvider<V>>
-) : PropertyProvider<V> {
-
-    override fun getFor(propertyHolder: PropertyHolder): Optional<V> {
-        for (provider in this.providers) {
-            val optional = provider.getFor(propertyHolder)
-            if (optional.isPresent) {
-                return optional
-            }
-        }
-        return emptyOptional()
-    }
-
-    override fun getFor(propertyHolder: DirectionRelativePropertyHolder, direction: Direction): Optional<V> {
-        for (provider in this.providers) {
-            val optional = provider.getFor(propertyHolder, direction)
-            if (optional.isPresent) {
-                return optional
-            }
-        }
-        return emptyOptional()
-    }
-
-    override fun getPriority() = Integer.MAX_VALUE
-}
+/**
+ * A wrapper to turn a [DirectionRelativeDataProvider] into a [IDirectionalDataProvider].
+ */
+internal class WrappedDirectionalDataProvider<V : Value<E>, E : Any>(val delegate: DirectionRelativeDataProvider<V, E>) :
+        IDirectionalDataProvider<V, E>, DirectionRelativeDataProvider<V, E> by delegate

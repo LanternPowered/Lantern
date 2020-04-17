@@ -25,8 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.orNull
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
@@ -119,8 +118,6 @@ internal class LanternLocalProviderKeyRegistration<V : Value<E>, E : Any, H : Da
         }
 
         override fun allowsAsynchronousAccess(container: DataHolder) = provider.allowsAsynchronousAccess(container)
-
-        override fun allowsAsynchronousAccess(token: TypeToken<out DataHolder>) = provider.allowsAsynchronousAccess(token)
 
         override fun get(container: DataHolder) = provider.get(container)
 

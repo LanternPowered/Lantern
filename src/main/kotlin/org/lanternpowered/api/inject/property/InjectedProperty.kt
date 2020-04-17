@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.api.inject.property
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

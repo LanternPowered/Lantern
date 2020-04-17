@@ -27,7 +27,7 @@ package org.lanternpowered.server.data
 
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.ext.emptyOptional
-import org.lanternpowered.api.ext.uncheckedCast
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value

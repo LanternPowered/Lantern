@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value

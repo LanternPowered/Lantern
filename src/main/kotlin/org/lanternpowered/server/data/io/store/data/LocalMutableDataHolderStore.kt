@@ -28,6 +28,7 @@ package org.lanternpowered.server.data.io.store.data
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.ElementKeyRegistration
 import org.lanternpowered.server.data.LocalMutableDataHolder
 import org.lanternpowered.server.data.io.store.ObjectStore

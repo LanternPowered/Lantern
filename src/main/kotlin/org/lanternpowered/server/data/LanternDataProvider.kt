@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.ext.uncheckedCast
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key

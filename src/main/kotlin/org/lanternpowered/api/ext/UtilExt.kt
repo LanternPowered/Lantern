@@ -29,11 +29,4 @@ package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.util.Tuple
 
-// Deconstructing declaration support for tuples
-operator fun <K, V> Tuple<K, V>.component1(): K = first
-operator fun <K, V> Tuple<K, V>.component2(): V = second
-
-fun <K, V> Tuple<K, V>.toPair() = Pair(first, second)
 fun <K, V> Pair<K, V>.toTuple() = Tuple(first, second)
-
-inline fun <T> Any?.uncheckedCast(): T = this as T

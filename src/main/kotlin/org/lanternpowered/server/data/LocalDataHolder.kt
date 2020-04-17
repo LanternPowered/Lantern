@@ -26,13 +26,12 @@
 package org.lanternpowered.server.data
 
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.ext.*
-import org.lanternpowered.server.data.property.PropertyHolderBase
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
 
-interface LocalDataHolder : ValueContainerBase, DataHolderBase, PropertyHolderBase {
+interface LocalDataHolder : ValueContainerBase, DataHolderBase {
 
     /**
      * Gets the [LocalKeyRegistry].

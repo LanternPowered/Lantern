@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.emptyOptional
+import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.value.CopyHelper
 import org.lanternpowered.server.data.value.ValueFactory
 import org.lanternpowered.server.util.function.TriConsumer
@@ -89,6 +90,8 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
 
     override val dataProvider: IDataProvider<V, E> = object : IDataProvider<V, E> {
 
+        override fun allowsAsynchronousAccess(container: DataHolder): Boolean = false // TODO
+
         override fun offer(container: DataHolder.Mutable, element: E): DataTransactionResult {
             container as H
             if (!validate(container, element)) {
@@ -148,8 +151,6 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
                 DataTransactionResult.successResult(value.asImmutable())
             }
         }
-
-        override fun allowsAsynchronousAccess(token: TypeToken<out DataHolder>) = false // TODO
 
         override fun get(container: DataHolder): Optional<E> {
             return backing.optional()

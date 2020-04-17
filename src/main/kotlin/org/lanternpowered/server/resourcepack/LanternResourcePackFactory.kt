@@ -74,6 +74,7 @@ class LanternResourcePackFactory : ResourcePack.Factory {
                 url = PathUtils.toURL(actualUri)
             }
             url.openStream().use { input ->
+                @Suppress("DEPRECATION")
                 hash = Hashing.sha1().hashBytes(ByteStreams.toByteArray(input)).toString()
             }
             id += ";Hash:" + hash!!

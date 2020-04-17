@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.manipulator
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.value.CopyHelper
 import org.spongepowered.api.data.DataManipulator
 import org.spongepowered.api.data.Key

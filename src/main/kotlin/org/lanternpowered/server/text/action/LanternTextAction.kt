@@ -26,6 +26,7 @@
 package org.lanternpowered.server.text.action
 
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.command.CommandCause
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType

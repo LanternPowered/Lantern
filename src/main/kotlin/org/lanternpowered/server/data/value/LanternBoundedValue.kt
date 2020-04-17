@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.value
 
-import org.lanternpowered.api.ext.uncheckedCast
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.Key

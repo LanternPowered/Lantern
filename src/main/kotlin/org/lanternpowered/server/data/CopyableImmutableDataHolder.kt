@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.uncheckedCast
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.CopyableDataHolder
 import org.spongepowered.api.data.DataHolder
 

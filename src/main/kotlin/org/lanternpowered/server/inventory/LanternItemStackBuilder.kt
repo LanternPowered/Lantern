@@ -56,7 +56,7 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
             }
             this.itemTypeSet = true
         } else if (itemStack == null) {
-            itemStack = LanternItemStack(ItemTypes.APPLE)
+            itemStack = LanternItemStack(ItemTypes.APPLE.get())
         }
         this.itemStack = itemStack
         return itemStack

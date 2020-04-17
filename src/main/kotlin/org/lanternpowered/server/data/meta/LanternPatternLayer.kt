@@ -29,6 +29,7 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.AbstractDataSerializable
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.Game
+import org.spongepowered.api.data.meta.BannerPatternLayer
 import org.spongepowered.api.data.meta.PatternLayer
 import org.spongepowered.api.data.persistence.*
 import org.spongepowered.api.data.type.BannerPatternShape
@@ -38,7 +39,7 @@ import java.util.*
 class LanternPatternLayer(
         private val shape: BannerPatternShape,
         private val color: DyeColor
-) : AbstractDataSerializable(), PatternLayer {
+) : AbstractDataSerializable(), BannerPatternLayer {
 
     override fun getShape() = this.shape
     override fun getColor() = this.color
@@ -53,9 +54,9 @@ class LanternPatternLayer(
             .add("dyeColor", this.color.key)
             .toString()
 
-    class Builder(private val game: Game) : AbstractDataBuilder<PatternLayer>(PatternLayer::class.java, 1) {
+    class Builder(private val game: Game) : AbstractDataBuilder<BannerPatternLayer>(BannerPatternLayer::class.java, 1) {
 
-        override fun buildContent(container: DataView): Optional<PatternLayer> {
+        override fun buildContent(container: DataView): Optional<BannerPatternLayer> {
             val bannerShape = container.getString(BANNER_SHAPE).orElse(null)
             val dyeColor = container.getString(DYE_COLOR).orElse(null)
             if (bannerShape == null || dyeColor == null) {

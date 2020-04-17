@@ -29,6 +29,7 @@ package org.lanternpowered.api.ext
 
 import com.google.inject.TypeLiteral
 import org.lanternpowered.api.util.TypeToken
+import org.lanternpowered.api.util.uncheckedCast
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 

@@ -86,7 +86,7 @@ internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any
 
     override fun validate(holder: H, element: E): Boolean {
         val key = this.key as BoundedValueKey<V, E>
-        val comparator = key.comparator
+        val comparator = key.elementComparator
 
         val minimum = this.minimum?.invoke(holder) ?: key.minimum()
         val maximum = this.maximum?.invoke(holder) ?: key.maximum()

@@ -25,8 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ext.emptyOptional
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
@@ -96,9 +95,6 @@ internal class LanternGlobalKeyRegistration<V : Value<E>, E : Any>(key: Key<V>) 
             }
             return false
         }
-
-        // This method cannot be implemented properly without knowing the container
-        override fun allowsAsynchronousAccess(token: TypeToken<out DataHolder>) = false
 
         override fun get(container: DataHolder): Optional<E> {
             for (provider in providers) {

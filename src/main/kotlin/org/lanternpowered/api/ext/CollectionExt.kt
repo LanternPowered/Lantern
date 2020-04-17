@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Multimap
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.util.weighted.WeightedTable
 import java.util.Collections
 import java.util.EnumMap

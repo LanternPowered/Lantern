@@ -27,8 +27,8 @@ package org.lanternpowered.api.inject.service
 
 import com.google.inject.Inject
 import com.google.inject.Provider
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.InjectionPoint
+import org.lanternpowered.api.util.uncheckedCast
 
 internal class ServiceRefProvider<T> : Provider<ServiceRef<T>> {
 

@@ -41,7 +41,6 @@ import org.spongepowered.api.data.type.InstrumentType
 import org.spongepowered.api.data.type.SkinPart
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.ListValue
-import org.spongepowered.api.data.value.OptionalValue
 import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.item.inventory.Carrier
@@ -172,7 +171,7 @@ object LanternKeys {
     /**
      * The hand of a entity that is currently active with an interaction.
      */
-    @JvmField val ACTIVE_HAND = valueKeyOf<OptionalValue<HandType>>(lantern("active_hand"))
+    @JvmField val ACTIVE_HAND = valueKeyOf<Value<HandType>>(lantern("active_hand"))
 
     /**
      * The maximum exhaustion of a entity.
@@ -196,7 +195,7 @@ object LanternKeys {
 
     @JvmField val ACCESSORIES = valueKeyOf<ListValue<Accessory>>(lantern("accessories"))
 
-    @JvmField val OPEN_ADVANCEMENT_TREE = valueKeyOf<OptionalValue<AdvancementTree>>(lantern("open_advancement_tree"))
+    @JvmField val OPEN_ADVANCEMENT_TREE = valueKeyOf<Value<AdvancementTree>>(lantern("open_advancement_tree"))
 
     @JvmField val ARE_PLAYING = valueKeyOf<Value<Boolean>>(lantern("are_playing"))
 

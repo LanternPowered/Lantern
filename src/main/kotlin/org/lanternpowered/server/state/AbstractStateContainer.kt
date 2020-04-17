@@ -35,7 +35,6 @@ import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.ext.immutableMapBuilderOf
 import org.lanternpowered.api.ext.immutableSetBuilderOf
 import org.lanternpowered.api.ext.toImmutableList
-import org.lanternpowered.api.ext.uncheckedCast
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery

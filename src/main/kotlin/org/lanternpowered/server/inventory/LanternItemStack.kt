@@ -29,8 +29,7 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalDataHolderHelper
 import org.lanternpowered.server.data.LocalKeyRegistry
-import org.lanternpowered.server.data.LocalMutableDataHolder
-import org.lanternpowered.server.data.property.PropertyHolderBase
+import org.lanternpowered.server.data.SerializableLocalMutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
 import org.lanternpowered.server.item.LanternItemType
 import org.spongepowered.api.data.Keys
@@ -47,7 +46,7 @@ class LanternItemStack private constructor(
         private val itemType: ItemType,
         private var quantity: Int,
         override val keyRegistry: LocalKeyRegistry<LanternItemStack>
-) : ItemStack, PropertyHolderBase, LocalMutableDataHolder {
+) : ItemStack, SerializableLocalMutableDataHolder {
 
     /**
      * Gets whether this item stack is filled. (non empty)
@@ -74,7 +73,7 @@ class LanternItemStack private constructor(
             register(Keys.DISPLAY_NAME)
             register(Keys.ITEM_LORE, mutableListOf())
             register(Keys.BREAKABLE_BLOCK_TYPES, mutableSetOf())
-            register(Keys.ITEM_ENCHANTMENTS, mutableListOf())
+            register(Keys.APPLIED_ENCHANTMENTS, mutableListOf())
         }
     }
 
@@ -96,7 +95,7 @@ class LanternItemStack private constructor(
         return (this.type as LanternItemType).nameFunction(this)
     }
 
-    override fun getType(): ItemType = if (this.quantity == 0) ItemTypes.AIR else this.itemType
+    override fun getType(): ItemType = if (this.quantity == 0) ItemTypes.AIR.get() else this.itemType
 
     override fun getMaxStackQuantity(): Int = this.type.maxStackQuantity
     override fun getQuantity(): Int = if (this.itemType === ItemTypes.AIR) 0 else this.quantity
@@ -195,7 +194,7 @@ class LanternItemStack private constructor(
 
     companion object {
 
-        private val empty by lazy { LanternItemStack(ItemTypes.AIR) }
+        private val empty by lazy { LanternItemStack(ItemTypes.AIR.get()) }
 
         /**
          * Gets a empty [ItemStack] if the specified [ItemStack]

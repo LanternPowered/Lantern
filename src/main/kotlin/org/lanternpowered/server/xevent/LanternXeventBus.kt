@@ -28,6 +28,7 @@ package org.lanternpowered.server.xevent
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.collect.HashMultimap
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.xevent.Xevent
 import org.lanternpowered.api.xevent.XeventBus
 import org.lanternpowered.api.xevent.XeventHandler

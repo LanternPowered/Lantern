@@ -25,7 +25,9 @@
  */
 package org.lanternpowered.server.data
 
+import org.lanternpowered.api.data.Key
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.value.Value
 
 object LocalDataHolderHelper {
@@ -48,7 +50,7 @@ object LocalDataHolderHelper {
         }
 
         for (registrationA in keyRegistryA.registrations) {
-            val registrationB = keyRegistryB.get<Value<Any>, Any>(registrationA.key.uncheckedCast()) ?: return false
+            val registrationB = keyRegistryB[registrationA.key.uncheckedCast<Key<Value<Any>>>()] ?: return false
 
             // Get the values from both of the containers and match them
             val valueA = registrationA.anyDataProvider().get(dataHolderA).orNull()

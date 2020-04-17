@@ -29,7 +29,7 @@ import com.google.common.base.Objects
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterators
 import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.ext.uncheckedCast
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextColor

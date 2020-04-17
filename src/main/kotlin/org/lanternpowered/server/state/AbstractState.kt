@@ -33,8 +33,7 @@ import org.lanternpowered.api.ext.emptyOptional
 import org.lanternpowered.api.ext.optional
 import org.lanternpowered.api.ext.orNull
 import org.lanternpowered.server.catalog.AbstractCatalogType
-import org.lanternpowered.server.data.ImmutableDataHolder
-import org.lanternpowered.server.data.property.PropertyHolderBase
+import org.lanternpowered.server.data.SerializableImmutableDataHolder
 import org.lanternpowered.server.state.property.AbstractStateProperty
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
@@ -50,7 +49,7 @@ import java.util.function.Predicate
 
 @Suppress("UNCHECKED_CAST")
 abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: StateBuilder<S>) : AbstractCatalogType(),
-        IState<S>, PropertyHolderBase, ImmutableDataHolder<S> {
+        IState<S>, SerializableImmutableDataHolder<S> {
 
     private val key: CatalogKey
 
@@ -169,7 +168,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
     override fun <E : Any> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<S> {
         val keysToProperty = (this.stateContainer as AbstractStateContainer<*>).keysToProperty
 
-        val property = (keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return super.transform(key, function)
+        val property = (keysToProperty[key] as? AbstractStateProperty<*, E>)
+                ?: return super<SerializableImmutableDataHolder>.transform(key, function)
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]
@@ -186,7 +186,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
 
     override fun <E : Any> with(key: Key<out Value<E>>, value: E): Optional<S> {
         val keysToProperty = (this.stateContainer as AbstractStateContainer<*>).keysToProperty
-        val property = (keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return super.with(key, value)
+        val property = (keysToProperty[key] as? AbstractStateProperty<*, E>)
+                ?: return super<SerializableImmutableDataHolder>.with(key, value)
 
         val stateValue = property.keyValueTransformer.toStateValue(value)
         val currentStateValue = this.stateValues[property]
@@ -209,20 +210,21 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
 
     override fun without(key: Key<*>): Optional<S> {
         val keysToProperty = (this.stateContainer as AbstractStateContainer<*>).keysToProperty
-        return if (key in keysToProperty) emptyOptional() else super<ImmutableDataHolder>.without(key)
+        return if (key in keysToProperty) emptyOptional() else super<SerializableImmutableDataHolder>.without(key)
     }
 
-    override fun merge(that: S, function: MergeFunction): S {
+    override fun mergeWith(that: S, function: MergeFunction): S {
         if (this.stateContainer != (that as IState<S>).stateContainer) {
             return this as S
         }
-        return super<ImmutableDataHolder>.merge(that, function)
+        return super<SerializableImmutableDataHolder>.mergeWith(that, function)
     }
 
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
         val keysToProperty = (this.stateContainer as AbstractStateContainer<*>).keysToProperty
 
-        val property = (keysToProperty[key] as? AbstractStateProperty<*, E>) ?: return super.get(key)
+        val property = (keysToProperty[key] as? AbstractStateProperty<*, E>)
+                ?: return super<SerializableImmutableDataHolder>.get(key)
         val transformer = property.keyValueTransformer as StateKeyValueTransformer<Comparable<Any>, E>
 
         val currentStateValue = this.stateValues[property]
@@ -233,7 +235,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
 
     override fun supports(key: Key<*>): Boolean {
         val keysToProperty = (this.stateContainer as AbstractStateContainer<*>).keysToProperty
-        return key in keysToProperty || super<ImmutableDataHolder>.supports(key)
+        return key in keysToProperty || super<SerializableImmutableDataHolder>.supports(key)
     }
 
     override fun copy(): S = this as S

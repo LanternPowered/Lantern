@@ -27,7 +27,8 @@
 
 package org.lanternpowered.api.util.option
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.toImmutableMap
+import org.lanternpowered.api.util.collections.toImmutableSet
 
 /**
  * Base class for all the [OptionMap]s.

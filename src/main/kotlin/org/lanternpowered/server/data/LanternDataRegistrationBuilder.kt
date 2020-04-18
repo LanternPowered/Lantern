@@ -26,8 +26,11 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.plugin.PluginContainer
+import org.lanternpowered.api.util.collections.toImmutableList
+import org.lanternpowered.api.util.collections.toImmutableMap
+import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.DataProvider

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.api.ext.emptyOptional
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.server.data.DataHelper.checkDataExists
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.state.AbstractStateBuilder

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.data.DataRegistration
 import org.spongepowered.api.data.Key

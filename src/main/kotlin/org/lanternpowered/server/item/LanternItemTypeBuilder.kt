@@ -34,7 +34,6 @@ import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl
 import org.lanternpowered.server.data.LocalKeyRegistry
-import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.block.BlockType
 
@@ -42,8 +41,8 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
 
     private var nameFunction: (ItemStack.() -> Translation)? = null
     private var maxStackQuantity = 64
-    private val propertiesBuilderFunctions = mutableListOf<ItemTypePropertyRegistryBuilder.() -> Unit>()
-    private val valueKeysFunctions = mutableListOf<LocalKeyRegistry<ItemStack>.() -> Unit>()
+    private val keysFunctions = mutableListOf<LocalKeyRegistry<ItemType>.() -> Unit>()
+    private val stackKeysFunctions = mutableListOf<LocalKeyRegistry<ItemStack>.() -> Unit>()
     private val behaviorsBuilderFunctions = mutableListOf<MutableBehaviorPipeline<Behavior>.() -> Unit>()
 
     /**
@@ -68,12 +67,12 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
         this.maxStackQuantity = quantity
     }
 
-    override fun properties(fn: ItemTypePropertyRegistryBuilder.() -> Unit) {
-        this.propertiesBuilderFunctions += fn
+    override fun keys(fn: LocalKeyRegistry<ItemType>.() -> Unit) {
+        this.keysFunctions += fn
     }
 
-    override fun valueKeys(fn: LocalKeyRegistry<ItemStack>.() -> Unit) {
-        this.valueKeysFunctions += fn
+    override fun stackKeys(fn: LocalKeyRegistry<ItemStack>.() -> Unit) {
+        this.stackKeysFunctions += fn
     }
 
     override fun behaviors(fn: MutableBehaviorPipeline<Behavior>.() -> Unit) {
@@ -87,18 +86,16 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
             nameFunction = { def }
         }
 
-        val properties = PropertyRegistry.of<ItemType>()
-
-        val builder = LanternItemTypePropertyRegistryBuilder(properties)
-        for (fn in this.propertiesBuilderFunctions) {
-            builder.fn()
+        val keyRegistry = LocalKeyRegistry.of<ItemType>()
+        for (fn in this.keysFunctions) {
+            keyRegistry.fn()
         }
 
         // Already create the key registry, this can be copied
         // to every item stack later, instead of reapplying every function
-        val valueKeyRegistry = LocalKeyRegistry.of<ItemStack>()
-        for (fn in this.valueKeysFunctions) {
-            valueKeyRegistry.fn()
+        val stackKeyRegistry = LocalKeyRegistry.of<ItemStack>()
+        for (fn in this.stackKeysFunctions) {
+            stackKeyRegistry.fn()
         }
 
         val behaviorPipeline = MutableBehaviorPipelineImpl(Behavior::class.java, mutableListOf())
@@ -107,6 +104,6 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
         }
 
         return LanternItemType(key, nameFunction, this.blockType, this.maxStackQuantity,
-                valueKeyRegistry, behaviorPipeline, properties.forHolderUnchecked())
+                stackKeyRegistry, behaviorPipeline, keyRegistry.forHolderUnchecked())
     }
 }

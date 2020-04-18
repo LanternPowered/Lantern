@@ -27,7 +27,9 @@ package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.catalog.CatalogKeys.sponge
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.data.valueKeyOf
+import org.lanternpowered.api.util.ranges.rangeTo
+import org.lanternpowered.api.util.type.typeToken
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.data.Key

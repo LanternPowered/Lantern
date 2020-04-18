@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.asUnmodifiableCollection
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.DataHolder

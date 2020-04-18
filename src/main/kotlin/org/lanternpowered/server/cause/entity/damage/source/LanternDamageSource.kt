@@ -28,4 +28,6 @@ package org.lanternpowered.server.cause.entity.damage.source
 import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder
 
-internal open class LanternDamageSource(builder: AbstractDamageSourceBuilder<*, *>) : AbstractDamageSource(builder)
+internal open class LanternDamageSource(builder: AbstractDamageSourceBuilder<*, *>) : AbstractDamageSource(builder) {
+    override fun isFire(): Boolean = false // TODO
+}

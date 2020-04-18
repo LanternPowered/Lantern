@@ -26,12 +26,11 @@
 package org.lanternpowered.server.block
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.times
+import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.util.AABB
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
-import org.lanternpowered.server.block.property.FlammableInfo
 import org.lanternpowered.server.block.state.BlockStateProperties
 import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.item.ItemTypeBuilder

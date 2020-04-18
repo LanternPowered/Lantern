@@ -55,16 +55,3 @@ fun String.toText(): Text = Text(this)
  * Converts the [String] into a [Text] object.
  */
 fun String.toText(fn: TextBuilder.() -> Unit): Text = Text(this, fn)
-
-/**
- * Applies a [ClickAction.ExecuteCallback] as click action.
- */
-fun TextBuilder.onClick(fn: (CommandCause) -> Unit): TextBuilder = onClick(ClickAction.ExecuteCallback.builder().callback(fn).build())
-
-inline operator fun TextFormat.plus(that: TextFormat): TextFormat = merge(that)
-inline operator fun TextFormat.plus(that: TextStyle): TextFormat = style(that)
-inline operator fun TextFormat.plus(that: TextColor): TextFormat = color(that)
-
-inline operator fun TextStyle.plus(that: TextStyle): TextStyle = and(that)
-inline operator fun TextStyle.minus(that: TextStyle): TextStyle = andNot(that)
-inline operator fun TextStyle.unaryMinus(): TextStyle = negate()

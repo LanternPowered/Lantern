@@ -42,6 +42,7 @@ public final class PotionEffectSerializer {
     private static final DataQuery AMPLIFIER = DataQuery.of("Amplifier");
     private static final DataQuery DURATION = DataQuery.of("Duration");
     private static final DataQuery SHOW_PARTICLES = DataQuery.of("ShowParticles");
+    private static final DataQuery SHOW_ICON = DataQuery.of("ShowIcon");
     private static final DataQuery AMBIENT = DataQuery.of("Ambient");
 
     public static DataView serialize(PotionEffect potionEffect) {
@@ -49,9 +50,10 @@ public final class PotionEffectSerializer {
         dataView.set(AMPLIFIER, (byte) potionEffect.getAmplifier());
         dataView.set(DURATION, potionEffect.getDuration());
         dataView.set(AMBIENT, (byte) (potionEffect.isAmbient() ? 1 : 0));
-        if (potionEffect.getShowParticles()) {
+        if (potionEffect.showsParticles())
             dataView.set(SHOW_PARTICLES, (byte) 1);
-        }
+        if (potionEffect.showsIcon())
+            dataView.set(SHOW_ICON, (byte) 1);
         final LanternPotionEffectType potionEffectType = (LanternPotionEffectType) potionEffect.getType();
         final int internalId = potionEffectType.getInternalId();
         if (internalId > 0xff) {
@@ -82,12 +84,14 @@ public final class PotionEffectSerializer {
         final int duration = dataView.getInt(DURATION).get();
         final boolean ambient = dataView.getInt(AMBIENT).orElse(0) > 0;
         final boolean particles = dataView.getInt(SHOW_PARTICLES).orElse(0) > 0;
+        final boolean icon = dataView.getInt(SHOW_ICON).orElse(1) > 0;
         return PotionEffect.builder()
                 .potionType(effectType)
-                .ambience(ambient)
+                .ambient(ambient)
                 .amplifier(amplifier)
                 .duration(duration)
-                .particles(particles)
+                .showParticles(particles)
+                .showIcon(icon)
                 .build();
     }
 

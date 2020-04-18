@@ -28,7 +28,7 @@ package org.lanternpowered.api.item.potion
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.util.builder.CatalogBuilder
+import org.lanternpowered.api.registry.CatalogBuilder
 
 /**
  * A builder to construct [PotionType]s.

@@ -66,7 +66,7 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
         itemStack(itemType)
     }
 
-    override fun getCurrentItem(): ItemType = if (this.itemTypeSet) itemStack(null).type else ItemTypes.AIR
+    override fun getCurrentItem(): ItemType = if (this.itemTypeSet) itemStack(null).type else ItemTypes.AIR.get()
 
     override fun quantity(quantity: Int) = apply {
         itemStack(null).quantity = quantity

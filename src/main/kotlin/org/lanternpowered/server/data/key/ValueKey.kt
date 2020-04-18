@@ -27,8 +27,10 @@ package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.collections.asUnmodifiableList
+import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.data.value.ValueConstructorFactory
 import org.lanternpowered.server.event.RegisteredListener
 import org.lanternpowered.server.game.Lantern

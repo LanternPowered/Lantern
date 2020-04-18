@@ -31,6 +31,7 @@ import ninja.leaping.configurate.gson.GsonConfigurationLoader
 import ninja.leaping.configurate.loader.HeaderMode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
+import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataContainer
@@ -94,7 +95,7 @@ class TextConfigSerializer : AbstractDataBuilder<Text>(Text::class.java, 1), Typ
 
     override fun buildContent(container: DataView): Optional<Text> {
         try {
-            return container.get(Queries.JSON).map { json -> TextSerializers.JSON.deserialize(json.toString()) }
+            return container.get(Queries.JSON).map { json -> JsonTextSerializer.deserialize(json.toString()) }
         } catch (e: TextParseException) {
             throw InvalidDataException(e)
         }

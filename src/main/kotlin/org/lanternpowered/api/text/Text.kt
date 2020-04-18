@@ -30,6 +30,8 @@ package org.lanternpowered.api.text
 
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
+import org.spongepowered.api.command.CommandCause
+import org.spongepowered.api.text.action.ClickAction
 
 typealias LiteralText = org.spongepowered.api.text.LiteralText
 typealias LiteralTextBuilder = org.spongepowered.api.text.LiteralText.Builder
@@ -147,3 +149,8 @@ inline fun TranslatableText(translatable: Translatable, vararg args: Any): Trans
 @JvmName("of")
 inline fun Text(translatable: Translatable, vararg args: Any): TranslatableText =
         Text.of(translatable, *args)
+
+/**
+ * Applies a [ClickAction.ExecuteCallback] as click action.
+ */
+fun TextBuilder.onClick(callback: (CommandCause) -> Unit): TextBuilder = onClick(ClickAction.ExecuteCallback.builder().callback(callback).build())

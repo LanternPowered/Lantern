@@ -27,7 +27,7 @@ package org.lanternpowered.api.catalog
 
 import org.lanternpowered.api.Sponge
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.plugin.PluginContainer
 
 object CatalogKeys {

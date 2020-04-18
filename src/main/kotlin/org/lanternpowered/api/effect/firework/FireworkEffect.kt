@@ -27,7 +27,6 @@
 
 package org.lanternpowered.api.effect.firework
 
-import org.lanternpowered.api.ext.*
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -36,22 +35,22 @@ typealias FireworkEffectBuilder = org.spongepowered.api.item.FireworkEffect.Buil
 typealias FireworkShape = org.spongepowered.api.item.FireworkShape
 typealias FireworkShapes = org.spongepowered.api.item.FireworkShapes
 
+inline val FireworkEffect.flickers: Boolean
+    get() = flickers()
+
+inline val FireworkEffect.hasTrail: Boolean
+    get() = hasTrail()
+
 /**
  * Constructs a new [FireworkEffect] using the builder function.
  *
  * @param fn The builder function
  * @return The constructed firework effect
  */
-inline fun FireworkEffect(fn: FireworkEffectBuilder.() -> Unit): FireworkEffect {
+inline fun fireworkEffect(fn: FireworkEffectBuilder.() -> Unit): FireworkEffect {
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }
-    return FireworkEffectBuilder().apply(fn).build()
+    return FireworkEffect.builder().apply(fn).build()
 }
 
-/**
- * Constructs a new [FireworkEffectBuilder].
- *
- * @return The constructed firework effect builder
- */
-inline fun FireworkEffectBuilder(): FireworkEffectBuilder = builderOf()

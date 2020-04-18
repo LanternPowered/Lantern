@@ -27,9 +27,9 @@ package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.block.BlockType

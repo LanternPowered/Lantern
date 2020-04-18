@@ -26,6 +26,7 @@
 package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.Lantern
+import org.lanternpowered.api.util.optional.orNull
 import kotlin.reflect.typeOf
 
 inline fun <reified S> serviceOf(): S {

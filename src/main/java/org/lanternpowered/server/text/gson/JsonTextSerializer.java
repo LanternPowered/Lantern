@@ -47,16 +47,6 @@ import java.lang.reflect.Type;
 
 public final class JsonTextSerializer extends JsonTextBaseSerializer<Text> {
 
-    /**
-     * Gets the {@link Gson} that is used
-     * to serialize {@link Text} objects.
-     *
-     * @return The gson
-     */
-    public static Gson getGson() {
-        return ((LanternJsonTextSerializer) TextSerializers.JSON).getGson();
-    }
-
     @Override
     public JsonElement serialize(Text src, Type typeOfSrc, JsonSerializationContext context) {
         if (src instanceof LiteralText) {

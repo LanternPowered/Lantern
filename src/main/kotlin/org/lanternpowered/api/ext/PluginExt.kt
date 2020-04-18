@@ -27,6 +27,7 @@ package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.Sponge
 import org.lanternpowered.api.plugin.PluginContainer
+import org.lanternpowered.api.util.optional.orNull
 
 // Represents a "null" message,
 private val nullMessage: () -> Any = { "" }

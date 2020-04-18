@@ -26,12 +26,14 @@
 package org.lanternpowered.server.fluid
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.property.PropertyHolderBase
+import org.lanternpowered.server.data.LocalImmutableDataHolder
+import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.state.AbstractCatalogTypeStateContainer
 import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.state.StateProperty
 
 class LanternFluidType(
-        key: CatalogKey, stateProperties: Iterable<StateProperty<*>>
-) : AbstractCatalogTypeStateContainer<FluidState>(key, stateProperties, ::LanternFluidState), FluidType, PropertyHolderBase
+        key: CatalogKey, stateProperties: Iterable<StateProperty<*>>,
+        override val keyRegistry: LocalKeyRegistry<out LocalImmutableDataHolder<FluidType>>
+) : AbstractCatalogTypeStateContainer<FluidState>(key, stateProperties, ::LanternFluidState), FluidType, LocalImmutableDataHolder<FluidType>

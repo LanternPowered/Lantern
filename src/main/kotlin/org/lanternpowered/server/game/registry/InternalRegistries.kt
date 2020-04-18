@@ -30,7 +30,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.gson.fromJson
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader

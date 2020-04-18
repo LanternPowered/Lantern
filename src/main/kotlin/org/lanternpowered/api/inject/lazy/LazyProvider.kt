@@ -30,8 +30,8 @@ import com.google.inject.Inject
 import com.google.inject.Injector
 import com.google.inject.Key
 import com.google.inject.Provider
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.inject.InjectionPoint
+import org.lanternpowered.api.util.type.typeLiteral
 import org.lanternpowered.api.util.uncheckedCast
 import java.lang.reflect.TypeVariable
 

@@ -28,7 +28,7 @@
 package org.lanternpowered.api.util.option
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.toImmutableList
 import java.util.concurrent.ConcurrentHashMap
 
 /**

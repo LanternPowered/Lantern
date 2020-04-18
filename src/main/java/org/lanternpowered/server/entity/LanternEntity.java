@@ -35,8 +35,8 @@ import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
+import org.lanternpowered.server.data.SerializableLocalMutableDataHolder;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -75,10 +75,8 @@ import org.spongepowered.api.event.cause.entity.damage.DamageModifierTypes;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
-import org.spongepowered.api.event.cause.entity.health.source.HealingSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.HealEntityEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -108,7 +106,7 @@ import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHolderBase {
+public class LanternEntity implements Entity, SerializableLocalMutableDataHolder {
 
     // The unique id of this entity
     private final UUID uniqueId;
@@ -165,7 +163,7 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
     private long lastPulseTime = -1;
     private long voidDamageCounter;
 
-    private SoundCategory soundCategory = SoundCategories.NEUTRAL;
+    private SoundCategory soundCategory = SoundCategories.NEUTRAL.get();
 
     @Override
     public LocalKeyRegistry<? extends LanternEntity> getKeyRegistry() {
@@ -208,7 +206,7 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         c.register(LanternKeys.PORTAL_COOLDOWN_TICKS, 0);
         c.registerProvider(Keys.ON_GROUND, builder -> builder.get(holder -> holder.onGround));
         // TODO: Setting base vehicle?
-        c.registerProvider(Keys.BASE_VEHICLE, builder -> builder.get(holder -> Optional.ofNullable(holder.getBaseVehicle())));
+        c.registerProvider(Keys.BASE_VEHICLE, builder -> builder.get(LanternEntity::getBaseVehicle));
         c.registerProvider(Keys.PASSENGERS, builder -> {
             builder.get(LanternEntity::getPassengers);
             builder.removeFast(entity -> {
@@ -218,9 +216,9 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
             // TODO: Offering
         });
         c.registerProvider(Keys.VEHICLE, builder -> {
-            builder.get(LanternEntity::getVehicle);
+            builder.get(holder -> holder.getVehicle().orElse(null));
             builder.offerFast((entity, vehicle) -> {
-                entity.setVehicle(vehicle.orElse(null));
+                entity.setVehicle(vehicle);
                 return true;
             });
             builder.removeFast(entity -> {
@@ -336,7 +334,7 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
                 final CauseStack causeStack = CauseStack.current();
                 // TODO: Message channel?
                 final DestructEntityEvent event = SpongeEventFactory.createDestructEntityEvent(causeStack.getCurrentCause(),
-                        MessageChannel.toNone(), Optional.empty(), this, new MessageEvent.MessageFormatter(), false);
+                        MessageChannel.toNone(), Optional.empty(), new MessageEvent.MessageFormatter(), this, false);
                 postDestructEvent(event);
             }
         }
@@ -429,7 +427,7 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
     public EntityType<?> getType() {
         EntityType<?> entityType = this.entityType;
         if (entityType == null) {
-            entityType = this.entityType = EntityTypeRegistryModule.INSTANCE.getByClass(getClass()).orElse(EntityTypes.UNKNOWN);
+            entityType = this.entityType = EntityTypeRegistryModule.INSTANCE.getByClass(getClass()).get();
         }
         return entityType;
     }
@@ -755,8 +753,8 @@ public class LanternEntity implements Entity, LocalMutableDataHolder, PropertyHo
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(damageSource);
             frame.addContext(EventContextKeys.DAMAGE_TYPE, damageSource.getType());
-            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(), this,
-                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), damage);
+            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(),
+                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), this, damage);
             event.setCancelled(cancelled);
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {

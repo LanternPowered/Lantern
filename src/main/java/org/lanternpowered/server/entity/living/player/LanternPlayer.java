@@ -1257,7 +1257,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             return;
         }
         final ChangeWorldBorderEvent.TargetPlayer event = SpongeEventFactory.createChangeWorldBorderEventTargetPlayer(
-                cause, Optional.ofNullable(border), this, Optional.ofNullable(this.worldBorder));
+                cause, Optional.ofNullable(border), Optional.ofNullable(this.worldBorder), this);
         Sponge.getEventManager().post(event);
         if (event.isCancelled()) {
             return;

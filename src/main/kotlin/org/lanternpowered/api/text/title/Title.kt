@@ -35,23 +35,14 @@ typealias Title = org.spongepowered.api.text.title.Title
 typealias TitleBuilder = org.spongepowered.api.text.title.Title.Builder
 
 /**
- * Constructs a new [Title].
+ * Constructs a new [title].
  *
  * @param fn The builder function
  * @return The constructed title
  */
-@JvmName("of")
-inline fun Title(fn: TitleBuilder.() -> Unit): Title {
+inline fun title(fn: TitleBuilder.() -> Unit): Title {
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }
-    return TitleBuilder().apply(fn).build()
+    return Title.builder().apply(fn).build()
 }
-
-/**
- * Constructs a new [TitleBuilder].
- *
- * @return The constructed title builder
- */
-@JvmName("builder")
-inline fun TitleBuilder(): TitleBuilder = Title.builder()

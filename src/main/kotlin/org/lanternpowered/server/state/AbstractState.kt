@@ -29,9 +29,9 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.emptyOptional
-import org.lanternpowered.api.ext.optional
-import org.lanternpowered.api.ext.orNull
+import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.catalog.AbstractCatalogType
 import org.lanternpowered.server.data.SerializableImmutableDataHolder
 import org.lanternpowered.server.state.property.AbstractStateProperty

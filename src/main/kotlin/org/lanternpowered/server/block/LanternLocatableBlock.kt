@@ -29,10 +29,13 @@ import com.google.common.base.Objects
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.ForwardingDataHolder
+import org.lanternpowered.server.data.SerializableForwardingDataHolder
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.SerializableDataHolder
 import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
@@ -43,12 +46,12 @@ import java.util.function.Function
 
 class LanternLocatableBlock internal constructor(
         internal val location: Location, internal val blockState: BlockState
-) : LocatableBlock, ForwardingDataHolder {
+) : LocatableBlock, SerializableForwardingDataHolder {
 
     override fun getBlockState() = this.blockState
     override fun getLocation() = this.location
 
-    override val delegateDataHolder: DataHolder get() = this.blockState
+    override val delegateDataHolder: SerializableDataHolder get() = this.blockState
 
     override fun toContainer(): DataContainer {
         val blockPos = this.location.position.toInt()
@@ -60,30 +63,25 @@ class LanternLocatableBlock internal constructor(
                 .set(DataQueries.BLOCK_STATE, this.blockState)
     }
 
-    override fun <E> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<LocatableBlock> {
-        return this.blockState.transform(key, function)
-                .map { state -> LanternLocatableBlock(this.location, state) }
-    }
+    override fun <E> transform(key: Key<out Value<E>>, function: Function<E, E>): Optional<LocatableBlock> =
+            this.blockState.transform(key, function).map { state -> LanternLocatableBlock(this.location, state) }
 
-    override fun <E> with(key: Key<out Value<E>>, value: E): Optional<LocatableBlock> {
-        return this.blockState.with(key, value)
-                .map { state -> LanternLocatableBlock(this.location, state) }
-    }
+    override fun <E> with(key: Key<out Value<E>>, value: E): Optional<LocatableBlock> =
+            this.blockState.with(key, value).map { state -> LanternLocatableBlock(this.location, state) }
 
-    override fun with(value: Value<*>): Optional<LocatableBlock> {
-        return this.blockState.with(value)
-                .map { state -> LanternLocatableBlock(this.location, state) }
-    }
+    override fun with(value: Value<*>): Optional<LocatableBlock> =
+            this.blockState.with(value).map { state -> LanternLocatableBlock(this.location, state) }
 
-    override fun without(key: Key<*>): Optional<LocatableBlock> {
-        return this.blockState.without(key)
-                .map { state -> LanternLocatableBlock(this.location, state) }
-    }
+    override fun without(key: Key<*>): Optional<LocatableBlock> =
+            this.blockState.without(key).map { state -> LanternLocatableBlock(this.location, state) }
 
-    override fun merge(that: LocatableBlock, function: MergeFunction): LocatableBlock {
-        val state = this.blockState.merge(that.blockState, function)
+    override fun mergeWith(that: LocatableBlock, function: MergeFunction): LocatableBlock {
+        val state = this.blockState.mergeWith(that.blockState, function)
         return if (state === this.blockState) this else LanternLocatableBlock(this.location, state)
     }
+
+    override fun withRawData(container: DataView): LocatableBlock =
+            LanternLocatableBlock(this.location, this.blockState.withRawData(container))
 
     override fun copy() = this
 

@@ -34,7 +34,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.ISlot;
-import org.lanternpowered.server.item.ItemProperties;
+import org.lanternpowered.server.item.ItemKeys;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.data.Keys;
@@ -68,7 +68,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
         if (optPlayer.isPresent()) {
             final Player player = optPlayer.get();
             final ItemStack itemStack = context.requireContext(ContextKeys.USED_ITEM_STACK);
-            if (itemStack.getProperty(ItemProperties.IS_ALWAYS_CONSUMABLE).orElse(false)) {
+            if (itemStack.getProperty(ItemKeys.IS_ALWAYS_CONSUMABLE).orElse(false)) {
                 int status = 0;
                 final double replenishedFood = itemStack.getDoubleProperty(Properties.REPLENISHED_FOOD).orElse(0);
                 if (replenishedFood != 0) {
@@ -77,7 +77,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                     status = food < maxFood ? 2 : 1;
                 }
                 if (status != 2) {
-                    final double restoredHealth = itemStack.getDoubleProperty(ItemProperties.HEALTH_RESTORATION).orElse(0);
+                    final double restoredHealth = itemStack.getDoubleProperty(ItemKeys.HEALTH_RESTORATION).orElse(0);
                     if (restoredHealth != 0) {
                         final double maxHealth = player.get(Keys.MAX_HEALTH).orElse(1.0);
                         final double health = player.get(Keys.HEALTH).orElse(maxHealth);
@@ -108,7 +108,7 @@ public class ConsumableInteractionBehavior implements InteractWithItemBehavior, 
                 optFoodLevel.ifPresent(food -> player.offer(Keys.FOOD_LEVEL,
                         Math.min(food + (int) replenishedFood, maxFood.orElse(Integer.MAX_VALUE))));
             }
-            final double restoredHealth = itemStack.getDoubleProperty(ItemProperties.HEALTH_RESTORATION).orElse(0);
+            final double restoredHealth = itemStack.getDoubleProperty(ItemKeys.HEALTH_RESTORATION).orElse(0);
             if (restoredHealth != 0) {
                 final Optional<Double> maxHealth = player.get(Keys.MAX_HEALTH);
                 final Optional<Double> optHealth = player.get(Keys.HEALTH);

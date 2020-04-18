@@ -29,23 +29,14 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeys.minecraft
 import org.lanternpowered.api.ext.itemStackOf
 import org.lanternpowered.api.ext.potionEffectOf
-import org.lanternpowered.api.ext.requireCatalogOf
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.ItemTypes
 import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.registry.CatalogRegistry
+import org.lanternpowered.api.registry.require
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.data.type.LanternDyeColor
 import org.lanternpowered.server.effect.potion.LanternPotionType
-import org.lanternpowered.server.ext.properties.alwaysConsumable
-import org.lanternpowered.server.ext.properties.applicablePotionEffects
-import org.lanternpowered.server.ext.properties.armorType
-import org.lanternpowered.server.ext.properties.dualWieldable
-import org.lanternpowered.server.ext.properties.equipmentType
-import org.lanternpowered.server.ext.properties.replenishedFood
-import org.lanternpowered.server.ext.properties.saturation
-import org.lanternpowered.server.ext.properties.toolType
-import org.lanternpowered.server.ext.properties.useDuration
-import org.lanternpowered.server.ext.properties.useLimit
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule
@@ -60,14 +51,12 @@ import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior
 import org.lanternpowered.server.item.behavior.vanilla.WallOrStandingPlacementBehavior
 import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer
-import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider
 import org.lanternpowered.server.item.property.BowProjectile
 import org.lanternpowered.server.network.item.NetworkItemTypeRegistry
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.Keys
-import org.spongepowered.api.data.property.Properties
 import org.spongepowered.api.data.type.ArmorType
 import org.spongepowered.api.data.type.ArmorTypes
 import org.spongepowered.api.data.type.DyeColor
@@ -90,6 +79,7 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 import org.spongepowered.api.registry.util.RegistrationDependency
 import java.util.Collections
+import java.util.function.Supplier
 import kotlin.random.Random
 
 @RegistrationDependency(
@@ -111,7 +101,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun register(key: CatalogKey, fn: ItemTypeBuilder.() -> Unit = {}): ItemType {
-        return itemTypeOf(key, fn).also { register(it) }
+        return itemTypeOf(key, fn)//.also { register(it) }
     }
 
     private fun ItemTypeBuilder.woodenTool(useLimit: Int = 60) {
@@ -134,9 +124,13 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         tool(useLimit, ToolTypes.DIAMOND)
     }
 
+    private fun ItemTypeBuilder.tool(useLimit: Int, toolType: Supplier<out ToolType>) {
+        tool(useLimit, toolType.get())
+    }
+
     private fun ItemTypeBuilder.tool(useLimit: Int, toolType: ToolType) {
         durable(useLimit)
-        properties {
+        keys {
             toolType(toolType)
             dualWieldable(true)
         }
@@ -144,7 +138,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun ItemTypeBuilder.leatherArmor(useLimit: Int, equipmentType: EquipmentType) {
         armor(useLimit, ArmorTypes.LEATHER, equipmentType)
-        valueKeys {
+        stackKeys {
             register(Keys.COLOR)
         }
     }
@@ -167,7 +161,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun ItemTypeBuilder.armor(useLimit: Int, armorType: ArmorType, equipmentType: EquipmentType) {
         durable(useLimit)
-        properties {
+        keys {
             armorType(armorType)
             equipmentType(equipmentType)
         }
@@ -178,19 +172,19 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun ItemTypeBuilder.durable(useLimit: Int) {
         maxStackQuantity(1)
-        properties {
+        keys {
             useLimit(useLimit)
         }
-        valueKeys {
+        stackKeys {
             register(Keys.ITEM_DURABILITY, 0)
-            register(Keys.UNBREAKABLE, true) // TODO: True until durability is implemented
+            register(Keys.IS_UNBREAKABLE, true) // TODO: True until durability is implemented
         }
     }
 
     private fun ItemTypeBuilder.food(replenishedFood: Double, saturation: Double,
                                      consumeDuration: Int = 32,
                                      consumeBehavior: ConsumableInteractionBehavior.() -> Unit = {}) {
-        properties {
+        keys {
             useDuration(consumeDuration)
             replenishedFood(replenishedFood)
             saturation(saturation)
@@ -202,7 +196,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun ItemTypeBuilder.fluidBucket(fluidType: FluidType) {
         maxStackQuantity(1)
-        valueKeys {
+        stackKeys {
             register(Keys.FLUID_ITEM_STACK, FluidStackSnapshot.builder()
                     .fluid(fluidType)
                     .volume(1000)
@@ -211,8 +205,8 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun ItemTypeBuilder.dyeColor(dyeColor: DyeColor) {
-        properties {
-            register(ItemProperties.DYE_COLOR, dyeColor)
+        keys {
+            register(ItemKeys.DYE_COLOR, dyeColor)
         }
     }
 
@@ -378,7 +372,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("bow")) {
             durable(385)
-            properties {
+            keys {
                 useDuration(0..72000)
             }
         }
@@ -452,7 +446,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("golden_apple")) {
             food(replenishedFood = 4.0, saturation = 9.6)
-            properties {
+            keys {
                 applicablePotionEffects(
                         potionEffectOf(PotionEffectTypes.REGENERATION, amplifier = 1, duration = 100),
                         potionEffectOf(PotionEffectTypes.ABSORPTION, amplifier = 0, duration = 2400)
@@ -463,7 +457,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("enchanted_golden_apple")) {
             food(replenishedFood = 4.0, saturation = 9.6)
-            properties {
+            keys {
                 applicablePotionEffects(
                         potionEffectOf(PotionEffectTypes.REGENERATION, amplifier = 1, duration = 400),
                         potionEffectOf(PotionEffectTypes.RESISTANCE, amplifier = 0, duration = 6000),
@@ -570,7 +564,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("pufferfish")) {
             food(replenishedFood = 1.0, saturation = 0.2)
-            properties {
+            keys {
                 applicablePotionEffects(
                         potionEffectOf(PotionEffectTypes.POISON, amplifier = 3, duration = 1200),
                         potionEffectOf(PotionEffectTypes.HUNGER, amplifier = 2, duration = 300),
@@ -581,7 +575,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("spider_eye")) {
             food(replenishedFood = 2.0, saturation = 3.2)
-            properties {
+            keys {
                 applicablePotionEffects(
                         potionEffectOf(PotionEffectTypes.POISON, amplifier = 0, duration = 100)
                 )
@@ -602,7 +596,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("poisonous_potato")) {
             food(replenishedFood = 2.0, saturation = 1.2)
-            properties {
+            keys {
                 applicablePotionEffects(
                         potionEffectOf(PotionEffectTypes.POISON, amplifier = 0, duration = 100)
                 )
@@ -632,14 +626,14 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
             food(replenishedFood = 4.0, saturation = 2.4) {
                 // TODO: Add random teleport consumer behavior
             }
-            properties {
+            keys {
                 alwaysConsumable(true)
             }
         }
 
         register(minecraft("milk_bucket")) {
             maxStackQuantity(1)
-            properties {
+            keys {
                 useDuration(32)
                 alwaysConsumable(true)
             }
@@ -660,7 +654,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
         register(minecraft("elytra")) {
             durable(432)
-            properties {
+            keys {
                 equipmentType(EquipmentTypes.CHESTPLATE)
             }
             behaviors {
@@ -757,7 +751,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerMinecarts() {
-        fun registerMinecart(key: CatalogKey, entityType: () -> EntityType<out MinecartEntity>) {
+        fun registerMinecart(key: CatalogKey, entityType: () -> Supplier<out EntityType<out MinecartEntity>>) {
             register(key) {
                 maxStackQuantity(1)
             }
@@ -777,13 +771,13 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
             val dyeId = dyeColor.key.value
             register(minecraft("${dyeId}_banner")) {
                 maxStackQuantity(16)
-                valueKeys {
+                stackKeys {
                     register(Keys.BANNER_BASE_COLOR, DyeColors.WHITE)
                     register(Keys.BANNER_PATTERNS, listOf())
                 }
                 behaviors {
-                    val wallType = lazy { requireCatalogOf<BlockType>(minecraft("${dyeId}_wall_banner")) }
-                    val standingType = lazy { requireCatalogOf<BlockType>(minecraft("${dyeId}_banner")) }
+                    val wallType = lazy { CatalogRegistry.require<BlockType>(minecraft("${dyeId}_wall_banner")) }
+                    val standingType = lazy { CatalogRegistry.require<BlockType>(minecraft("${dyeId}_banner")) }
                     add(WallOrStandingPlacementBehavior.ofTypes(wallType, standingType))
                 }
             }
@@ -793,8 +787,8 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     private fun registerDyeColors() {
         for (dyeColor in LanternDyeColor.values()) {
             register(minecraft("${dyeColor.key.value}_dye")) {
-                properties {
-                    register(ItemProperties.DYE_COLOR, dyeColor)
+                keys {
+                    register(ItemKeys.DYE_COLOR, dyeColor)
                 }
             }
         }
@@ -805,7 +799,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         name {
             get(Keys.POTION_TYPE).map { translation(it as LanternPotionType) }.orElse(defaultTranslation)
         }
-        valueKeys {
+        stackKeys {
             register(Keys.COLOR)
             register(Keys.POTION_EFFECTS)
             register(Keys.POTION_TYPE)
@@ -816,7 +810,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         register(minecraft("potion")) {
             potionEffects { this.translation }
             maxStackQuantity(1)
-            properties {
+            keys {
                 useDuration(32)
                 alwaysConsumable(true)
                 forStack {
@@ -844,13 +838,13 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     private fun registerBooks() {
         register(minecraft("writable_book")) {
             maxStackQuantity(1)
-            valueKeys {
+            stackKeys {
                 register(Keys.PLAIN_BOOK_PAGES)
             }
         }
         register(minecraft("written_book")) {
             maxStackQuantity(1)
-            valueKeys {
+            stackKeys {
                 register(Keys.BOOK_PAGES)
                 register(Keys.BOOK_AUTHOR)
                 register(Keys.GENERATION)
@@ -861,7 +855,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         }
         register(minecraft("enchanted_book")) {
             maxStackQuantity(1)
-            valueKeys {
+            stackKeys {
                 register(Keys.STORED_ENCHANTMENTS)
             }
         }
@@ -869,7 +863,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun ItemTypeBuilder.headwear() {
-        properties {
+        keys {
             equipmentType(EquipmentTypes.HEADWEAR)
         }
     }
@@ -883,7 +877,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         }
         register(minecraft("player_head")) {
             headwear()
-            valueKeys {
+            stackKeys {
                 register(Keys.SKIN)
             }
         }
@@ -897,14 +891,14 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun registerFireworks() {
         register(minecraft("firework_rocket")) {
-            valueKeys {
+            stackKeys {
                 register(Keys.FIREWORK_EFFECTS, Collections.emptyList())
                 register(Keys.FIREWORK_FLIGHT_MODIFIER, 1)
             }
         }
         register(minecraft("firework_star")) {
             maxStackQuantity(1)
-            valueKeys {
+            stackKeys {
                 register(Keys.FIREWORK_EFFECTS, Collections.emptyList())
             }
         }
@@ -925,8 +919,8 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     private fun registerDoors() {
         fun registerWoodenDoor(key: CatalogKey, woodType: WoodType) {
             register(key) {
-                properties {
-                    register(ItemProperties.WOOD_TYPE, woodType)
+                keys {
+                    register(ItemKeys.WOOD_TYPE, woodType)
                 }
             }
         }
@@ -943,8 +937,8 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         fun registerBoat(key: CatalogKey, woodType: WoodType) {
             register(key) {
                 maxStackQuantity(1)
-                properties {
-                    register(ItemProperties.WOOD_TYPE, woodType)
+                keys {
+                    register(ItemKeys.WOOD_TYPE, woodType)
                 }
             }
         }
@@ -959,8 +953,8 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun <P : Projectile> ItemTypeBuilder.arrow(
             entityType: EntityType<P>, fn: P.(itemStack: ItemStack) -> Unit = {}) {
-        properties {
-            register(ItemProperties.BOW_PROJECTILE_PROVIDER, BowProjectile(entityType, fn))
+        keys {
+            register(ItemKeys.BOW_PROJECTILE_PROVIDER, BowProjectile(entityType, fn))
         }
     }
 
@@ -983,7 +977,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         fun registerMusicDisc(key: CatalogKey, musicDisc: MusicDisc) {
             register(key) {
                 maxStackQuantity(1)
-                properties {
+                keys {
                     register(Properties.MUSIC_DISC, musicDisc)
                 }
             }

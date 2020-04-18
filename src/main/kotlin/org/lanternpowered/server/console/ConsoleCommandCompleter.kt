@@ -29,7 +29,7 @@ import org.jline.reader.Candidate
 import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.ParsedLine
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.text.normalizeSpaces
 import org.lanternpowered.server.game.Lantern
 import org.spongepowered.api.Sponge
 import java.util.concurrent.ExecutionException

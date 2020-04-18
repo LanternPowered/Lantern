@@ -28,7 +28,7 @@ package org.lanternpowered.server.text.serializer
 import com.google.common.reflect.TypeToken
 import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.orNull
 import org.spongepowered.api.text.TextTemplate
 
 class TextTemplateArgConfigSerializer : TypeSerializer<TextTemplate.Arg> {

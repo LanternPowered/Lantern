@@ -27,7 +27,6 @@
 
 package org.lanternpowered.api.boss
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.Text
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -47,17 +46,10 @@ typealias BossBarOverlays = org.spongepowered.api.boss.BossBarOverlays
  * @param fn The builder function
  * @return The constructed boss bar
  */
-inline fun BossBar(name: Text, fn: BossBarBuilder.() -> Unit = {}): BossBar {
+inline fun bossBar(name: Text, fn: BossBarBuilder.() -> Unit = {}): BossBar {
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }
     // Apply a few defaults, so only the name is required
-    return BossBarBuilder().name(name).color(BossBarColors.PURPLE).overlay(BossBarOverlays.PROGRESS).apply(fn).build()
+    return BossBar.builder().name(name).color(BossBarColors.PURPLE).overlay(BossBarOverlays.PROGRESS).apply(fn).build()
 }
-
-/**
- * Constructs a new [BossBarBuilder].
- *
- * @return The constructed boss bar builder
- */
-inline fun BossBarBuilder(): BossBarBuilder = builderOf()

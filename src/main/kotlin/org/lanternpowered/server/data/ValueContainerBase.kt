@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.emptyOptionalDouble
-import org.lanternpowered.api.ext.emptyOptionalInt
-import org.lanternpowered.api.ext.emptyOptionalLong
+import org.lanternpowered.api.util.optional.emptyOptionalDouble
+import org.lanternpowered.api.util.optional.emptyOptionalInt
+import org.lanternpowered.api.util.optional.emptyOptionalLong
 import org.lanternpowered.api.ext.optionalDouble
 import org.lanternpowered.api.ext.optionalInt
 import org.lanternpowered.api.ext.optionalLong

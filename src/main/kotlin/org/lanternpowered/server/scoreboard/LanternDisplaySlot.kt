@@ -26,7 +26,7 @@
 package org.lanternpowered.server.scoreboard
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot

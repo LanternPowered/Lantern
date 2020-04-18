@@ -27,11 +27,11 @@ package org.lanternpowered.server.text.format
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextStyle
-import org.lanternpowered.api.text.format.TextStyleBase
+import org.lanternpowered.api.text.format.TextStyleType
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.x.text.format.XTextStyle
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import java.util.Objects
@@ -184,13 +184,13 @@ open class LanternTextStyle(
 
     class Real(key: CatalogKey, override val code: Char, bold: Boolean? = null, italic: Boolean? = null, underline: Boolean? = null,
                strikethrough: Boolean? = null, obfuscated: Boolean? = null) :
-            LanternTextStyle(bold, italic, underline, strikethrough, obfuscated), TextStyleBase,
+            LanternTextStyle(bold, italic, underline, strikethrough, obfuscated), TextStyleType,
             CatalogType by DefaultCatalogType(key), FormattingCodeHolder {
 
         override fun isComposite() = false
     }
 
-    class None(key: CatalogKey) : LanternTextStyle(), TextStyleBase, CatalogType by DefaultCatalogType(key) {
+    class None(key: CatalogKey) : LanternTextStyle(), TextStyleType, CatalogType by DefaultCatalogType(key) {
 
         override fun isComposite() = false
     }

@@ -26,13 +26,13 @@
 package org.lanternpowered.server.text.format
 
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextColors
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.format.TextStyles
+import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.text.serializer.TextFormatConfigSerializer
 
 data class LanternTextFormat(

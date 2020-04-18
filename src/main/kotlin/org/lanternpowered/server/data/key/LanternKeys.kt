@@ -26,7 +26,8 @@
 package org.lanternpowered.server.data.key
 
 import org.lanternpowered.api.catalog.CatalogKeys.lantern
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.data.valueKeyOf
+import org.lanternpowered.api.util.ranges.rangeTo
 import org.lanternpowered.server.data.type.LanternBedPart
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.RedstoneConnectionType

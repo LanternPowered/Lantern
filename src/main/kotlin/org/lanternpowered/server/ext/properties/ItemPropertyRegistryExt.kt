@@ -26,14 +26,12 @@
 package org.lanternpowered.server.ext.properties
 
 import org.lanternpowered.api.effect.potion.PotionEffect
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.ItemType
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.data.property.PropertyRegistry
-import org.lanternpowered.server.item.ItemProperties
 import org.spongepowered.api.data.property.Properties
 import org.spongepowered.api.data.type.ArmorType
 import org.spongepowered.api.data.type.ToolType
-import org.spongepowered.api.effect.sound.music.MusicDisc
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
 fun <H : ItemType> PropertyRegistry<H>.applicablePotionEffects(vararg effects: PotionEffect) {

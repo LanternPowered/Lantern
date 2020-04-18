@@ -27,7 +27,7 @@
 
 package org.lanternpowered.server.ext
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.orNull
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.data.type.NotePitch

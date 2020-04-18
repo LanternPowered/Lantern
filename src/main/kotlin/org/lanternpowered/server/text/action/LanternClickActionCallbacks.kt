@@ -44,7 +44,7 @@ object LanternClickActionCallbacks {
     /**
      * The pattern of a valid [TextActions.executeCallback] command line.
      */
-    val commandPattern = "^/lantern:textclickcallback ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$".toRegex()
+    val commandPattern = "^$commandBase([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$".toRegex()
 
     private val reverseMap = ConcurrentHashMap<UUID, Consumer<CommandCause>>()
     private val callbackCache = Caffeine.newBuilder()
@@ -64,8 +64,8 @@ object LanternClickActionCallbacks {
      * @param callback The callback
      * @return The unique id
      */
-    fun getOrCreateIdForCallback(callback: Consumer<CommandCause>): UUID
-            = this.callbackCache.get(callback) ?: throw IllegalStateException()
+    fun getOrCreateIdForCallback(callback: Consumer<CommandCause>): UUID =
+            this.callbackCache[callback] ?: throw IllegalStateException()
 
     /**
      * Gets the callback for the specified [UUID], may return [Optional.empty]
@@ -74,6 +74,6 @@ object LanternClickActionCallbacks {
      * @param uniqueId The unique id
      * @return The callback
      */
-    fun getCallbackForUUID(uniqueId: UUID): Consumer<CommandCause>?
-            = this.reverseMap[uniqueId]
+    fun getCallbackForUUID(uniqueId: UUID): Consumer<CommandCause>? =
+            this.reverseMap[uniqueId]
 }

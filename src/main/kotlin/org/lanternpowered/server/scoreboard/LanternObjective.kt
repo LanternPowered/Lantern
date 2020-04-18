@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.scoreboard
 
-import org.lanternpowered.api.ext.toImmutableMap
-import org.lanternpowered.api.ext.toImmutableSet
+import org.lanternpowered.api.util.collections.toImmutableMap
+import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.network.message.Message
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore

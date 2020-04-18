@@ -41,4 +41,4 @@ typealias DamageTypes = org.spongepowered.api.event.cause.entity.damage.DamageTy
  * @param fn The function
  * @return The damage function
  */
-inline fun DamageFunction(modifier: DamageModifier, noinline fn: (Double) -> Double = { 0.0 }) = DamageFunction.of(modifier, fn)
+inline fun damageFunctionOf(modifier: DamageModifier, noinline fn: (Double) -> Double): DamageFunction = DamageFunction.of(modifier, fn)

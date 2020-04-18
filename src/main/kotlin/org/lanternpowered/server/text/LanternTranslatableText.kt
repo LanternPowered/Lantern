@@ -26,13 +26,13 @@
 package org.lanternpowered.server.text
 
 import com.google.common.collect.ImmutableList
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TranslatableText
 import org.lanternpowered.api.text.TranslatableTextBuilder
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
 import org.spongepowered.api.text.action.ShiftClickAction

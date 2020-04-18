@@ -28,50 +28,41 @@
 
 package org.lanternpowered.api.text.format
 
-import org.lanternpowered.server.text.format.LanternTextStyle
+import java.util.function.Supplier
 
 typealias TextColor = org.spongepowered.api.text.format.TextColor
 typealias TextColors = org.spongepowered.api.text.format.TextColors
 typealias TextFormat = org.spongepowered.api.text.format.TextFormat
 typealias TextStyle = org.spongepowered.api.text.format.TextStyle
-typealias TextStyleBase = org.spongepowered.api.text.format.TextStyle.Base
+typealias TextStyleType = org.spongepowered.api.text.format.TextStyle.Type
 typealias TextStyles = org.spongepowered.api.text.format.TextStyles
 
-/**
- * Constructs a new [TextStyle].
- *
- * @return The constructed text style
- */
-@JvmName("of")
-inline fun TextStyle(
-        bold: Boolean? = null,
-        italic: Boolean? = null,
-        underline: Boolean? = null,
-        strikethrough: Boolean? = null,
-        obfuscated: Boolean? = null
-): TextStyle = LanternTextStyle(bold, italic, underline, strikethrough, obfuscated)
+@JvmName("mergeWith")
+inline operator fun TextFormat.plus(that: TextFormat): TextFormat = merge(that)
 
-/**
- * Constructs a new [TextFormat].
- *
- * @return The constructed text format
- */
-@JvmName("of")
-inline fun TextFormat(color: TextColor = TextColors.NONE, style: TextStyle = TextStyles.NONE): TextFormat =
-        if (style == TextStyles.NONE && color == TextColors.NONE) TextFormat.of() else TextFormat.of(color, style)
+@JvmName("withStyle")
+inline operator fun TextFormat.plus(that: TextStyle): TextFormat = style(style.and(that))
 
-/**
- * Constructs a new [TextFormat].
- *
- * @return The constructed text format
- */
-@JvmName("of")
-inline fun TextFormat(color: TextColor): TextFormat = if (color == TextColors.NONE) TextFormat.of() else TextFormat.of(color)
+@JvmName("withStyle")
+inline operator fun TextFormat.plus(that: Supplier<out TextStyle>): TextFormat = style(style.and(that.get()))
 
-/**
- * Constructs a new [TextFormat].
- *
- * @return The constructed text format
- */
-@JvmName("of")
-inline fun TextFormat(style: TextStyle): TextFormat = if (style == TextStyles.NONE) TextFormat.of() else TextFormat.of(style)
+@JvmName("withColor")
+inline operator fun TextFormat.plus(that: TextColor): TextFormat = color(that)
+
+@JvmName("withColor")
+inline operator fun TextFormat.plus(that: Supplier<out TextColor>): TextFormat = color(that.get())
+
+inline operator fun TextStyle.plus(that: TextStyle): TextStyle = and(that)
+inline operator fun TextStyle.plus(that: Supplier<out TextStyle>): TextStyle = and(that.get())
+inline operator fun Supplier<out TextStyle>.plus(that: TextStyle): TextStyle = get().and(that)
+inline operator fun Supplier<out TextStyle>.plus(that: Supplier<out TextStyle>): TextStyle = get().and(that.get())
+
+inline operator fun TextStyle.minus(that: TextStyle): TextStyle = andNot(that)
+inline operator fun TextStyle.minus(that: Supplier<out TextStyle>): TextStyle = andNot(that.get())
+inline operator fun Supplier<out TextStyle>.minus(that: TextStyle): TextStyle = get().andNot(that)
+inline operator fun Supplier<out TextStyle>.minus(that: Supplier<out TextStyle>): TextStyle = get().andNot(that.get())
+
+inline operator fun TextStyle.contains(that: TextStyle): Boolean = contains(that)
+inline operator fun TextStyle.contains(that: Supplier<out TextStyle>): Boolean = contains(that.get())
+
+inline operator fun TextStyle.unaryMinus(): TextStyle = negate()

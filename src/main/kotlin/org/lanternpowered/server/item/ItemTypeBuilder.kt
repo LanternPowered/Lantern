@@ -33,7 +33,6 @@ import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.data.LocalKeyRegistry
-import org.lanternpowered.server.data.property.PropertyRegistry
 
 /**
  * Constructs a new [ItemType].
@@ -61,7 +60,7 @@ interface ItemTypeBuilder {
     /**
      * Applies properties to the [ItemType].
      */
-    fun properties(fn: ItemTypePropertyRegistryBuilder.() -> Unit)
+    fun keys(fn: @ItemTypeBuilderDsl LocalKeyRegistry<ItemType>.() -> Unit)
 
     /**
      * Applies behaviors to the [ItemType].
@@ -72,15 +71,5 @@ interface ItemTypeBuilder {
      * Applies a function that can be used to register
      * [Key]s on [ItemStack]s of the built item type.
      */
-    fun valueKeys(fn: @ItemTypeBuilderDsl LocalKeyRegistry<ItemStack>.() -> Unit)
+    fun stackKeys(fn: @ItemTypeBuilderDsl LocalKeyRegistry<ItemStack>.() -> Unit)
 }
-
-@ItemTypeBuilderDsl
-abstract class ItemTypePropertyRegistryBuilder : PropertyRegistry<ItemType>() {
-
-    /**
-     * Applies properties based on the [ItemStack] of the target [ItemType].
-     */
-    abstract fun forStack(fn: PropertyRegistry<ItemStack>.() -> Unit)
-}
-

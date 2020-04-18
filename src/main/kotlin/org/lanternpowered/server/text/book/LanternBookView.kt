@@ -26,7 +26,7 @@
 package org.lanternpowered.server.text.book
 
 import com.google.common.collect.ImmutableList
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.text.BookView

@@ -28,32 +28,13 @@
 package org.lanternpowered.api.ext
 
 import org.lanternpowered.api.cause.Cause
-import org.lanternpowered.api.cause.CauseContextKey
-import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.cause.CauseStackManagerFrame
+import org.lanternpowered.api.util.optional.orNull
 import java.util.Optional
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
-
-inline fun <T> CauseStackManager.first(target: Class<T>): Optional<T> = this.currentCause.first(target)
-inline fun <T> CauseStackManager.last(target: Class<T>): Optional<T> = this.currentCause.last(target)
-inline fun CauseStackManager.containsType(target: Class<*>): Boolean = this.currentCause.containsType(target)
-inline operator fun CauseStackManager.contains(any: Any): Boolean = any in this.currentCause
-
-inline fun <reified T> CauseStackManager.first(): T? = this.currentCause.first(T::class.java).orNull()
-inline fun <T : Any> CauseStackManager.first(clazz: KClass<T>): T? = this.currentCause.first(clazz.java).orNull()
-inline fun <reified T> CauseStackManager.last(): T? = this.currentCause.last(T::class.java).orNull()
-inline fun <T : Any> CauseStackManager.last(clazz: KClass<T>): T? = this.currentCause.last(clazz.java).orNull()
-
-inline fun <reified T> CauseStack.first(): T? = first(T::class.java).orNull()
-inline fun <T : Any> CauseStack.first(clazz: KClass<T>): T? = first(clazz.java).orNull()
-inline fun <reified T> CauseStack.last(): T? = last(T::class.java).orNull()
-inline fun <T : Any> CauseStack.last(clazz: KClass<T>): T? = last(clazz.java).orNull()
-
-inline operator fun <T> CauseStackManager.get(key: CauseContextKey<T>): T? = getContext(key).orNull()
-inline operator fun <T> CauseStackManager.set(key: CauseContextKey<T>, value: T) { addContext(key, value) }
 
 inline fun CauseStackManager.withFrame(fn: CauseStackManagerFrame.() -> Unit) {
     contract {
@@ -78,23 +59,3 @@ inline fun CauseStackManager.withCause(cause: Any, fn: () -> Unit) {
         fn()
     }
 }
-
-inline fun CauseStack.withFrame(fn: CauseStack.Frame.() -> Unit) {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    pushCauseFrame().use(fn)
-}
-
-inline fun <reified T> Cause.first(): T? = first(T::class.java).orNull()
-inline fun <T : Any> Cause.first(clazz: KClass<T>): T? = first(clazz.java).orNull()
-inline fun <reified T> Cause.last(): T? = last(T::class.java).orNull()
-inline fun <T : Any> Cause.last(clazz: KClass<T>): T? = last(clazz.java).orNull()
-inline fun <reified T> Cause.before(): Any? = before(T::class.java).orNull()
-inline fun Cause.before(clazz: KClass<*>): Any? = before(clazz.java).orNull()
-inline fun <reified T> Cause.after(): Any? = after(T::class.java).orNull()
-inline fun Cause.after(clazz: KClass<*>): Any? = after(clazz.java).orNull()
-inline fun <reified T> Cause.allOf(): List<T> = allOf(T::class.java)
-inline fun <T : Any> Cause.allOf(clazz: KClass<T>): List<T> = allOf(clazz.java)
-inline fun <reified T> Cause.noneOf(): List<Any> = noneOf(T::class.java)
-inline fun Cause.noneOf(clazz: KClass<*>): List<Any> = noneOf(clazz.java)

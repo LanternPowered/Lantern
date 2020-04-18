@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import org.lanternpowered.api.text.serializer.JsonTextSerializer;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
@@ -43,7 +44,6 @@ import org.lanternpowered.server.network.status.LanternStatusHelper;
 import org.lanternpowered.server.network.status.LanternStatusResponse;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
-import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -123,7 +123,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         }
 
         rootObject.add("version", versionObject);
-        rootObject.add("description", JsonTextSerializer.getGson().toJsonTree(response.getDescription()));
+        rootObject.add("description", JsonTextSerializer.Companion.serializeToTree(response.getDescription()));
 
         response.getFavicon().ifPresent(icon -> rootObject.addProperty("favicon", ((LanternFavicon) icon).getEncoded()));
 

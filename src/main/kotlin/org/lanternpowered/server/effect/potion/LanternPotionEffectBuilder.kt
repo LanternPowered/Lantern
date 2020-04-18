@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.effect.potion
 
+import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectType
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.registry.CatalogRegistry
+import org.lanternpowered.api.registry.require
 import org.lanternpowered.server.data.DataQueries
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataView
@@ -42,6 +44,7 @@ class LanternPotionEffectBuilder : AbstractDataBuilder<PotionEffect>(PotionEffec
     private var amplifier: Int = 0
     private var isAmbient: Boolean = true
     private var showParticles: Boolean = true
+    private var showIcon: Boolean = true
 
     override fun duration(duration: Int): PotionEffectBuilder = apply {
         check(duration > 0) { "Duration $duration must be greater than 0" }
@@ -50,14 +53,14 @@ class LanternPotionEffectBuilder : AbstractDataBuilder<PotionEffect>(PotionEffec
 
     override fun potionType(potionEffectType: PotionEffectType): PotionEffectBuilder = apply { this.potionType = potionEffectType }
     override fun amplifier(amplifier: Int): PotionEffectBuilder = apply { this.amplifier = amplifier }
-    // Sponge, here is a typo
-    override fun ambience(ambience: Boolean): PotionEffectBuilder = apply { this.isAmbient = ambience }
-    override fun particles(showsParticles: Boolean): PotionEffectBuilder = apply { this.showParticles = showsParticles }
+    override fun ambient(ambience: Boolean): PotionEffectBuilder = apply { this.isAmbient = ambience }
+    override fun showParticles(showsParticles: Boolean): PotionEffectBuilder = apply { this.showParticles = showsParticles }
+    override fun showIcon(showIcon: Boolean): PotionEffectBuilder = apply { this.showIcon = showIcon }
 
     override fun build(): PotionEffect {
         val potionType = checkNotNull(this.potionType) { "Potion type must be set" }
         check(this.duration > 0) { "Duration must be set" }
-        return LanternPotionEffect(potionType, this.duration, this.amplifier, this.isAmbient, this.showParticles)
+        return LanternPotionEffect(potionType, this.duration, this.amplifier, this.isAmbient, this.showParticles, this.showIcon)
     }
 
     override fun from(holder: PotionEffect): PotionEffectBuilder = apply {
@@ -65,7 +68,8 @@ class LanternPotionEffectBuilder : AbstractDataBuilder<PotionEffect>(PotionEffec
         this.duration = holder.duration
         this.amplifier = holder.amplifier
         this.isAmbient = holder.isAmbient
-        this.showParticles = holder.showParticles
+        this.showParticles = holder.showsParticles()
+        this.showParticles = holder.showsIcon()
     }
 
     override fun reset(): PotionEffectBuilder = apply {
@@ -74,6 +78,7 @@ class LanternPotionEffectBuilder : AbstractDataBuilder<PotionEffect>(PotionEffec
         this.duration = 1
         this.isAmbient = true
         this.showParticles = true
+        this.showIcon = true
     }
 
     @Throws(InvalidDataException::class)
@@ -83,13 +88,14 @@ class LanternPotionEffectBuilder : AbstractDataBuilder<PotionEffect>(PotionEffec
                 || !container.contains(DataQueries.POTION_SHOWS_PARTICLES)) {
             return Optional.empty()
         }
-        val typeId = container.getString(DataQueries.POTION_TYPE).get()
-        val type = catalogOf<PotionEffectType>(typeId) ?: throw InvalidDataException("The container has an invalid potion type name: $typeId")
+        val typeId = CatalogKey.resolve(container.getString(DataQueries.POTION_TYPE).get())
+        val type = CatalogRegistry.require<PotionEffectType>(typeId)
         val duration = container.getInt(DataQueries.POTION_DURATION).get()
         val amplifier = container.getInt(DataQueries.POTION_AMPLIFIER).get()
         val ambient = container.getBoolean(DataQueries.POTION_AMBIANCE).get()
         val showParticles = container.getBoolean(DataQueries.POTION_SHOWS_PARTICLES).get()
-        return Optional.of(LanternPotionEffect(type, duration, amplifier, ambient, showParticles))
+        val showIcon = container.getBoolean(DataQueries.POTION_SHOWS_ICON).get()
+        return Optional.of(LanternPotionEffect(type, duration, amplifier, ambient, showParticles, showIcon))
     }
 
 }

@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla.consumable
 
-import org.lanternpowered.api.ext.immutableListOf
+import org.lanternpowered.api.util.collections.immutableListOf
 import org.lanternpowered.api.ext.merge
-import org.lanternpowered.api.ext.orNull
-import org.lanternpowered.api.ext.toImmutableSet
+import org.lanternpowered.api.util.optional.orNull
+import org.lanternpowered.api.util.collections.toImmutableSet
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.effect.potion.PotionEffect
 import org.spongepowered.api.item.inventory.ItemStack

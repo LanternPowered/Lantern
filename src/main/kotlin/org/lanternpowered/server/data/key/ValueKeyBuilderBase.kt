@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.util.uncheckedCast
-import org.lanternpowered.api.util.builder.BaseBuilder
+import org.lanternpowered.api.registry.BaseBuilder
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.data.value.CopyHelper
 import org.spongepowered.api.CatalogKey

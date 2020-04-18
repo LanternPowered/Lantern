@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult

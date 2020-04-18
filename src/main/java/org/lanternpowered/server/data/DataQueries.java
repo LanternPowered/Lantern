@@ -62,6 +62,7 @@ public final class DataQueries {
     public static final DataQuery POTION_TYPE = of("PotionType");
     public static final DataQuery POTION_AMPLIFIER = of("Amplifier");
     public static final DataQuery POTION_SHOWS_PARTICLES = of("ShowsParticles");
+    public static final DataQuery POTION_SHOWS_ICON = of("ShowsIcon");
     public static final DataQuery POTION_AMBIANCE = of("Ambiance");
     public static final DataQuery POTION_DURATION = of("Duration");
 

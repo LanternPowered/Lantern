@@ -26,7 +26,8 @@
 package org.lanternpowered.server.data.manipulator
 
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.toImmutableSet
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.ValueContainerBase
 import org.lanternpowered.server.data.value.ValueFactory

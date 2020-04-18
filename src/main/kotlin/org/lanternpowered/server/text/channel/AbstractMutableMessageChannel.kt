@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.weakSetOf
 import org.spongepowered.api.text.channel.MessageReceiver
 import org.spongepowered.api.text.channel.MutableMessageChannel
 

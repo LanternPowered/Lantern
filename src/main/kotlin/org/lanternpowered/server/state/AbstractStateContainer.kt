@@ -32,9 +32,9 @@ import com.google.common.collect.ImmutableTable
 import com.google.common.collect.Lists
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.ext.immutableMapBuilderOf
-import org.lanternpowered.api.ext.immutableSetBuilderOf
-import org.lanternpowered.api.ext.toImmutableList
+import org.lanternpowered.api.util.collections.immutableMapBuilderOf
+import org.lanternpowered.api.util.collections.immutableSetBuilderOf
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery

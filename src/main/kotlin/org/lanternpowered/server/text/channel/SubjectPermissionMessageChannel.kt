@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.toImmutableSet
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.text.channel.MessageChannel

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.text.translation.Translation

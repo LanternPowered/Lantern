@@ -30,20 +30,19 @@ import org.lanternpowered.api.cause.CauseContext
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManagerFrame
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.SystemProperties
 import java.util.ArrayDeque
-import java.util.HashMap
-import java.util.HashSet
 import java.util.Optional
-import java.util.function.Consumer
+import kotlin.reflect.KClass
 
 class LanternCauseStack : CauseStack {
 
     private val cause = ArrayDeque<Any>()
     private val frames = ArrayDeque<CauseStackFrameImpl>()
-    private val ctx = HashMap<CauseContextKey<*>, Any>()
+    private val ctx = mutableMapOf<CauseContextKey<*>, Any>()
 
     private var minDepth = 0
     private var cachedCause: Cause? = null
@@ -82,42 +81,31 @@ class LanternCauseStack : CauseStack {
     }
 
     override fun popCauses(n: Int) {
-        for (i in 0 until n) {
+        repeat(n) {
             popCause()
         }
     }
 
     override fun peekCause(): Any = this.cause.peek()
 
-    override fun <T> first(target: Class<T>): Optional<T> = firstIn(this.cause.iterator(), target)
-    override fun <T> last(target: Class<T>): Optional<T> = firstIn(this.cause.descendingIterator(), target)
+    override fun <T : Any> first(target: KClass<T>): T? = firstIn(this.cause.iterator(), target.java)
+    override fun <T : Any> first(target: Class<T>): Optional<T> = firstIn(this.cause.iterator(), target).optional()
+    override fun <T : Any> last(target: KClass<T>): T? = firstIn(this.cause.descendingIterator(), target.java)
+    override fun <T : Any> last(target: Class<T>): Optional<T> = firstIn(this.cause.descendingIterator(), target).optional()
 
-    override fun containsType(target: Class<*>): Boolean {
-        for (cause in this.cause) {
-            if (target.isInstance(cause)) {
-                return true
-            }
-        }
-        return false
-    }
+    override fun containsType(target: KClass<*>): Boolean = containsType(target.java)
+    override fun containsType(target: Class<*>): Boolean = this.cause.any { cause -> target.isInstance(cause) }
 
-    override fun contains(any: Any): Boolean {
-        for (cause in this.cause) {
-            if (cause == any) {
-                return true
-            }
-        }
-        return false
-    }
+    override fun contains(any: Any): Boolean = this.cause.any { cause -> cause == any }
 
-    private fun <T> firstIn(iterator: Iterator<Any>, target: Class<T>): Optional<T> {
+    private fun <T> firstIn(iterator: Iterator<Any>, target: Class<T>): T? {
         while (iterator.hasNext()) {
             val cause = iterator.next()
             if (target.isInstance(cause)) {
-                return Optional.of(target.cast(cause))
+                return target.cast(cause)
             }
         }
-        return Optional.empty()
+        return null
     }
 
     override fun pushCauseFrame(): CauseStack.Frame {
@@ -200,7 +188,7 @@ class LanternCauseStack : CauseStack {
         // Remove new values
         var ctxInvalid = false
         if (frame.hasNew()) {
-            frame.newCtxValues!!.forEach(Consumer<CauseContextKey<*>> { this.ctx.remove(it) })
+            frame.newCtxValues!!.forEach { value -> this.ctx.remove(value) }
             ctxInvalid = true
         }
         // Restore old values
@@ -274,7 +262,7 @@ class LanternCauseStack : CauseStack {
         fun store(key: CauseContextKey<*>, existing: Any) {
             var storedCtxValues = this.storedCtxValues
             if (storedCtxValues == null) {
-                storedCtxValues = HashMap()
+                storedCtxValues = mutableMapOf()
                 this.storedCtxValues = storedCtxValues
             }
             storedCtxValues[key] = existing
@@ -292,7 +280,7 @@ class LanternCauseStack : CauseStack {
 
         internal fun markNew(key: CauseContextKey<*>) {
             if (this.newCtxValues == null) {
-                this.newCtxValues = HashSet()
+                this.newCtxValues = mutableSetOf()
             }
             this.newCtxValues!!.add(key)
         }

@@ -29,16 +29,17 @@ import org.lanternpowered.api.effect.firework.FireworkEffect
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
 import org.lanternpowered.api.effect.firework.FireworkShape
 import org.lanternpowered.api.effect.firework.FireworkShapes
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.effect.firework.flickers
+import org.lanternpowered.api.effect.firework.hasTrail
 import org.lanternpowered.api.util.Color
-import java.util.ArrayList
+import org.lanternpowered.api.util.collections.toImmutableList
 
 class LanternFireworkEffectBuilder : FireworkEffectBuilder {
 
     private var trail: Boolean = false
     private var flicker: Boolean = false
-    private val colors: MutableList<Color> = ArrayList()
-    private val fades: MutableList<Color> = ArrayList()
+    private val colors: MutableList<Color> = mutableListOf()
+    private val fades: MutableList<Color> = mutableListOf()
     private var shape: FireworkShape? = null
 
     init {
@@ -60,7 +61,7 @@ class LanternFireworkEffectBuilder : FireworkEffectBuilder {
     }
 
     override fun from(value: FireworkEffect): FireworkEffectBuilder = apply {
-        trail(value.trail)
+        trail(value.hasTrail)
         colors(value.colors)
         fades(value.fadeColors)
         shape(value.shape)
@@ -72,6 +73,6 @@ class LanternFireworkEffectBuilder : FireworkEffectBuilder {
         this.flicker = false
         this.colors.clear()
         this.fades.clear()
-        this.shape = FireworkShapes.BALL
+        this.shape = FireworkShapes.BALL.get()
     }
 }

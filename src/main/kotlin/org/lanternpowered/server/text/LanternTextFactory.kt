@@ -43,10 +43,12 @@ import org.spongepowered.api.text.selector.Selector
 
 object LanternTextFactory : XTextFactory {
 
-    override fun of(vararg objects: Any): Text {
+    override fun of(vararg objects: Any): Text = of(objects.asList())
+
+    fun of(collection: Collection<Any>): Text {
         // Shortcut for a lonely TextRepresentable
-        if (objects.size == 1 && objects[0] is TextRepresentable) {
-            return (objects[0] as TextRepresentable).toText()
+        if (collection.size == 1 && collection.first() is TextRepresentable) {
+            return (collection.first() as TextRepresentable).toText()
         }
 
         val builder = Text.builder()
@@ -56,7 +58,7 @@ object LanternTextFactory : XTextFactory {
         var shiftClickAction: ShiftClickAction<*>? = null
         var changedFormat = false
 
-        for (obj in objects) {
+        for (obj in collection) {
             // Text formatting + actions
             when (obj) {
                 is TextFormat -> {
@@ -69,7 +71,7 @@ object LanternTextFactory : XTextFactory {
                 }
                 is TextStyle -> {
                     changedFormat = true
-                    format = format.style(if (obj == TextStyles.RESET) TextStyles.NONE else format.style.and(obj))
+                    format = format.style(if (obj == TextStyles.RESET) TextStyle.of() else format.style.and(obj))
                 }
                 is TextAction<*> -> {
                     changedFormat = true
@@ -146,6 +148,8 @@ object LanternTextFactory : XTextFactory {
         // Single content, reduce Text depth
         return if (builder.children.size == 1) builder.children[0] else builder.build()
     }
+
+    override fun ofCompact(vararg objects: Any?) = of(objects.asList()) // TODO
 
     override fun joinWith(separator: Text, vararg texts: Text): Text {
         when (texts.size) {

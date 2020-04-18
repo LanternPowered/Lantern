@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.api.xevent
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.orNull
 import java.util.Optional
 import kotlin.reflect.KClass
 

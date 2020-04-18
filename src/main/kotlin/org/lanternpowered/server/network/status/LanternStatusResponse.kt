@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.network.status
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.event.server.ClientPingServerEvent

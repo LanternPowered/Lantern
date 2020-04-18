@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.emptyOptional
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider

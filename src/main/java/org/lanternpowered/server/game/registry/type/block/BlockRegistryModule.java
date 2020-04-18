@@ -878,7 +878,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ////////////////////////
         register(pumpkinBuilder()
                 .itemType(builder -> builder
-                        .properties(properties -> properties
+                        .keys(properties -> properties
                                 .add(equipmentType(EquipmentTypes.HEADWEAR))))
                 .build("minecraft", "carved_pumpkin"));
         /////////////////

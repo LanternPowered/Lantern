@@ -28,13 +28,14 @@ package org.lanternpowered.server.text
 import com.google.common.base.Objects
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterators
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
+import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.api.text.serializer.TextSerializers
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.x.text.format.XTextStyle
@@ -65,8 +66,8 @@ abstract class LanternText(
     override fun getHoverAction(): Optional<HoverAction<*>> = this.hoverAction.optional()
     override fun getShiftClickAction(): Optional<ShiftClickAction<*>> = this.shiftClickAction.optional()
     override fun isEmpty(): Boolean = this === LanternLiteralText.EMPTY
-    override fun toPlain(): String = TextSerializers.PLAIN.serialize(this)
-    override fun toPlainSingle(): String = TextSerializers.PLAIN.serializeSingle(this)
+    override fun toPlain(): String = TextSerializers.PLAIN.get().serialize(this)
+    override fun toPlainSingle(): String = TextSerializers.PLAIN.get().serializeSingle(this)
     override fun concat(other: Text): Text = toBuilder().append(other).build()
     override fun trim(): Text = toBuilder().trim().build()
     override fun getContentVersion(): Int = 1
@@ -134,7 +135,7 @@ abstract class LanternText(
     override fun toContainer(): DataContainer {
         return DataContainer.createNew()
                 .set(Queries.CONTENT_VERSION, this.contentVersion)
-                .set(Queries.JSON, TextSerializers.JSON.serialize(this))
+                .set(Queries.JSON, JsonTextSerializer.serialize(this))
     }
 
     override fun compareTo(other: Text): Int = toPlain().compareTo(other.toPlain())
@@ -154,15 +155,13 @@ abstract class LanternText(
 
     abstract override fun toBuilder(): TextBuilder
 
-    internal open fun toStringHelper(): ToStringHelper {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("format", if (this.format.isEmpty) null else this.format)
-                .add("children", if (this.children.isEmpty()) null else this.children)
-                .add("clickAction", this.clickAction)
-                .add("hoverAction", this.hoverAction)
-                .add("shiftClickAction", this.shiftClickAction)
-    }
+    internal open fun toStringHelper(): ToStringHelper = ToStringHelper(this)
+            .omitNullValues()
+            .add("format", if (this.format.isEmpty) null else this.format)
+            .add("children", if (this.children.isEmpty()) null else this.children)
+            .add("clickAction", this.clickAction)
+            .add("hoverAction", this.hoverAction)
+            .add("shiftClickAction", this.shiftClickAction)
 
     abstract class AbstractBuilder<B : AbstractBuilder<B>> : TextBuilder {
 
@@ -171,6 +170,7 @@ abstract class LanternText(
         internal var clickAction: ClickAction<*>? = null
         internal var hoverAction: HoverAction<*>? = null
         internal var shiftClickAction: ShiftClickAction<*>? = null
+        internal var compact: Boolean = false
 
         /**
          * Constructs a new empty [TextBuilder].
@@ -205,7 +205,9 @@ abstract class LanternText(
         override fun getHoverAction(): Optional<HoverAction<*>> = this.hoverAction.optional()
         override fun getShiftClickAction(): Optional<ShiftClickAction<*>> = this.shiftClickAction.optional()
         override fun getChildren(): List<Text> = Collections.unmodifiableList(this.children)
+        override fun shouldCompact(): Boolean = this.compact
 
+        override fun setCompact(compact: Boolean) = apply { this.compact = compact }
         override fun format(format: TextFormat) = apply { this.format = format }
         override fun color(color: TextColor) = format(this.format.color(color))
         override fun style(vararg styles: TextStyle) = format(this.format.style(style.and(styles.asList())))
@@ -275,18 +277,16 @@ abstract class LanternText(
                     this.shiftClickAction == other.shiftClickAction)
         }
 
-        override fun hashCode() = Objects.hashCode(this.format, this.clickAction, this.hoverAction, this.shiftClickAction, this.children)
-        override fun toString() = toStringHelper().toString()
-        override fun toText() = build()
+        override fun hashCode(): Int = Objects.hashCode(this.format, this.clickAction, this.hoverAction, this.shiftClickAction, this.children)
+        override fun toString(): String = toStringHelper().toString()
+        override fun toText(): Text = build()
 
-        internal open fun toStringHelper(): ToStringHelper {
-            return ToStringHelper(this)
-                    .omitNullValues()
-                    .add("format", if (this.format.isEmpty) null else this.format)
-                    .add("children", if (this.children.isEmpty()) null else this.children)
-                    .add("clickAction", this.clickAction)
-                    .add("hoverAction", this.hoverAction)
-                    .add("shiftClickAction", this.shiftClickAction)
-        }
+        internal open fun toStringHelper(): ToStringHelper = ToStringHelper(this)
+                .omitNullValues()
+                .add("format", if (this.format.isEmpty) null else this.format)
+                .add("children", if (this.children.isEmpty()) null else this.children)
+                .add("clickAction", this.clickAction)
+                .add("hoverAction", this.hoverAction)
+                .add("shiftClickAction", this.shiftClickAction)
     }
 }

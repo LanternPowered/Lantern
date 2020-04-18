@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.world.gamerule
 
-import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.registry.CatalogRegistry
+import org.lanternpowered.api.registry.getAllOf
 import org.spongepowered.api.world.gamerule.GameRule
 import org.spongepowered.api.world.gamerule.GameRuleHolder
 import java.util.function.Consumer
@@ -50,7 +50,7 @@ class GameRuleContainer : GameRuleHolder {
 
     override fun getGameRules(): Map<GameRule<*>, *> {
         val gameRules = hashMapOf<GameRule<*>, Any>()
-        for (gameRule in Lantern.registry.getAllOf(GameRule::class)) {
+        for (gameRule in CatalogRegistry.getAllOf<GameRule<*>>()) {
             gameRules[gameRule] = this.values[gameRule]?.value ?: gameRule.defaultValue
         }
         return gameRules

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.value
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.removeAll
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.MapValue
 import java.util.function.Function

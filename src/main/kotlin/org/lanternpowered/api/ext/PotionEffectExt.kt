@@ -31,12 +31,10 @@ package org.lanternpowered.api.ext
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectType
+import org.lanternpowered.api.registry.builderOf
 
 inline fun potionEffectOf(type: PotionEffectType, amplifier: Int, duration: Int, ambient: Boolean = false, particles: Boolean = true): PotionEffect =
         PotionEffect.builder().potionType(type).amplifier(amplifier).duration(duration).ambient(ambient).particles(particles).build()
-
-// Fix sponge typo
-inline fun PotionEffectBuilder.ambient(ambient: Boolean = true): PotionEffectBuilder = ambience(ambient)
 
 fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<PotionEffect> {
     val effectsByType = mutableMapOf<PotionEffectType, PotionEffect>()
@@ -71,6 +69,7 @@ fun PotionEffect.merge(that: PotionEffect): PotionEffect {
     } else if (!that.isAmbient && isAmbient) {
         builder.ambient(that.isAmbient)
     }
-    builder.particles(that.showParticles)
+    builder.showParticles(that.showsParticles())
+    builder.showIcon(that.showsIcon())
     return builder.build()
 }

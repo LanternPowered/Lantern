@@ -28,9 +28,9 @@ package org.lanternpowered.server.item.potion
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.effect.potion.PotionEffect
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.effect.potion.LanternPotionType
 import org.lanternpowered.server.game.registry.InternalRegistries

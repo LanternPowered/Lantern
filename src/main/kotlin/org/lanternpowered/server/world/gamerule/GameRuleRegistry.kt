@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.gamerule
 
 import com.google.common.base.CaseFormat
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.text.translation.FixedTranslation

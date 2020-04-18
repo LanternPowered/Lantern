@@ -42,7 +42,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
-import org.lanternpowered.server.item.ItemProperties;
+import org.lanternpowered.server.item.ItemKeys;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
@@ -155,7 +155,7 @@ public final class PlayerInteractionHandler {
                 // Stop the interaction
                 resetItemUseTime();
             } else {
-                final OptionalInt property = itemStack.getIntProperty(ItemProperties.MAXIMUM_USE_DURATION);
+                final OptionalInt property = itemStack.getIntProperty(ItemKeys.MAXIMUM_USE_DURATION);
                 if (property.isPresent()) {
                     // Check if the interaction reached it's max time
                     final long time = LanternGame.currentTimeTicks();
@@ -429,7 +429,7 @@ public final class PlayerInteractionHandler {
         }
 
         // Require a minimum amount of ticks for the interaction to succeed
-        final OptionalInt property = rawItemStack.getIntProperty(ItemProperties.MINIMUM_USE_DURATION);
+        final OptionalInt property = rawItemStack.getIntProperty(ItemKeys.MINIMUM_USE_DURATION);
         if (property.isPresent()) {
             final long time = LanternGame.currentTimeTicks();
             if (time - this.activeHandStartTime < property.getAsInt()) {
@@ -504,7 +504,7 @@ public final class PlayerInteractionHandler {
                 final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
                 final LanternItemStack handItem = offHandSlot.peek();
                 if (handItem.isNotEmpty()) {
-                    if (handItem.getProperty(ItemProperties.IS_DUAL_WIELDABLE).orElse(false)) {
+                    if (handItem.getProperty(ItemKeys.IS_DUAL_WIELDABLE).orElse(false)) {
                     /*
                     final Vector3d position = this.player.getPosition().add(0, this.player.get(Keys.IS_SNEAKING).get() ? 1.54 : 1.62, 0);
                     final Optional<BlockRayHit<LanternWorld>> hit = BlockRay.from(this.player.getWorld(), position)

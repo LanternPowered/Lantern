@@ -27,6 +27,44 @@ package org.lanternpowered.api.cause
 
 import org.lanternpowered.api.Lantern
 import java.util.Optional
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+import kotlin.reflect.KClass
+
+/**
+ * Executes the [block] with a new [CauseStack.Frame]. It is automatically
+ * closed after the block finishes executing.
+ */
+inline fun CauseStack.withFrame(block: CauseStack.Frame.() -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    pushCauseFrame().use(block)
+}
+
+/**
+ * Gets the first [T] object of this [Cause], if available.
+ *
+ * @param T The type of object being queried for
+ * @return The first element of the type, if available
+ */
+inline fun <reified T : Any> CauseStack.first(): T? = first(T::class)
+
+/**
+ * Gets the last object instance of the [Cause] of type [T].
+ *
+ * @param T The type of object being queried for
+ * @return The last element of the type, if available
+ */
+inline fun <reified T : Any> CauseStack.last(): T? = last(T::class)
+
+/**
+ * Returns whether the target type matches any object of this [Cause].
+ *
+ * @param T The target type
+ * @return True if found, false otherwise
+ */
+inline fun <reified T : Any> CauseStack.containsType(): Boolean = containsType(T::class)
 
 /**
  * A [CauseStack] for a specific [Thread].
@@ -40,16 +78,42 @@ interface CauseStack : CauseStackManager {
      * @param T The type of object being queried for
      * @return The first element of the type, if available
      */
-    fun <T> first(target: Class<T>): Optional<T>
+    fun <T : Any> first(target: KClass<T>): T?
 
     /**
-     * Gets the last object instance of the [Class] of type [T].
+     * Gets the first [T] object of this [Cause], if available.
+     *
+     * @param target The class of the target type
+     * @param T The type of object being queried for
+     * @return The first element of the type, if available
+     */
+    fun <T : Any> first(target: Class<T>): Optional<T>
+
+    /**
+     * Gets the last object instance of the [Cause] of type [T].
      *
      * @param target The class of the target type
      * @param T The type of object being queried for
      * @return The last element of the type, if available
      */
-    fun <T> last(target: Class<T>): Optional<T>
+    fun <T : Any> last(target: KClass<T>): T?
+
+    /**
+     * Gets the last object instance of the [Cause] of type [T].
+     *
+     * @param target The class of the target type
+     * @param T The type of object being queried for
+     * @return The last element of the type, if available
+     */
+    fun <T : Any> last(target: Class<T>): Optional<T>
+
+    /**
+     * Returns whether the target class matches any object of this [Cause].
+     *
+     * @param target The class of the target type
+     * @return True if found, false otherwise
+     */
+    fun containsType(target: KClass<*>): Boolean
 
     /**
      * Returns whether the target class matches any object of this [Cause].
@@ -61,7 +125,7 @@ interface CauseStack : CauseStackManager {
 
     /**
      * Checks if this cause contains of any of the provided [Object]. This
-     * is the equivalent to checking based on [.equals] for each
+     * is the equivalent to checking based on [Any.equals] for each
      * object in this cause.
      *
      * @param any The object to check if it is contained

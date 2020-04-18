@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.emptyOptional
-import org.lanternpowered.api.ext.optional
+import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.value.CopyHelper
 import org.lanternpowered.server.data.value.ValueFactory

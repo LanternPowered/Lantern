@@ -28,6 +28,7 @@ package org.lanternpowered.api.ext
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
+import org.lanternpowered.api.registry.builderOf
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 

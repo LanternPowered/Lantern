@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.ext.mutableCollectionOf
-import org.lanternpowered.api.ext.orNull
-import org.lanternpowered.api.ext.removeAll
+import org.lanternpowered.api.util.collections.mutableCollectionOf
+import org.lanternpowered.api.util.optional.orNull
+import org.lanternpowered.api.util.collections.removeAll
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult

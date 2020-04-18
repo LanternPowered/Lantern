@@ -31,3 +31,11 @@ typealias PotionEffect = org.spongepowered.api.effect.potion.PotionEffect
 typealias PotionEffectBuilder = org.spongepowered.api.effect.potion.PotionEffect.Builder
 typealias PotionEffectType = org.spongepowered.api.effect.potion.PotionEffectType
 typealias PotionEffectTypes = org.spongepowered.api.effect.potion.PotionEffectTypes
+
+fun potionEffectOf(
+        type: PotionEffectType, amplifier: Int, duration: Int,
+        ambient: Boolean = false,
+        showParticles: Boolean = true,
+        showIcon: Boolean = true
+): PotionEffect = PotionEffect.builder().potionType(type).amplifier(amplifier).duration(duration)
+        .ambient(ambient).showParticles(showParticles).showIcon(showIcon).build()

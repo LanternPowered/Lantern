@@ -27,14 +27,14 @@ package org.lanternpowered.server.game.registry.type.text
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
-import org.lanternpowered.api.text.format.TextStyleBase
+import org.lanternpowered.api.text.format.TextStyleType
 import org.lanternpowered.api.text.format.TextStyles
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.lanternpowered.server.game.registry.EarlyRegistration
 import org.lanternpowered.server.text.TextConstants
 import org.lanternpowered.server.text.format.LanternTextStyle
 
-object TextStyleRegistryModule : DefaultCatalogRegistryModule<TextStyleBase>(TextStyles::class) {
+object TextStyleRegistryModule : DefaultCatalogRegistryModule<TextStyleType>(TextStyles::class) {
 
     var NONE: LanternTextStyle by initOnce()
         private set

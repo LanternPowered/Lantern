@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.api.world.weather
 
-import org.lanternpowered.api.util.builder.CatalogBuilder
+import org.lanternpowered.api.registry.CatalogBuilder
 import org.lanternpowered.api.x.world.weather.XWeather
 
 /**

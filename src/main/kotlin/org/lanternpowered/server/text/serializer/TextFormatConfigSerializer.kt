@@ -27,16 +27,16 @@ package org.lanternpowered.server.text.serializer
 
 import com.google.common.reflect.TypeToken
 import ninja.leaping.configurate.ConfigurationNode
-import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.registry.CatalogRegistry
+import org.lanternpowered.api.registry.getAllOf
+import org.lanternpowered.api.registry.require
 import org.lanternpowered.server.text.format.LanternTextFormat
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextFormat
 import org.spongepowered.api.text.format.TextStyle
-import org.spongepowered.api.text.format.TextStyles
 
 /**
  * An implementation of [TypeSerializer] to allow serialization of
@@ -45,15 +45,15 @@ import org.spongepowered.api.text.format.TextStyles
 class TextFormatConfigSerializer : TypeSerializer<TextFormat> {
 
     override fun deserialize(type: TypeToken<*>, value: ConfigurationNode): TextFormat {
-        var color: TextColor = TextColors.NONE
+        var color: TextColor = TextColors.NONE.get()
         val colorId = value.getNode(FORMAT_NODE_COLOR).string
         if (colorId != null) {
-            color = catalogOf(CatalogKey.resolve(colorId)) ?: throw ObjectMappingException("Color not found: $colorId")
+            color = CatalogRegistry.require(CatalogKey.resolve(colorId))
         }
 
-        var style = TextStyles.NONE
+        var style = TextStyle.of()
         val styleNode = value.getNode(FORMAT_NODE_STYLE)
-        for (component in allCatalogsOf<TextStyle.Base>()) {
+        for (component in CatalogRegistry.getAllOf<TextStyle.Type>()) {
             if (styleNode.getNode(component.key.toString()).boolean) {
                 style = style.and(component)
             }
@@ -69,7 +69,9 @@ class TextFormatConfigSerializer : TypeSerializer<TextFormat> {
         value.getNode(FORMAT_NODE_COLOR).value = obj.color.key.toString()
         val styleNode = value.getNode(FORMAT_NODE_STYLE)
         val composite = obj.style
-        allCatalogsOf<TextStyle.Base>().forEach { styleNode.getNode(it.key.toString()).value = composite.contains(it) }
+        CatalogRegistry.getAllOf<TextStyle.Type>().forEach { styleType ->
+            styleNode.getNode(styleType.key.toString()).value = composite.contains(styleType)
+        }
     }
 
     companion object {

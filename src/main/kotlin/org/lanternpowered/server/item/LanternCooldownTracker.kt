@@ -29,8 +29,8 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.LanternEventFactory
-import org.lanternpowered.api.ext.emptyOptionalDouble
-import org.lanternpowered.api.ext.emptyOptionalInt
+import org.lanternpowered.api.util.optional.emptyOptionalDouble
+import org.lanternpowered.api.util.optional.emptyOptionalInt
 import org.lanternpowered.api.ext.optionalDouble
 import org.lanternpowered.api.ext.optionalInt
 import org.lanternpowered.server.entity.living.player.LanternPlayer

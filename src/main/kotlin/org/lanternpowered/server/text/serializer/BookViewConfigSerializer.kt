@@ -29,7 +29,7 @@ import com.google.common.reflect.TypeToken
 import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.type.typeTokenOf
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataQuery

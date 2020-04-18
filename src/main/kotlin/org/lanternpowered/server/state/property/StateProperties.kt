@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.state.property
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.state.StateKeyValueTransformer
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
 import org.spongepowered.api.CatalogKey

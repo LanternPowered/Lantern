@@ -118,37 +118,38 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         keys {
             toolType(toolType)
             dualWieldable(true)
+            register()
         }
     }
 
-    private fun ItemTypeBuilder.leatherArmor(useLimit: Int, equipmentType: EquipmentType) {
+    private fun ItemTypeBuilder.leatherArmor(useLimit: Int, equipmentType: Supplier<out EquipmentType>) {
         armor(useLimit, ArmorTypes.LEATHER, equipmentType)
         stackKeys {
             register(Keys.COLOR)
         }
     }
 
-    private fun ItemTypeBuilder.ironArmor(useLimit: Int, equipmentType: EquipmentType) {
+    private fun ItemTypeBuilder.ironArmor(useLimit: Int, equipmentType: Supplier<out EquipmentType>) {
         armor(useLimit, ArmorTypes.IRON, equipmentType)
     }
 
-    private fun ItemTypeBuilder.chainmailArmor(useLimit: Int, equipmentType: EquipmentType) {
+    private fun ItemTypeBuilder.chainmailArmor(useLimit: Int, equipmentType: Supplier<out EquipmentType>) {
         armor(useLimit, ArmorTypes.CHAIN, equipmentType)
     }
 
-    private fun ItemTypeBuilder.goldenArmor(useLimit: Int, equipmentType: EquipmentType) {
+    private fun ItemTypeBuilder.goldenArmor(useLimit: Int, equipmentType: Supplier<out EquipmentType>) {
         armor(useLimit, ArmorTypes.GOLD, equipmentType)
     }
 
-    private fun ItemTypeBuilder.diamondArmor(useLimit: Int, equipmentType: EquipmentType) {
+    private fun ItemTypeBuilder.diamondArmor(useLimit: Int, equipmentType: Supplier<out EquipmentType>) {
         armor(useLimit, ArmorTypes.DIAMOND, equipmentType)
     }
 
-    private fun ItemTypeBuilder.armor(useLimit: Int, armorType: ArmorType, equipmentType: EquipmentType) {
+    private fun ItemTypeBuilder.armor(useLimit: Int, armorType: ArmorType, equipmentType: Supplier<out EquipmentType>) {
         durable(useLimit)
         keys {
             armorType(armorType)
-            equipmentType(equipmentType)
+            register(Keys.EQUIPMENT_TYPE, equipmentType)
         }
         behaviors {
             add(ArmorQuickEquipInteractionBehavior())
@@ -640,7 +641,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         register(minecraft("elytra")) {
             durable(432)
             keys {
-                equipmentType(EquipmentTypes.CHESTPLATE)
+                register(Keys.EQUIPMENT_TYPE, EquipmentTypes.CHESTPLATE)
             }
             behaviors {
                 add(ArmorQuickEquipInteractionBehavior())
@@ -758,7 +759,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
                 maxStackQuantity(16)
                 stackKeys {
                     register(Keys.BANNER_BASE_COLOR, DyeColors.WHITE)
-                    register(Keys.BANNER_PATTERNS, listOf())
+                    register(Keys.BANNER_PATTERN_LAYERS, listOf())
                 }
                 behaviors {
                     val wallType = lazy { CatalogRegistry.require<BlockType>(minecraft("${dyeId}_wall_banner")) }
@@ -849,7 +850,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
 
     private fun ItemTypeBuilder.headwear() {
         keys {
-            equipmentType(EquipmentTypes.HEADWEAR)
+            register(Keys.EQUIPMENT_TYPE, EquipmentTypes.HEADWEAR)
         }
     }
 
@@ -902,7 +903,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerDoors() {
-        fun registerWoodenDoor(key: CatalogKey, woodType: WoodType) {
+        fun registerWoodenDoor(key: CatalogKey, woodType: Supplier<out WoodType>) {
             register(key) {
                 keys {
                     register(ItemKeys.WOOD_TYPE, woodType)
@@ -919,7 +920,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerBoats() {
-        fun registerBoat(key: CatalogKey, woodType: WoodType) {
+        fun registerBoat(key: CatalogKey, woodType: Supplier<out WoodType>) {
             register(key) {
                 maxStackQuantity(1)
                 keys {
@@ -937,9 +938,9 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun <P : Projectile> ItemTypeBuilder.arrow(
-            entityType: EntityType<P>, fn: P.(itemStack: ItemStack) -> Unit = {}) {
+            entityType: Supplier<out EntityType<P>>, fn: P.(itemStack: ItemStack) -> Unit = {}) {
         keys {
-            register(ItemKeys.BOW_PROJECTILE_PROVIDER, BowProjectile(entityType, fn))
+            register(ItemKeys.BOW_PROJECTILE_PROVIDER, BowProjectile(entityType.get(), fn))
         }
     }
 
@@ -959,11 +960,11 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerMusicDiscs() {
-        fun registerMusicDisc(key: CatalogKey, musicDisc: MusicDisc) {
+        fun registerMusicDisc(key: CatalogKey, musicDisc: Supplier<out MusicDisc>) {
             register(key) {
                 maxStackQuantity(1)
                 keys {
-                    register(Properties.MUSIC_DISC, musicDisc)
+                    // register(Properties.MUSIC_DISC, musicDisc) TODO
                 }
             }
         }

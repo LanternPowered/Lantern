@@ -16,12 +16,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 
+import java.util.function.Supplier;
+
 public final class SwingHandEntityEvent implements EntityEvent {
+
+    public static SwingHandEntityEvent of(Supplier<? extends HandType> handType) {
+        return of(handType.get());
+    }
 
     public static SwingHandEntityEvent of(HandType handType) {
         checkNotNull(handType, "handType");
-        return handType == HandTypes.MAIN_HAND ? Holder.MAIN_HAND :
-                handType == HandTypes.OFF_HAND ? Holder.OFF_HAND : new SwingHandEntityEvent(handType);
+        return handType == HandTypes.MAIN_HAND.get() ? Holder.MAIN_HAND :
+                handType == HandTypes.OFF_HAND.get() ? Holder.OFF_HAND : new SwingHandEntityEvent(handType);
     }
 
     private final HandType handType;
@@ -45,7 +51,7 @@ public final class SwingHandEntityEvent implements EntityEvent {
     }
 
     private static class Holder {
-        static final SwingHandEntityEvent MAIN_HAND = new SwingHandEntityEvent(HandTypes.MAIN_HAND);
-        static final SwingHandEntityEvent OFF_HAND = new SwingHandEntityEvent(HandTypes.OFF_HAND);
+        static final SwingHandEntityEvent MAIN_HAND = new SwingHandEntityEvent(HandTypes.MAIN_HAND.get());
+        static final SwingHandEntityEvent OFF_HAND = new SwingHandEntityEvent(HandTypes.OFF_HAND.get());
     }
 }

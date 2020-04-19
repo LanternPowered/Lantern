@@ -33,10 +33,6 @@ object ItemKeys {
             = valueKeyOf(minecraft("use_cooldown"))
 
     @JvmField
-    val IS_DUAL_WIELDABLE: Key<Value<Boolean>>
-            = valueKeyOf(minecraft("is_dual_wieldable"))
-
-    @JvmField
     val HEALTH_RESTORATION: Key<Value<Double>>
             = valueKeyOf(minecraft("health_restoration"))
 

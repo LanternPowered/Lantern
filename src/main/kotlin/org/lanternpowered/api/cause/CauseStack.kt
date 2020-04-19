@@ -17,6 +17,21 @@ import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 /**
+ * Executes the [block] with the given cause applied to this [CauseStack].
+ */
+inline fun CauseStack.withCause(cause: Any, block: () -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    try {
+        pushCause(cause)
+        block()
+    } finally {
+        popCause()
+    }
+}
+
+/**
  * Executes the [block] with the given causes applied to this [CauseStack].
  */
 inline fun CauseStack.withCauses(iterable: Iterable<Any>, block: () -> Unit) {
@@ -38,14 +53,14 @@ inline fun CauseStack.withCauses(iterable: Iterable<Any>, block: () -> Unit) {
 /**
  * Executes the [block] with the given causes applied to this [CauseStack].
  */
-inline fun CauseStack.withCauses(first: Any, vararg more: Any, block: () -> Unit) {
+inline fun CauseStack.withCauses(first: Any, second: Any, vararg more: Any, block: () -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    var count = 0
+    var count = 2
     try {
         pushCause(first)
-        count++
+        pushCause(second)
         for (cause in more) {
             pushCause(cause)
             count++
@@ -60,7 +75,7 @@ inline fun CauseStack.withCauses(first: Any, vararg more: Any, block: () -> Unit
  * Executes the [block] with a new [CauseStack.Frame]. It is automatically
  * closed after the block finishes executing.
  */
-inline fun CauseStack.withFrame(block: CauseStack.Frame.() -> Unit) {
+inline fun CauseStack.withFrame(block: (frame: CauseStack.Frame) -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }

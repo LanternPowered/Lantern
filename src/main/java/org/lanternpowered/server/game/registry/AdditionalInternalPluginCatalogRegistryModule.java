@@ -12,7 +12,6 @@ package org.lanternpowered.server.game.registry;
 
 import kotlin.reflect.KClass;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 
 public class AdditionalInternalPluginCatalogRegistryModule<T extends CatalogType> extends InternalPluginCatalogRegistryModule<T>
         implements AdditionalCatalogRegistryModule<T> {

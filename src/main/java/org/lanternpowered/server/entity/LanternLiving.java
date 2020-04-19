@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.cause.entity.health.source.HealingSources;
 import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffect;
@@ -32,7 +33,6 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
@@ -50,7 +50,6 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.health.source.HealingSources;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.HarvestEntityEvent;
@@ -429,7 +428,7 @@ public class LanternLiving extends LanternEntity implements Living, AbstractProj
 
     private void pulsePotions(int deltaTicks) {
         // TODO: Move potion effects to a component? + The key registration
-        final List<PotionEffect> potionEffects = get(Keys.POTION_EFFECTS).get();
+        final List<PotionEffect> potionEffects = require(Keys.POTION_EFFECTS);
         if (!potionEffects.isEmpty()) {
             final PotionEffect.Builder builder = PotionEffect.builder();
             final ImmutableList.Builder<PotionEffect> newPotionEffects = ImmutableList.builder();
@@ -443,19 +442,19 @@ public class LanternLiving extends LanternEntity implements Living, AbstractProj
                         newPotionEffects.add(newPotionEffect);
                     }
                 }
-                if (potionEffect.getType() == PotionEffectTypes.GLOWING) {
-                    offer(Keys.GLOWING, duration > 0);
-                } else if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY) {
-                    offer(Keys.INVISIBLE, duration > 0);
-                } else if (potionEffect.getType() == PotionEffectTypes.HUNGER && supports(Keys.EXHAUSTION)) {
-                    final BoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
+                if (potionEffect.getType() == PotionEffectTypes.GLOWING.get()) {
+                    offer(Keys.IS_GLOWING, duration > 0);
+                } else if (potionEffect.getType() == PotionEffectTypes.INVISIBILITY.get()) {
+                    offer(Keys.IS_INVISIBLE, duration > 0);
+                } else if (potionEffect.getType() == PotionEffectTypes.HUNGER.get() && supports(Keys.EXHAUSTION)) {
+                    final BoundedValue<Double> exhaustion = requireValue(Keys.EXHAUSTION);
                     final double value = exhaustion.get() + (double) deltaTicks * 0.005 * (potionEffect.getAmplifier() + 1.0);
                     offer(Keys.EXHAUSTION, Math.min(value, exhaustion.getMaxValue()));
-                } else if (potionEffect.getType() == PotionEffectTypes.SATURATION && supports(Keys.SATURATION)) {
+                } else if (potionEffect.getType() == PotionEffectTypes.SATURATION.get() && supports(Keys.SATURATION)) {
                     final int amount = potionEffect.getAmplifier() + 1;
-                    final int food = Math.min(get(Keys.FOOD_LEVEL).get() + amount, get(LanternKeys.MAX_FOOD_LEVEL).get());
+                    final int food = Math.min(require(Keys.FOOD_LEVEL) + amount, require(LanternKeys.MAX_FOOD_LEVEL));
                     offer(Keys.FOOD_LEVEL, food);
-                    offer(Keys.SATURATION, Math.min(get(Keys.SATURATION).get() + (amount * 2), food));
+                    offer(Keys.SATURATION, Math.min(require(Keys.SATURATION) + (amount * 2), food));
                 }
             }
             offer(Keys.POTION_EFFECTS, newPotionEffects.build());

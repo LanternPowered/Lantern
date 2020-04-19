@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.event;
 
+import org.lanternpowered.api.cause.entity.health.HealingType;
 import org.spongepowered.api.event.cause.EventContextKey;
-import org.spongepowered.api.event.cause.entity.health.HealingType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 

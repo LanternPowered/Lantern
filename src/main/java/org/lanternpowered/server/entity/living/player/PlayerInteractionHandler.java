@@ -398,7 +398,7 @@ public final class PlayerInteractionHandler {
     }
 
     public void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
-        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND);
         // The player is already interacting
         if (!activeHand.isPresent() || this.activeHandStartTime == -1L) {
             return;
@@ -414,10 +414,10 @@ public final class PlayerInteractionHandler {
         }
 
         // Require a minimum amount of ticks for the interaction to succeed
-        final OptionalInt property = rawItemStack.getIntProperty(ItemKeys.MINIMUM_USE_DURATION);
-        if (property.isPresent()) {
+        final Optional<Integer> minUseDuration = rawItemStack.get(ItemKeys.MINIMUM_USE_DURATION);
+        if (minUseDuration.isPresent()) {
             final long time = LanternGame.currentTimeTicks();
-            if (time - this.activeHandStartTime < property.getAsInt()) {
+            if (time - this.activeHandStartTime < minUseDuration.get()) {
                 resetItemUseTime();
                 return;
             }
@@ -454,7 +454,7 @@ public final class PlayerInteractionHandler {
         this.lastActiveItemStack = null;
         this.lastActiveHand = null;
         this.activeHandStartTime = -1L;
-        this.player.offer(LanternKeys.ACTIVE_HAND, Optional.empty());
+        this.player.remove(LanternKeys.ACTIVE_HAND);
     }
 
     void cancelActiveItem() {
@@ -489,7 +489,7 @@ public final class PlayerInteractionHandler {
                 final AbstractSlot offHandSlot = this.player.getInventory().getOffhand();
                 final LanternItemStack handItem = offHandSlot.peek();
                 if (handItem.isNotEmpty()) {
-                    if (handItem.getProperty(ItemKeys.IS_DUAL_WIELDABLE).orElse(false)) {
+                    if (handItem.get(LanternKeys.IS_DUAL_WIELDABLE).orElse(false)) {
                     /*
                     final Vector3d position = this.player.getPosition().add(0, this.player.get(Keys.IS_SNEAKING).get() ? 1.54 : 1.62, 0);
                     final Optional<BlockRayHit<LanternWorld>> hit = BlockRay.from(this.player.getWorld(), position)
@@ -516,21 +516,21 @@ public final class PlayerInteractionHandler {
     }
 
     private boolean isInteracting() {
-        return this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty()).isPresent();
+        return this.player.get(LanternKeys.ACTIVE_HAND).isPresent();
     }
 
-    private boolean handleOffHandItemInteraction(BehaviorContextImpl context, @Nullable BehaviorContext.Snapshot snapshot) {
-        return handleHandItemInteraction(context, HandTypes.OFF_HAND,
+    private boolean handleOffHandItemInteraction(BehaviorContextImpl context, BehaviorContext.@Nullable Snapshot snapshot) {
+        return handleHandItemInteraction(context, HandTypes.OFF_HAND.get(),
                 this.player.getInventory().getOffhand(), snapshot);
     }
 
-    private boolean handleMainHandItemInteraction(BehaviorContextImpl context, @Nullable BehaviorContext.Snapshot snapshot) {
-        return handleHandItemInteraction(context, HandTypes.MAIN_HAND, this.player.getInventory().getHotbar().getSelectedSlot(), snapshot);
+    private boolean handleMainHandItemInteraction(BehaviorContextImpl context, BehaviorContext.@Nullable Snapshot snapshot) {
+        return handleHandItemInteraction(context, HandTypes.MAIN_HAND.get(), this.player.getInventory().getHotbar().getSelectedSlot(), snapshot);
     }
 
     private boolean handleHandItemInteraction(BehaviorContextImpl context, HandType handType, AbstractSlot slot,
-            @Nullable BehaviorContext.Snapshot snapshot) {
-        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+            BehaviorContext.@Nullable Snapshot snapshot) {
+        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND);
         // The player is already interacting
         if (activeHand.isPresent()) {
             return true;
@@ -555,8 +555,8 @@ public final class PlayerInteractionHandler {
         return false;
     }
 
-    private boolean handleItemInteraction(BehaviorContextImpl context, @Nullable BehaviorContext.Snapshot snapshot) {
-        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+    private boolean handleItemInteraction(BehaviorContextImpl context, BehaviorContext.@Nullable Snapshot snapshot) {
+        final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND);
         if (activeHand.isPresent() || handleMainHandItemInteraction(context, snapshot) || handleOffHandItemInteraction(context, null)) {
             context.accept();
             return true;

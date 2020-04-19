@@ -23,6 +23,19 @@ typealias CauseStackManager = org.spongepowered.api.event.CauseStackManager
 typealias CauseStackManagerFrame = org.spongepowered.api.event.CauseStackManager.StackFrame
 
 /**
+ * Executes the [block] with the given cause applied to this [CauseStack].
+ */
+inline fun CauseStackManager.withCause(cause: Any, block: () -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    val causeStack = this as? CauseStack ?: CauseStack.current()
+    causeStack.withCause(cause) {
+        block()
+    }
+}
+
+/**
  * Executes the [block] with the given causes applied to the current stack.
  */
 inline fun CauseStackManager.withCauses(iterable: Iterable<Any>, block: () -> Unit) {
@@ -38,12 +51,12 @@ inline fun CauseStackManager.withCauses(iterable: Iterable<Any>, block: () -> Un
 /**
  * Executes the [block] with the given causes applied to the current stack.
  */
-inline fun CauseStackManager.withCauses(first: Any, vararg more: Any, block: () -> Unit) {
+inline fun CauseStackManager.withCauses(first: Any, second: Any, vararg more: Any, block: () -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     val causeStack = this as? CauseStack ?: CauseStack.current()
-    causeStack.withCauses(first, *more) {
+    causeStack.withCauses(first, second, *more) {
         block()
     }
 }

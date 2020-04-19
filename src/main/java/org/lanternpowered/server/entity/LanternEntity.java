@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.cause.entity.health.source.HealingSource;
 import org.lanternpowered.server.data.DataHelper;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.LocalMutableDataHolder;
@@ -36,11 +37,13 @@ import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BoundedValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -93,7 +96,7 @@ import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class LanternEntity implements Entity, SerializableLocalMutableDataHolder {
+public class LanternEntity implements SerializableLocalMutableDataHolder, Entity {
 
     // The unique id of this entity
     private final UUID uniqueId;
@@ -740,8 +743,8 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
             frame.pushCause(damageSource);
             frame.addContext(EventContextKeys.DAMAGE_TYPE, damageSource.getType());
-            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(),
-                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), this, damage);
+            final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(), this,
+                    damageFunctions.stream().map(Tuple::getFirst).collect(Collectors.toList()), damage);
             event.setCancelled(cancelled);
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {
@@ -796,7 +799,7 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
         if (isDead()) {
             return false;
         }
-        final BoundedValue<Double> health = getValue(Keys.HEALTH).orElse(null);
+        final @Nullable BoundedValue<Double> health = getValue(Keys.HEALTH).orElse(null);
         if (health == null || health.get() >= health.getMaxValue()) {
             return false;
         }
@@ -805,6 +808,7 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
             frame.pushCause(source);
             frame.addContext(LanternEventContextKeys.HEALING_TYPE, source.getHealingType());
 
+            /*
             final HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(
                     frame.getCurrentCause(), this, new ArrayList<>(), amount);
             Sponge.getEventManager().post(event);
@@ -812,6 +816,8 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
                 return false;
             }
             amount = event.getFinalHealAmount();
+            */
+
             if (amount > 0) {
                 offer(Keys.HEALTH, Math.min(health.get() + amount, health.getMaxValue()));
             }
@@ -950,4 +956,5 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
         final Quaterniond rot = Quaterniond.fromAxesAnglesDeg(0, getRotation().getY(), 0);
         return rot.rotate(relativePosition);
     }
+
 }

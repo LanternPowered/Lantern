@@ -365,7 +365,7 @@ import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipeRegistry;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.FactoryRegistry;
 import org.spongepowered.api.registry.RegistrationPhase;

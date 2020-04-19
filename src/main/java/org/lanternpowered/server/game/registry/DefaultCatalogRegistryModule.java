@@ -20,10 +20,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import kotlin.jvm.JvmClassMappingKt;
 import kotlin.reflect.KClass;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.util.Tuple;
 
 import java.util.Arrays;
@@ -34,8 +34,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
         implements AlternateCatalogRegistryModule<T>, CatalogMappingDataHolder {

@@ -11,6 +11,7 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key

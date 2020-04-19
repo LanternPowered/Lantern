@@ -13,6 +13,8 @@ package org.lanternpowered.api.registry
 import org.lanternpowered.api.Lantern
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
+import org.spongepowered.api.registry.UnknownTypeException
+import java.util.function.Supplier
 import kotlin.reflect.KClass
 
 /**
@@ -46,6 +48,16 @@ inline fun <reified T : CatalogType> CatalogRegistry.require(key: CatalogKey): T
 inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: CatalogKey): T? = get(T::class, key)
 
 /**
+ * Creates a [Supplier] that will be used to get [CatalogType] instances.
+ *
+ * @param suggestedId The suggested id to use
+ * @param T The type of catalog
+ * @return The supplier
+ * @throws UnknownTypeException If the type provided has not been registered
+ */
+inline fun <reified T : CatalogType> CatalogRegistry.provideSupplier(suggestedId: String): Supplier<T> = provideSupplier(T::class, suggestedId)
+
+/**
  * Gets a collection of all available found specific types of
  * [CatalogType] requested.
  *
@@ -62,6 +74,18 @@ inline fun <reified T : CatalogType> CatalogRegistry.getAllOf(): Sequence<T> = g
  * The catalog registry.
  */
 interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
+
+    /**
+     * Creates a [Supplier] that will be used to get [CatalogType] instances.
+     *
+     * @param catalogClass The catalog class
+     * @param suggestedId The suggested id to use
+     * @param T The type of catalog
+     * @param E The generic of the catalog (if applicable)
+     * @return The supplier
+     * @throws UnknownTypeException If the type provided has not been registered
+     */
+    fun <T : CatalogType, E : T> provideSupplier(catalogClass: KClass<T>, suggestedId: String): Supplier<E>
 
     /**
      * Attempts to retrieve the specific type of [CatalogType] based on

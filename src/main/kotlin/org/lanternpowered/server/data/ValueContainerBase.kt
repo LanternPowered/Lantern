@@ -13,9 +13,9 @@ package org.lanternpowered.server.data
 import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
 import org.lanternpowered.api.util.optional.emptyOptionalLong
-import org.lanternpowered.api.ext.optionalDouble
-import org.lanternpowered.api.ext.optionalInt
-import org.lanternpowered.api.ext.optionalLong
+import org.lanternpowered.api.util.optional.optionalDouble
+import org.lanternpowered.api.util.optional.optionalInt
+import org.lanternpowered.api.util.optional.optionalLong
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.ValueContainer
@@ -55,11 +55,13 @@ interface ValueContainerBase : ValueContainer {
     @JvmDefault
     override fun <E : Any> get(key: Supplier<out Key<out Value<E>>>): Optional<E> = get(key.get())
 
+    @JvmDefault
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E>
 
     @JvmDefault
     override fun <E : Any, V : Value<E>> getValue(key: Supplier<out Key<V>>): Optional<V> = getValue(key.get())
 
+    @JvmDefault
     override fun <E : Any, V : Value<E>> getValue(key: Key<V>): Optional<V>
 
     override fun getKeys(): Set<Key<*>>

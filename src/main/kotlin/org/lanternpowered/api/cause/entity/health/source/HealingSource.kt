@@ -10,38 +10,105 @@
  */
 package org.lanternpowered.api.cause.entity.health.source
 
-import org.spongepowered.api.block.BlockSnapshot
-import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.event.cause.entity.health.HealingType
-import org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource
-import org.spongepowered.api.event.cause.entity.health.source.HealingSource
-import org.spongepowered.api.world.Location
+import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.cause.entity.health.HealingType
+import org.lanternpowered.api.registry.BaseBuilder
+import org.lanternpowered.api.registry.builderOf
+import org.lanternpowered.api.world.difficulty.Difficulty
+import java.util.function.Supplier
 
-typealias BlockHealingSource = org.spongepowered.api.event.cause.entity.health.source.BlockHealingSource
-typealias BlockHealingSourceBuilder = org.spongepowered.api.event.cause.entity.health.source.BlockHealingSource.Builder
-typealias EntityHealingSource = org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource
-typealias EntityHealingSourceBuilder = org.spongepowered.api.event.cause.entity.health.source.EntityHealingSource.Builder
-typealias HealingSource = org.spongepowered.api.event.cause.entity.health.source.HealingSource
-typealias HealingSourceBuilder = org.spongepowered.api.event.cause.entity.health.source.HealingSource.Builder
-typealias HealingSources = org.spongepowered.api.event.cause.entity.health.source.HealingSources
-typealias IndirectEntityHealingSource = org.spongepowered.api.event.cause.entity.health.source.IndirectEntityHealingSource
-typealias IndirectEntityHealingSourceBuilder = org.spongepowered.api.event.cause.entity.health.source.IndirectEntityHealingSource.Builder
+private typealias HealingSourceBuilder = HealingSource.Builder
 
-inline fun HealingSource(type: HealingType, fn: HealingSourceBuilder.() -> Unit = {}): HealingSource =
-        HealingSource.builder().type(type).apply(fn).build()
+/**
+ * Constructs a new [HealingSource].
+ */
+fun healingSourceOf(type: Supplier<out HealingType>): HealingSource =
+        builderOf<HealingSource.Builder>().type(type).build()
 
-inline fun BlockHealingSource(type: HealingType, location: Location,
-                             fn: BlockHealingSourceBuilder.() -> Unit = {}): BlockHealingSource =
-        BlockHealingSource.builder().type(type).block(location).apply(fn).build()
+/**
+ * Constructs a new [HealingSource].
+ */
+fun healingSourceOf(type: HealingType): HealingSource =
+        builderOf<HealingSource.Builder>().type(type).build()
 
-inline fun BlockHealingSource(type: HealingType, snapshot: BlockSnapshot,
-                              fn: BlockHealingSourceBuilder.() -> Unit = {}): BlockHealingSource =
-        BlockHealingSource.builder().type(type).block(snapshot).apply(fn).build()
+/**
+ * Constructs a new [HealingSource].
+ */
+fun healingSource(block: HealingSourceBuilder.() -> Unit): HealingSource =
+        builderOf<HealingSource.Builder>().apply(block).build()
 
-inline fun EntityHealingSource(type: HealingType, entity: Entity,
-                               fn: EntityHealingSourceBuilder.() -> Unit = {}): EntityHealingSource =
-        EntityHealingSource.builder().type(type).entity(entity).apply(fn).build()
+/**
+ * Represents a [Cause] for damage on the [Entity] being
+ * healed. This will help inform what type of healing
+ */
+interface HealingSource {
 
-inline fun IndirectEntityHealingSource(type: HealingType, entity: Entity, indirectSource: Entity,
-                                       fn: IndirectEntityHealingSourceBuilder.() -> Unit = {}): IndirectEntityHealingSource =
-        IndirectEntityHealingSource.builder().type(type).entity(entity).indirectEntity(indirectSource).apply(fn).build()
+    /**
+     * The [HealingType] for this source.
+     */
+    val healingType: HealingType
+
+    /**
+     * Whether this [HealingSource]'s healing amount is scaled by [Difficulty].
+     */
+    val isDifficultyScaled: Boolean
+
+    /**
+     * Whether this [HealingSource] is considered to be magical
+     * healing, such as potions, or other sources.
+     */
+    val isMagic: Boolean
+
+    /**
+     * A builder to build [HealingSource] specifically.
+     */
+    interface Builder : BaseBuilder<HealingSource, Builder> {
+
+        /**
+         * Sets for the built [HealingSource] to have scaled with
+         * difficulty, usually meaning that the amount is scaled.
+         *
+         * @return This builder, for chaining
+         */
+        fun scalesWithDifficulty(): Builder
+
+        /**
+         * Sets that the built [HealingSource] to have been a "magical"
+         * source.
+         *
+         * @return This builder, for chaining
+         */
+        fun magical(): Builder
+
+        /**
+         * Sets the [HealingType].
+         *
+         * @param type The healing type
+         * @return This builder, for chaining
+         */
+        fun type(type: Supplier<out HealingType>): Builder = type(type.get())
+
+        /**
+         * Sets the [HealingType].
+         *
+         * @param type The healing type
+         * @return This builder, for chaining
+         */
+        fun type(type: HealingType): Builder
+
+        /**
+         * Builds the healing source.
+         */
+        fun build(): HealingSource
+    }
+
+    companion object {
+
+        /**
+         * Creates a new [Builder] to construct a new [HealingSource].
+         *
+         * @return A new builder
+         */
+        fun builder(): Builder = builderOf()
+    }
+}

@@ -72,6 +72,8 @@ abstract class LanternText(
     override fun trim(): Text = toBuilder().trim().build()
     override fun getContentVersion(): Int = 1
 
+    override fun compact(): Text = this // TODO
+
     override fun replace(oldValue: Pattern, newValue: Text): Text
             = replace(oldValue, newValue, false)
 

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.text
 
 import com.google.common.collect.ImmutableList
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.text.ScoreText
 import org.spongepowered.api.text.Text

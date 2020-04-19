@@ -23,41 +23,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.entity;
+package org.lanternpowered.server.effect.entity.sound
 
-import org.lanternpowered.server.entity.EntityBodyPosition;
-import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.data.property.entity.EyeHeightProperty;
-import org.spongepowered.math.vector.Vector3d;
+import org.lanternpowered.server.effect.entity.AbstractEntityEffect
+import org.lanternpowered.server.entity.EntityBodyPosition
+import org.lanternpowered.server.entity.LanternEntity
+import org.spongepowered.api.data.Keys
+import kotlin.random.Random
 
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+abstract class AbstractLivingSoundEffect(position: EntityBodyPosition) : AbstractEntityEffect(position) {
 
-@SuppressWarnings("ConstantConditions")
-public abstract class AbstractEntityEffect implements EntityEffect {
-
-    private final EntityBodyPosition position;
-
-    protected AbstractEntityEffect(EntityBodyPosition position) {
-        this.position = position;
+    /**
+     * Gets a randomized volume value for the sound effect.
+     *
+     * @param random The random
+     * @return The volume value
+     */
+    protected fun getVolume(entity: LanternEntity, random: Random): Double {
+        return 1.0
     }
 
-    protected AbstractEntityEffect() {
-        this(EntityBodyPosition.FEET);
-    }
-
-    @Override
-    public void play(LanternEntity entity) {
-        final Random random = ThreadLocalRandom.current();
-        Vector3d relativePosition = Vector3d.ZERO;
-        if (this.position == EntityBodyPosition.HEAD) {
-            final EyeHeightProperty eyeHeightProperty = entity.getProperty(EyeHeightProperty.class).orElse(null);
-            if (eyeHeightProperty != null) {
-                relativePosition = new Vector3d(0, eyeHeightProperty.getValue(), 0);
-            }
+    /**
+     * Gets a randomized pitch value for the sound effect.
+     *
+     * @param random The random
+     * @return The pitch value
+     */
+    protected fun getPitch(entity: LanternEntity, random: Random): Double {
+        var value = random.nextFloat() - random.nextFloat() * 0.2
+        // Adults and children use a different pitch value
+        value += if (entity.get(Keys.IS_ADULT).orElse(true)) {
+            1.0
+        } else {
+            1.5
         }
-        play(entity, relativePosition, random);
+        return value
     }
-
-    protected abstract void play(LanternEntity entity, Vector3d relativePosition, Random random);
 }

@@ -30,6 +30,7 @@ import org.lanternpowered.api.logging.Logger
 import org.lanternpowered.api.logging.Marker
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.toLegacy
 import java.util.function.Supplier
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

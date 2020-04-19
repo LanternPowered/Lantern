@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.resourcepack
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.resourcepack.ResourcePack
 import java.net.URI
 

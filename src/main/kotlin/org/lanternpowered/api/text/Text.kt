@@ -28,6 +28,7 @@
 
 package org.lanternpowered.api.text
 
+import org.lanternpowered.api.text.serializer.TextSerializers
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
 import org.spongepowered.api.command.CommandCause
@@ -43,6 +44,26 @@ typealias TextElement = org.spongepowered.api.text.TextElement
 typealias TextRepresentable = org.spongepowered.api.text.TextRepresentable
 typealias TranslatableText = org.spongepowered.api.text.TranslatableText
 typealias TranslatableTextBuilder = org.spongepowered.api.text.TranslatableText.Builder
+
+/**
+ * Converts the [Text] into the legacy [String] format.
+ */
+fun Text.toLegacy(): String = TextSerializers.LEGACY_FORMATTING_CODE.serialize(this)
+
+/**
+ * Converts the legacy [String] into a [Text] object.
+ */
+fun String.fromLegacy(): Text = TextSerializers.LEGACY_FORMATTING_CODE.deserialize(this)
+
+/**
+ * Converts the [String] into a [Text] object.
+ */
+fun String.toText(): Text = Text(this)
+
+/**
+ * Converts the [String] into a [Text] object.
+ */
+fun String.toText(fn: TextBuilder.() -> Unit): Text = Text(this, fn)
 
 /**
  * Constructs a new [LiteralText] from the given content.

@@ -23,33 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.entity;
+package org.lanternpowered.api.text.serializer
 
-import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.entity.Entity;
+import org.lanternpowered.api.registry.factoryOf
 
-public interface EntityEffect {
-
-    /**
-     * A sound effect that does nothing.
-     */
-    EntityEffect NONE = entity -> {};
+/**
+ * A text serializer for plain text.
+ */
+interface PlainTextSerializer : SafeTextSerializer {
 
     /**
-     * Plays this {@link EntityEffect} for the
-     * given {@link Entity}.
-     *
-     * @param entity The entity
+     * The singleton instance of [PlainTextSerializer].
      */
-    default void play(Entity entity) {
-        play((LanternEntity) entity);
-    }
-
-    /**
-     * Plays this {@link EntityEffect} for the
-     * given {@link LanternEntity}.
-     *
-     * @param entity The entity
-     */
-    void play(LanternEntity entity);
+    companion object : PlainTextSerializer by factoryOf<TextSerializerFactory>().plain
 }

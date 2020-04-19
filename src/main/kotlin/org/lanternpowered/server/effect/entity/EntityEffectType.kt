@@ -23,39 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@file:Suppress("NOTHING_TO_INLINE")
+package org.lanternpowered.server.effect.entity
 
-package org.lanternpowered.api.ext
+import org.spongepowered.api.CatalogType
+import org.spongepowered.api.util.annotation.CatalogedBy
 
-import org.lanternpowered.api.cause.Cause
-import org.lanternpowered.api.cause.CauseStackManager
-import org.lanternpowered.api.cause.CauseStackManagerFrame
-import org.lanternpowered.api.util.optional.orNull
-import java.util.Optional
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-import kotlin.reflect.KClass
-
-inline fun CauseStackManager.withFrame(fn: CauseStackManagerFrame.() -> Unit) {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    pushCauseFrame().use(fn)
-}
-
-inline fun CauseStackManager.withPlugin(plugin: Any, fn: () -> Unit) {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    withCause(checkPluginInstance(plugin), fn)
-}
-
-inline fun CauseStackManager.withCause(cause: Any, fn: () -> Unit) {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    withFrame {
-        pushCause(cause)
-        fn()
-    }
-}
+/**
+ * Represents a entity sound type, this is the context
+ * where a [EntityEffect] will be played.
+ */
+@CatalogedBy(EntityEffectTypes::class)
+interface EntityEffectType : CatalogType

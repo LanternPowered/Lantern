@@ -23,45 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.entity.sound;
+package org.lanternpowered.server.effect.entity
 
-import org.lanternpowered.server.effect.entity.AbstractEntityEffect;
-import org.lanternpowered.server.entity.EntityBodyPosition;
-import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.data.Keys;
+import org.lanternpowered.server.entity.LanternEntity
+import org.spongepowered.api.entity.Entity
 
-import java.util.Random;
+private val emptyEntityEffect = entityEffect {}
 
-public abstract class AbstractLivingSoundEffect extends AbstractEntityEffect {
+/**
+ * Gets an empty entity effect.
+ */
+fun emptyEntityEffect(): EntityEffect = emptyEntityEffect
 
-    public AbstractLivingSoundEffect(EntityBodyPosition position) {
-        super(position);
-    }
-
-    /**
-     * Gets a randomized volume value for the sound effect.
-     *
-     * @param random The random
-     * @return The volume value
-     */
-    protected double getVolume(LanternEntity entity, Random random) {
-        return 1.0;
-    }
-
-    /**
-     * Gets a randomized pitch value for the sound effect.
-     *
-     * @param random The random
-     * @return The pitch value
-     */
-    protected double getPitch(LanternEntity entity, Random random) {
-        double value = random.nextFloat() - random.nextFloat() * 0.2;
-        // Adults and children use a different pitch value
-        if (entity.get(Keys.IS_ADULT).orElse(true)) {
-            value += 1.0;
-        } else {
-            value += 1.5;
+/**
+ * Constructs a new [EntityEffect].
+ */
+inline fun entityEffect(crossinline block: (entity: LanternEntity) -> Unit): EntityEffect {
+    return object : EntityEffect {
+        override fun play(entity: LanternEntity) {
+            block(entity)
         }
-        return value;
     }
+}
+
+/**
+ * Plays this [EntityEffect] for the given [Entity].
+ *
+ * @param entity The entity
+ */
+fun EntityEffect.play(entity: Entity) = play(entity as LanternEntity)
+
+/**
+ * Represents an effect of an entity.
+ */
+interface EntityEffect {
+
+    /**
+     * Plays this [EntityEffect] for the given [LanternEntity].
+     *
+     * @param entity The entity
+     */
+    fun play(entity: LanternEntity)
 }

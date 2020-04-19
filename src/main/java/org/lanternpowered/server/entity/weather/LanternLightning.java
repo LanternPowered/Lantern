@@ -54,7 +54,7 @@ import java.util.UUID;
 public class LanternLightning extends LanternEntity implements AbstractLightning {
 
     public static final EntityEffectCollection DEFAULT_SOUND_COLLECTION = EntityEffectCollection.builder()
-            .add(EntityEffectTypes.LIGHTNING, new LightningSoundEffect())
+            .add(EntityEffectTypes.LIGHTNING, LightningSoundEffect.INSTANCE)
             .build();
 
     /**

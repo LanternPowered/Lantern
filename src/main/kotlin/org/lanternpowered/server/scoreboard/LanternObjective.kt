@@ -65,7 +65,7 @@ class LanternObjective internal constructor(
     }
 
     private fun sendObjectiveUpdate() {
-        if (scoreboards.isEmpty())
+        if (this.scoreboards.isEmpty())
             return
         val message = listOf(MessagePlayOutScoreboardObjective.Update(
                 this.name, this.displayName, this.displayMode))
@@ -82,8 +82,8 @@ class LanternObjective internal constructor(
     }
 
     override fun addScore(score: Score) {
-        check(!scores.containsKey(score.name)) { "A score with the name ${score.name} already exists!" }
-        scores[score.name] = score
+        check(!this.scores.containsKey(score.name)) { "A score with the name ${score.name} already exists!" }
+        this.scores[score.name] = score
         (score as LanternScore).addObjective(this)
         sendScoreToClient(score)
     }

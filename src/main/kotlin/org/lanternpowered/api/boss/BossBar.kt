@@ -53,3 +53,24 @@ inline fun bossBar(name: Text, fn: BossBarBuilder.() -> Unit = {}): BossBar {
     // Apply a few defaults, so only the name is required
     return BossBar.builder().name(name).color(BossBarColors.PURPLE).overlay(BossBarOverlays.PROGRESS).apply(fn).build()
 }
+
+/**
+ * Whether fog should be created.
+ */
+inline var BossBar.createFog: Boolean
+    get() = shouldCreateFog()
+    set(value) { setCreateFog(value) }
+
+/**
+ * Whether the sky should darken.
+ */
+inline var BossBar.darkenSky: Boolean
+    get() = shouldDarkenSky()
+    set(value) { setDarkenSky(value) }
+
+/**
+ * Whether end boss music should be played.
+ */
+inline var BossBar.playEndBossMusic: Boolean
+    get() = shouldPlayEndBossMusic()
+    set(value) { setPlayEndBossMusic(value) }

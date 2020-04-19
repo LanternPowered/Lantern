@@ -25,14 +25,13 @@
  */
 package org.lanternpowered.server.text
 
-import com.google.common.base.MoreObjects
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
 import ninja.leaping.configurate.objectmapping.Setting
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.TextElement
 import org.spongepowered.api.text.TextTemplate
@@ -40,8 +39,6 @@ import org.spongepowered.api.text.TextTemplateArgumentException
 import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.text.format.TextFormat
 import org.spongepowered.api.text.format.TextStyle
-import java.util.ArrayList
-import java.util.HashMap
 
 data class LanternTextTemplate internal constructor(
         private val openArg: String,
@@ -65,7 +62,7 @@ data class LanternTextTemplate internal constructor(
     override fun getCloseArgString() = this.closeArg
 
     override fun concat(other: TextTemplate): TextTemplate {
-        val elements = ArrayList(this.elements)
+        val elements = this.elements.toMutableList()
         elements.addAll(other.elements)
         return of(this.openArg, this.closeArg, elements.toTypedArray().asIterable())
     }
@@ -196,7 +193,7 @@ data class LanternTextTemplate internal constructor(
             }
 
             override fun toString(): String {
-                return MoreObjects.toStringHelper(this)
+                return ToStringHelper(this)
                         .omitNullValues()
                         .add("name", this.name)
                         .add("optional", this.optional)
@@ -228,7 +225,7 @@ data class LanternTextTemplate internal constructor(
         fun of(openArg: String, closeArg: String, elements: Iterable<Any>): LanternTextTemplate {
             // Collect elements
             val elementsBuilder = ImmutableList.builder<Any>()
-            val argumentMap = HashMap<String, Arg>()
+            val argumentMap = mutableMapOf<String, Arg>()
 
             elements.forEach {
                 var element = it

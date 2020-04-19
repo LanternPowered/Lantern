@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.permission
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.service.ServiceManager
+import org.lanternpowered.api.service.provide
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.server.service.LanternServiceListeners
 import org.spongepowered.api.service.context.Context
@@ -74,7 +75,7 @@ interface ProxySubject : Subject {
     fun resolveNullableSubject(): Subject? {
         var reference = this.internalSubject
         if (reference == null) {
-            val service = serviceOf<PermissionService?>()
+            val service = ServiceManager.provide<PermissionService>()
             if (service != null) {
                 // Try to update the internal subject
                 SubjectSettingCallback.apply(this, service)

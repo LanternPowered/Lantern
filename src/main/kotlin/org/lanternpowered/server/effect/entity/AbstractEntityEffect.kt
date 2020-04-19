@@ -23,16 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.ext
+package org.lanternpowered.server.effect.entity
 
-import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.util.optional.orNull
-import kotlin.reflect.typeOf
+import org.lanternpowered.server.entity.EntityBodyPosition
+import org.lanternpowered.server.entity.LanternEntity
+import org.spongepowered.api.data.Keys
+import org.spongepowered.math.vector.Vector3d
+import kotlin.random.Random
 
-inline fun <reified S> serviceOf(): S {
-    val type = typeOf<S>()
-    if (type.isMarkedNullable) {
-        return Lantern.serviceManager.provide(S::class.java).orNull() as S
+abstract class AbstractEntityEffect protected constructor(
+        private val position: EntityBodyPosition = EntityBodyPosition.FEET
+) : EntityEffect {
+
+    override fun play(entity: LanternEntity) {
+        var relativePosition = Vector3d.ZERO
+        if (this.position == EntityBodyPosition.HEAD) {
+            val eyeHeight = entity.get(Keys.EYE_HEIGHT).orElse(null)
+            if (eyeHeight != null) {
+                relativePosition = Vector3d(0.0, eyeHeight, 0.0)
+            }
+        }
+        play(entity, relativePosition, Random)
     }
-    return Lantern.serviceManager.provideUnchecked(S::class.java)
+
+    protected abstract fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random)
+
 }

@@ -140,14 +140,44 @@ inline fun <reified T : Any> Cause.noneOf(): List<Any> = noneOf(T::class)
 fun Cause.noneOf(target: KClass<*>): List<Any> = noneOf(target.java)
 
 /**
- * Constructs a new [Cause].
+ * Gets an empty [Cause].
  */
-fun cause(fn: CauseBuilder.() -> Unit): Cause = builderOf<CauseBuilder>().apply(fn).build()
+fun emptyCause(): Cause = Cause.of(CauseContext.empty(), emptyList())
 
 /**
- * Constructs a new cause context.
+ * Constructs a new [Cause].
  */
-fun causeContext(fn: CauseContextBuilder.() -> Unit): CauseContext = CauseContext.builder().apply(fn).build()
+fun causeOf(cause: Any): Cause = Cause.of(CauseContext.empty(), cause)
+
+/**
+ * Constructs a new [Cause].
+ */
+fun causeOf(first: Any, vararg more: Any): Cause = Cause.of(CauseContext.empty(), listOf(first) + more.asList())
+
+/**
+ * Constructs a new [Cause].
+ */
+fun cause(block: CauseBuilder.() -> Unit): Cause = builderOf<CauseBuilder>().apply(block).build()
+
+/**
+ * Constructs a new [CauseContext].
+ */
+fun emptyCauseContext(): CauseContext = CauseContext.empty()
+
+/**
+ * Constructs a new [CauseContext].
+ */
+fun causeContextOf(entries: Map<CauseContextKey<*>, Any>): CauseContext = CauseContext.of(entries)
+
+/**
+ * Constructs a new [CauseContext].
+ */
+fun causeContext(block: CauseContextBuilder.() -> Unit): CauseContext = CauseContext.builder().apply(block).build()
+
+/**
+ * Constructs a new [Cause].
+ */
+fun Cause.withContext(context: CauseContext): Cause = Cause.of(context, all())
 
 /**
  * A builder to construct [Cause]s.

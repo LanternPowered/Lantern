@@ -33,4 +33,6 @@ typealias TextSerializers = org.spongepowered.api.text.serializer.TextSerializer
 interface TextSerializerFactory {
 
     val json: JsonTextSerializer
+
+    val plain: PlainTextSerializer
 }

@@ -31,7 +31,9 @@ import org.lanternpowered.api.boss.BossBarColor
 import org.lanternpowered.api.boss.BossBarColors
 import org.lanternpowered.api.boss.BossBarOverlay
 import org.lanternpowered.api.boss.BossBarOverlays
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.boss.createFog
+import org.lanternpowered.api.boss.darkenSky
+import org.lanternpowered.api.boss.playEndBossMusic
 import org.lanternpowered.api.text.Text
 
 import java.util.UUID

@@ -30,6 +30,7 @@ import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
+import java.util.function.Supplier
 
 /**
  * Represents the [ElementKeyRegistration] of a bounded value.
@@ -72,6 +73,14 @@ interface BoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHo
     fun minimum(minimum: Key<out Value<E>>): BoundedElementKeyRegistration<V, E, H>
 
     /**
+     * Sets the minimum value key of this key registration.
+     *
+     * @param minimum The minimum value key
+     * @return This registration, for chaining
+     */
+    fun minimum(minimum: Supplier<out Key<out Value<E>>>): BoundedElementKeyRegistration<V, E, H> = minimum(minimum.get())
+
+    /**
      * Sets the maximum value of this key registration.
      *
      * @param maximum The maximum value
@@ -94,6 +103,14 @@ interface BoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHo
      * @return This registration, for chaining
      */
     fun maximum(maximum: Key<out Value<E>>): BoundedElementKeyRegistration<V, E, H>
+
+    /**
+     * Sets the maximum value key of this key registration.
+     *
+     * @param maximum The maximum value key
+     * @return This registration, for chaining
+     */
+    fun maximum(maximum: Supplier<out Key<out Value<E>>>): BoundedElementKeyRegistration<V, E, H> = maximum(maximum.get())
 
     /**
      * Applies a validator which checks if the element [E] is valid.

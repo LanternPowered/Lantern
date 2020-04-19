@@ -28,7 +28,6 @@ package org.lanternpowered.server.text.action
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.spongepowered.api.command.CommandCause
 import org.spongepowered.api.text.action.TextActions
-import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -68,7 +67,7 @@ object LanternClickActionCallbacks {
             this.callbackCache[callback] ?: throw IllegalStateException()
 
     /**
-     * Gets the callback for the specified [UUID], may return [Optional.empty]
+     * Gets the callback for the specified [UUID], may return `null`
      * if there is no callback for the specified unique id.
      *
      * @param uniqueId The unique id

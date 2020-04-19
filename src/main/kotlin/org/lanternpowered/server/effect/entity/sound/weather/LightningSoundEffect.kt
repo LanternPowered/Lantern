@@ -23,20 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.entity.animation;
+package org.lanternpowered.server.effect.entity.sound.weather
 
-import org.lanternpowered.server.effect.entity.EntityEffect;
-import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.DamagedEntityEvent;
+import org.lanternpowered.server.effect.entity.AbstractEntityEffect
+import org.lanternpowered.server.entity.LanternEntity
+import org.spongepowered.api.effect.sound.SoundTypes
+import org.spongepowered.math.vector.Vector3d
+import kotlin.random.Random
 
-/**
- * Plays a entity hurt animation. This will make a
- * living entity become red for a few ticks.
- */
-public class DefaultLivingHurtAnimation implements EntityEffect {
+object LightningSoundEffect : AbstractEntityEffect() {
 
-    @Override
-    public void play(LanternEntity entity) {
-        entity.triggerEvent(DamagedEntityEvent.of());
+    override fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random) {
+        entity.playSound(SoundTypes.ENTITY_LIGHTNING_BOLT_THUNDER,
+                10000.0, 0.8 + random.nextDouble() * 0.2)
+        entity.playSound(SoundTypes.ENTITY_LIGHTNING_BOLT_IMPACT,
+                2.0, 0.5 + random.nextDouble() * 0.2)
     }
 }

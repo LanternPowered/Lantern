@@ -27,30 +27,34 @@ package org.lanternpowered.server.cause
 
 import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.cause.CauseContext
+import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManagerFrame
-import org.spongepowered.api.event.cause.EventContext
-import org.spongepowered.api.event.cause.EventContextKey
+import org.lanternpowered.api.cause.causeOf
+import org.lanternpowered.api.cause.emptyCauseContext
+import org.lanternpowered.api.util.optional.emptyOptional
 import java.util.Optional
+import kotlin.reflect.KClass
 
 internal object EmptyCauseStack : CauseStack {
 
     private val obj = Any()
-    private val cause by lazy { Cause.of(EventContext.empty(), Lantern.game) }
+    private val cause by lazy { causeOf(Lantern.game) }
     private val frame = object : CauseStack.Frame {
 
         override fun close() {}
         override fun getCurrentCause(): Cause = cause
-        override fun getCurrentContext() = EventContext.empty()
-        override fun pushCause(obj: Any) = this
+        override fun getCurrentContext(): CauseContext = emptyCauseContext()
+        override fun pushCause(obj: Any): CauseStack.Frame = this
         override fun popCause(): Any = obj
 
-        override fun <T> addContext(key: EventContextKey<T>, value: T) = this
-        override fun <T> removeContext(key: EventContextKey<T>) = Optional.empty<T>()
+        override fun <T> addContext(key: CauseContextKey<T>, value: T) = this
+        override fun <T> removeContext(key: CauseContextKey<T>): Optional<T> = emptyOptional()
     }
 
     override fun getCurrentCause(): Cause = cause
-    override fun getCurrentContext(): EventContext = EventContext.empty()
+    override fun getCurrentContext(): CauseContext = emptyCauseContext()
 
     override fun pushCause(obj: Any): CauseStack = this
     override fun popCause(): Any = obj
@@ -59,13 +63,16 @@ internal object EmptyCauseStack : CauseStack {
     override fun pushCauseFrame() = frame
     override fun popCauseFrame(handle: CauseStackManagerFrame) {}
 
-    override fun <T> first(target: Class<T>) = Optional.empty<T>()
-    override fun <T> last(target: Class<T>) = Optional.empty<T>()
+    override fun <T : Any> first(target: Class<T>): Optional<T> = emptyOptional()
+    override fun <T : Any> first(target: KClass<T>): T? = null
+    override fun <T : Any> last(target: Class<T>): Optional<T> = emptyOptional()
+    override fun <T : Any> last(target: KClass<T>): T? = null
 
-    override fun containsType(target: Class<*>) = false
-    override fun contains(any: Any) = false
+    override fun containsType(target: Class<*>): Boolean = false
+    override fun containsType(target: KClass<*>): Boolean = false
+    override fun contains(any: Any): Boolean = false
 
-    override fun <T> addContext(key: EventContextKey<T>, value: T) = this
-    override fun <T> getContext(key: EventContextKey<T>) = Optional.empty<T>()
-    override fun <T> removeContext(key: EventContextKey<T>) = Optional.empty<T>()
+    override fun <T> addContext(key: CauseContextKey<T>, value: T): EmptyCauseStack = this
+    override fun <T> getContext(key: CauseContextKey<T>): Optional<T> = emptyOptional()
+    override fun <T> removeContext(key: CauseContextKey<T>): Optional<T> = emptyOptional()
 }

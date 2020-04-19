@@ -23,26 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.entity.particle.item;
+package org.lanternpowered.server.effect.entity.sound.player
 
-import org.lanternpowered.server.effect.entity.EntityEffect;
-import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.util.AABB;
-import org.spongepowered.math.vector.Vector3d;
+import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.cause.first
+import org.lanternpowered.server.effect.entity.sound.AbstractLivingSoundEffect
+import org.lanternpowered.server.entity.EntityBodyPosition
+import org.lanternpowered.server.entity.LanternEntity
+import org.spongepowered.api.effect.sound.SoundTypes
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources
+import org.spongepowered.math.vector.Vector3d
+import kotlin.random.Random
 
-public class ItemDeathParticleEffect implements EntityEffect {
+class PlayerHurtSoundEffect(position: EntityBodyPosition) : AbstractLivingSoundEffect(position) {
 
-    static final class EffectHolder {
-
-        static final ParticleEffect DEATH_EFFECT =
-                ParticleEffect.builder().type(ParticleTypes.CLOUD).quantity(3).offset(Vector3d.ONE.mul(0.1)).build();
-    }
-
-    @Override
-    public void play(LanternEntity entity) {
-        entity.getWorld().spawnParticles(EffectHolder.DEATH_EFFECT,
-                entity.getBoundingBox().map(AABB::getCenter).orElseGet(entity::getPosition));
+    override fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random) {
+        val soundType = when (CauseStack.currentOrEmpty().first<DamageSource>()) {
+            DamageSources.FIRE_TICK.get() -> SoundTypes.ENTITY_PLAYER_HURT_ON_FIRE
+            DamageSources.DROWNING.get() -> SoundTypes.ENTITY_PLAYER_HURT_DROWN
+            else -> SoundTypes.ENTITY_PLAYER_HURT
+        }
+        entity.playSound(soundType, relativePosition, getVolume(entity, random), getPitch(entity, random))
     }
 }

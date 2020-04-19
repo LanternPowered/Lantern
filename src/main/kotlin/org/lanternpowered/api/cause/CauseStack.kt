@@ -32,6 +32,46 @@ import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 /**
+ * Executes the [block] with the given causes applied to this [CauseStack].
+ */
+inline fun CauseStack.withCauses(iterable: Iterable<Any>, block: () -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    var count = 0
+    try {
+        for (cause in iterable) {
+            pushCause(cause)
+            count++
+        }
+        block()
+    } finally {
+        popCauses(count)
+    }
+}
+
+/**
+ * Executes the [block] with the given causes applied to this [CauseStack].
+ */
+inline fun CauseStack.withCauses(first: Any, vararg more: Any, block: () -> Unit) {
+    contract {
+        callsInPlace(block, InvocationKind.EXACTLY_ONCE)
+    }
+    var count = 0
+    try {
+        pushCause(first)
+        count++
+        for (cause in more) {
+            pushCause(cause)
+            count++
+        }
+        block()
+    } finally {
+        popCauses(count)
+    }
+}
+
+/**
  * Executes the [block] with a new [CauseStack.Frame]. It is automatically
  * closed after the block finishes executing.
  */

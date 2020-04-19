@@ -164,8 +164,38 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @param initialElement The initial element
      * @return The element key registration
      */
+    fun <V : Value<E>, E : Any> register(key: Key<V>, initialElement: Supplier<out E>): ElementKeyRegistration<V, E, H> =
+            register(key, initialElement.get())
+
+    /**
+     * Registers the given [Key] to this value
+     * collection with the initial element.
+     *
+     * By default are registrations registered using this
+     * method non-removable. This can be changed by explicitly
+     * calling [ElementKeyRegistration.removable].
+     *
+     * @param key The key to register
+     * @param initialElement The initial element
+     * @return The element key registration
+     */
     fun <V : Value<E>, E : Any> register(key: Supplier<out Key<V>>, initialElement: E): ElementKeyRegistration<V, E, H> =
             register(key.get(), initialElement)
+
+    /**
+     * Registers the given [Key] to this value
+     * collection with the initial element.
+     *
+     * By default are registrations registered using this
+     * method non-removable. This can be changed by explicitly
+     * calling [ElementKeyRegistration.removable].
+     *
+     * @param key The key to register
+     * @param initialElement The initial element
+     * @return The element key registration
+     */
+    fun <V : Value<E>, E : Any> register(key: Supplier<out Key<V>>, initialElement: Supplier<out E>): ElementKeyRegistration<V, E, H> =
+            register(key.get(), initialElement.get())
 
     /**
      * Registers the given [Key] with bounded value to this local key registry.

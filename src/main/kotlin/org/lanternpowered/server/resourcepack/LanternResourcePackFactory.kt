@@ -27,7 +27,7 @@ package org.lanternpowered.server.resourcepack
 
 import com.google.common.hash.Hashing
 import com.google.common.io.ByteStreams
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.util.PathUtils
 import org.spongepowered.api.resourcepack.ResourcePack
 import java.io.FileNotFoundException

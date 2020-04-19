@@ -67,7 +67,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class LanternItem extends LanternEntity implements Item {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
-            .add(EntityEffectTypes.DEATH, new ItemDeathParticleEffect())
+            .add(EntityEffectTypes.DEATH, ItemDeathParticleEffect.INSTANCE)
             .build();
 
     public static final int DROPPED_PICKUP_DELAY = 40;

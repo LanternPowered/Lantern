@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.text.channel
 
-import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.util.collections.toImmutableSet
+import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.text.channel.MessageReceiver
 import org.spongepowered.api.text.chat.ChatType
@@ -43,7 +43,7 @@ import java.util.Optional
  */
 class CombinedMessageChannel(channels: Iterable<MessageChannel>) : MessageChannel {
 
-    private val channels = ImmutableSet.copyOf(channels)
+    private val channels = channels.toImmutableSet()
 
     override fun transformMessage(sender: Any?, recipient: MessageReceiver, original: Text, type: ChatType): Optional<Text> {
         var text = original
@@ -56,6 +56,6 @@ class CombinedMessageChannel(channels: Iterable<MessageChannel>) : MessageChanne
     override fun getMembers(): Collection<MessageReceiver> {
         return this.channels.stream()
                 .flatMap { channel -> channel.members.stream() }
-                .collect(ImmutableSet.toImmutableSet())
+                .toImmutableSet()
     }
 }

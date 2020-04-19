@@ -42,7 +42,7 @@ class LanternBanner : LanternBlockEntity(), Banner {
 
         keyRegistry {
             register(Keys.BANNER_BASE_COLOR, DyeColors.WHITE)
-            register(Keys.BANNER_PATTERNS, mutableListOf())
+            register(Keys.BANNER_PATTERN_LAYERS, mutableListOf())
         }
     }
 }

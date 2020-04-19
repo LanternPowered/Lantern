@@ -38,8 +38,8 @@ object LanternTextSerializerFactory : TextSerializers.Factory {
     @Suppress("DEPRECATION")
     override fun createFormattingCodeSerializer(legacyChar: Char): FormattingCodeTextSerializer {
         return when (legacyChar) {
-            TextConstants.LEGACY_CHAR -> TextSerializers.LEGACY_FORMATTING_CODE
-            TextSerializers.FORMATTING_CODE.character -> TextSerializers.FORMATTING_CODE
+            TextConstants.LEGACY_CHAR -> TextSerializers.LEGACY_FORMATTING_CODE.get()
+            TextSerializers.FORMATTING_CODE.get().character -> TextSerializers.FORMATTING_CODE.get()
             else -> this.formattingCodeSerializers.computeIfAbsent(legacyChar) {
                 val serializer = LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
                 TextSerializerRegistryModule.register(serializer)

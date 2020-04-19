@@ -27,7 +27,7 @@ package org.lanternpowered.api.entity.spawn
 
 import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.event.LanternEventFactory
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.x.world.XWorld
 import org.spongepowered.api.entity.Entity

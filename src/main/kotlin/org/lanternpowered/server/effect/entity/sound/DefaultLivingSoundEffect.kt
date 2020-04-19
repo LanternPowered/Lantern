@@ -23,27 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.ext
+package org.lanternpowered.server.effect.entity.sound
 
-import org.lanternpowered.api.boss.BossBar
+import org.lanternpowered.server.entity.EntityBodyPosition
+import org.lanternpowered.server.entity.LanternEntity
+import org.spongepowered.api.effect.sound.SoundType
+import org.spongepowered.math.vector.Vector3d
+import java.util.function.Supplier
+import kotlin.random.Random
 
-/**
- * Whether fog should be created.
- */
-inline var BossBar.createFog: Boolean
-    get() = shouldCreateFog()
-    set(value) { setCreateFog(value) }
+class DefaultLivingSoundEffect(position: EntityBodyPosition, private val soundType: SoundType) : AbstractLivingSoundEffect(position) {
 
-/**
- * Whether the sky should darken.
- */
-inline var BossBar.darkenSky: Boolean
-    get() = shouldDarkenSky()
-    set(value) { setDarkenSky(value) }
+    constructor(position: EntityBodyPosition, soundType: Supplier<out SoundType>) : this(position, soundType.get())
 
-/**
- * Whether end boss music should be played.
- */
-inline var BossBar.playEndBossMusic: Boolean
-    get() = shouldPlayEndBossMusic()
-    set(value) { setPlayEndBossMusic(value) }
+    override fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random) {
+        entity.playSound(soundType, relativePosition, getVolume(entity, random), getPitch(entity, random))
+    }
+}

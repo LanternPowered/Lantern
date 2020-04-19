@@ -26,7 +26,7 @@
 package org.lanternpowered.server.effect.entity;
 
 import org.lanternpowered.api.cause.CauseStack;
-import org.spongepowered.api.entity.living.animal.Horse;
+import org.spongepowered.api.entity.living.animal.horse.Horse;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class EntityEffectTypes {

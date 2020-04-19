@@ -33,8 +33,8 @@ import org.spongepowered.api.text.serializer.TextSerializers
 object LanternTexts {
 
     @JvmStatic
-    fun toLegacy(text: Text): String = TextSerializers.LEGACY_FORMATTING_CODE.serialize(text)
+    fun toLegacy(text: Text): String = TextSerializers.LEGACY_FORMATTING_CODE.get().serialize(text)
 
     @JvmStatic
-    fun fromLegacy(text: String): Text = TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text)
+    fun fromLegacy(text: String): Text = TextSerializers.LEGACY_FORMATTING_CODE.get().deserialize(text)
 }

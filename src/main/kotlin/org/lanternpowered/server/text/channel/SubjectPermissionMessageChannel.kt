@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.text.channel
 
+import org.lanternpowered.api.service.serviceOf
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.text.channel.MessageReceiver
@@ -39,7 +39,7 @@ import org.spongepowered.api.text.channel.MessageReceiver
 class SubjectPermissionMessageChannel(private val permission: String) : MessageChannel {
 
     override fun getMembers(): Collection<MessageReceiver> {
-        val service = Sponge.getGame().serviceManager.provideUnchecked(PermissionService::class.java)
+        val service = serviceOf<PermissionService>()
 
         return service.loadedCollections.values.stream()
                 .flatMap { input ->

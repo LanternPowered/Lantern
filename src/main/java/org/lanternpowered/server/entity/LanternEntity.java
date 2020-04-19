@@ -38,6 +38,7 @@ import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.SerializableLocalMutableDataHolder;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
+import org.lanternpowered.server.effect.entity.EntityEffectCollectionKt;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventContextKeys;
@@ -102,6 +103,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.DoubleUnaryOperator;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -135,7 +137,7 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
     /**
      * The {@link EntityEffectCollection} of this entity.
      */
-    private EntityEffectCollection effectCollection = EntityEffectCollection.build();
+    private EntityEffectCollection effectCollection = EntityEffectCollection.of();
 
     /**
      * The entity protocol type of this entity.
@@ -874,6 +876,15 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
      *
      * @param soundCategory  The sound category
      */
+    public void setSoundCategory(Supplier<? extends SoundCategory> soundCategory) {
+        setSoundCategory(soundCategory.get());
+    }
+
+    /**
+     * Sets the {@link SoundCategory} of this entity.
+     *
+     * @param soundCategory  The sound category
+     */
     public void setSoundCategory(SoundCategory soundCategory) {
         this.soundCategory = soundCategory;
     }
@@ -885,8 +896,31 @@ public class LanternEntity implements Entity, SerializableLocalMutableDataHolder
      * @param volume The volume
      * @param pitch The pitch value
      */
+    public void playSound(Supplier<? extends SoundType> soundType, double volume, double pitch) {
+        playSound(soundType.get(), volume, pitch);
+    }
+
+    /**
+     * Plays a sound which is caused by this {@link LanternEntity}.
+     *
+     * @param soundType The sound type
+     * @param volume The volume
+     * @param pitch The pitch value
+     */
     public void playSound(SoundType soundType, double volume, double pitch) {
         playSound(soundType, Vector3d.ZERO, volume, pitch);
+    }
+
+    /**
+     * Plays a sound which is caused by this {@link LanternEntity}.
+     *
+     * @param soundType The sound type
+     * @param relativeSoundPosition The relative position to the entity to play the sound at
+     * @param volume The volume
+     * @param pitch The pitch value
+     */
+    public void playSound(Supplier<? extends SoundType> soundType, Vector3d relativeSoundPosition, double volume, double pitch) {
+        playSound(soundType.get(), relativeSoundPosition, volume, pitch);
     }
 
     /**

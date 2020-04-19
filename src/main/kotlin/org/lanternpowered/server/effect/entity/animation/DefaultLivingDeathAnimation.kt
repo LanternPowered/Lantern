@@ -23,5 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.effect.entity.sound.weather;
+package org.lanternpowered.server.effect.entity.animation
+
+import org.lanternpowered.server.effect.entity.EntityEffect
+import org.lanternpowered.server.entity.LanternEntity
+
+class DefaultLivingDeathAnimation : EntityEffect {
+
+    override fun play(entity: LanternEntity) {
+        // TODO: Override default client behavior (by tricking the client) and make this effect server controlled
+    }
+}

@@ -98,9 +98,9 @@ public class LanternLiving extends LanternEntity implements Living, AbstractProj
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
             .add(EntityEffectTypes.HURT, new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
-            .add(EntityEffectTypes.HURT, new DefaultLivingHurtAnimation())
+            .add(EntityEffectTypes.HURT, DefaultLivingHurtAnimation.INSTANCE)
             .add(EntityEffectTypes.DEATH, new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))
-            .add(EntityEffectTypes.DEATH, new DefaultLivingDeathAnimation())
+            .add(EntityEffectTypes.DEATH, DefaultLivingDeathAnimation.INSTANCE)
             .add(EntityEffectTypes.FALL, new DefaultLivingFallSoundEffect(
                     SoundTypes.ENTITY_GENERIC_SMALL_FALL,
                     SoundTypes.ENTITY_GENERIC_BIG_FALL))
@@ -372,7 +372,7 @@ public class LanternLiving extends LanternEntity implements Living, AbstractProj
 
     @Override
     public void lookAt(Vector3d targetPos) {
-        final Vector3d eyePos = getProperty(Properties.EYE_POSITION).get();
+        final Vector3d eyePos = require(Keys.EYE_POSITION);
         if (eyePos == null) {
             return;
         }
@@ -478,27 +478,27 @@ public class LanternLiving extends LanternEntity implements Living, AbstractProj
     }
 
     private void pulseFood() {
-        if (!supports(Keys.FOOD_LEVEL) || get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
+        if (!supports(Keys.FOOD_LEVEL) || get(Keys.GAME_MODE).orElseGet(GameModes.NOT_SET) == GameModes.CREATIVE.get()) {
             return;
         }
         final Difficulty difficulty = getWorld().getDifficulty();
 
-        BoundedValue<Double> exhaustion = getValue(Keys.EXHAUSTION).get();
-        BoundedValue<Double> saturation = getValue(Keys.SATURATION).get();
-        BoundedValue<Integer> foodLevel = getValue(Keys.FOOD_LEVEL).get();
+        BoundedValue<Double> exhaustion = requireValue(Keys.EXHAUSTION);
+        BoundedValue<Double> saturation = requireValue(Keys.SATURATION);
+        BoundedValue<Integer> foodLevel = requireValue(Keys.FOOD_LEVEL);
 
         if (exhaustion.get() > 4.0) {
             if (saturation.get() > saturation.getMinValue()) {
                 offer(Keys.SATURATION, Math.max(saturation.get() - 1.0, saturation.getMinValue()));
                 // Get the updated saturation
-                saturation = getValue(Keys.SATURATION).get();
-            } else if (!difficulty.equals(Difficulties.PEACEFUL)) {
+                saturation = requireValue(Keys.SATURATION);
+            } else if (difficulty != Difficulties.PEACEFUL.get()) {
                 offer(Keys.FOOD_LEVEL, Math.max(foodLevel.get() - 1, foodLevel.getMinValue()));
                 // Get the updated food level
-                foodLevel = getValue(Keys.FOOD_LEVEL).get();
+                foodLevel = requireValue(Keys.FOOD_LEVEL);
             }
             offer(Keys.EXHAUSTION, Math.max(exhaustion.get() - 4.0, exhaustion.getMinValue()));
-            exhaustion = getValue(Keys.EXHAUSTION).get();
+            exhaustion = requireValue(Keys.EXHAUSTION);
         }
 
         final boolean naturalRegeneration = getWorld().getGameRule(GameRules.NATURAL_REGENERATION);

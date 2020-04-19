@@ -29,6 +29,7 @@ package org.lanternpowered.server.game.registry.type.item
 
 import org.lanternpowered.api.catalog.CatalogKeys
 import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.cause.withCauses
 import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.server.game.Lantern
@@ -48,7 +49,7 @@ object EnchantmentTypeRegistryModule : InternalPluginCatalogRegistryModule<Encha
 
 
         // Register for minecraft plugin
-        CauseStack.current().withPlugin(Lantern.getMinecraftPlugin()) {
+        CauseStack.current().withCauses(Lantern.getMinecraftPlugin()) {
             register("protection", "enchantment.protect.all")
             register("fire_protection", "enchantment.protect.fire")
             register("feather_falling", "enchantment.protect.fall")

@@ -15,13 +15,15 @@ import org.lanternpowered.api.logging.Logger
 import org.lanternpowered.api.logging.Marker
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
-import org.lanternpowered.api.text.toLegacy
+import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import java.util.function.Supplier
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 // Logger extensions to allow lazily initialized messages
 // and Text objects to be logged
+
+private fun Text.toLegacy(): String = LegacyTextSerializer.serialize(this)
 
 /**
  * Converts [Any] into a readable [String].

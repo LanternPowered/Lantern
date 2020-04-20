@@ -12,17 +12,14 @@ package org.lanternpowered.server.text.chat
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.text.chat.ChatType
 import org.spongepowered.api.text.chat.ChatVisibility
 import org.spongepowered.api.text.translation.Translatable
 
 class LanternChatVisibility(
-        key: CatalogKey, override val internalId: Int,
-        private val chatTypePredicate: (ChatType) -> Boolean
-) : DefaultCatalogType(key), ChatVisibility, InternalCatalogType,
-        Translatable by Translated("options.chat.visibility.${key.value}") {
+        key: CatalogKey, private val chatTypePredicate: (ChatType) -> Boolean
+) : DefaultCatalogType(key), ChatVisibility, Translatable by Translated("options.chat.visibility.${key.value}") {
 
-    override fun isVisible(chatType: ChatType): Boolean = this.chatTypePredicate.invoke(chatType)
+    override fun isVisible(chatType: ChatType): Boolean = this.chatTypePredicate(chatType)
 }

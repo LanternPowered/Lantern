@@ -13,9 +13,9 @@ package org.lanternpowered.server.text.translation;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.TextSerializer;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -64,7 +64,7 @@ public final class TextTranslation implements Translation {
 
     @Override
     public String get(Locale locale) {
-        return ((LanternTextSerializer) TextSerializers.PLAIN).serialize(this.text, locale);
+        return ((TextSerializer) TextSerializers.PLAIN).serialize(this.text, locale);
     }
 
     @Override

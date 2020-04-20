@@ -17,6 +17,7 @@ import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import kotlin.text.MatchResult;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.command.LanternCommandCause;
 import org.lanternpowered.server.config.GlobalConfig;
@@ -74,10 +75,10 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         final String message0 = message.getMessage();
 
         // Check for a valid click action callback
-        final MatchResult result = LanternClickActionCallbacks.INSTANCE.getCommandPattern().matchEntire(message0);
+        @Nullable final MatchResult result = LanternClickActionCallbacks.INSTANCE.getCommandPattern().matchEntire(message0);
         if (result != null) {
             final UUID uniqueId = UUID.fromString(result.getGroupValues().get(1));
-            final Consumer<CommandCause> callback = LanternClickActionCallbacks.INSTANCE.getCallbackForUUID(uniqueId);
+            @Nullable final Consumer<CommandCause> callback = LanternClickActionCallbacks.INSTANCE.getCallbackForUUID(uniqueId);
             if (callback != null) {
                 final CauseStack causeStack = CauseStack.current();
                 try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {

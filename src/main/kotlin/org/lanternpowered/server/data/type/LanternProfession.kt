@@ -12,8 +12,6 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.data.type.Profession
 
-class LanternProfession(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), Profession, InternalCatalogType
+class LanternProfession(key: CatalogKey) : DefaultCatalogType(key), Profession

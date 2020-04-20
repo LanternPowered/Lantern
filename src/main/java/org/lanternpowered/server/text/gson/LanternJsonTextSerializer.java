@@ -15,8 +15,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.lanternpowered.api.text.serializer.TextSerializer;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.text.LanternTextSerializer;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.text.LiteralText;
@@ -29,7 +29,7 @@ import org.spongepowered.api.text.translation.locale.Locales;
 
 import java.util.Locale;
 
-public final class LanternJsonTextSerializer extends DefaultCatalogType implements LanternTextSerializer {
+public final class LanternJsonTextSerializer extends DefaultCatalogType implements TextSerializer {
 
     private final Gson gson;
 

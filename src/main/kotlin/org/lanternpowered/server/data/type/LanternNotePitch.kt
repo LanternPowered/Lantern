@@ -12,11 +12,9 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.data.type.NotePitch
 
-class LanternNotePitch(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), NotePitch, InternalCatalogType {
+class LanternNotePitch(key: CatalogKey) : DefaultCatalogType(key), NotePitch {
 
     private lateinit var next: NotePitch
 

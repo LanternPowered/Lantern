@@ -13,7 +13,7 @@ package org.lanternpowered.server.game.registry.type.text
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.game.registry.EarlyRegistration
 import org.lanternpowered.server.text.LanternFormattingCodeTextSerializer
-import org.lanternpowered.server.text.PlainTextSerializer
+import org.lanternpowered.server.text.LanternPlainTextSerializer
 import org.lanternpowered.server.text.TextConstants
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer
 import org.spongepowered.api.CatalogKey
@@ -26,7 +26,7 @@ object TextSerializerRegistryModule : AdditionalPluginCatalogRegistryModule<Text
 
     @EarlyRegistration
     override fun registerDefaults() {
-        register(PlainTextSerializer(CatalogKey.minecraft("plain")))
+        register(LanternPlainTextSerializer(CatalogKey.minecraft("plain")))
         register(LanternFormattingCodeTextSerializer(CatalogKey.minecraft("legacy_formatting_code"), TextConstants.LEGACY_CHAR))
         register(LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code"), '&'))
         register(LanternJsonTextSerializer(CatalogKey.minecraft("json"), TranslationManagerRegistryModule.translationManager))

@@ -32,7 +32,7 @@ object TextStyleRegistryModule : DefaultCatalogRegistryModule<TextStyleType>(Tex
         register(LanternTextStyle.Real(CatalogKey.minecraft("strikethrough"), TextConstants.STRIKETHROUGH, strikethrough = true))
         register(LanternTextStyle.Real(CatalogKey.minecraft("obfuscated"), TextConstants.OBFUSCATED, obfuscated = true))
         register(LanternTextStyle.Real(CatalogKey.minecraft("reset"), TextConstants.RESET,
-                false, false, false, false, false))
+                bold = false, italic = false, underline = false, strikethrough = false, obfuscated = false))
         NONE = register(LanternTextStyle.None(CatalogKey.minecraft("none")))
     }
 }

@@ -12,8 +12,9 @@ package org.lanternpowered.server.boss
 
 import org.lanternpowered.api.boss.BossBarColor
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 
-class LanternBossBarColor(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), BossBarColor, InternalCatalogType
+class LanternBossBarColor(key: CatalogKey, private val color: TextColor) : DefaultCatalogType(key), BossBarColor {
+    override fun getColor(): TextColor = this.color
+}

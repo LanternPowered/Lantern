@@ -25,4 +25,3 @@ typealias RespawnLocation = org.spongepowered.api.util.RespawnLocation
 typealias TextMessageException = org.spongepowered.api.util.TextMessageException
 typealias Tristate = org.spongepowered.api.util.Tristate
 typealias Tuple<K, V> = org.spongepowered.api.util.Tuple<K, V>
-typealias TypeToken<T> = com.google.common.reflect.TypeToken<T>

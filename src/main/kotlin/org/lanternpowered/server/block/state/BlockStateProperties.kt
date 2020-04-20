@@ -19,7 +19,6 @@ import org.lanternpowered.server.data.type.LanternPortionType
 import org.lanternpowered.server.data.type.LanternRailDirection
 import org.lanternpowered.server.data.type.LanternSlabPortion
 import org.lanternpowered.server.data.type.RedstoneConnectionType
-import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule
 import org.lanternpowered.server.state.property.booleanStatePropertyOf
 import org.lanternpowered.server.state.property.enumStatePropertyOf
 import org.lanternpowered.server.state.property.intStatePropertyOf

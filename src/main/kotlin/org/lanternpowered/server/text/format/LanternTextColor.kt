@@ -15,13 +15,8 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.util.Color
 
-open class LanternTextColor(key: CatalogKey, private val color: Color) : DefaultCatalogType(key), TextColor {
-
+class LanternTextColor(key: CatalogKey, private val color: Color) : DefaultCatalogType(key), TextColor {
     override fun getColor() = this.color
-
-    class Formatting(key: CatalogKey, color: Color, override val code: Char) : LanternTextColor(key, color), FormattingCodeHolder {
-
-        override fun toStringHelper() = super.toStringHelper()
-                .add("code", this.code)
-    }
+    override fun toStringHelper() = super.toStringHelper()
+            .add("color", this.color)
 }

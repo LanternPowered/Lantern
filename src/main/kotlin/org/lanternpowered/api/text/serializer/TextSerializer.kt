@@ -10,14 +10,22 @@
  */
 package org.lanternpowered.api.text.serializer
 
-typealias SafeTextSerializer = org.spongepowered.api.text.serializer.SafeTextSerializer
-typealias TextParseException = org.spongepowered.api.text.serializer.TextParseException
-typealias TextSerializer = org.spongepowered.api.text.serializer.TextSerializer
-typealias TextSerializers = org.spongepowered.api.text.serializer.TextSerializers
+import org.lanternpowered.api.locale.Locale
+import org.lanternpowered.api.locale.Locales
+import org.lanternpowered.api.text.Text
 
-interface TextSerializerFactory {
+interface TextSerializer : org.spongepowered.api.text.serializer.TextSerializer {
 
-    val json: JsonTextSerializer
+    override fun serialize(text: Text): String = serialize(text, Locales.DEFAULT)
 
-    val plain: PlainTextSerializer
+    /**
+     * Returns a string representation of the provided [Text] in a format
+     * that will be accepted by this [TextSerializer]'s [deserialize] method using
+     * the given [Locale].
+     *
+     * @param text The text to serialize
+     * @param locale The locale to use
+     * @return The string representation of this text
+     */
+    fun serialize(text: Text, locale: Locale): String
 }

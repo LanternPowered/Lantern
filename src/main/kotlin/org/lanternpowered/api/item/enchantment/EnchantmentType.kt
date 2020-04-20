@@ -14,7 +14,8 @@
 package org.lanternpowered.api.item.enchantment
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.registry.builderOf
+import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -23,23 +24,24 @@ typealias EnchantmentType = org.spongepowered.api.item.enchantment.EnchantmentTy
 typealias EnchantmentTypes = org.spongepowered.api.item.enchantment.EnchantmentTypes
 
 /**
+ * The range of the minimum and maximum level.
+ */
+inline val EnchantmentType.levelRange: IntRange get() = (this as XEnchantmentType).levelRange
+
+/**
+ * Gets the enchantability range for given level.
+ */
+fun EnchantmentType.enchantabilityRangeForLevel(level: Int): IntRange = (this as XEnchantmentType).enchantabilityRangeForLevel(level)
+
+/**
  * Constructs a new [EnchantmentType] with the given id and the builder function.
  *
  * @param key The key of the enchantment type
  * @param fn The builder function to apply
  */
-@JvmName("of")
-inline fun EnchantmentType(key: CatalogKey, fn: EnchantmentTypeBuilder.() -> Unit): EnchantmentType {
+inline fun enchantmentTypeOf(key: CatalogKey, fn: EnchantmentTypeBuilder.() -> Unit): EnchantmentType {
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }
-    return EnchantmentTypeBuilder().key(key).name(tr("enchantment.${key.value}")).apply(fn).build()
+    return builderOf<EnchantmentTypeBuilder>().key(key).name(tr("enchantment.${key.value}")).apply(fn).build()
 }
-
-/**
- * Constructs a new [EnchantmentTypeBuilder].
- *
- * @return The constructed enchantment type builder
- */
-@JvmName("builder")
-inline fun EnchantmentTypeBuilder(): EnchantmentTypeBuilder = builderOf()

@@ -18,9 +18,7 @@ import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
 import org.lanternpowered.api.item.potion.PotionTypes
 import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule
-import org.spongepowered.api.registry.util.RegistrationDependency
 
-@RegistrationDependency(PotionEffectTypeRegistryModule::class)
 object PotionTypeRegistryModule : InternalPluginCatalogRegistryModule<PotionType>(PotionTypes::class) {
 
     fun register(key: CatalogKey, fn: PotionTypeBuilder.() -> Unit = {}) {

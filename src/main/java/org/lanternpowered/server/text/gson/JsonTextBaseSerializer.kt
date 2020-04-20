@@ -31,93 +31,98 @@ import java.util.Optional
 
 internal abstract class JsonTextBaseSerializer<T : Text> : JsonSerializer<T>, JsonDeserializer<T> {
 
-    protected fun deserialize(json: JsonObject, builder: Text.Builder, context: JsonDeserializationContext) {
-        json[TextConstants.COLOR]?.let { element ->
-            CatalogRegistry.get<TextColor>(CatalogKey.resolve(element.asString))?.let { builder.color(it) }
-        }
+    companion object {
 
-        var style = builder.style
-        fun style(key: String, fn: TextStyle.(Boolean) -> TextStyle) {
-            json[key]?.let { element -> style = style.fn(element.asBoolean) }
-        }
-        style(TextConstants.BOLD, TextStyle::bold)
-        style(TextConstants.ITALIC, TextStyle::italic)
-        style(TextConstants.UNDERLINE, TextStyle::underline)
-        style(TextConstants.STRIKETHROUGH, TextStyle::strikethrough)
-        style(TextConstants.OBFUSCATED, TextStyle::obfuscated)
-        builder.style(style)
+        @JvmStatic
+        protected fun deserialize(json: JsonObject, builder: Text.Builder, context: JsonDeserializationContext) {
+            json[TextConstants.COLOR]?.let { element ->
+                CatalogRegistry.get<TextColor>(CatalogKey.resolve(element.asString))?.let { builder.color(it) }
+            }
 
-        val children = json.getAsJsonArray(TextConstants.CHILDREN)
-        if (children != null)
-            builder.append(context.deserialize<Array<Text>>(children, Array<Text>::class.java).asList())
+            var style = builder.style
+            fun style(key: String, fn: TextStyle.(Boolean) -> TextStyle) {
+                json[key]?.let { element -> style = style.fn(element.asBoolean) }
+            }
+            style(TextConstants.BOLD, TextStyle::bold)
+            style(TextConstants.ITALIC, TextStyle::italic)
+            style(TextConstants.UNDERLINE, TextStyle::underline)
+            style(TextConstants.STRIKETHROUGH, TextStyle::strikethrough)
+            style(TextConstants.OBFUSCATED, TextStyle::obfuscated)
+            builder.style(style)
 
-        json[TextConstants.CLICK_EVENT]?.let { element ->
-            element as JsonObject
-            val jsonEventAction = element.getAsJsonPrimitive(TextConstants.EVENT_ACTION)
-            val jsonEventValue = element.getAsJsonPrimitive(TextConstants.EVENT_VALUE)
-            if (jsonEventAction != null && jsonEventValue != null) {
-                val action = jsonEventAction.asString
-                val value = jsonEventValue.asString
-                val clickAction = JsonTextEventHelper.parseClickAction(action, value)
-                if (clickAction != null)
-                    builder.onClick(clickAction)
+            val children = json.getAsJsonArray(TextConstants.CHILDREN)
+            if (children != null)
+                builder.append(context.deserialize<Array<Text>>(children, Array<Text>::class.java).asList())
+
+            json[TextConstants.CLICK_EVENT]?.let { element ->
+                element as JsonObject
+                val jsonEventAction = element.getAsJsonPrimitive(TextConstants.EVENT_ACTION)
+                val jsonEventValue = element.getAsJsonPrimitive(TextConstants.EVENT_VALUE)
+                if (jsonEventAction != null && jsonEventValue != null) {
+                    val action = jsonEventAction.asString
+                    val value = jsonEventValue.asString
+                    val clickAction = JsonTextEventHelper.parseClickAction(action, value)
+                    if (clickAction != null)
+                        builder.onClick(clickAction)
+                }
+            }
+
+            json[TextConstants.HOVER_EVENT]?.let { element ->
+                element as JsonObject
+                val jsonEventAction = element.getAsJsonPrimitive(TextConstants.EVENT_ACTION)
+                val jsonEventValue = element.getAsJsonPrimitive(TextConstants.EVENT_VALUE)
+                if (jsonEventAction != null && jsonEventValue != null) {
+                    val action = jsonEventAction.asString
+                    val value = jsonEventValue.asString
+                    builder.onHover(JsonTextEventHelper.parseHoverAction(action, value))
+                }
+            }
+
+            json[TextConstants.INSERTION]?.let { element ->
+                builder.onShiftClick(TextActions.insertText(element.asString))
             }
         }
 
-        json[TextConstants.HOVER_EVENT]?.let { element ->
-            element as JsonObject
-            val jsonEventAction = element.getAsJsonPrimitive(TextConstants.EVENT_ACTION)
-            val jsonEventValue = element.getAsJsonPrimitive(TextConstants.EVENT_VALUE)
-            if (jsonEventAction != null && jsonEventValue != null) {
-                val action = jsonEventAction.asString
-                val value = jsonEventValue.asString
-                builder.onHover(JsonTextEventHelper.parseHoverAction(action, value))
+        @JvmStatic
+        protected fun serialize(json: JsonObject, text: Text, context: JsonSerializationContext) {
+            val color = text.color
+            if (color !== TextColors.NONE.get())
+                json.addProperty(TextConstants.COLOR, color.key.value)
+
+            val style = text.style
+            fun style(key: String, fn: TextStyle.() -> Optional<Boolean>) {
+                style.fn().ifPresent { value -> json.addProperty(key, value) }
             }
-        }
+            style(TextConstants.BOLD, TextStyle::hasBold)
+            style(TextConstants.ITALIC, TextStyle::hasItalic)
+            style(TextConstants.UNDERLINE, TextStyle::hasUnderline)
+            style(TextConstants.STRIKETHROUGH, TextStyle::hasStrikethrough)
+            style(TextConstants.OBFUSCATED, TextStyle::hasObfuscated)
 
-        json[TextConstants.INSERTION]?.let { element ->
-            builder.onShiftClick(TextActions.insertText(element.asString))
-        }
-    }
+            val children = text.children
+            if (children.isNotEmpty())
+                json.add(TextConstants.CHILDREN, context.serialize(children.toTypedArray()))
 
-    fun serialize(json: JsonObject, text: Text, context: JsonSerializationContext) {
-        val color = text.color
-        if (color !== TextColors.NONE.get())
-            json.addProperty(TextConstants.COLOR, color.key.value)
+            text.clickAction.ifPresent { clickAction: ClickAction<*> ->
+                val raw = JsonTextEventHelper.raw(clickAction)
+                val jsonEvent = JsonObject()
+                jsonEvent.addProperty(TextConstants.EVENT_ACTION, raw.action)
+                jsonEvent.addProperty(TextConstants.EVENT_VALUE, raw.value)
+                json.add(TextConstants.CLICK_EVENT, jsonEvent)
+            }
 
-        val style = text.style
-        fun style(key: String, fn: TextStyle.() -> Optional<Boolean>) {
-            style.fn().ifPresent { value -> json.addProperty(key, value) }
-        }
-        style(TextConstants.BOLD, TextStyle::hasBold)
-        style(TextConstants.ITALIC, TextStyle::hasItalic)
-        style(TextConstants.UNDERLINE, TextStyle::hasUnderline)
-        style(TextConstants.STRIKETHROUGH, TextStyle::hasStrikethrough)
-        style(TextConstants.OBFUSCATED, TextStyle::hasObfuscated)
+            text.hoverAction.ifPresent { clickAction: HoverAction<*> ->
+                val raw = JsonTextEventHelper.raw(clickAction)
+                val jsonEvent = JsonObject()
+                jsonEvent.addProperty(TextConstants.EVENT_ACTION, raw.action)
+                jsonEvent.addProperty(TextConstants.EVENT_VALUE, raw.value)
+                json.add(TextConstants.HOVER_EVENT, jsonEvent)
+            }
 
-        val children = text.children
-        if (children.isNotEmpty())
-            json.add(TextConstants.CHILDREN, context.serialize(children.toTypedArray()))
-
-        text.clickAction.ifPresent { clickAction: ClickAction<*> ->
-            val raw = JsonTextEventHelper.raw(clickAction)
-            val jsonEvent = JsonObject()
-            jsonEvent.addProperty(TextConstants.EVENT_ACTION, raw.action)
-            jsonEvent.addProperty(TextConstants.EVENT_VALUE, raw.value)
-            json.add(TextConstants.CLICK_EVENT, jsonEvent)
-        }
-
-        text.hoverAction.ifPresent { clickAction: HoverAction<*> ->
-            val raw = JsonTextEventHelper.raw(clickAction)
-            val jsonEvent = JsonObject()
-            jsonEvent.addProperty(TextConstants.EVENT_ACTION, raw.action)
-            jsonEvent.addProperty(TextConstants.EVENT_VALUE, raw.value)
-            json.add(TextConstants.HOVER_EVENT, jsonEvent)
-        }
-
-        text.shiftClickAction.ifPresent { shiftClickAction: ShiftClickAction<*>? ->
-            if (shiftClickAction is InsertText) {
-                json.addProperty(TextConstants.INSERTION, shiftClickAction.result)
+            text.shiftClickAction.ifPresent { shiftClickAction: ShiftClickAction<*>? ->
+                if (shiftClickAction is InsertText) {
+                    json.addProperty(TextConstants.INSERTION, shiftClickAction.result)
+                }
             }
         }
     }

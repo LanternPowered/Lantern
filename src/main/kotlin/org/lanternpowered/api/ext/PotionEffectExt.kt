@@ -17,9 +17,28 @@ import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.api.registry.builderOf
+import java.util.function.Supplier
 
-inline fun potionEffectOf(type: PotionEffectType, amplifier: Int, duration: Int, ambient: Boolean = false, particles: Boolean = true): PotionEffect =
-        PotionEffect.builder().potionType(type).amplifier(amplifier).duration(duration).ambient(ambient).particles(particles).build()
+inline fun potionEffectOf(
+        type: Supplier<out PotionEffectType>, amplifier: Int, duration: Int,
+        ambient: Boolean = false,
+        showParticles: Boolean = true,
+        showIcon: Boolean = true
+): PotionEffect = potionEffectOf(type.get(), amplifier, duration, ambient, showParticles, showIcon)
+
+inline fun potionEffectOf(
+        type: PotionEffectType, amplifier: Int, duration: Int,
+        ambient: Boolean = false,
+        showParticles: Boolean = true,
+        showIcon: Boolean = true
+): PotionEffect = PotionEffect.builder()
+        .potionType(type)
+        .amplifier(amplifier)
+        .duration(duration)
+        .ambient(ambient)
+        .showParticles(showParticles)
+        .showIcon(showIcon)
+        .build()
 
 fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<PotionEffect> {
     val effectsByType = mutableMapOf<PotionEffectType, PotionEffect>()

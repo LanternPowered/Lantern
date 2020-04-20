@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.api.registry
 
-import org.lanternpowered.api.Lantern
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.registry.UnknownTypeException
@@ -137,5 +136,5 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
     /**
      * The singleton instance of the catalog registry.
      */
-    companion object : CatalogRegistry by Lantern.registry.catalogRegistry
+    companion object : CatalogRegistry by GameRegistry.catalogRegistry
 }

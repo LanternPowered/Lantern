@@ -11,7 +11,7 @@
 package org.lanternpowered.server.cause.entity.healing
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.cause.entity.health.HealingType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.event.cause.entity.health.HealingType
 
 class LanternHealingType(key: CatalogKey) : DefaultCatalogType(key), HealingType

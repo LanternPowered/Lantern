@@ -14,7 +14,6 @@ import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseContext
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.cause.CauseStackManagerFrame
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.util.PrettyPrinter
@@ -106,7 +105,7 @@ class LanternCauseStack : CauseStack {
         return frame
     }
 
-    override fun popCauseFrame(oldFrame: CauseStackManagerFrame) {
+    override fun popCauseFrame(oldFrame: org.spongepowered.api.event.CauseStackManager.StackFrame) {
         val frame = this.frames.peek()
         if (frame !== oldFrame) {
             if (frame.stack != this) {
@@ -193,7 +192,10 @@ class LanternCauseStack : CauseStack {
         this.minDepth = frame.oldMinDepth
     }
 
-    override fun <T> addContext(key: CauseContextKey<T>, value: T): CauseStack {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> get(key: CauseContextKey<T>): T? = this.ctx[key] as T?
+
+    override fun <T : Any> set(key: CauseContextKey<T>, value: T) {
         this.cachedCtx = null
         val existing = this.ctx.put(key, value as Any)
         if (!this.frames.isEmpty()) {
@@ -204,18 +206,16 @@ class LanternCauseStack : CauseStack {
                 frame.store(key, existing)
             }
         }
-        return this
     }
 
-    override fun <T> getContext(key: CauseContextKey<T>): Optional<T> {
-        @Suppress("UNCHECKED_CAST")
-        return Optional.ofNullable(this.ctx[key] as T)
-    }
+    override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): CauseStack = apply { set(key, value) }
 
-    override fun <T> removeContext(key: CauseContextKey<T>): Optional<T> {
+    override fun <T : Any> getContext(key: CauseContextKey<T>): Optional<T> = get(key).optional()
+
+    override fun <T : Any> removeContext(key: CauseContextKey<T>): Optional<T> {
         this.cachedCtx = null
         @Suppress("UNCHECKED_CAST")
-        val existing = this.ctx.remove(key) as T
+        val existing = this.ctx.remove(key) as T?
         if (existing != null && !this.frames.isEmpty()) {
             val frame = this.frames.peek()
             if (!frame.isNew(key)) {
@@ -275,8 +275,8 @@ class LanternCauseStack : CauseStack {
         override fun getCurrentContext() = this.stack.currentContext
         override fun pushCause(obj: Any): CauseStack.Frame = apply { this.stack.pushCause(obj) }
         override fun popCause() = this.stack.popCause()
-        override fun <T> addContext(key: CauseContextKey<T>, value: T) = apply { this.stack.addContext(key, value) }
-        override fun <T> removeContext(key: CauseContextKey<T>) = this.stack.removeContext(key)
+        override fun <T : Any> addContext(key: CauseContextKey<T>, value: T) = apply { this.stack.addContext(key, value) }
+        override fun <T : Any> removeContext(key: CauseContextKey<T>) = this.stack.removeContext(key)
     }
 
     companion object {

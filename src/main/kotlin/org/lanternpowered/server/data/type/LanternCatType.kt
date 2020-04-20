@@ -12,8 +12,6 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.data.type.CatType
 
-class LanternCatType(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), CatType, InternalCatalogType
+class LanternCatType(key: CatalogKey) : DefaultCatalogType(key), CatType

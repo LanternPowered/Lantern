@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.api.registry
 
-import org.lanternpowered.api.Lantern
 import org.spongepowered.api.item.inventory.ItemStack
 import kotlin.reflect.KClass
 
@@ -61,5 +60,5 @@ interface BuilderRegistry : org.spongepowered.api.registry.BuilderRegistry {
     /**
      * The singleton instance of the builder registry.
      */
-    companion object : BuilderRegistry by Lantern.registry.builderRegistry
+    companion object : BuilderRegistry by GameRegistry.builderRegistry
 }

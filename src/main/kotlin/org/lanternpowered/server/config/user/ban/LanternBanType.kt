@@ -16,6 +16,5 @@ import org.spongepowered.api.util.ban.Ban
 import org.spongepowered.api.util.ban.BanType
 
 class LanternBanType(key: CatalogKey, private val banClass: Class<out Ban>) : DefaultCatalogType(key), BanType {
-
     override fun getBanClass(): Class<out Ban> = this.banClass
 }

@@ -12,8 +12,6 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.data.type.HorseStyle
 
-class LanternHorseStyle(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), HorseStyle, InternalCatalogType
+class LanternHorseStyle(key: CatalogKey) : DefaultCatalogType(key), HorseStyle

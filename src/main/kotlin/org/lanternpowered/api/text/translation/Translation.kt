@@ -10,7 +10,23 @@
  */
 package org.lanternpowered.api.text.translation
 
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
+
 typealias FixedTranslation = org.spongepowered.api.text.translation.FixedTranslation
-typealias ResourceBundleTranslation = org.spongepowered.api.text.translation.ResourceBundleTranslation
 typealias Translation = org.spongepowered.api.text.translation.Translation
 typealias Translatable = org.spongepowered.api.text.translation.Translatable
+
+/**
+ * Converts the translation to a [Text] with the given parameters.
+ */
+fun Translation.toText(vararg parameters: Any): Text {
+    return when (this) {
+        is ParameterizedTextTranslation -> getText(parameters.asList().map { parameter -> parameter.toText() })
+        is TextTranslation -> getText()
+        else -> translatableTextOf(this, *parameters)
+    }
+}
+
+private fun Any.toText(): Text = if (this is TextRepresentable) toText() else Text.of(this)

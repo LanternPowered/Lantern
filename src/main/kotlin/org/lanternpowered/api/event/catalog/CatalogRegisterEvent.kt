@@ -10,4 +10,4 @@
  */
 package org.lanternpowered.api.event.catalog
 
-typealias CatalogRegisterEvent<T> = org.spongepowered.api.event.game.GameRegistryEvent.Register<T>
+typealias CatalogRegisterEvent<T> = org.spongepowered.api.event.registry.RegistryEvent.Catalog<T>

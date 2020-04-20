@@ -12,12 +12,9 @@
 
 package org.lanternpowered.api.item.enchantment
 
-import org.lanternpowered.api.ext.*
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
+import java.util.function.Supplier
 
 typealias Enchantment = org.spongepowered.api.item.enchantment.Enchantment
-typealias EnchantmentBuilder = org.spongepowered.api.item.enchantment.Enchantment.Builder
 
 /**
  * Constructs a new [Enchantment] with the given [EnchantmentType] and level. If no
@@ -27,16 +24,14 @@ typealias EnchantmentBuilder = org.spongepowered.api.item.enchantment.Enchantmen
  * @param level The level of the enchantment
  * @return The constructed enchantment
  */
-inline fun Enchantment(type: EnchantmentType, level: Int = type.minimumLevel, fn: EnchantmentBuilder.() -> Unit = {}): Enchantment {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    return EnchantmentBuilder().type(type).level(level).apply(fn).build()
-}
+inline fun enchantmentOf(type: Supplier<out EnchantmentType>, level: Int = type.get().minimumLevel): Enchantment = Enchantment.of(type, level)
 
 /**
- * Constructs a new [EnchantmentBuilder].
+ * Constructs a new [Enchantment] with the given [EnchantmentType] and level. If no
+ * level is specified, then will the minimum one be used instead.
  *
- * @return The constructed enchantment builder
+ * @param type The enchantment type
+ * @param level The level of the enchantment
+ * @return The constructed enchantment
  */
-inline fun EnchantmentBuilder(): EnchantmentBuilder = builderOf()
+inline fun enchantmentOf(type: EnchantmentType, level: Int = type.minimumLevel): Enchantment = Enchantment.of(type, level)

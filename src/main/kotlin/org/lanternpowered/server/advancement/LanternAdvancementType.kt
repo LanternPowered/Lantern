@@ -13,11 +13,8 @@ package org.lanternpowered.server.advancement
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.advancement.AdvancementType
 
-class LanternAdvancementType(key: CatalogKey, override val internalId: Int, private val textFormat: TextFormat) :
-        DefaultCatalogType(key), AdvancementType, InternalCatalogType {
-
+class LanternAdvancementType(key: CatalogKey, private val textFormat: TextFormat) : DefaultCatalogType(key), AdvancementType {
     override fun getTextFormat(): TextFormat = this.textFormat
 }

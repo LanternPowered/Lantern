@@ -50,7 +50,7 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
         register(new LanternDisplaySlot(CatalogKeys.minecraft("below_name", "belowName"), null, 2));
         for (TextColor textColor : Sponge.getRegistry().getAllOf(TextColor.class)) {
             // There is not mapping for "none"
-            if (textColor == TextColors.NONE) {
+            if (textColor == TextColors.NONE.get()) {
                 continue;
             }
             final char character = ((LanternTextColor.Formatting) textColor).getCode();

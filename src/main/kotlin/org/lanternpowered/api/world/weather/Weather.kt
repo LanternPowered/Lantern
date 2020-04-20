@@ -13,7 +13,7 @@
 
 package org.lanternpowered.api.world.weather
 
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.x.world.weather.XWeather
 import org.spongepowered.api.CatalogKey
 import kotlin.contracts.InvocationKind
@@ -24,15 +24,9 @@ typealias Weathers = org.spongepowered.api.world.weather.Weathers
 typealias WeatherUniverse = org.spongepowered.api.world.weather.WeatherUniverse
 
 @JvmName("of")
-inline fun Weather(key: CatalogKey, fn: WeatherBuilder.() -> Unit): XWeather {
+inline fun weatherOf(key: CatalogKey, fn: WeatherBuilder.() -> Unit): XWeather {
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }
-    return WeatherBuilder().key(key).apply(fn).build()
+    return builderOf<WeatherBuilder>().key(key).apply(fn).build()
 }
-
-/**
- * Constructs a new [WeatherBuilder].
- */
-@JvmName("builder")
-inline fun WeatherBuilder(): WeatherBuilder = builderOf()

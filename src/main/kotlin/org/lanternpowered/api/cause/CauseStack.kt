@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.api.cause
 
-import org.lanternpowered.api.Lantern
 import java.util.Optional
+import java.util.function.Supplier
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.reflect.KClass
@@ -109,7 +109,43 @@ inline fun <reified T : Any> CauseStack.containsType(): Boolean = containsType(T
 /**
  * A [CauseStack] for a specific [Thread].
  */
-interface CauseStack : CauseStackManager {
+interface CauseStack : org.spongepowered.api.event.CauseStackManager {
+
+    /**
+     * Gets the context value with the given key.
+     *
+     * @param key The context key
+     * @param T The type of the value stored with the event context key
+     * @return The context object, if present
+     */
+    operator fun <T : Any> get(key: Supplier<out CauseContextKey<T>>): T? = get(key.get())
+
+    /**
+     * Gets the context value with the given key.
+     *
+     * @param key The context key
+     * @param T The type of the value stored with the event context key
+     * @return The context object, if present
+     */
+    operator fun <T : Any> get(key: CauseContextKey<T>): T?
+
+    /**
+     * Adds the given object to the current context under the given key.
+     *
+     * @param key The context key
+     * @param value The object
+     * @param T The type of the value stored with the event context key
+     */
+    operator fun <T : Any> set(key: Supplier<out CauseContextKey<T>>, value: T) = set(key.get(), value)
+
+    /**
+     * Adds the given object to the current context under the given key.
+     *
+     * @param key The context key
+     * @param value The object
+     * @param T The type of the value stored with the event context key
+     */
+    operator fun <T : Any> set(key: CauseContextKey<T>, value: T)
 
     /**
      * Gets the first [T] object of this [Cause], if available.
@@ -175,12 +211,12 @@ interface CauseStack : CauseStackManager {
 
     override fun pushCauseFrame(): Frame
     override fun pushCause(obj: Any): CauseStack
-    override fun <T> addContext(key: CauseContextKey<T>, value: T): CauseStack
+    override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): CauseStack
 
-    interface Frame : CauseStackManagerFrame {
+    interface Frame : org.spongepowered.api.event.CauseStackManager.StackFrame {
 
         override fun pushCause(obj: Any): Frame
-        override fun <T> addContext(key: CauseContextKey<T>, value: T): Frame
+        override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): Frame
     }
 
     companion object {
@@ -192,7 +228,7 @@ interface CauseStack : CauseStackManager {
          * @return The cause stack
          */
         @JvmStatic
-        fun currentOrNull() = Lantern.causeStackManager.currentStackOrNull()
+        fun currentOrNull() = CauseStackManager.currentStackOrNull()
 
         /**
          * Gets the [CauseStack] for the current [Thread]. A
@@ -202,7 +238,7 @@ interface CauseStack : CauseStackManager {
          * @return The cause stack
          */
         @JvmStatic
-        fun currentOrEmpty() = Lantern.causeStackManager.currentStackOrEmpty()
+        fun currentOrEmpty() = CauseStackManager.currentStackOrEmpty()
 
         /**
          * Gets the [CauseStack] for the current [Thread]. A
@@ -212,6 +248,6 @@ interface CauseStack : CauseStackManager {
          * @return The cause stack
          */
         @JvmStatic
-        fun current() = Lantern.causeStackManager.currentStack()
+        fun current() = CauseStackManager.currentStack()
     }
 }

@@ -13,7 +13,7 @@
 package org.lanternpowered.api.util.option
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.util.TypeToken
+import org.lanternpowered.api.util.type.TypeToken
 import kotlin.reflect.KClass
 
 /**

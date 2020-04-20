@@ -21,7 +21,7 @@ import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
-import org.lanternpowered.api.text.serializer.TextSerializers
+import org.lanternpowered.api.text.serializer.PlainTextSerializer
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.x.text.format.XTextStyle
 import org.spongepowered.api.data.persistence.DataContainer
@@ -51,8 +51,8 @@ abstract class LanternText(
     override fun getHoverAction(): Optional<HoverAction<*>> = this.hoverAction.optional()
     override fun getShiftClickAction(): Optional<ShiftClickAction<*>> = this.shiftClickAction.optional()
     override fun isEmpty(): Boolean = this === LanternLiteralText.EMPTY
-    override fun toPlain(): String = TextSerializers.PLAIN.get().serialize(this)
-    override fun toPlainSingle(): String = TextSerializers.PLAIN.get().serializeSingle(this)
+    override fun toPlain(): String = PlainTextSerializer.serialize(this)
+    override fun toPlainSingle(): String = PlainTextSerializer.serializeSingle(this)
     override fun concat(other: Text): Text = toBuilder().append(other).build()
     override fun trim(): Text = toBuilder().trim().build()
     override fun getContentVersion(): Int = 1

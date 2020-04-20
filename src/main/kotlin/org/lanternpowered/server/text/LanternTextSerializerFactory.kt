@@ -11,21 +11,39 @@
 package org.lanternpowered.server.text
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.text.serializer.FormattingCodeTextSerializer
+import org.lanternpowered.api.text.serializer.JsonTextSerializer
+import org.lanternpowered.api.text.serializer.LegacyTextSerializer
+import org.lanternpowered.api.text.serializer.PlainTextSerializer
+import org.lanternpowered.api.text.serializer.TextSerializerFactory
 import org.lanternpowered.server.game.registry.type.text.TextSerializerRegistryModule
-import org.spongepowered.api.text.serializer.FormattingCodeTextSerializer
 import org.spongepowered.api.text.serializer.TextSerializers
 import java.util.concurrent.ConcurrentHashMap
 
-object LanternTextSerializerFactory : TextSerializers.Factory {
+object LanternTextSerializerFactory : TextSerializerFactory, TextSerializers.Factory {
 
     private val formattingCodeSerializers = ConcurrentHashMap<Char, FormattingCodeTextSerializer>()
 
-    @Suppress("DEPRECATION")
-    override fun createFormattingCodeSerializer(legacyChar: Char): FormattingCodeTextSerializer {
-        return when (legacyChar) {
-            TextConstants.LEGACY_CHAR -> TextSerializers.LEGACY_FORMATTING_CODE.get()
-            TextSerializers.FORMATTING_CODE.get().character -> TextSerializers.FORMATTING_CODE.get()
-            else -> this.formattingCodeSerializers.computeIfAbsent(legacyChar) {
+    private const val defaultFormattingCode = '&'
+    private val defaultFormattingCodeTextSerializer = LanternFormattingCodeTextSerializer(
+            CatalogKey.minecraft("formatting_code"), this.defaultFormattingCode)
+
+    override fun createFormattingCodeSerializer(code: Char): FormattingCodeTextSerializer = formatting(code)
+
+    override val json: JsonTextSerializer
+        get() = TODO("Not yet implemented")
+
+    override val plain: PlainTextSerializer
+        get() = LanternPlainTextSerializer
+
+    override val legacy: LegacyTextSerializer
+        get() = LanternLegacyTextSerializer
+
+    override fun formatting(code: Char): FormattingCodeTextSerializer {
+        return when (code) {
+            TextConstants.LEGACY_CHAR -> LanternLegacyTextSerializer
+            this.defaultFormattingCode -> this.defaultFormattingCodeTextSerializer
+            else -> this.formattingCodeSerializers.computeIfAbsent(code) {
                 val serializer = LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
                 TextSerializerRegistryModule.register(serializer)
                 serializer

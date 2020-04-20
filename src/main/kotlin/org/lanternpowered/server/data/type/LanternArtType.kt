@@ -12,16 +12,14 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.data.type.ArtType
 
 class LanternArtType(
         key: CatalogKey,
         name: String,
-        override val internalId: Int,
         private val width: Int,
         private val height: Int
-): DefaultCatalogType.Named(key, name), ArtType, InternalCatalogType {
+): DefaultCatalogType.Named(key, name), ArtType {
 
     override fun getHeight(): Int = this.height
     override fun getWidth(): Int = this.width

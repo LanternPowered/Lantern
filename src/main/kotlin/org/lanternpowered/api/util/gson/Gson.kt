@@ -15,7 +15,7 @@ package org.lanternpowered.api.util.gson
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
-import org.lanternpowered.api.util.TypeToken
+import org.lanternpowered.api.util.type.TypeToken
 import java.io.Reader
 import kotlin.reflect.KClass
 import kotlin.reflect.KType

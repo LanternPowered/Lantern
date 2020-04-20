@@ -13,7 +13,5 @@ package org.lanternpowered.server.boss
 import org.lanternpowered.api.boss.BossBarOverlay
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 
-class LanternBossBarOverlay(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), BossBarOverlay, InternalCatalogType
+class LanternBossBarOverlay(key: CatalogKey) : DefaultCatalogType(key), BossBarOverlay

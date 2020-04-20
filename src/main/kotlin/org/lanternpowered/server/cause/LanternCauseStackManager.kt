@@ -15,18 +15,17 @@ import org.lanternpowered.api.cause.CauseContext
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManager
-import org.lanternpowered.api.cause.CauseStackManagerFrame
 import org.lanternpowered.api.util.concurrent.ThreadLocal
-import org.lanternpowered.api.x.cause.XCauseStackManager
 import org.lanternpowered.server.util.LanternThread
 
 import java.util.Optional
+import kotlin.reflect.KClass
 
 /**
  * A [CauseStackManager] that manages the [LanternCauseStack]s for all
  * the supported [Thread]s. (main, world threads, etc.)
  */
-object LanternCauseStackManager : XCauseStackManager {
+object LanternCauseStackManager : CauseStackManager {
 
     /**
      * A [ThreadLocal] to fall back to if a thread doesn't extend [LanternThread].
@@ -53,17 +52,26 @@ object LanternCauseStackManager : XCauseStackManager {
     fun getCauseStackOrEmpty(thread: Thread) = getCauseStackOrNull(thread) ?: EmptyCauseStack
 
     override fun currentStackOrEmpty(): CauseStack = currentStackOrNull() ?: EmptyCauseStack
-    override fun currentStack() = currentStackOrNull() ?: throw IllegalStateException("The current thread doesn't support a cause stack.")
+    override fun currentStack() = currentStackOrNull() ?: error("The current thread doesn't support a cause stack.")
 
     override fun getCurrentCause(): Cause = currentStack().currentCause
     override fun getCurrentContext(): CauseContext = currentStack().currentContext
-    override fun pushCause(obj: Any): CauseStackManager = currentStack().pushCause(obj)
+    override fun pushCause(obj: Any): CauseStackManager = apply { currentStack().pushCause(obj) }
     override fun popCause(): Any = currentStack().popCause()
     override fun popCauses(n: Int) = currentStack().popCauses(n)
     override fun peekCause(): Any = currentStack().peekCause()
-    override fun pushCauseFrame(): CauseStackManagerFrame = currentStack().pushCauseFrame()
-    override fun popCauseFrame(handle: CauseStackManagerFrame) = currentStack().popCauseFrame(handle)
-    override fun <T> addContext(key: CauseContextKey<T>, value: T): CauseStackManager = currentStack().addContext(key, value)
-    override fun <T> getContext(key: CauseContextKey<T>): Optional<T> = currentStack().getContext(key)
-    override fun <T> removeContext(key: CauseContextKey<T>): Optional<T> = currentStack().removeContext(key)
+    override fun pushCauseFrame(): CauseStack.Frame = currentStack().pushCauseFrame()
+    override fun popCauseFrame(handle: org.spongepowered.api.event.CauseStackManager.StackFrame) = currentStack().popCauseFrame(handle)
+    override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): CauseStackManager = apply { currentStack().addContext(key, value) }
+    override fun <T : Any> getContext(key: CauseContextKey<T>): Optional<T> = currentStack().getContext(key)
+    override fun <T : Any> removeContext(key: CauseContextKey<T>): Optional<T> = currentStack().removeContext(key)
+    override fun <T : Any> get(key: CauseContextKey<T>): T?= currentStack()[key]
+    override fun <T : Any> set(key: CauseContextKey<T>, value: T) = currentStack().set(key, value)
+    override fun <T : Any> first(target: KClass<T>): T?  = currentStack().first(target)
+    override fun <T : Any> first(target: Class<T>): Optional<T> = currentStack().first(target)
+    override fun <T : Any> last(target: KClass<T>): T? = currentStack().last(target)
+    override fun <T : Any> last(target: Class<T>): Optional<T> = currentStack().last(target)
+    override fun containsType(target: KClass<*>): Boolean = currentStack().containsType(target)
+    override fun containsType(target: Class<*>): Boolean = currentStack().containsType(target)
+    override fun contains(any: Any): Boolean = currentStack().contains(any)
 }

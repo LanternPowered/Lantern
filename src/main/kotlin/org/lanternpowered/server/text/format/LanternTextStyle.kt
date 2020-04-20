@@ -40,11 +40,11 @@ open class LanternTextStyle(
     override fun strikethrough(strikethrough: Boolean?) = LanternTextStyle(this.bold, this.italic, this.underline, strikethrough, this.obfuscated)
     override fun obfuscated(obfuscated: Boolean?) = LanternTextStyle(this.bold, this.italic, this.underline, this.strikethrough, obfuscated)
 
-    override fun isBold() = this.bold.optional()
-    override fun isItalic() = this.italic.optional()
+    override fun hasBold() = this.bold.optional()
+    override fun hasItalic() = this.italic.optional()
     override fun hasUnderline() = this.underline.optional()
     override fun hasStrikethrough() = this.strikethrough.optional()
-    override fun isObfuscated() = this.obfuscated.optional()
+    override fun hasObfuscated() = this.obfuscated.optional()
 
     /**
      * Utility method to check if the given "super-property" contains the given "sub-property".

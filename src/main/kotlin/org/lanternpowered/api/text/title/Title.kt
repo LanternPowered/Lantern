@@ -20,7 +20,7 @@ typealias Title = org.spongepowered.api.text.title.Title
 typealias TitleBuilder = org.spongepowered.api.text.title.Title.Builder
 
 /**
- * Constructs a new [title].
+ * Constructs a new [Title].
  *
  * @param fn The builder function
  * @return The constructed title

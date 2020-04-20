@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.api.registry
 
-import org.lanternpowered.api.Lantern
 import kotlin.reflect.KClass
 
 /**
@@ -59,5 +58,5 @@ interface FactoryRegistry : org.spongepowered.api.registry.FactoryRegistry {
     /**
      * The singleton instance of the factory registry.
      */
-    companion object : FactoryRegistry by Lantern.registry.factoryRegistry
+    companion object : FactoryRegistry by GameRegistry.factoryRegistry
 }

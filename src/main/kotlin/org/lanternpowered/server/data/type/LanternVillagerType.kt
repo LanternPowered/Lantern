@@ -12,8 +12,6 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.data.type.VillagerType
 
-class LanternVillagerType(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), VillagerType, InternalCatalogType
+class LanternVillagerType(key: CatalogKey) : DefaultCatalogType(key), VillagerType

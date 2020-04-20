@@ -20,6 +20,8 @@ interface GameRegistry : org.spongepowered.api.registry.GameRegistry {
     override fun getBuilderRegistry(): BuilderRegistry
     override fun getCatalogRegistry(): CatalogRegistry
     override fun getFactoryRegistry(): FactoryRegistry
+    override fun getRecipeRegistry(): RecipeRegistry
+    override fun getVillagerRegistry(): VillagerRegistry
 
     /**
      * The singleton instance of the game registry.

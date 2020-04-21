@@ -23,7 +23,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.entity.living.humanoid.player.CooldownEvent;
+import org.spongepowered.api.event.entity.living.player.CooldownEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.item.ItemType;
@@ -38,6 +38,7 @@ import java.util.OptionalInt;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class LanternEventFactory {
 
     public static DropItemEvent.@NonNull Pre createDropItemEventPre(
@@ -69,7 +70,7 @@ public class LanternEventFactory {
             @NonNull Cause cause,
             @NonNull EntityType<?> targetType,
             @NonNull Transform transform,
-            @NonNull World world) {
+            @NonNull World<?> world) {
         return SpongeEventFactory.createConstructEntityEventPre(cause, targetType, transform, world);
     }
 

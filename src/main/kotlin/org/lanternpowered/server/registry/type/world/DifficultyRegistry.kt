@@ -10,10 +10,12 @@
  */
 package org.lanternpowered.server.registry.type.world
 
+import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.world.difficulty.Difficulty
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.lanternpowered.server.world.difficulty.LanternDifficulty
-import org.spongepowered.api.CatalogKey
+import org.lanternpowered.server.text.translation.Translated
+import org.spongepowered.api.text.translation.Translatable
 
 val DifficultyRegistry = internalCatalogTypeRegistry<Difficulty> {
     fun register(id: String) =
@@ -24,3 +26,6 @@ val DifficultyRegistry = internalCatalogTypeRegistry<Difficulty> {
     register("normal")
     register("hard")
 }
+
+private class LanternDifficulty(key: CatalogKey) : DefaultCatalogType(key), Difficulty,
+        Translatable by Translated("options.difficulty.${key.value}")

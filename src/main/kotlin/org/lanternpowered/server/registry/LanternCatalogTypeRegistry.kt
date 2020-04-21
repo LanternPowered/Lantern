@@ -172,7 +172,7 @@ private abstract class LanternImmutableCatalogTypeRegistry<T : CatalogType, D : 
     }
 }
 
-abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryData<T>>(
+private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryData<T>>(
         override val typeToken: TypeToken<T>
 ) : CatalogTypeRegistry<T> {
 
@@ -222,7 +222,7 @@ abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryData<T>>(
     }
 }
 
-class GenericInternalRegistryData<T : CatalogType, I>(
+private class GenericInternalRegistryData<T : CatalogType, I>(
         override val byKey: Map<CatalogKey, T> = emptyMap(),
         private val byId: BiMap<I, T> = HashBiMap.create(),
         override val suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
@@ -232,7 +232,7 @@ class GenericInternalRegistryData<T : CatalogType, I>(
     fun getId(type: T): I? = this.byId.inverse()[type]
 }
 
-class InternalRegistryData<T : CatalogType>(
+private class InternalRegistryData<T : CatalogType>(
         override val byKey: Map<CatalogKey, T> = emptyMap(),
         private val byId: Int2ObjectMap<T> = Int2ObjectMaps.emptyMap(),
         private val toId: Object2IntMap<T> = Object2IntOpenHashMap<T>().apply { defaultReturnValue(Integer.MIN_VALUE) },
@@ -249,7 +249,7 @@ class InternalRegistryData<T : CatalogType>(
     }
 }
 
-interface RegistryData<T> {
+private interface RegistryData<T> {
     val byKey: Map<CatalogKey, T>
     val suggestedIdMatchers: List<(String, T) -> Boolean>
 }
@@ -293,28 +293,6 @@ private class CatalogTypeSupplier<T : CatalogType>(
             "There's no ${registry.typeName} registered with the suggested id: $suggestedId")
 }
 
-private class LanternGenericInternalCatalogTypeRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
-        AbstractCatalogTypeRegistryBuilder<T, Int, InternalRegistryData<T>>(typeToken), InternalCatalogTypeRegistryBuilder<T> {
-
-    private var nextFreeId: Int = 0
-
-    override fun register(internalId: Int, type: T): T = register(type, internalId)
-
-    override fun register(type: T, internalId: Int?): T {
-        super.register(type, internalId ?: this.nextFreeId)
-        while (this.byId.containsKey(this.nextFreeId)) {
-            this.nextFreeId++
-        }
-        return type
-    }
-
-    override fun build(): InternalRegistryData<T> {
-        val toId = Object2IntOpenHashMap<T>(this.byId.inverse()).apply { defaultReturnValue(Integer.MIN_VALUE) }
-        val byId = Int2ObjectOpenHashMap(this.byId)
-        return InternalRegistryData(this.byKey.toImmutableMap(), byId, toId, this.suggestedIdMatchers)
-    }
-}
-
 private class LanternGenericRegistryBuilder<T : CatalogType, I>(typeToken: TypeToken<T>) :
         AbstractCatalogTypeRegistryBuilder<T, I, GenericInternalRegistryData<T, I>>(typeToken), GenericInternalCatalogTypeRegistryBuilder<T, I> {
 
@@ -344,9 +322,11 @@ private class LanternRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
     }
 
     override fun build(): InternalRegistryData<T> {
+        val byKey = this.byKey.toImmutableMap()
         val toId = Object2IntOpenHashMap<T>(this.byId.inverse()).apply { defaultReturnValue(Integer.MIN_VALUE) }
         val byId = Int2ObjectOpenHashMap(this.byId)
-        return InternalRegistryData(this.byKey.toImmutableMap(), byId, toId, this.suggestedIdMatchers.toImmutableList())
+        val suggestedIdMatchers = this.suggestedIdMatchers.toImmutableList()
+        return InternalRegistryData(byKey, byId, toId, suggestedIdMatchers)
     }
 }
 
@@ -393,41 +373,6 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
 
     abstract fun build(): D
 
-    override fun allowPluginRegistrations() { this.allowPluginRegistrations = true }
-    override fun matchSuggestedId(matcher: (suggestedId: String, type: T) -> Boolean) { this.suggestedIdMatchers += matcher }
-}
-
-private class LanternCatalogTypeRegistryBuilder<T : CatalogType, I>(
-        val typeToken: TypeToken<T>
-) : InternalCatalogTypeRegistryBuilder<T>, GenericInternalCatalogTypeRegistryBuilder<T, I> {
-
-    private val suggestedIdMatchers: MutableList<(String, T) -> Boolean> = mutableListOf()
-    private val byKey: MutableMap<CatalogKey, T> = mutableMapOf()
-    private val byIntId: Int2ObjectMap<T> = Int2ObjectOpenHashMap<T>()
-    private val toIntId: Object2IntMap<T> = Object2IntOpenHashMap<T>().apply { defaultReturnValue(Integer.MIN_VALUE) }
-    private var allowPluginRegistrations = false
-
-    private var nextFreeId: Int = 0
-    private val typeName: String get() = this.typeToken.rawType.simpleName
-
-    override fun register(internalId: Int, type: T): T {
-        val key = type.key
-        check(!this.byKey.containsKey(key)) { "There's already a $typeName registered with the key: $key" }
-        check(!this.byIntId.containsKey(internalId)) { "There's already a $typeName registered with the internal id: $internalId" }
-        this.byKey[key] = type
-        this.byIntId[internalId] = type
-        this.toIntId[type] = internalId
-        while (this.byIntId.containsKey(this.nextFreeId)) {
-            this.nextFreeId++
-        }
-        return type
-    }
-
-    override fun register(internalId: I, type: T): T {
-        TODO("Not yet implemented")
-    }
-
-    override fun register(type: T) = register(this.nextFreeId, type)
     override fun allowPluginRegistrations() { this.allowPluginRegistrations = true }
     override fun matchSuggestedId(matcher: (suggestedId: String, type: T) -> Boolean) { this.suggestedIdMatchers += matcher }
 }

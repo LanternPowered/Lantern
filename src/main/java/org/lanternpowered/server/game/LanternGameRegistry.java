@@ -64,7 +64,7 @@ import org.lanternpowered.server.data.property.LanternPropertyBuilder;
 import org.lanternpowered.server.data.LanternKeyValueMatcherBuilder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternChestAttachment;
-import org.lanternpowered.server.data.type.LanternComparatorType;
+import org.lanternpowered.server.data.type.LanternComparatorMode;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.LanternHinge;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
@@ -126,7 +126,6 @@ import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.VillagerTypeRegistryModule;
@@ -163,12 +162,10 @@ import org.lanternpowered.server.game.registry.type.text.TextStyleRegistryModule
 import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.BanTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.RotationRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.BlockChangeFlagRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DefaultGameRulesRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.SerializationBehaviorRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
@@ -549,8 +546,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(new BlockSoundGroupRegistryModule())
                 .registerModule(BlockType.class, BlockRegistryModule.get())
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
-                .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
-                .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
                 .registerModule(Accessory.class, new AccessoryRegistryModule())
                 .registerModule(DamageType.class, new DamageTypeRegistryModule())
                 .registerModule(DamageModifierType.class, new DamageModifierTypeRegistryModule())
@@ -561,14 +556,6 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
-                .registerModule(ComparatorType.class,
-                        new EnumValueRegistryModule<ComparatorType>(LanternComparatorType.class, ComparatorTypes.class) {})
-                .registerModule(ChestAttachmentType.class,
-                        new EnumValueRegistryModule<ChestAttachmentType>(LanternChestAttachment.class, ChestAttachmentTypes.class) {})
-                .registerModule(LanternDoorHalf.class,
-                        new EnumValueRegistryModule<LanternDoorHalf>(LanternDoorHalf.class, null) {})
-                .registerModule(InstrumentType.class,
-                        new EnumValueRegistryModule<InstrumentType>(LanternInstrumentType.class, InstrumentTypes.class) {})
                 .registerModule(ArtType.class, new ArtTypeRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
                 .registerModule(HandPreference.class, new HandPreferenceRegistryModule())

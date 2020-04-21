@@ -12,10 +12,9 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.catalog.asString
 
-enum class LanternBedPart(id: String) : CatalogType by DefaultCatalogType.minecraft(id), InternalCatalogType.EnumOrdinal {
+enum class LanternBedPart(id: String) : CatalogType by DefaultCatalogType.minecraft(id) {
 
     FOOT("foot"),
     HEAD("head");

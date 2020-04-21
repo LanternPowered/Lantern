@@ -26,20 +26,33 @@ import org.lanternpowered.server.registry.type.boss.BossBarColorRegistry
 import org.lanternpowered.server.registry.type.boss.BossBarOverlayRegistry
 import org.lanternpowered.server.registry.type.data.ArtTypeRegistry
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
+import org.lanternpowered.server.registry.type.data.BedPartRegistry
 import org.lanternpowered.server.registry.type.data.CatTypeRegistry
+import org.lanternpowered.server.registry.type.data.ChestAttachmentTypeRegistry
+import org.lanternpowered.server.registry.type.data.ComparatorTypeRegistry
+import org.lanternpowered.server.registry.type.data.DismountTypeRegistry
+import org.lanternpowered.server.registry.type.data.DoorHalfRegistry
+import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.lanternpowered.server.registry.type.data.FireworkShapeRegistry
 import org.lanternpowered.server.registry.type.data.HandPreferenceRegistry
 import org.lanternpowered.server.registry.type.data.HandTypeRegistry
+import org.lanternpowered.server.registry.type.data.HingeRegistry
 import org.lanternpowered.server.registry.type.data.HorseColorRegistry
 import org.lanternpowered.server.registry.type.data.HorseStyleRegistry
+import org.lanternpowered.server.registry.type.data.InstrumentTypeRegistry
 import org.lanternpowered.server.registry.type.data.LlamaTypeRegistry
 import org.lanternpowered.server.registry.type.data.MusicDiscRegistry
 import org.lanternpowered.server.registry.type.data.NotePitchRegistry
 import org.lanternpowered.server.registry.type.data.PickupRuleRegistry
+import org.lanternpowered.server.registry.type.data.PortionTypeRegistry
 import org.lanternpowered.server.registry.type.data.ProfessionRegistry
 import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry
+import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
+import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
+import org.lanternpowered.server.registry.type.data.SurfaceRegistry
 import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
+import org.lanternpowered.server.registry.type.data.WireAttachmentTypeRegistry
 import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
 import org.lanternpowered.server.registry.type.economy.TransactionTypeRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistry
@@ -55,6 +68,7 @@ import org.lanternpowered.server.registry.type.text.TextSerializerRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
 import org.lanternpowered.server.registry.type.world.PortalAgentTypeRegistry
+import org.lanternpowered.server.registry.type.world.SerializationBehaviorRegistry
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.registry.RegistryEvent
@@ -76,6 +90,7 @@ class LanternGameRegistry : GameRegistry {
             register(ArtTypeRegistry)
             register(BannerPatternShapeRegistry)
             register(CatTypeRegistry)
+            register(DismountTypeRegistry)
             register(FireworkShapeRegistry)
             register(HandPreferenceRegistry)
             register(HandTypeRegistry)
@@ -90,6 +105,19 @@ class LanternGameRegistry : GameRegistry {
             register(SkinPartRegistry)
             register(VillagerTypeRegistry)
             register(WoodTypeRegistry)
+
+            register(BedPartRegistry)
+            register(ChestAttachmentTypeRegistry)
+            register(ComparatorTypeRegistry)
+            register(DoorHalfRegistry)
+            register(DyeColorRegistry)
+            register(HingeRegistry)
+            register(InstrumentTypeRegistry)
+            register(PortionTypeRegistry)
+            register(RailDirectionRegistry)
+            register(SlabPortionRegistry)
+            register(SurfaceRegistry)
+            register(WireAttachmentTypeRegistry)
 
             register(TransactionTypeRegistry)
 
@@ -110,6 +138,7 @@ class LanternGameRegistry : GameRegistry {
 
             register(DifficultyRegistry)
             register(PortalAgentTypeRegistry)
+            register(SerializationBehaviorRegistry)
         }
 
         // Allow plugins to register their catalog type, builders and factories

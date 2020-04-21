@@ -12,15 +12,15 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.catalog.asString
-import org.spongepowered.api.data.type.ComparatorType
+import org.spongepowered.api.data.type.WireAttachmentType
 
-enum class LanternComparatorType(id: String) :
-        ComparatorType, CatalogType by DefaultCatalogType.minecraft(id), InternalCatalogType.EnumOrdinal {
+enum class LanternWireAttachmentType(id: String) : CatalogType by DefaultCatalogType.minecraft(id), WireAttachmentType {
 
-    COMPARE     ("compare"),
-    SUBTRACT    ("subtract");
+    NONE        ("none"),
+    SIDE        ("side"),
+    UP          ("up"),
+    ;
 
     override fun toString(): String = asString()
 }

@@ -8,10 +8,20 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.world
+package org.lanternpowered.server.registry.type.world
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.world.SerializationBehavior
 
-class LanternSerializationBehavior(key: CatalogKey) : DefaultCatalogType(key), SerializationBehavior
+val SerializationBehaviorRegistry = catalogTypeRegistry<SerializationBehavior> {
+    fun register(id: String) =
+            register(LanternSerializationBehavior(CatalogKey.minecraft(id)))
+
+    register("automatic")
+    register("manual")
+    register("none")
+}
+
+private class LanternSerializationBehavior(key: CatalogKey) : DefaultCatalogType(key), SerializationBehavior

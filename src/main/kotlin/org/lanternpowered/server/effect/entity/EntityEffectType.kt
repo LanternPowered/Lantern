@@ -10,12 +10,26 @@
  */
 package org.lanternpowered.server.effect.entity
 
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.registry.factoryOf
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.util.annotation.CatalogedBy
+
+/**
+ * Constructs a new [EntityEffectType].
+ */
+fun entityEffectOf(key: CatalogKey): EntityEffectType =
+        factoryOf<EntityEffectType.Factory>().of(key)
 
 /**
  * Represents a entity sound type, this is the context
  * where a [EntityEffect] will be played.
  */
 @CatalogedBy(EntityEffectTypes::class)
-interface EntityEffectType : CatalogType
+interface EntityEffectType : CatalogType {
+
+    interface Factory {
+
+        fun of(key: CatalogKey): EntityEffectType
+    }
+}

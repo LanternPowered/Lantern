@@ -14,11 +14,10 @@ import org.lanternpowered.api.catalog.CatalogKeys.minecraft
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.data.type.LanternChestAttachment
 import org.lanternpowered.server.data.type.LanternInstrumentType
-import org.lanternpowered.server.data.type.LanternNotePitch
 import org.lanternpowered.server.data.type.LanternPortionType
 import org.lanternpowered.server.data.type.LanternRailDirection
 import org.lanternpowered.server.data.type.LanternSlabPortion
-import org.lanternpowered.server.data.type.RedstoneConnectionType
+import org.lanternpowered.server.data.type.LanternWireAttachmentType
 import org.lanternpowered.server.state.property.booleanStatePropertyOf
 import org.lanternpowered.server.state.property.enumStatePropertyOf
 import org.lanternpowered.server.state.property.intStatePropertyOf
@@ -104,16 +103,16 @@ object BlockStateProperties {
             Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP)
 
     @JvmField val REDSTONE_NORTH_CONNECTION = enumStatePropertyOf(minecraft("north"),
-            LanternKeys.REDSTONE_NORTH_CONNECTION as K<RedstoneConnectionType>)
+            LanternKeys.REDSTONE_NORTH_CONNECTION as K<LanternWireAttachmentType>)
 
     @JvmField val REDSTONE_SOUTH_CONNECTION = enumStatePropertyOf(minecraft("south"),
-            LanternKeys.REDSTONE_SOUTH_CONNECTION as K<RedstoneConnectionType>)
+            LanternKeys.REDSTONE_SOUTH_CONNECTION as K<LanternWireAttachmentType>)
 
     @JvmField val REDSTONE_EAST_CONNECTION = enumStatePropertyOf(minecraft("east"),
-            LanternKeys.REDSTONE_EAST_CONNECTION as K<RedstoneConnectionType>)
+            LanternKeys.REDSTONE_EAST_CONNECTION as K<LanternWireAttachmentType>)
 
     @JvmField val REDSTONE_WEST_CONNECTION = enumStatePropertyOf(minecraft("west"),
-            LanternKeys.REDSTONE_WEST_CONNECTION as K<RedstoneConnectionType>)
+            LanternKeys.REDSTONE_WEST_CONNECTION as K<LanternWireAttachmentType>)
 
     @JvmField val INSTRUMENT = enumStatePropertyOf(minecraft("instrument"),
             LanternKeys.INSTRUMENT_TYPE as K<LanternInstrumentType>)

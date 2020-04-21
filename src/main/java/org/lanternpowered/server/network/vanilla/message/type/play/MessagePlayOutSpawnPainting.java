@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.data.type.Art;
+import org.spongepowered.api.data.type.ArtType;
 import org.spongepowered.api.util.Direction;
 
 import java.util.UUID;
@@ -20,13 +20,13 @@ public final class MessagePlayOutSpawnPainting implements Message {
 
     private final int entityId;
     private final UUID uniqueId;
-    private final Art art;
+    private final ArtType art;
     private final Direction direction;
     private final int x;
     private final int y;
     private final int z;
 
-    public MessagePlayOutSpawnPainting(int entityId, UUID uniqueId, Art art, int x, int y, int z, Direction direction) {
+    public MessagePlayOutSpawnPainting(int entityId, UUID uniqueId, ArtType art, int x, int y, int z, Direction direction) {
         this.entityId = entityId;
         this.uniqueId = uniqueId;
         this.direction = direction;
@@ -44,7 +44,7 @@ public final class MessagePlayOutSpawnPainting implements Message {
         return this.uniqueId;
     }
 
-    public Art getArt() {
+    public ArtType getArt() {
         return this.art;
     }
 

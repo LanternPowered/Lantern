@@ -12,11 +12,10 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.catalog.asString
 import org.spongepowered.api.data.type.PortionType
 
-enum class LanternPortionType(id: String) : PortionType, CatalogType by DefaultCatalogType.minecraft(id), InternalCatalogType.EnumOrdinal {
+enum class LanternPortionType(id: String) : PortionType, CatalogType by DefaultCatalogType.minecraft(id) {
 
     BOTTOM  ("bottom"),
     TOP     ("top");

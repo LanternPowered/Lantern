@@ -25,7 +25,7 @@ public final class EntityEffectTypes {
     public static final EntityEffectType ANGRY = DummyObjectProvider.createFor(EntityEffectType.class, "ANGRY");
 
     /**
-     * The {@link EntityEffectType} that is played when a entity dies.
+     * The {@link EntityEffectType} that is played when an entity dies.
      */
     public static final EntityEffectType DEATH = DummyObjectProvider.createFor(EntityEffectType.class, "DEATH");
 
@@ -70,12 +70,12 @@ public final class EntityEffectTypes {
     public static final EntityEffectType SWIM = DummyObjectProvider.createFor(EntityEffectType.class, "SWIM");
 
     /**
-     * The {@link EntityEffectType} that is played when a villagers says no.
+     * The {@link EntityEffectType} that is played when a villager says no.
      */
     public static final EntityEffectType VILLAGER_NO = DummyObjectProvider.createFor(EntityEffectType.class, "VILLAGER_NO");
 
     /**
-     * The {@link EntityEffectType} that is played when a villagers says yes.
+     * The {@link EntityEffectType} that is played when a villager says yes.
      */
     public static final EntityEffectType VILLAGER_YES = DummyObjectProvider.createFor(EntityEffectType.class, "VILLAGER_YES");
 

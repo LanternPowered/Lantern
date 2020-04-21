@@ -12,11 +12,9 @@ package org.lanternpowered.server.effect.sound
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.effect.sound.SoundCategory
 import org.spongepowered.api.text.translation.Translatable
 
-class LanternSoundCategory(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), SoundCategory, InternalCatalogType,
+class LanternSoundCategory(key: CatalogKey) : DefaultCatalogType(key), SoundCategory,
         Translatable by Translated("soundCategory.${key.value}")

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.type.LanternNotePitch
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.NotePitch
 
@@ -50,6 +50,11 @@ val NotePitchRegistry = internalCatalogTypeRegistry<NotePitch> {
         entries.add(notePitch)
     }
     for (i in entries.indices) {
-        entries[i].setNext(entries[(i + 1) % entries.size])
+        entries[i].next = entries[(i + 1) % entries.size]
     }
+}
+
+private class LanternNotePitch(key: CatalogKey) : DefaultCatalogType(key), NotePitch {
+    lateinit var next: NotePitch
+    override fun cycleNext(): NotePitch = this.next
 }

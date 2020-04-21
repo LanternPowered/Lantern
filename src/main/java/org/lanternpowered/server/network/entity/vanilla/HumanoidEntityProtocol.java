@@ -14,7 +14,6 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
@@ -35,7 +34,7 @@ import java.util.Set;
 
 public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
-    private HandPreference lastDominantHand = HandPreferences.RIGHT;
+    private HandPreference lastDominantHand = HandPreferences.RIGHT.get();
     @Nullable private Set<SkinPart> lastSkinParts;
 
     public HumanoidEntityProtocol(E entity) {

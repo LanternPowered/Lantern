@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.server.data.type.LanternProfession
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.CatalogKey
@@ -21,3 +21,5 @@ val ProfessionRegistry = internalCatalogTypeRegistry<Profession> {
         register(internalId, LanternProfession(CatalogKey.resolve(key)))
     }
 }
+
+private class LanternProfession(key: CatalogKey) : DefaultCatalogType(key), Profession

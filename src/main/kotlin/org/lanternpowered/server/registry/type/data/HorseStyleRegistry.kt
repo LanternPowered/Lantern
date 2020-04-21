@@ -11,8 +11,7 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.type.LanternHorseStyle
-
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.HorseStyle
 
@@ -26,3 +25,5 @@ val HorseStyleRegistry = internalCatalogTypeRegistry<HorseStyle> {
     register("white_dots")
     register("black_dots")
 }
+
+private class LanternHorseStyle(key: CatalogKey) : DefaultCatalogType(key), HorseStyle

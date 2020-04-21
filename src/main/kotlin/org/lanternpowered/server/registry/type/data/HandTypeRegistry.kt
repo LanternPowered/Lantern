@@ -11,9 +11,11 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.registry.catalogTypeRegistry
-import org.lanternpowered.server.data.type.LanternHandType
+import org.lanternpowered.server.catalog.DefaultCatalogType
+import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.type.HandType
+import org.spongepowered.api.text.translation.Translatable
 
 val HandTypeRegistry = catalogTypeRegistry<HandType> {
     fun register(id: String, translationKey: String) =
@@ -22,3 +24,6 @@ val HandTypeRegistry = catalogTypeRegistry<HandType> {
     register("main_hand", "options.mainHand")
     register("off_hand", "hand.off")
 }
+
+private class LanternHandType(key: CatalogKey, translationKey: String) :
+        DefaultCatalogType(key), HandType, Translatable by Translated(translationKey)

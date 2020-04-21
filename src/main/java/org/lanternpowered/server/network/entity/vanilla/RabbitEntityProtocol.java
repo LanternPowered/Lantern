@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.data.type.LanternRabbitType;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.RabbitTypes;
 
@@ -25,7 +25,7 @@ public class RabbitEntityProtocol<E extends LanternEntity> extends AnimalEntityP
     }
 
     private int getTypeId() {
-        return ((LanternRabbitType) this.entity.get(Keys.RABBIT_TYPE).orElse(RabbitTypes.WHITE)).getInternalId();
+        return RabbitTypeRegistry.get().getId(this.entity.get(Keys.RABBIT_TYPE).orElseGet(RabbitTypes.WHITE));
     }
 
     @Override

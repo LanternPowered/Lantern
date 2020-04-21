@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.server.data.type.LanternLlamaType
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.type.LlamaType
@@ -24,3 +24,5 @@ val LlamaTypeRegistry = internalCatalogTypeRegistry<LlamaType> {
     register("brown")
     register("gray")
 }
+
+private class LanternLlamaType(key: CatalogKey) : DefaultCatalogType(key), LlamaType

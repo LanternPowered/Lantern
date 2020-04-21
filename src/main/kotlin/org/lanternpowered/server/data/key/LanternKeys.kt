@@ -15,7 +15,7 @@ import org.lanternpowered.api.data.valueKeyOf
 import org.lanternpowered.api.util.ranges.rangeTo
 import org.lanternpowered.server.data.type.LanternBedPart
 import org.lanternpowered.server.data.type.LanternDoorHalf
-import org.lanternpowered.server.data.type.RedstoneConnectionType
+import org.lanternpowered.server.data.type.LanternWireAttachmentType
 import org.lanternpowered.server.entity.Pose
 import org.lanternpowered.server.extra.accessory.Accessory
 import org.lanternpowered.server.inventory.InventorySnapshot
@@ -205,10 +205,10 @@ object LanternKeys {
 
     @JvmField val INSTRUMENT_TYPE: Key<Value<InstrumentType>> = valueKeyOf(lantern("instrument_type"))
 
-    @JvmField val REDSTONE_NORTH_CONNECTION: Key<Value<RedstoneConnectionType>> = valueKeyOf(lantern("redstone_north_connection"))
-    @JvmField val REDSTONE_SOUTH_CONNECTION: Key<Value<RedstoneConnectionType>> = valueKeyOf(lantern("redstone_south_connection"))
-    @JvmField val REDSTONE_EAST_CONNECTION: Key<Value<RedstoneConnectionType>> = valueKeyOf(lantern("redstone_east_connection"))
-    @JvmField val REDSTONE_WEST_CONNECTION: Key<Value<RedstoneConnectionType>> = valueKeyOf(lantern("redstone_west_connection"))
+    @JvmField val REDSTONE_NORTH_CONNECTION: Key<Value<LanternWireAttachmentType>> = valueKeyOf(lantern("redstone_north_connection"))
+    @JvmField val REDSTONE_SOUTH_CONNECTION: Key<Value<LanternWireAttachmentType>> = valueKeyOf(lantern("redstone_south_connection"))
+    @JvmField val REDSTONE_EAST_CONNECTION: Key<Value<LanternWireAttachmentType>> = valueKeyOf(lantern("redstone_east_connection"))
+    @JvmField val REDSTONE_WEST_CONNECTION: Key<Value<LanternWireAttachmentType>> = valueKeyOf(lantern("redstone_west_connection"))
 
     @JvmField val CONNECTED_NORTH: Key<Value<Boolean>> = valueKeyOf(lantern("connected_north"))
     @JvmField val CONNECTED_SOUTH: Key<Value<Boolean>> = valueKeyOf(lantern("connected_south"))

@@ -10,8 +10,9 @@
  */
 package org.lanternpowered.server.effect.entity
 
+import org.lanternpowered.api.registry.CopyableBuilder
 import org.lanternpowered.api.registry.builderOf
-import org.spongepowered.api.util.CopyableBuilder
+import java.util.function.Supplier
 
 /**
  * Gets an empty [EntityEffectCollection].
@@ -25,6 +26,13 @@ fun entityEffectCollectionOf(): EntityEffectCollection {
  */
 fun entityEffectCollectionOf(vararg pairs: Pair<EntityEffectType, EntityEffect>): EntityEffectCollection =
         builderOf<EntityEffectCollection.Builder>().addAll(mapOf(*pairs)).build()
+
+/**
+ * Gets an empty [EntityEffectCollection].
+ */
+@JvmName("entityEffectCollectionOfSuppliers")
+fun entityEffectCollectionOf(vararg pairs: Pair<Supplier<out EntityEffectType>, EntityEffect>): EntityEffectCollection =
+        builderOf<EntityEffectCollection.Builder>().addAll(mapOf(*pairs).mapKeys { (key, _) -> key.get() }).build()
 
 /**
  * Creates a new [EntityEffectCollection].
@@ -41,7 +49,27 @@ interface EntityEffectCollection {
      * @param effectType The entity effect type
      * @return The entity effects
      */
+    fun getAll(effectType: Supplier<out EntityEffectType>): Collection<EntityEffect> = getAll(effectType.get())
+
+    /**
+     * Gets a collection of [EntityEffect]s for the given
+     * [EntityEffectType].
+     *
+     * @param effectType The entity effect type
+     * @return The entity effects
+     */
     fun getAll(effectType: EntityEffectType): Collection<EntityEffect>
+
+    /**
+     * Attempts to get the combined [EntityEffect] for the given
+     * [EntityEffectType]. This [EntityEffect] will trigger
+     * all the [EntityEffect] that are registered for the given
+     * type. Returns `null` if no effects are found.
+     *
+     * @param effectType The entity effect type
+     * @return The entity effects
+     */
+    fun getCombined(effectType: Supplier<out EntityEffectType>): EntityEffect? = getCombined(effectType.get())
 
     /**
      * Attempts to get the combined [EntityEffect] for the given
@@ -64,9 +92,30 @@ interface EntityEffectCollection {
      * @param effectType The entity effect type
      * @return The entity effects
      */
+    fun getCombinedOrEmpty(effectType: Supplier<out EntityEffectType>): EntityEffect = getCombinedOrEmpty(effectType.get())
+
+    /**
+     * Attempts to get the combined [EntityEffect] for the given
+     * [EntityEffectType]. This [EntityEffect] will trigger
+     * all the [EntityEffect] that are registered for the given
+     * type. Returns an [emptyEntityEffect] if no effects could
+     * be found.
+     *
+     * @param effectType The entity effect type
+     * @return The entity effects
+     */
     fun getCombinedOrEmpty(effectType: EntityEffectType): EntityEffect {
         return getCombined(effectType) ?: emptyEntityEffect()
     }
+
+    /**
+     * Adds a [EntityEffect] for the given [EntityEffectType].
+     *
+     * @param effectType The entity effect type
+     * @param entityEffect The entity effect effect
+     * @return Whether the effect was added
+     */
+    fun add(effectType: Supplier<out EntityEffectType>, entityEffect: EntityEffect): Boolean = add(effectType.get(), entityEffect)
 
     /**
      * Adds a [EntityEffect] for the given [EntityEffectType].
@@ -106,6 +155,15 @@ interface EntityEffectCollection {
      * A builder to construct [EntityEffectCollection]s.
      */
     interface Builder : CopyableBuilder<EntityEffectCollection, Builder> {
+
+        /**
+         * Adds a [EntityEffect] for the given [EntityEffectType].
+         *
+         * @param effectType The entity effect type
+         * @param entityEffect The entity effect effect
+         * @return This builder, for chaining
+         */
+        fun add(effectType: Supplier<out EntityEffectType>, entityEffect: EntityEffect): Builder = add(effectType.get(), entityEffect)
 
         /**
          * Adds a [EntityEffect] for the given [EntityEffectType].

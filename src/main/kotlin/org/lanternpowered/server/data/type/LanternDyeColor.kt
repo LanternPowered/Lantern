@@ -12,7 +12,6 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.catalog.asString
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.data.type.DyeColor
@@ -20,7 +19,7 @@ import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.util.Color
 
 enum class LanternDyeColor(id: String, rgb: Int) : DyeColor, CatalogType by DefaultCatalogType.minecraft(id),
-        InternalCatalogType.EnumOrdinal, Translatable by Translated("color.$id.name") {
+        Translatable by Translated("color.$id.name") {
 
     WHITE       ("white", 16777215),
     ORANGE      ("orange", 14188339),

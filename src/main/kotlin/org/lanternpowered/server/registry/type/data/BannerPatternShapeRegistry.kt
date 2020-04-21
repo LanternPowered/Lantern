@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.type.LanternBannerPatternShape
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
 import org.spongepowered.api.data.type.BannerPatternShape
 
@@ -59,3 +59,5 @@ val BannerPatternShapeRegistry = customInternalCatalogTypeRegistry<BannerPattern
     register("bt", "triangle_bottom")
     register("tt", "triangle_top")
 }
+
+private class LanternBannerPatternShape(key: CatalogKey) : DefaultCatalogType(key), BannerPatternShape

@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.server.data.type.LanternCatType
+import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.type.CatType
 
 val CatTypeRegistry = internalCatalogTypeRegistry<CatType> {
@@ -21,3 +21,5 @@ val CatTypeRegistry = internalCatalogTypeRegistry<CatType> {
         register(internalId, LanternCatType(CatalogKey.resolve(key)))
     }
 }
+
+private class LanternCatType(key: CatalogKey) : DefaultCatalogType(key), CatType

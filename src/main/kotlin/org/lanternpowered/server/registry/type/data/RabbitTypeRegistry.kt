@@ -8,13 +8,15 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
+@file:JvmName("RabbitTypeRegistry")
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.type.LanternRabbitType
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.RabbitType
 
+@get:JvmName("get")
 val RabbitTypeRegistry = internalCatalogTypeRegistry<RabbitType> {
     fun register(id: String, internalId: Int = -1) {
         val type = LanternRabbitType(CatalogKey.minecraft(id))
@@ -33,3 +35,5 @@ val RabbitTypeRegistry = internalCatalogTypeRegistry<RabbitType> {
     register("salt_and_pepper")
     register("killer", 99)
 }
+
+private class LanternRabbitType(key: CatalogKey) : DefaultCatalogType(key), RabbitType

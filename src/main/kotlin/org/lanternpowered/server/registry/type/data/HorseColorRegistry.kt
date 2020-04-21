@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.server.data.type.LanternHorseColor
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.data.type.HorseColor
@@ -27,3 +27,5 @@ val HorseColorRegistry = internalCatalogTypeRegistry<HorseColor> {
     register("gray")
     register("dark_brown")
 }
+
+private class LanternHorseColor(key: CatalogKey) : DefaultCatalogType(key), HorseColor

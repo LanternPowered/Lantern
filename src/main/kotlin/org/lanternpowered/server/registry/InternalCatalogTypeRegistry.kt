@@ -18,6 +18,21 @@ import org.lanternpowered.api.util.type.typeTokenOf
 /**
  * Constructs a new [InternalCatalogTypeRegistry].
  */
+inline fun <reified T : CatalogType> internalCatalogTypeRegistryOfArray(noinline provider: () -> Array<out T>):
+        InternalCatalogTypeRegistry<T> = internalCatalogTypeRegistryOf { provider().asList() }
+
+/**
+ * Constructs a new [InternalCatalogTypeRegistry].
+ */
+inline fun <reified T : CatalogType> internalCatalogTypeRegistryOf(noinline provider: () -> Iterable<T>):
+        InternalCatalogTypeRegistry<T> = internalCatalogTypeRegistry<T>(typeTokenOf()) {
+    for (value in provider())
+        register(value)
+}
+
+/**
+ * Constructs a new [InternalCatalogTypeRegistry].
+ */
 inline fun <reified T : CatalogType> internalCatalogTypeRegistry(noinline fn: InternalCatalogTypeRegistryBuilder<T>.() -> Unit):
         InternalCatalogTypeRegistry<T> = internalCatalogTypeRegistry(typeTokenOf(), fn)
 

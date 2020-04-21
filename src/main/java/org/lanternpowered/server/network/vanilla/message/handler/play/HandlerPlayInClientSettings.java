@@ -11,7 +11,6 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -25,7 +24,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.entity.living.player.PlayerChangeClientSettingsEvent;
 
-import java.util.Collection;
 import java.util.Set;
 
 public final class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {

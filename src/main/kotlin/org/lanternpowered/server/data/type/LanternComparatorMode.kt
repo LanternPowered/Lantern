@@ -10,15 +10,15 @@
  */
 package org.lanternpowered.server.data.type
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.data.type.NotePitch
+import org.lanternpowered.server.catalog.asString
+import org.spongepowered.api.data.type.ComparatorMode
 
-class LanternNotePitch(key: CatalogKey) : DefaultCatalogType(key), NotePitch {
+enum class LanternComparatorMode(id: String) : ComparatorMode, CatalogType by DefaultCatalogType.minecraft(id) {
 
-    private lateinit var next: NotePitch
+    COMPARE     ("compare"),
+    SUBTRACT    ("subtract");
 
-    override fun cycleNext(): NotePitch = this.next
-
-    fun setNext(next: NotePitch) { this.next = next }
+    override fun toString(): String = asString()
 }

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.type.LanternArtType
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.ArtType
 
@@ -45,4 +45,15 @@ val ArtTypeRegistry = internalCatalogTypeRegistry<ArtType> {
     register("wanderer", "Wanderer", 1, 2)
     register("wasteland", "Wasteland", 1, 1)
     register("wither", "Wither", 2, 2)
+}
+
+private class LanternArtType(key: CatalogKey, name: String, private val width: Int, private val height: Int):
+        DefaultCatalogType.Named(key, name), ArtType {
+
+    override fun getHeight(): Int = this.height
+    override fun getWidth(): Int = this.width
+
+    override fun toStringHelper() = super.toStringHelper()
+            .add("width", this.width)
+            .add("height", this.height)
 }

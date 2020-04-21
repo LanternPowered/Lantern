@@ -57,7 +57,7 @@ import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.LanternSlabPortion;
-import org.lanternpowered.server.data.type.RedstoneConnectionType;
+import org.lanternpowered.server.data.type.LanternWireAttachmentType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.InternalIDRegistries;
@@ -765,10 +765,10 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         BlockStateProperties.REDSTONE_WEST_CONNECTION)
                 .defaultState(state -> state
                         .withTrait(BlockStateProperties.POWER, 0).get()
-                        .withTrait(BlockStateProperties.REDSTONE_NORTH_CONNECTION, RedstoneConnectionType.NONE).get()
-                        .withTrait(BlockStateProperties.REDSTONE_SOUTH_CONNECTION, RedstoneConnectionType.NONE).get()
-                        .withTrait(BlockStateProperties.REDSTONE_EAST_CONNECTION, RedstoneConnectionType.NONE).get()
-                        .withTrait(BlockStateProperties.REDSTONE_WEST_CONNECTION, RedstoneConnectionType.NONE).get())
+                        .withTrait(BlockStateProperties.REDSTONE_NORTH_CONNECTION, LanternWireAttachmentType.NONE).get()
+                        .withTrait(BlockStateProperties.REDSTONE_SOUTH_CONNECTION, LanternWireAttachmentType.NONE).get()
+                        .withTrait(BlockStateProperties.REDSTONE_EAST_CONNECTION, LanternWireAttachmentType.NONE).get()
+                        .withTrait(BlockStateProperties.REDSTONE_WEST_CONNECTION, LanternWireAttachmentType.NONE).get())
                 .selectionBox(new AABB(0, 0, 0, 1.0, 0.0625, 1.0)) // TODO: Based on connections
                 .build("minecraft", "redstone_wire"));
         ///////////////////////

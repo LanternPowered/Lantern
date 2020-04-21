@@ -12,12 +12,10 @@ package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.catalog.asString
 import org.spongepowered.api.data.type.RailDirection
 
-enum class LanternRailDirection(id: String) : RailDirection,
-        CatalogType by DefaultCatalogType.minecraft(id), InternalCatalogType.EnumOrdinal {
+enum class LanternRailDirection(id: String) : RailDirection, CatalogType by DefaultCatalogType.minecraft(id) {
 
     NORTH_SOUTH         ("north_south"),
     EAST_WEST           ("east_west"),

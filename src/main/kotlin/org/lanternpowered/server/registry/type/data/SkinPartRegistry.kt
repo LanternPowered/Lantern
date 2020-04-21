@@ -12,10 +12,12 @@ package org.lanternpowered.server.registry.type.data
 
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.data.type.LanternSkinPart
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistry
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
+import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.data.type.SkinPart
+import org.spongepowered.api.text.translation.Translatable
 
 object SkinPartRegistry : InternalCatalogTypeRegistry<SkinPart> by internalCatalogTypeRegistry({
     fun register(id: String) =
@@ -62,3 +64,6 @@ object SkinPartRegistry : InternalCatalogTypeRegistry<SkinPart> by internalCatal
         return bitPattern
     }
 }
+
+private class LanternSkinPart(key: CatalogKey) : DefaultCatalogType(key), SkinPart,
+        Translatable by Translated("options.modelPart.${key.value}")

@@ -12,11 +12,14 @@ package org.lanternpowered.server.data.meta
 
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.AbstractDataSerializable
+import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
+import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.spongepowered.api.CatalogKey
-import org.spongepowered.api.Game
 import org.spongepowered.api.data.meta.BannerPatternLayer
-import org.spongepowered.api.data.meta.PatternLayer
-import org.spongepowered.api.data.persistence.*
+import org.spongepowered.api.data.persistence.AbstractDataBuilder
+import org.spongepowered.api.data.persistence.DataContainer
+import org.spongepowered.api.data.persistence.DataQuery
+import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.type.BannerPatternShape
 import org.spongepowered.api.data.type.DyeColor
 import java.util.*
@@ -39,7 +42,7 @@ class LanternPatternLayer(
             .add("dyeColor", this.color.key)
             .toString()
 
-    class Builder(private val game: Game) : AbstractDataBuilder<BannerPatternLayer>(BannerPatternLayer::class.java, 1) {
+    class Builder : AbstractDataBuilder<BannerPatternLayer>(BannerPatternLayer::class.java, 1) {
 
         override fun buildContent(container: DataView): Optional<BannerPatternLayer> {
             val bannerShape = container.getString(BANNER_SHAPE).orElse(null)
@@ -47,10 +50,8 @@ class LanternPatternLayer(
             if (bannerShape == null || dyeColor == null) {
                 return Optional.empty()
             }
-            val shape = this.game.registry
-                    .getType(BannerPatternShape::class.java, CatalogKey.resolve(bannerShape)).orElse(null)
-            val color = this.game.registry
-                    .getType(DyeColor::class.java, CatalogKey.resolve(dyeColor)).orElse(null)
+            val shape = BannerPatternShapeRegistry[CatalogKey.resolve(bannerShape)]
+            val color = DyeColorRegistry[CatalogKey.resolve(dyeColor)]
             return if (shape == null || color == null) {
                 Optional.empty()
             } else Optional.of(LanternPatternLayer(shape, color))

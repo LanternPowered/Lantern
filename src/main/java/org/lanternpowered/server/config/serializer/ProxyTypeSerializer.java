@@ -25,6 +25,6 @@ public final class ProxyTypeSerializer implements TypeSerializer<ProxyType> {
 
     @Override
     public void serialize(TypeToken<?> type, ProxyType obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(obj.getName());
+        value.setValue(obj.getDisplayName());
     }
 }

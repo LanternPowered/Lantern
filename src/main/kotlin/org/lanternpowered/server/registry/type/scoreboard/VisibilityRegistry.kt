@@ -12,9 +12,10 @@
 package org.lanternpowered.server.registry.type.scoreboard
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
-import org.lanternpowered.server.scoreboard.LanternVisibility
 import org.spongepowered.api.scoreboard.Visibility
+import org.spongepowered.api.text.translation.FixedTranslation
 
 @get:JvmName("get")
 val VisibilityRegistry = customInternalCatalogTypeRegistry<Visibility, String> {
@@ -25,4 +26,8 @@ val VisibilityRegistry = customInternalCatalogTypeRegistry<Visibility, String> {
     register("hideForOwnTeam", "hide_for_own_team")
     register("hideForOtherTeams", "hide_for_other_teams")
     register("never", "never")
+}
+
+private class LanternVisibility(key: CatalogKey) : DefaultCatalogType(key), Visibility {
+    override fun getTranslation() = FixedTranslation(this.key.value) // TODO
 }

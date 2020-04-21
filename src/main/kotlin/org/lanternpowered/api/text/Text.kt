@@ -25,6 +25,7 @@ typealias LiteralTextBuilder = org.spongepowered.api.text.LiteralText.Builder
 typealias ScoreText = org.spongepowered.api.text.ScoreText
 typealias SelectorText = org.spongepowered.api.text.SelectorText
 typealias Text = org.spongepowered.api.text.Text
+typealias TextFactory = org.spongepowered.api.text.Text.Factory
 typealias TextBuilder = org.spongepowered.api.text.Text.Builder
 typealias TextElement = org.spongepowered.api.text.TextElement
 typealias TextRepresentable = org.spongepowered.api.text.TextRepresentable

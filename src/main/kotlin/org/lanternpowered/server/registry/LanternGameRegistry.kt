@@ -12,12 +12,23 @@ package org.lanternpowered.server.registry
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.cause.CauseStackManager
+import org.lanternpowered.api.data.KeyBuilder
+import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.registry.BuilderRegistry
 import org.lanternpowered.api.registry.GameRegistry
-import org.lanternpowered.api.registry.RecipeRegistry
-import org.lanternpowered.api.registry.VillagerRegistry
 import org.lanternpowered.api.registry.catalogTypeRegistry
+import org.lanternpowered.api.scoreboard.ScoreboardBuilder
+import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
+import org.lanternpowered.api.scoreboard.ScoreboardTeam
+import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
+import org.lanternpowered.server.data.key.SpongeValueKeyBuilder
+import org.lanternpowered.server.data.key.ValueKeyBuilder
+import org.lanternpowered.server.data.manipulator.ImmutableDataManipulatorFactory
+import org.lanternpowered.server.data.manipulator.MutableDataManipulatorFactory
+import org.lanternpowered.server.data.value.BoundedValueFactory
+import org.lanternpowered.server.data.value.ValueFactory
+import org.lanternpowered.server.effect.firework.LanternFireworkEffectBuilder
+import org.lanternpowered.server.item.ItemStackComparatorsRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerRegistry
@@ -48,16 +59,23 @@ import org.lanternpowered.server.registry.type.data.PortionTypeRegistry
 import org.lanternpowered.server.registry.type.data.ProfessionRegistry
 import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry
 import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
+import org.lanternpowered.server.registry.type.data.RecipeTypeRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
+import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
 import org.lanternpowered.server.registry.type.data.SurfaceRegistry
+import org.lanternpowered.server.registry.type.data.TeleportTypeRegistry
 import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
 import org.lanternpowered.server.registry.type.data.WireAttachmentTypeRegistry
 import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
 import org.lanternpowered.server.registry.type.economy.TransactionTypeRegistry
+import org.lanternpowered.server.registry.type.effect.particle.ParticleOptionRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
+import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
+import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
+import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
@@ -69,15 +87,59 @@ import org.lanternpowered.server.registry.type.util.BanTypeRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
 import org.lanternpowered.server.registry.type.world.PortalAgentTypeRegistry
 import org.lanternpowered.server.registry.type.world.SerializationBehaviorRegistry
+import org.lanternpowered.server.scheduler.LanternTaskBuilder
+import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder
+import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder
+import org.lanternpowered.server.scoreboard.LanternTeam
+import org.lanternpowered.server.scoreboard.LanternTeamBuilder
+import org.lanternpowered.server.text.LanternTextFactory
+import org.lanternpowered.server.text.LanternTextSerializerFactory
+import org.lanternpowered.server.text.LanternTextTemplateFactory
+import org.lanternpowered.server.timings.DummyTimingsFactory
+import org.lanternpowered.server.world.LanternWorldBorderBuilder
 import org.spongepowered.api.CatalogType
+import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.registry.RegistryEvent
+import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.util.ResettableBuilder
+import org.spongepowered.api.world.WorldBorder
 import java.util.function.Supplier
 
 class LanternGameRegistry : GameRegistry {
 
     fun init() {
+        factoryRegistry.apply {
+            register(ImmutableDataManipulatorFactory)
+            register(MutableDataManipulatorFactory)
+            register(ValueFactory)
+            register(BoundedValueFactory)
+
+            register(ItemStackComparatorsRegistry)
+
+            register(LanternTextFactory)
+            register(LanternTextSerializerFactory)
+            register(LanternTextTemplateFactory)
+
+            register(DummyTimingsFactory)
+        }
+
+        builderRegistry.apply {
+            register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
+            register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }
+
+            register<FireworkEffectBuilder> { LanternFireworkEffectBuilder() }
+
+            register<Task.Builder> { LanternTaskBuilder() }
+
+            register<ScoreboardBuilder> { LanternScoreboardBuilder() }
+            register<ScoreboardObjectiveBuilder> { LanternObjectiveBuilder() }
+            register<ScoreboardTeamBuilder> { LanternTeamBuilder() }
+
+            register<WorldBorder.Builder> { LanternWorldBorderBuilder() }
+        }
+
         catalogRegistry.apply {
             register(AdvancementRegistry)
             register(AdvancementTreeRegistry)
@@ -102,7 +164,10 @@ class LanternGameRegistry : GameRegistry {
             register(PickupRuleRegistry)
             register(ProfessionRegistry)
             register(RabbitTypeRegistry)
+            register(RecipeTypeRegistry)
             register(SkinPartRegistry)
+            register(SpawnTypeRegistry)
+            register(TeleportTypeRegistry)
             register(VillagerTypeRegistry)
             register(WoodTypeRegistry)
 
@@ -121,10 +186,17 @@ class LanternGameRegistry : GameRegistry {
 
             register(TransactionTypeRegistry)
 
+            register(ParticleOptionRegistry)
+
             register(SoundCategoryRegistry)
             register(SoundTypeRegistry)
 
+            register(FluidTypeRegistry)
+
+            register(EquipmentTypeRegistry)
+
             register(CollisionRuleRegistry)
+            register(CriterionRegistry)
             register(DisplaySlotRegistry)
             register(ObjectiveDisplayModeRegistry)
             register(VisibilityRegistry)
@@ -153,9 +225,8 @@ class LanternGameRegistry : GameRegistry {
         val cause = CauseStackManager.currentCause
         val builderRegistryEvent = object : RegistryEvent.Builder {
             override fun getCause(): Cause = cause
-            override fun <T : ResettableBuilder<*, in T>> register(builderClass: Class<T>, supplier: Supplier<in T>) {
-                TODO()
-            }
+            override fun <T : ResettableBuilder<*, in T>> register(builderClass: Class<T>, supplier: Supplier<in T>) =
+                    builderRegistry.register(builderClass, supplier)
         }
         EventManager.post(builderRegistryEvent)
     }
@@ -178,18 +249,9 @@ class LanternGameRegistry : GameRegistry {
         EventManager.post(catalogRegistryEvent)
     }
 
-    override fun getBuilderRegistry(): BuilderRegistry {
-        TODO("Not yet implemented")
-    }
-
+    override fun getBuilderRegistry() = LanternBuilderRegistry
     override fun getCatalogRegistry() = LanternCatalogRegistry
     override fun getFactoryRegistry() = LanternFactoryRegistry
-
-    override fun getRecipeRegistry(): RecipeRegistry {
-        TODO("Not yet implemented")
-    }
-
-    override fun getVillagerRegistry(): VillagerRegistry {
-        TODO("Not yet implemented")
-    }
+    override fun getRecipeRegistry() = LanternRecipeRegistry
+    override fun getVillagerRegistry() = LanternVillagerRegistry
 }

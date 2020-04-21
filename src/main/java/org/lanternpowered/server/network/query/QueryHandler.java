@@ -236,7 +236,7 @@ class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private String getWorldName() {
         final Collection<World> worlds = this.queryServer.getGame().getServer().getWorlds();
         if (!worlds.isEmpty()) {
-            return worlds.iterator().next().getName();
+            return worlds.iterator().next().getProperties().getDirectoryName();
         }
         return "none";
     }

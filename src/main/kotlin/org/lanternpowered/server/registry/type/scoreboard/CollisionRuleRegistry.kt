@@ -12,9 +12,10 @@
 package org.lanternpowered.server.registry.type.scoreboard
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
-import org.lanternpowered.server.scoreboard.LanternCollisionRule
 import org.spongepowered.api.scoreboard.CollisionRule
+import org.spongepowered.api.text.translation.FixedTranslation
 
 @get:JvmName("get")
 val CollisionRuleRegistry = customInternalCatalogTypeRegistry<CollisionRule, String> {
@@ -25,4 +26,8 @@ val CollisionRuleRegistry = customInternalCatalogTypeRegistry<CollisionRule, Str
     register("pushOwnTeam", "push_own_team")
     register("pushOtherTeams", "push_other_teams")
     register("never", "never")
+}
+
+class LanternCollisionRule(key: CatalogKey) : DefaultCatalogType(key), CollisionRule {
+    override fun getTranslation() = FixedTranslation(this.key.value) // TODO
 }

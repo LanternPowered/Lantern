@@ -11,8 +11,8 @@
 package org.lanternpowered.server.registry.type.scoreboard
 
 import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.lanternpowered.server.scoreboard.LanternObjectiveDisplayMode
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode
 
 val ObjectiveDisplayModeRegistry = internalCatalogTypeRegistry<ObjectiveDisplayMode> {
@@ -22,3 +22,5 @@ val ObjectiveDisplayModeRegistry = internalCatalogTypeRegistry<ObjectiveDisplayM
     register("integer")
     register("hearts")
 }
+
+private class LanternObjectiveDisplayMode(key: CatalogKey) : DefaultCatalogType(key), ObjectiveDisplayMode

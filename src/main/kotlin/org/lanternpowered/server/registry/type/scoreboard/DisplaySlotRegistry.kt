@@ -13,9 +13,10 @@ package org.lanternpowered.server.registry.type.scoreboard
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.text.format.TextColor
+import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
-import org.lanternpowered.server.scoreboard.LanternDisplaySlot
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot
 
 @get:JvmName("get")
@@ -40,4 +41,17 @@ val DisplaySlotRegistry = internalCatalogTypeRegistry<DisplaySlot> {
         // val name = "sidebar.team." + textColor.key.value
         registerSidebar(3 + TextColorRegistry.getId(teamColor), id, teamColor)
     }
+}
+
+private class LanternDisplaySlot(
+        key: CatalogKey,
+        private val teamColor: org.spongepowered.api.text.format.TextColor?,
+        private val withTeamColor: ((org.spongepowered.api.text.format.TextColor?) -> DisplaySlot)?
+) : DefaultCatalogType(key), DisplaySlot {
+
+    override fun withTeamColor(color: org.spongepowered.api.text.format.TextColor?) = this.withTeamColor?.invoke(color) ?: this
+    override fun getTeamColor() = this.teamColor.optional()
+    override fun toStringHelper() = super.toStringHelper()
+            .omitNullValues()
+            .add("teamColor", this.teamColor)
 }

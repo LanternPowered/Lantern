@@ -54,10 +54,10 @@ object LanternCatalogRegistry : CatalogRegistry {
     fun <T : CatalogType> getRegistry(catalogClass: Class<T>): CatalogTypeRegistry<T>? =
             this.registriesByType[catalogClass] as CatalogTypeRegistry<T>?
 
-    fun <T : CatalogType> requireRegistry(catalogClass: Class<T>): CatalogTypeRegistry<T> =
+    private fun <T : CatalogType> requireRegistry(catalogClass: Class<T>): CatalogTypeRegistry<T> =
             getRegistry(catalogClass) ?: error("No registry is registered for the type ${catalogClass.simpleName}")
 
-    fun <T : CatalogType> requireRegistry(catalogClass: KClass<T>): CatalogTypeRegistry<T> =
+    private fun <T : CatalogType> requireRegistry(catalogClass: KClass<T>): CatalogTypeRegistry<T> =
             requireRegistry(catalogClass.java)
 
     override fun <T : CatalogType, E : T> provideSupplier(catalogClass: KClass<T>, suggestedId: String): Supplier<E> =

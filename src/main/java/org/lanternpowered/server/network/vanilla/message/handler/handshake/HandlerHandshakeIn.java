@@ -65,6 +65,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         switch (proxyType) {
             case WATERFALL:
             case BUNGEE_CORD:
+            case VELOCITY:
                 String[] split = hostname.split("\0\\|", 2);
 
                 // Check for a fml marker
@@ -80,7 +81,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                         try {
                             properties = LanternProfileProperty.createPropertiesMapFromJson(GSON.fromJson(split[3], JsonArray.class));
                         } catch (Exception e) {
-                            session.disconnect(t("Invalid %s proxy data format.", proxyType.getName()));
+                            session.disconnect(t("Invalid %s proxy data format.", proxyType.getDisplayName()));
                             throw new CodecException(e);
                         }
                     } else {
@@ -132,7 +133,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
                     virtualAddress = new InetSocketAddress(host, port);
                 } catch (Exception e) {
-                    session.disconnect(t("Invalid %s proxy data format.", proxyType.getName()));
+                    session.disconnect(t("Invalid %s proxy data format.", proxyType.getDisplayName()));
                     throw new CodecException(e);
                 }
                 break;

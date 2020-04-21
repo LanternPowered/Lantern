@@ -11,6 +11,7 @@
 package org.lanternpowered.server.text
 
 import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextFactory
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextFormat
@@ -18,7 +19,6 @@ import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.format.TextStyles
 import org.lanternpowered.api.text.translation.Translatable
 import org.lanternpowered.api.text.translation.Translation
-import org.lanternpowered.api.x.text.XTextFactory
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
@@ -26,7 +26,7 @@ import org.spongepowered.api.text.action.ShiftClickAction
 import org.spongepowered.api.text.action.TextAction
 import org.spongepowered.api.text.selector.Selector
 
-object LanternTextFactory : XTextFactory {
+object LanternTextFactory : TextFactory {
 
     override fun of(vararg objects: Any): Text = of(objects.asList())
 

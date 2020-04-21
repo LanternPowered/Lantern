@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.item;
 
+import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.DurabilityData;
 import org.spongepowered.api.data.property.Property;
@@ -71,10 +72,9 @@ public class ItemStackComparatorRegistryModule implements RegistryModule {
 
     private static final class ItemDataComparator implements Comparator<ItemStack> {
 
-        private final Class<? extends DataManipulator<?, ?>>[] ignored;
+        private final Set<Key<?>> ignored;
 
-        @SafeVarargs
-        ItemDataComparator(Class<? extends DataManipulator<?, ?>>... ignored) {
+        ItemDataComparator(Set<Key<?>> ignored) {
             this.ignored = ignored;
         }
 

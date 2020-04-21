@@ -94,9 +94,6 @@ dependencies {
     compile 'org.xerial:sqlite-jdbc:3.21.0.1'
     compile 'com.h2database:h2:1.4.197'
 
-    // Scripting
-    compile 'org.codehaus.groovy:groovy-all:2.4.15'
-
     // Asm
     compile 'org.ow2.asm:asm:7.1'
     compile 'org.ow2.asm:asm-tree:7.1'

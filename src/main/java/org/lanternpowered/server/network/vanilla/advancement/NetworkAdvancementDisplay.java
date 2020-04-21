@@ -11,23 +11,22 @@
 package org.lanternpowered.server.network.vanilla.advancement;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.advancement.LanternAdvancementType;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.math.vector.Vector2d;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class NetworkAdvancementDisplay {
 
     private final Text title;
     private final Text description;
     private final ItemStackSnapshot icon;
-    private final LanternAdvancementType frameType;
+    private final AdvancementType frameType;
     @Nullable private final String background;
     private final Vector2d position;
     private final boolean showToast;
@@ -35,7 +34,7 @@ public final class NetworkAdvancementDisplay {
 
     public NetworkAdvancementDisplay(Text title, Text description, ItemStackSnapshot icon, AdvancementType frameType,
             @Nullable String background, Vector2d position, boolean showToast, boolean hidden) {
-        this.frameType = (LanternAdvancementType) frameType;
+        this.frameType = frameType;
         this.description = description;
         this.background = background;
         this.showToast = showToast;
@@ -49,7 +48,7 @@ public final class NetworkAdvancementDisplay {
         ctx.write(buf, ContextualValueTypes.TEXT, this.title);
         ctx.write(buf, ContextualValueTypes.TEXT, this.description);
         ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.icon.createStack());
-        buf.writeVarInt(this.frameType.getInternalId());
+        buf.writeVarInt(AdvancementTypeRegistry.get().getId(this.frameType));
         int flags = 0;
         if (this.background != null) {
             flags |= 0x1;

@@ -16,7 +16,7 @@ import org.spongepowered.api.effect.particle.ParticleOption
 
 class LanternParticleOption<V> @JvmOverloads constructor(
         key: CatalogKey, private val valueType: Class<V>,
-        internal val valueValidator: (V) -> IllegalArgumentException? = { _ -> null }
+        internal val valueValidator: (V) -> Unit = {}
 ) : DefaultCatalogType(key), ParticleOption<V> {
 
     override fun getValueType() = this.valueType

@@ -8,8 +8,11 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.scoreboard
+package org.lanternpowered.server.network.rcon
 
-typealias ScoreboardTeam = org.spongepowered.api.scoreboard.Team
-typealias ScoreboardTeamBuilder = org.spongepowered.api.scoreboard.Team.Builder
-typealias ScoreboardTeamMember = org.spongepowered.api.scoreboard.TeamMember
+import org.spongepowered.api.service.rcon.RconService
+
+data class EmptyRconService(private val password: String) : RconService {
+    override fun isRconEnabled(): Boolean = false
+    override fun getRconPassword(): String = this.password
+}

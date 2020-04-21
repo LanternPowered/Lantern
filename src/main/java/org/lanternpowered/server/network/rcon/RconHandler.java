@@ -190,7 +190,7 @@ final class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         int start = 0;
         while (start < payload.length()) {
             final int length = payload.length() - start;
-            final int truncated = length > 2048 ? 2048 : length;
+            final int truncated = Math.min(length, 2048);
 
             sendResponse(ctx, requestId, TYPE_RESPONSE, payload.substring(start, truncated));
             start += truncated;

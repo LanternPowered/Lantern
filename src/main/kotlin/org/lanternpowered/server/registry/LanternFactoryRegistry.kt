@@ -10,11 +10,22 @@
  */
 package org.lanternpowered.server.registry
 
+import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.registry.FactoryRegistry
 
 object LanternFactoryRegistry : FactoryRegistry {
 
-    override fun <T : Any> provideFactory(clazz: Class<T>): T {
-        TODO("Not yet implemented")
+    private val factories = mutableMapOf<Class<*>, Any>()
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> provideFactory(clazz: Class<T>): T =
+            this.factories[clazz] as? T ?: error("There's no factory registered with the type ${clazz.simpleName}.")
+
+    fun register(factory: Any) {
+        val factoryTypes = TypeToken.of(factory.javaClass).types.rawTypes()
+                .filterNot { it as Class<*> != Object::class.java }
+                .filter { it.isInterface }
+        for (factoryType in factoryTypes)
+            this.factories.putIfAbsent(factoryType, factory)
     }
 }

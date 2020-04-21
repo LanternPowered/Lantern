@@ -12,10 +12,27 @@ package org.lanternpowered.server.registry
 
 import org.lanternpowered.api.registry.BaseBuilder
 import org.lanternpowered.api.registry.BuilderRegistry
+import org.lanternpowered.api.util.uncheckedCast
+import java.util.function.Supplier
+import kotlin.reflect.KClass
 
 object LanternBuilderRegistry : BuilderRegistry {
 
-    override fun <T : BaseBuilder<*, in T>> provideBuilder(builderClass: Class<T>): T {
-        TODO("Not yet implemented")
+    private val builders = mutableMapOf<Class<*>, Supplier<BaseBuilder<*,*>>>()
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : BaseBuilder<*, in T>> provideBuilder(builderClass: Class<T>): T =
+            this.builders[builderClass] as T
+
+    inline fun <reified T : BaseBuilder<*, in T>> register(noinline supplier: () -> T) = register(T::class, supplier)
+
+    fun <T : BaseBuilder<*, in T>> register(builderClass: KClass<T>, supplier: () -> T) =
+            register(builderClass.java, Supplier(supplier))
+
+    fun <T : BaseBuilder<*, in T>> register(builderClass: KClass<T>, supplier: Supplier<in T>) =
+            register(builderClass.java, supplier)
+
+    fun <T : BaseBuilder<*, in T>> register(builderClass: Class<T>, supplier: Supplier<in T>) {
+        this.builders[builderClass] = supplier.uncheckedCast()
     }
 }

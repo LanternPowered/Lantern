@@ -43,9 +43,7 @@ object LanternTextSerializerFactory : TextSerializerFactory, TextSerializers.Fac
             TextConstants.LEGACY_CHAR -> LanternLegacyTextSerializer
             this.defaultFormattingCode -> this.defaultFormattingCodeTextSerializer
             else -> this.formattingCodeSerializers.computeIfAbsent(code) {
-                val serializer = LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
-                TextSerializerRegistryModule.register(serializer)
-                serializer
+                LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
             }
         }
     }

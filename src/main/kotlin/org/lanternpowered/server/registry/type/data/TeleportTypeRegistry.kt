@@ -8,20 +8,22 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.registry.type.economy
+package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.service.economy.transaction.TransactionType
+import org.spongepowered.api.event.cause.entity.teleport.TeleportType
 
-val TransactionTypeRegistry = catalogTypeRegistry<TransactionType> {
+val TeleportTypeRegistry = catalogTypeRegistry<TeleportType> {
     fun register(id: String) =
-            register(LanternTransactionType(CatalogKey.sponge(id)))
+            register(LanternTeleportType(CatalogKey.minecraft(id)))
 
-    register("deposit")
-    register("withdraw")
-    register("transfer")
+    register("command")
+    register("entity_teleport")
+    register("plugin")
+    register("portal")
+    register("unknown")
 }
 
-private class LanternTransactionType(key: CatalogKey) : DefaultCatalogType(key), TransactionType
+private class LanternTeleportType(key: CatalogKey) : DefaultCatalogType(key), TeleportType

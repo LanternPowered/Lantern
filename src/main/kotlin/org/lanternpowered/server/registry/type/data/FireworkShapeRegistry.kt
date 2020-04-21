@@ -13,7 +13,7 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.effect.firework.FireworkShape
-import org.lanternpowered.server.effect.firework.LanternFireworkShape
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 
 @get:JvmName("get")
@@ -27,3 +27,5 @@ val FireworkShapeRegistry = internalCatalogTypeRegistry<FireworkShape> {
     register("creeper")
     register("burst")
 }
+
+private class LanternFireworkShape(key: CatalogKey) : DefaultCatalogType(key), FireworkShape

@@ -8,8 +8,15 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.scoreboard
+package org.lanternpowered.server.timings
 
-typealias ScoreboardTeam = org.spongepowered.api.scoreboard.Team
-typealias ScoreboardTeamBuilder = org.spongepowered.api.scoreboard.Team.Builder
-typealias ScoreboardTeamMember = org.spongepowered.api.scoreboard.TeamMember
+import co.aikar.timings.Timing
+
+object DummyTiming : Timing {
+    override fun startTiming(): Timing = this
+    override fun stopTiming() {}
+    override fun startTimingIfSync() {}
+    override fun stopTimingIfSync() {}
+    override fun abort() {}
+    override fun close() {}
+}

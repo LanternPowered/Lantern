@@ -68,10 +68,7 @@ class LanternParticleEffectBuilder : AbstractDataBuilder<ParticleEffect>(Particl
 
     @Throws(IllegalArgumentException::class)
     override fun <V> option(option: ParticleOption<V>, value: V): ParticleEffect.Builder = apply {
-        val exception = (option as LanternParticleOption<V>).valueValidator.invoke(value)
-        if (exception != null) {
-            throw exception
-        }
+        (option as LanternParticleOption<V>).valueValidator(value)
         var actualValue: Any = value as Any
         if (actualValue is List<*>) {
             actualValue = ImmutableList.copyOf(value as List<*>)

@@ -21,6 +21,7 @@ import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
+import org.lanternpowered.server.registry.type.data.SkinPartRegistry;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
@@ -73,7 +74,7 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
                 (byte) (this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT) == HandPreferences.RIGHT ? 1 : 0));
         final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
         parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
-                (byte) (skinParts == null ? 0xff : LanternSkinPart.toBitPattern(skinParts)));
+                (byte) (skinParts == null ? 0xff : SkinPartRegistry.INSTANCE.toBitPattern(skinParts)));
     }
 
     @Override
@@ -87,7 +88,7 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
         if (!Objects.equals(this.lastSkinParts, skinParts)) {
             parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
-                    (byte) (skinParts == null ? 0xff : LanternSkinPart.toBitPattern(skinParts)));
+                    (byte) (skinParts == null ? 0xff : SkinPartRegistry.INSTANCE.toBitPattern(skinParts)));
             this.lastSkinParts = skinParts;
         }
     }

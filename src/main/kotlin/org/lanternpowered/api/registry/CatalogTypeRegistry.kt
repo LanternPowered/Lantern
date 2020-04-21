@@ -17,23 +17,6 @@ import org.lanternpowered.api.util.type.typeTokenOf
 import java.util.function.Supplier
 
 /**
- * A builder for [CatalogTypeRegistry]s.
- */
-interface CatalogTypeRegistryBuilder<T : CatalogType> {
-
-    /**
-     * Allows registrations by plugins. This will trigger an event
-     * after the initial registration and each reload.
-     */
-    fun allowPluginRegistrations()
-
-    /**
-     * Registers a new [CatalogType].
-     */
-    fun register(type: T)
-}
-
-/**
  * Constructs a new [CatalogTypeRegistry].
  */
 inline fun <reified T : CatalogType> catalogTypeRegistry(noinline fn: CatalogTypeRegistryBuilder<T>.() -> Unit): CatalogTypeRegistry<T> =
@@ -48,7 +31,9 @@ fun <T : CatalogType> catalogTypeRegistry(typeToken: TypeToken<T>, fn: CatalogTy
 /**
  * A registry for catalog types.
  */
-interface CatalogTypeRegistry<T : CatalogType> {
+interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
+
+    override fun iterator(): Iterator<T> = this.all.iterator()
 
     /**
      * The type token of the base catalog type.

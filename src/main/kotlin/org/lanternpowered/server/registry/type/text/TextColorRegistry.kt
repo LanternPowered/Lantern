@@ -12,7 +12,7 @@ package org.lanternpowered.server.registry.type.text
 
 import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistry
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
@@ -22,7 +22,7 @@ import org.spongepowered.api.util.Color
 
 object TextColorRegistry: InternalCatalogTypeRegistry<TextColor> by internalCatalogTypeRegistry({
     fun register(id: String, color: Color, code: Char? = null) {
-        val textColor = LanternTextColor(CatalogKeys.minecraft(id), color)
+        val textColor = LanternTextColor(CatalogKey.minecraft(id), color)
         register(textColor)
         if (code != null) {
             TextColorRegistry.toCode[textColor] = code

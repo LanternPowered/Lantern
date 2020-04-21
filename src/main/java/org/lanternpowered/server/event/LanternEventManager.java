@@ -45,7 +45,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.impl.AbstractEvent;
-import org.spongepowered.api.event.impl.AbstractValueChangeEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.lang.invoke.MethodHandle;
@@ -77,8 +76,6 @@ public class LanternEventManager implements EventManager {
 
     private static final boolean SHOULD_FIRE_ALL_TRUE =
             SystemProperties.get().getBooleanProperty("sponge.shouldFireAll");
-
-    private static final TypeVariable<?> GENERIC_EVENT_TYPE = GenericEvent.class.getTypeParameters()[0];
 
     private final Logger logger;
     private final Object lock = new Object();
@@ -412,7 +409,7 @@ public class LanternEventManager implements EventManager {
             Order order, EventListener<? super T> handler) {
         TypeToken<?> genericType = null;
         if (GenericEvent.class.isAssignableFrom(eventType.getRawType())) {
-            genericType = eventType.resolveType(GENERIC_EVENT_TYPE);
+            genericType = eventType;
         }
         return new RegisteredListener(plugin, new EventType(eventType.getRawType(), genericType), order, handler);
     }
@@ -471,6 +468,7 @@ public class LanternEventManager implements EventManager {
             eventType = new EventType(eventClass, null);
         }
         final List<RegisteredListener<?>> listeners = this.listenersCache.get(eventType);
+        /* TODO
         // Special case
         if (event instanceof AbstractValueChangeEvent) {
             final AbstractValueChangeEvent event1 = (AbstractValueChangeEvent) event;
@@ -506,6 +504,7 @@ public class LanternEventManager implements EventManager {
                 }
             });
         }
+        */
         return post(event, listeners);
     }
 

@@ -13,18 +13,16 @@ package org.lanternpowered.server.scoreboard
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot
 import org.spongepowered.api.text.format.TextColor
 
 class LanternDisplaySlot(
         key: CatalogKey,
         private val teamColor: TextColor?,
-        private val withTeamColor: (TextColor?) -> DisplaySlot,
-        override val internalId: Int
-) : DefaultCatalogType(key), DisplaySlot, InternalCatalogType {
+        private val withTeamColor: ((TextColor?) -> DisplaySlot)?
+) : DefaultCatalogType(key), DisplaySlot {
 
-    override fun withTeamColor(color: TextColor?) = this.withTeamColor.invoke(color)
+    override fun withTeamColor(color: TextColor?) = this.withTeamColor?.invoke(color) ?: this
     override fun getTeamColor() = this.teamColor.optional()
     override fun toStringHelper() = super.toStringHelper()
             .omitNullValues()

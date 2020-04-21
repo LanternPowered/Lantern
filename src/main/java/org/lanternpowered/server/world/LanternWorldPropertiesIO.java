@@ -20,7 +20,6 @@ import org.lanternpowered.server.data.type.MoonPhase;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModule;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -37,6 +36,7 @@ import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gamerule.GameRule;
 import org.spongepowered.api.world.gen.GeneratorType;
 import org.spongepowered.api.world.gen.GeneratorTypes;
@@ -367,10 +367,10 @@ final class LanternWorldPropertiesIO {
         if (copyLevelSettingsToConfig) {
             worldConfig.getGeneration().setSeed(dataView.getLong(SEED).get());
             worldConfig.setGameMode(GameModeRegistryModule.get().getByInternalId(dataView.getInt(GAME_MODE).get())
-                    .orElse(GameModes.SURVIVAL));
+                    .orElseGet(GameModes.SURVIVAL));
             worldConfig.setHardcore(dataView.getInt(HARDCORE).get() > 0);
-            worldConfig.setDifficulty(DifficultyRegistryModule.get().getByInternalId(dataView.getInt(DIFFICULTY).get())
-                    .orElse(Difficulties.NORMAL));
+            @Nullable final Difficulty difficulty = DifficultyRegistryKt.getDifficultyRegistry().get(dataView.getInt(DIFFICULTY).get());
+            worldConfig.setDifficulty(difficulty == null ? Difficulties.NORMAL.get() : difficulty);
 
             if (dataView.contains(GENERATOR_NAME)) {
                 final String genName0 = dataView.getString(GENERATOR_NAME).get();

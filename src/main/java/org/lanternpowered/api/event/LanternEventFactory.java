@@ -10,6 +10,9 @@
  */
 package org.lanternpowered.api.event;
 
+import com.google.common.reflect.TypeParameter;
+import com.google.common.reflect.TypeToken;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.entity.Entity;
@@ -22,12 +25,15 @@ import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.CooldownEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.OptionalInt;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -72,6 +78,17 @@ public class LanternEventFactory {
             @NonNull DataTransactionResult originalChanges,
             DataHolder.@NonNull Mutable targetHolder) {
         return SpongeEventFactory.createChangeDataHolderEventValueChange(cause, originalChanges, targetHolder);
+    }
+
+    public static <T> ChangeServiceProviderEvent<T> createChangeServiceProviderEvent(
+            @NonNull Cause cause,
+            @NonNull ProviderRegistration<T> newProviderRegistration,
+            @Nullable ProviderRegistration<T> previousProviderRegistration) {
+        final TypeToken<ChangeServiceProviderEvent<T>> typeToken = new TypeToken<ChangeServiceProviderEvent<T>>() {}.where(
+                new TypeParameter<T>() {}, newProviderRegistration.getService());
+        //noinspection unchecked
+        return SpongeEventFactory.createChangeServiceProviderEvent(cause, typeToken,
+                newProviderRegistration, Optional.ofNullable(previousProviderRegistration));
     }
 
     public static CooldownEvent.@NonNull End createCooldownEventEnd(

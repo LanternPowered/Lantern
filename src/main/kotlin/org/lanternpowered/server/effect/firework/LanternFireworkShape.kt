@@ -13,7 +13,5 @@ package org.lanternpowered.server.effect.firework
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.effect.firework.FireworkShape
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 
-class LanternFireworkShape(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), FireworkShape, InternalCatalogType
+class LanternFireworkShape(key: CatalogKey) : DefaultCatalogType(key), FireworkShape

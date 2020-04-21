@@ -16,7 +16,6 @@ import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.text.serializer.PlainTextSerializer
 import org.lanternpowered.api.text.serializer.TextSerializerFactory
-import org.lanternpowered.server.game.registry.type.text.TextSerializerRegistryModule
 import org.spongepowered.api.text.serializer.TextSerializers
 import java.util.concurrent.ConcurrentHashMap
 

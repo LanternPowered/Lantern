@@ -12,11 +12,9 @@ package org.lanternpowered.server.world.difficulty
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.world.difficulty.Difficulty
 
-class LanternDifficulty(key: CatalogKey, override val internalId: Int) :
-        DefaultCatalogType(key), Difficulty, InternalCatalogType,
+class LanternDifficulty(key: CatalogKey) : DefaultCatalogType(key), Difficulty,
         Translatable by Translated("options.difficulty.${key.value}")

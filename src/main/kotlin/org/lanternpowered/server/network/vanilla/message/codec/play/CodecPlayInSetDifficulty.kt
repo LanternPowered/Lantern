@@ -10,15 +10,14 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play
 
-import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModule
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.message.codec.Codec
 import org.lanternpowered.server.network.message.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSetDifficulty
+import org.lanternpowered.server.registry.type.data.DifficultyRegistry
 
 class CodecPlayInSetDifficulty : Codec<MessagePlayInSetDifficulty> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): MessagePlayInSetDifficulty {
-        return MessagePlayInSetDifficulty(DifficultyRegistryModule.get().getByInternalId(buf.readVarInt()).get())
-    }
+    override fun decode(context: CodecContext, buf: ByteBuffer): MessagePlayInSetDifficulty =
+            MessagePlayInSetDifficulty(DifficultyRegistry.require(buf.readVarInt()))
 }

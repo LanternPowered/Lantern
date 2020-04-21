@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.data.type.LanternArtType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.ArtType
 
 val ArtTypeRegistry = internalCatalogTypeRegistry<ArtType> {
     fun register(id: String, name: String, width: Int, height: Int) =
-            register(LanternArtType(CatalogKeys.minecraft(id), name, width, height))
+            register(LanternArtType(CatalogKey.minecraft(id), name, width, height))
 
     register("alban", "Alban", 1, 1)
     register("aztec", "Aztec", 1, 1)

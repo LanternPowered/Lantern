@@ -14,5 +14,4 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.BannerPatternShape
 
-class LanternBannerPatternShape constructor(key: CatalogKey, val internalId: String) :
-        DefaultCatalogType(key), BannerPatternShape
+class LanternBannerPatternShape constructor(key: CatalogKey) : DefaultCatalogType(key), BannerPatternShape

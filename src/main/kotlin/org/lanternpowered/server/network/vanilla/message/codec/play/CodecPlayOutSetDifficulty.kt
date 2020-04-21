@@ -14,13 +14,13 @@ import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.message.codec.Codec
 import org.lanternpowered.server.network.message.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty
-import org.lanternpowered.server.world.difficulty.LanternDifficulty
+import org.lanternpowered.server.registry.type.data.DifficultyRegistry
 
 class CodecPlayOutSetDifficulty : Codec<MessagePlayOutSetDifficulty> {
 
     override fun encode(context: CodecContext, message: MessagePlayOutSetDifficulty): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {
-            writeByte((message.difficulty as LanternDifficulty).internalId.toByte())
+            writeByte(DifficultyRegistry.getId(message.difficulty).toByte())
             writeBoolean(message.locked)
         }
     }

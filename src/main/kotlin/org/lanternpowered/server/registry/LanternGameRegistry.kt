@@ -25,7 +25,9 @@ import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegist
 import org.lanternpowered.server.registry.type.boss.BossBarColorRegistry
 import org.lanternpowered.server.registry.type.boss.BossBarOverlayRegistry
 import org.lanternpowered.server.registry.type.data.ArtTypeRegistry
+import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.CatTypeRegistry
+import org.lanternpowered.server.registry.type.data.FireworkShapeRegistry
 import org.lanternpowered.server.registry.type.data.HandPreferenceRegistry
 import org.lanternpowered.server.registry.type.data.HandTypeRegistry
 import org.lanternpowered.server.registry.type.data.HorseColorRegistry
@@ -35,13 +37,24 @@ import org.lanternpowered.server.registry.type.data.MusicDiscRegistry
 import org.lanternpowered.server.registry.type.data.NotePitchRegistry
 import org.lanternpowered.server.registry.type.data.PickupRuleRegistry
 import org.lanternpowered.server.registry.type.data.ProfessionRegistry
+import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry
+import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
 import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
 import org.lanternpowered.server.registry.type.economy.TransactionTypeRegistry
+import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistry
+import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
+import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
+import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
+import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
+import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 import org.lanternpowered.server.registry.type.text.ChatTypeRegistry
 import org.lanternpowered.server.registry.type.text.ChatVisibilityRegistry
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
+import org.lanternpowered.server.registry.type.text.TextSerializerRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
+import org.lanternpowered.server.registry.type.world.DifficultyRegistry
+import org.lanternpowered.server.registry.type.world.PortalAgentTypeRegistry
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.registry.RegistryEvent
@@ -61,7 +74,9 @@ class LanternGameRegistry : GameRegistry {
             register(BossBarOverlayRegistry)
 
             register(ArtTypeRegistry)
+            register(BannerPatternShapeRegistry)
             register(CatTypeRegistry)
+            register(FireworkShapeRegistry)
             register(HandPreferenceRegistry)
             register(HandTypeRegistry)
             register(HorseColorRegistry)
@@ -71,16 +86,30 @@ class LanternGameRegistry : GameRegistry {
             register(NotePitchRegistry)
             register(PickupRuleRegistry)
             register(ProfessionRegistry)
+            register(RabbitTypeRegistry)
+            register(SkinPartRegistry)
             register(VillagerTypeRegistry)
             register(WoodTypeRegistry)
 
             register(TransactionTypeRegistry)
 
+            register(SoundCategoryRegistry)
+            register(SoundTypeRegistry)
+
+            register(CollisionRuleRegistry)
+            register(DisplaySlotRegistry)
+            register(ObjectiveDisplayModeRegistry)
+            register(VisibilityRegistry)
+
             register(ChatTypeRegistry)
             register(ChatVisibilityRegistry)
             register(TextColorRegistry)
+            register(TextSerializerRegistry)
 
             register(BanTypeRegistry)
+
+            register(DifficultyRegistry)
+            register(PortalAgentTypeRegistry)
         }
 
         // Allow plugins to register their catalog type, builders and factories

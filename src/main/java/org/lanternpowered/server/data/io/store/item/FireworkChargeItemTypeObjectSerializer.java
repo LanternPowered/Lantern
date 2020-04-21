@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.data.io.store.item;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.effect.firework.LanternFireworkShape;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
+import org.lanternpowered.server.registry.type.data.FireworkShapeRegistry;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -72,7 +72,7 @@ final class FireworkChargeItemTypeObjectSerializer extends ItemTypeObjectSeriali
         final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(FLICKER, (byte) (effect.flickers() ? 1 : 0));
         dataView.set(TRAIL, (byte) (effect.hasTrail() ? 1 : 0));
-        dataView.set(TYPE, (byte) ((LanternFireworkShape) effect.getShape()).getInternalId());
+        dataView.set(TYPE, (byte) FireworkShapeRegistry.get().getId(effect.getShape()));
         dataView.set(COLORS, effect.getColors().stream().mapToInt(Color::getRgb).toArray());
         dataView.set(FADE_COLORS, effect.getFadeColors().stream().mapToInt(Color::getRgb).toArray());
         return dataView;
@@ -82,11 +82,11 @@ final class FireworkChargeItemTypeObjectSerializer extends ItemTypeObjectSeriali
         final FireworkEffect.Builder builder = FireworkEffect.builder();
         dataView.getInt(FLICKER).ifPresent(v -> builder.flicker(v > 0));
         dataView.getInt(TRAIL).ifPresent(v -> builder.trail(v > 0));
-        final Optional<FireworkShape> shape = FireworkShapeRegistryModule.get().getByInternalId(dataView.getInt(TYPE).get());
-        if (!shape.isPresent()) {
+        @Nullable final FireworkShape shape = FireworkShapeRegistry.get().get(dataView.getInt(TYPE).get());
+        if (shape == null) {
             Lantern.getLogger().warn("Deserialized firework explosion data with unknown shape: {}", dataView.getInt(TYPE).get());
         } else {
-            builder.shape(shape.get());
+            builder.shape(shape);
         }
         dataView.get(COLORS).ifPresent(array -> {
             final int[] iArray = (int[]) array;

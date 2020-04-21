@@ -10,9 +10,12 @@
  */
 package org.lanternpowered.server.data.io;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
+import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry;
+import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry;
+import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.LanternTexts;
@@ -21,13 +24,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.scoreboard.CollisionRule;
-import org.spongepowered.api.scoreboard.CollisionRules;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
-import org.spongepowered.api.scoreboard.Visibilities;
-import org.spongepowered.api.scoreboard.Visibility;
 import org.spongepowered.api.scoreboard.criteria.Criteria;
 import org.spongepowered.api.scoreboard.criteria.Criterion;
 import org.spongepowered.api.scoreboard.objective.Objective;
@@ -49,8 +48,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class ScoreboardIO {
 
@@ -161,27 +158,15 @@ public class ScoreboardIO {
                     .prefix(LanternTexts.fromLegacy(entry.getString(PREFIX).get()))
                     .suffix(LanternTexts.fromLegacy(entry.getString(SUFFIX).get()))
                     .members(entry.getStringList(MEMBERS).get().stream().map(LanternTexts::fromLegacy).collect(Collectors.toSet()));
-            entry.getString(NAME_TAG_VISIBILITY).ifPresent(value -> builder.nameTagVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
-                    .stream().filter(visibility -> visibility.getKey().getValue().equals(value)).findFirst().orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.", value);
-                return Visibilities.ALWAYS;
-            })));
-            entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
-                    .stream().filter(visibility -> visibility.getKey().getValue().equals(value)).findFirst().orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a death message visibility with id: {}, default to always.", value);
-                return Visibilities.ALWAYS;
-            })));
-            entry.getString(COLLISION_RULE).ifPresent(value -> builder.collisionRule(Sponge.getRegistry().getAllOf(CollisionRule.class)
-                    .stream().filter(visibility -> visibility.getKey().getValue().equals(value)).findFirst().orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to never.", value);
-                return CollisionRules.NEVER;
-            })));
+            entry.getString(NAME_TAG_VISIBILITY).ifPresent(value -> builder.nameTagVisibility(VisibilityRegistry.get().require(value)));
+            entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(VisibilityRegistry.get().require(value)));
+            entry.getString(COLLISION_RULE).ifPresent(value -> builder.collisionRule(CollisionRuleRegistry.get().require(value)));
             entry.getString(TEAM_COLOR).ifPresent(color -> {
                 TextColor textColor = Sponge.getRegistry().getType(TextColor.class, CatalogKey.resolve(color)).orElseGet(() -> {
                     Lantern.getLogger().warn("Unable to find a team color with id: {}, default to none.", color);
                     return TextColors.NONE;
                 });
-                if (textColor != TextColors.NONE && textColor != TextColors.RESET) {
+                if (textColor != TextColors.NONE.get() && textColor != TextColors.RESET.get()) {
                     builder.color(textColor);
                 }
             });
@@ -195,7 +180,7 @@ public class ScoreboardIO {
                 final Matcher matcher = DISPLAY_SLOT_PATTERN.matcher(key.getParts().get(0));
                 if (matcher.matches()) {
                     final int internalId = Integer.parseInt(matcher.group(1));
-                    Lantern.getRegistry().getRegistryModule(DisplaySlotRegistryModule.class).get().getByInternalId(internalId).ifPresent(slot -> {
+                    DisplaySlotRegistry.get().get(internalId).ifPresent(slot -> {
                         final Objective objective = objectives.get(displaySlots.getString(key).get());
                         if (objective != null) {
                             scoreboard.updateDisplaySlot(objective, slot);
@@ -255,15 +240,15 @@ public class ScoreboardIO {
            final DataView container = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(ALLOW_FRIENDLY_FIRE, (byte) (team.allowFriendlyFire() ? 1 : 0))
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (byte) (team.canSeeFriendlyInvisibles() ? 1 : 0))
-                    .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getKey().getValue())
+                    .set(NAME_TAG_VISIBILITY, VisibilityRegistry.get().requireId(team.getNameTagVisibility()))
                     .set(NAME, team.getName())
                     .set(DISPLAY_NAME, LanternTexts.toLegacy(team.getDisplayName()))
-                    .set(DEATH_MESSAGE_VISIBILITY, team.getDeathMessageVisibility().getKey().getValue())
-                    .set(COLLISION_RULE, team.getCollisionRule().getKey().getValue())
+                    .set(DEATH_MESSAGE_VISIBILITY, VisibilityRegistry.get().requireId(team.getDeathMessageVisibility()))
+                    .set(COLLISION_RULE, CollisionRuleRegistry.get().requireId(team.getCollisionRule()))
                     .set(PREFIX, LanternTexts.toLegacy(team.getPrefix()))
                     .set(SUFFIX, LanternTexts.toLegacy(team.getSuffix()));
             final TextColor teamColor = team.getColor();
-            if (teamColor != TextColors.NONE) {
+            if (teamColor != TextColors.NONE.get()) {
                 container.set(TEAM_COLOR, teamColor.getKey());
             }
             final Set<Text> members = team.getMembers();

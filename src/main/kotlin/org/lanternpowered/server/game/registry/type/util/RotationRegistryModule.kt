@@ -12,6 +12,7 @@ package org.lanternpowered.server.game.registry.type.util
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.ext.*
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.lanternpowered.server.util.rotation.LanternRotation

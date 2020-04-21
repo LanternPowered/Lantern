@@ -27,22 +27,25 @@ inline fun <reified T : CatalogType> internalCatalogTypeRegistry(noinline fn: In
 fun <T : CatalogType> internalCatalogTypeRegistry(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T>.() -> Unit):
         InternalCatalogTypeRegistry<T> = LanternCatalogTypeRegistryFactory.build(typeToken, fn)
 
+/**
+ * A catalog type registry with int based internal mappings.
+ */
 interface InternalCatalogTypeRegistry<T : CatalogType> : CatalogTypeRegistry<T> {
 
     /**
-     * Gets the [InternalCatalogId] for the given catalog type.
+     * Gets the id for the given catalog type.
      */
-    fun getId(type: T): InternalCatalogId
+    fun getId(type: T): Int
 
     /**
      * Attempts to get a type for the given [id].
      */
-    fun get(id: InternalCatalogId): T?
+    fun get(id: Int): T?
 
     /**
      * Attempts to get a type for the given [id]. Throws an
      * [IllegalArgumentException] if the id couldn't be found.
      */
-    fun require(id: InternalCatalogId): T = get(id) ?: throw IllegalArgumentException(
-            "Can't find a ${typeToken.rawType.simpleName} with the id: ${id.value}")
+    fun require(id: Int): T = get(id) ?: throw IllegalArgumentException(
+            "Can't find a ${typeToken.rawType.simpleName} with the id: $id")
 }

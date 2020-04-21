@@ -12,13 +12,13 @@ package org.lanternpowered.server.data.io.store.item;
 
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.type.LanternBannerPatternShape;
 import org.lanternpowered.server.data.type.LanternDyeColor;
-import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
+import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.meta.PatternLayer;
+import org.spongepowered.api.data.meta.BannerPatternLayer;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -38,10 +38,10 @@ public class BannerItemTypeSerializer extends ItemTypeObjectSerializer {
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
         final DataView blockEntityView = getOrCreateView(dataView, BLOCK_ENTITY_TAG);
-        valueContainer.remove(Keys.BANNER_PATTERNS).ifPresent(patternLayers ->
+        valueContainer.remove(Keys.BANNER_PATTERN_LAYERS).ifPresent(patternLayers ->
                 blockEntityView.set(LAYERS, patternLayers.stream()
                         .map(patternLayer -> DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
-                                    .set(LAYER_ID, ((LanternBannerPatternShape) patternLayer.getShape()).getInternalId())
+                                    .set(LAYER_ID, BannerPatternShapeRegistry.INSTANCE.getInternalId(patternLayer.getShape()))
                                     .set(LAYER_COLOR, ((LanternDyeColor) patternLayer.getColor()).getInternalId()))
                         .collect(Collectors.toList())));
     }
@@ -51,14 +51,17 @@ public class BannerItemTypeSerializer extends ItemTypeObjectSerializer {
         super.deserializeValues(itemStack, valueContainer, dataView);
         dataView.getView(BLOCK_ENTITY_TAG).ifPresent(blockEntityView ->
                 blockEntityView.getViewList(LAYERS).ifPresent(value ->
-                        valueContainer.set(Keys.BANNER_PATTERNS, value.stream()
+                        valueContainer.set(Keys.BANNER_PATTERN_LAYERS, value.stream()
                                 .map(patternView -> {
                                     final DyeColor dyeColor = DyeColorRegistryModule.get()
                                             .getByInternalId(15 - patternView.getInt(LAYER_COLOR).get()).get();
-                                    final BannerPatternShape shape = BannerPatternShapeRegistryModule.get()
-                                            .getByInternalId(patternView.getString(LAYER_ID).get()).get();
-                                    return PatternLayer.of(shape, dyeColor);
+                                    @Nullable final BannerPatternShape shape = BannerPatternShapeRegistry.INSTANCE
+                                            .getByInternalId(patternView.getString(LAYER_ID).get());
+                                    if (shape == null)
+                                        return null;
+                                    return BannerPatternLayer.of(shape, dyeColor);
                                 })
+                                .filter(layer -> layer != null)
                                 .collect(Collectors.toList()))));
     }
 }

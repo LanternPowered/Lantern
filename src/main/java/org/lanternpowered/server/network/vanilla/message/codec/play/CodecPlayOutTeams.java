@@ -16,6 +16,8 @@ import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
+import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry;
+import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry;
 import org.lanternpowered.server.text.LanternFormattingCodeTextSerializer;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.translation.TranslationContext;
@@ -43,10 +45,10 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
                 flags |= 0x02;
             }
             buf.writeByte((byte) flags);
-            buf.writeString(message1.getNameTagVisibility().getKey().toString());
-            buf.writeString(message1.getCollisionRule().getName());
+            buf.writeString(VisibilityRegistry.get().requireId(message1.getNameTagVisibility()));
+            buf.writeString(CollisionRuleRegistry.get().requireId(message1.getCollisionRule()));
             final TextColor c = message1.getColor();
-            buf.writeByte((byte) (c == TextColors.NONE || c == TextColors.RESET ? 21 :
+            buf.writeByte((byte) (c == TextColors.NONE.get() || c == TextColors.RESET.get() ? 21 :
                             LanternFormattingCodeTextSerializer.FORMATS_TO_CODE.getChar(c)));
             context.write(buf, ContextualValueTypes.TEXT, message1.getPrefix());
             context.write(buf, ContextualValueTypes.TEXT, message1.getSuffix());

@@ -37,7 +37,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
-import org.spongepowered.api.server.Server;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.service.whitelist.WhitelistService;

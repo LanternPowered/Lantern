@@ -42,8 +42,7 @@ interface EntitySpawner {
     /**
      * Performs [ConstructEntityEvent]s and returns the constructed [Entity], if constructed.
      */
-    fun <T : Entity> preSpawn(entityType: EntityType<T>, transform: Transform, fn: (T) -> Unit = {}): Entity?
-            = preSpawn(listOf(EntitySpawnEntry(entityType, transform, fn))).firstOrNull()
+    fun <T : Entity> preSpawn(entityType: EntityType<T>, transform: Transform, fn: (T) -> Unit = {}): T?
 
     /**
      * Performs [ConstructEntityEvent]s and returns the constructed [Entity]s.

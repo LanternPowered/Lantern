@@ -10,7 +10,13 @@
  */
 package org.lanternpowered.server.registry
 
-/**
- * Represents an internal catalog id.
- */
-inline class InternalCatalogId(val value: Int)
+import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
+
+interface GenericInternalCatalogTypeRegistryBuilder<T : CatalogType, I> : CatalogTypeRegistryBuilder<T> {
+
+    /**
+     * Registers a new [CatalogType] with the given [internalId].
+     */
+    fun register(internalId: I, type: T): T
+}

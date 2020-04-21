@@ -16,7 +16,6 @@ import org.lanternpowered.server.effect.particle.LanternParticleType
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
-import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule
 import org.lanternpowered.server.inventory.LanternItemStack
 import org.lanternpowered.server.item.ItemTypeRegistry
 import org.spongepowered.api.CatalogKey

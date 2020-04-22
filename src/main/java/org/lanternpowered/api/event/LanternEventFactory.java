@@ -25,9 +25,12 @@ import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.player.CooldownEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.network.status.StatusClient;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.World;
@@ -99,7 +102,7 @@ public class LanternEventFactory {
         return SpongeEventFactory.createCooldownEventEnd(cause, itemType, player);
     }
 
-    public static CooldownEvent.Set createCooldownEventSet(
+    public static CooldownEvent.@NonNull Set createCooldownEventSet(
             @NonNull Cause cause,
             int originalNewCooldown,
             int newCooldown,
@@ -110,4 +113,17 @@ public class LanternEventFactory {
                 cause, originalNewCooldown, newCooldown, itemType, player, startingCooldown);
     }
 
+    public static ClientPingServerEvent.Response.@NonNull Players createClientPingServerEventResponsePlayers(
+            @NonNull List<GameProfile> profiles,
+            int max,
+            int online) {
+        return SpongeEventFactory.createClientPingServerEventResponsePlayers(profiles, max, online);
+    }
+
+    public static @NonNull ClientPingServerEvent createClientPingServerEvent(
+            @NonNull Cause cause,
+            @NonNull StatusClient client,
+            ClientPingServerEvent.@NonNull Response response) {
+        return SpongeEventFactory.createClientPingServerEvent(cause, client, response);
+    }
 }

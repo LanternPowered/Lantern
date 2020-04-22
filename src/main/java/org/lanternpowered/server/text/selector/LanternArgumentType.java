@@ -17,7 +17,7 @@ import com.google.common.primitives.Primitives;
 import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.registry.type.data.GameModeRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.entity.EntityType;
@@ -47,9 +47,9 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
             }
             try {
                 final int i = Integer.parseInt(input);
-                return GameModeRegistryModule.get().getByInternalId(i).orElse(GameModes.NOT_SET);
+                return GameModeRegistry.get().getOptional(i).orElseGet(GameModes.NOT_SET);
             } catch (NumberFormatException e) {
-                return GameModeRegistryModule.get().get(CatalogKey.resolve(input)).orElse(GameModes.NOT_SET);
+                return GameModeRegistry.get().getOptional(CatalogKey.resolve(input)).orElseGet(GameModes.NOT_SET);
             }
         });
     }

@@ -11,7 +11,6 @@
 package org.lanternpowered.server.game.registry.util;
 
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Field;

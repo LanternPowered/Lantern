@@ -15,7 +15,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.recipe.AbstractRecipeRegistry;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.ItemTypes;

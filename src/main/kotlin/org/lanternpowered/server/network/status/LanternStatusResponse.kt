@@ -61,14 +61,12 @@ class LanternStatusResponse(
     override fun setHidePlayers(hide: Boolean) = run { this.hidePlayers = hide }
     override fun setFavicon(favicon: Favicon?) = run { this.favicon = favicon }
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("version", this.version)
-                .add("description", this.description)
-                .add("players", this.players)
-                .add("hidePlayers", this.hidePlayers)
-                .add("favicon", this.favicon)
-                .toString()
-    }
+    override fun toString(): String = ToStringHelper(this)
+            .omitNullValues()
+            .add("version", this.version)
+            .add("description", this.description)
+            .add("players", this.players)
+            .add("hidePlayers", this.hidePlayers)
+            .add("favicon", this.favicon)
+            .toString()
 }

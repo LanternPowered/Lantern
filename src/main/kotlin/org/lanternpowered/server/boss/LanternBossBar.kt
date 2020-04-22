@@ -50,7 +50,7 @@ data class LanternBossBar internal constructor(
     override fun isVisible(): Boolean = this.visible
 
     private fun sendToViewers(message: () -> Message) {
-        if (!this.viewers.isEmpty()) {
+        if (this.viewers.isNotEmpty()) {
             val message1 = message()
             this.viewers.forEach { player -> player.connection.send(message1) }
         }
@@ -152,8 +152,6 @@ data class LanternBossBar internal constructor(
         player.connection.send(createAddMessage())
     }
 
-    private fun createAddMessage(): MessagePlayOutBossBar.Add {
-        return MessagePlayOutBossBar.Add(this.uniqueId, this.name,
-                this.color, this.overlay, this.percent, this.darkenSky, this.playEndBossMusic, this.createFog)
-    }
+    private fun createAddMessage(): MessagePlayOutBossBar.Add = MessagePlayOutBossBar.Add(this.uniqueId, this.name,
+            this.color, this.overlay, this.percent, this.darkenSky, this.playEndBossMusic, this.createFog)
 }

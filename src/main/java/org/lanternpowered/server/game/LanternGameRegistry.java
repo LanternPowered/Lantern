@@ -55,7 +55,7 @@ import org.lanternpowered.server.cause.entity.damage.source.LanternFallingBlockD
 import org.lanternpowered.server.cause.entity.damage.source.LanternIndirectEntityDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.healing.source.LanternEntityHealingSourceBuilder;
 import org.lanternpowered.server.cause.entity.healing.source.LanternHealingSourceBuilder;
-import org.lanternpowered.server.config.user.ban.BanBuilder;
+import org.lanternpowered.server.config.user.ban.LanternBanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.DataRegistrationRegistryModule;
 import org.lanternpowered.server.data.LanternDataRegistrationBuilder;
@@ -454,7 +454,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
                 .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)
                 .registerBuilderSupplier(Task.Builder.class, LanternTaskBuilder::new)
-                .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
+                .registerBuilderSupplier(Ban.Builder.class, LanternBanBuilder::new)
                 .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
                 .registerBuilderSupplier(Selector.Builder.class, LanternSelectorBuilder::new)
                 .registerBuilderSupplier(Objective.Builder.class, LanternObjectiveBuilder::new)

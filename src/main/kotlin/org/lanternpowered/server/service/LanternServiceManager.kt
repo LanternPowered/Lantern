@@ -31,7 +31,7 @@ object LanternServiceManager : ServiceManager {
             .concurrencyLevel(3).makeMap<Class<*>, ProviderRegistration<*>>()
 
     val providerRegistrations: Collection<ProviderRegistration<*>>
-        get() = ImmutableList.copyOf(providers.values)
+        get() = ImmutableList.copyOf(this.providers.values)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T> setProvider(plugin: PluginContainer, service: Class<T>, provider: T) {

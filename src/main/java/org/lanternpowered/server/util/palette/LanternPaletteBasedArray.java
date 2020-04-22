@@ -494,7 +494,7 @@ public class LanternPaletteBasedArray<T> implements PaletteBasedArray<T> {
         }
 
         @Override
-        public InternalPalette copy() {
+        public InternalPalette<T> copy() {
             return new ArrayBackedInternalPalette<>(Arrays.copyOf(this.objects, this.objects.length), this.assignedStates);
         }
     }

@@ -12,6 +12,7 @@ package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.scoreboard.criteria.Criterion

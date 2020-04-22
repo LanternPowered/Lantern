@@ -18,14 +18,14 @@ import org.lanternpowered.api.util.type.typeTokenOf
 /**
  * Constructs a new [GenericInternalCatalogTypeRegistry].
  */
-inline fun <reified T : CatalogType, I> customInternalCatalogTypeRegistry(noinline fn: GenericInternalCatalogTypeRegistryBuilder<T, I>.() -> Unit):
+inline fun <reified T : CatalogType, I> customInternalCatalogTypeRegistry(noinline fn: InternalCatalogTypeRegistryBuilder<T, I>.() -> Unit):
         GenericInternalCatalogTypeRegistry<T, I> = customInternalCatalogTypeRegistry(typeTokenOf(), fn)
 
 /**
  * Constructs a new [GenericInternalCatalogTypeRegistry].
  */
-fun <T : CatalogType, I> customInternalCatalogTypeRegistry(typeToken: TypeToken<T>, fn: GenericInternalCatalogTypeRegistryBuilder<T, I>.() -> Unit):
-        GenericInternalCatalogTypeRegistry<T, I> = LanternCatalogTypeRegistryFactory.buildGeneric(typeToken, fn)
+fun <T : CatalogType, I> customInternalCatalogTypeRegistry(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T, I>.() -> Unit):
+        GenericInternalCatalogTypeRegistry<T, I> = LanternCatalogTypeRegistryFactory.buildInternalGeneric(typeToken, fn)
 
 interface GenericInternalCatalogTypeRegistry<T : CatalogType, I> : CatalogTypeRegistry<T> {
 

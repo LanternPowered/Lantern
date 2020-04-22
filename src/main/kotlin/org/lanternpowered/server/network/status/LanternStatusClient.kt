@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.network.status
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.network.status.StatusClient
 import java.net.InetSocketAddress
@@ -26,12 +26,10 @@ class LanternStatusClient(
     override fun getVersion() = this.version
     override fun getVirtualHost() = this.virtualHost.optional()
 
-    override fun toString(): String {
-        return ToStringHelper(this)
-                .omitNullValues()
-                .add("address", this.address)
-                .add("virtualHost", this.virtualHost)
-                .add("version", this.version)
-                .toString()
-    }
+    override fun toString(): String = ToStringHelper(this)
+            .omitNullValues()
+            .add("address", this.address)
+            .add("virtualHost", this.virtualHost)
+            .add("version", this.version)
+            .toString()
 }

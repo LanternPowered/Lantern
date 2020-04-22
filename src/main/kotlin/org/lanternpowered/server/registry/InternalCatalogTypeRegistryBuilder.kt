@@ -13,10 +13,10 @@ package org.lanternpowered.server.registry
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
 
-interface InternalCatalogTypeRegistryBuilder<T : CatalogType> : CatalogTypeRegistryBuilder<T> {
+interface InternalCatalogTypeRegistryBuilder<T : CatalogType, I> : CatalogTypeRegistryBuilder<T> {
 
     /**
      * Registers a new [CatalogType] with the given [internalId].
      */
-    fun register(internalId: Int, type: T): T
+    fun register(internalId: I, type: T): T
 }

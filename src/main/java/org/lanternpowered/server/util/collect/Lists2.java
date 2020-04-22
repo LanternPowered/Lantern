@@ -15,7 +15,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValueList;
 import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -30,7 +29,6 @@ import java.util.function.Predicate;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@NonnullByDefault
 public final class Lists2 {
 
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createExpirableValueList(Function<V, B> backValueSupplier) {

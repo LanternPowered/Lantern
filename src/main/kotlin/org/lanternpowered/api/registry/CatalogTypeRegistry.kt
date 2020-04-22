@@ -12,9 +12,26 @@ package org.lanternpowered.api.registry
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
+import java.util.Optional
 import java.util.function.Supplier
+
+/**
+ * Constructs a new [CatalogTypeRegistry].
+ */
+inline fun <reified T : CatalogType> catalogTypeRegistryOf(noinline values: () -> Iterable<T>): CatalogTypeRegistry<T> =
+        catalogTypeRegistryOf(typeTokenOf(), values)
+
+/**
+ * Constructs a new [CatalogTypeRegistry].
+ */
+fun <T : CatalogType> catalogTypeRegistryOf(typeToken: TypeToken<T>, values: () -> Iterable<T>): CatalogTypeRegistry<T> =
+        catalogTypeRegistry(typeToken) {
+            for (value in values())
+                register(value)
+        }
 
 /**
  * Constructs a new [CatalogTypeRegistry].
@@ -49,6 +66,11 @@ interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
      * Attempts to get a type for the given [key].
      */
     operator fun get(key: CatalogKey): T?
+
+    /**
+     * Attempts to get a type for the given [key].
+     */
+    fun getOptional(key: CatalogKey): Optional<T> = get(key).optional()
 
     /**
      * Attempts to get a type for the given [key]. Throws an

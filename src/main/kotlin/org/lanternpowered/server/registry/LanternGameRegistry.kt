@@ -11,24 +11,49 @@
 package org.lanternpowered.server.registry
 
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.boss.BossBarBuilder
+import org.lanternpowered.api.catalog.CatalogKeyBuilder
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
+import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
+import org.lanternpowered.api.item.inventory.ItemStackBuilder
 import org.lanternpowered.api.registry.GameRegistry
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.scoreboard.ScoreboardBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
-import org.lanternpowered.api.scoreboard.ScoreboardTeam
 import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
+import org.lanternpowered.server.attribute.LanternAttributeBuilder
+import org.lanternpowered.server.block.BlockSnapshotBuilder
+import org.lanternpowered.server.block.LanternBlockSnapshotBuilder
+import org.lanternpowered.server.block.LanternLocatableBlockBuilder
+import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder
+import org.lanternpowered.server.boss.LanternBossBarBuilder
+import org.lanternpowered.server.catalog.LanternCatalogKeyBuilder
+import org.lanternpowered.server.config.user.ban.LanternBanBuilder
 import org.lanternpowered.server.data.key.SpongeValueKeyBuilder
 import org.lanternpowered.server.data.key.ValueKeyBuilder
 import org.lanternpowered.server.data.manipulator.ImmutableDataManipulatorFactory
 import org.lanternpowered.server.data.manipulator.MutableDataManipulatorFactory
 import org.lanternpowered.server.data.value.BoundedValueFactory
 import org.lanternpowered.server.data.value.ValueFactory
+import org.lanternpowered.server.effect.entity.EntityEffectCollection
+import org.lanternpowered.server.effect.entity.LanternEntityEffectCollectionBuilder
 import org.lanternpowered.server.effect.firework.LanternFireworkEffectBuilder
+import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder
+import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder
+import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder
+import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder
+import org.lanternpowered.server.event.LanternEventContextKeyBuilder
+import org.lanternpowered.server.fluid.LanternFluidStackBuilder
+import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder
+import org.lanternpowered.server.inventory.LanternItemStackBuilder
+import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResult
 import org.lanternpowered.server.item.ItemStackComparatorsRegistry
+import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder
+import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerRegistry
@@ -45,6 +70,7 @@ import org.lanternpowered.server.registry.type.data.DismountTypeRegistry
 import org.lanternpowered.server.registry.type.data.DoorHalfRegistry
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.lanternpowered.server.registry.type.data.FireworkShapeRegistry
+import org.lanternpowered.server.registry.type.data.GameModeRegistry
 import org.lanternpowered.server.registry.type.data.HandPreferenceRegistry
 import org.lanternpowered.server.registry.type.data.HandTypeRegistry
 import org.lanternpowered.server.registry.type.data.HingeRegistry
@@ -84,27 +110,49 @@ import org.lanternpowered.server.registry.type.text.ChatVisibilityRegistry
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.registry.type.text.TextSerializerRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
+import org.lanternpowered.server.registry.type.util.RotationRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
 import org.lanternpowered.server.registry.type.world.PortalAgentTypeRegistry
 import org.lanternpowered.server.registry.type.world.SerializationBehaviorRegistry
+import org.lanternpowered.server.resourcepack.LanternResourcePackFactory
 import org.lanternpowered.server.scheduler.LanternTaskBuilder
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder
-import org.lanternpowered.server.scoreboard.LanternTeam
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder
 import org.lanternpowered.server.text.LanternTextFactory
 import org.lanternpowered.server.text.LanternTextSerializerFactory
 import org.lanternpowered.server.text.LanternTextTemplateFactory
+import org.lanternpowered.server.text.selector.LanternSelectorBuilder
 import org.lanternpowered.server.timings.DummyTimingsFactory
+import org.lanternpowered.server.world.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.LanternWorldBorderBuilder
+import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
+import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder
 import org.spongepowered.api.CatalogType
+import org.spongepowered.api.block.BlockSnapshot
+import org.spongepowered.api.block.entity.BlockEntityArchetype
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.effect.particle.ParticleEffect
+import org.spongepowered.api.effect.sound.SoundType
+import org.spongepowered.api.entity.living.player.tab.TabListEntry
 import org.spongepowered.api.event.cause.Cause
+import org.spongepowered.api.event.cause.EventContextKey
 import org.spongepowered.api.event.registry.RegistryEvent
+import org.spongepowered.api.fluid.FluidStack
+import org.spongepowered.api.fluid.FluidStackSnapshot
+import org.spongepowered.api.item.enchantment.Enchantment
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult
 import org.spongepowered.api.scheduler.Task
+import org.spongepowered.api.text.selector.Selector
 import org.spongepowered.api.util.ResettableBuilder
+import org.spongepowered.api.util.RespawnLocation
+import org.spongepowered.api.util.ban.Ban
+import org.spongepowered.api.world.LocatableBlock
+import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.WorldBorder
+import org.spongepowered.api.world.biome.VirtualBiomeType
+import org.spongepowered.api.world.gamerule.GameRule
 import java.util.function.Supplier
 
 class LanternGameRegistry : GameRegistry {
@@ -117,6 +165,7 @@ class LanternGameRegistry : GameRegistry {
             register(BoundedValueFactory)
 
             register(ItemStackComparatorsRegistry)
+            register(LanternResourcePackFactory)
 
             register(LanternTextFactory)
             register(LanternTextSerializerFactory)
@@ -126,10 +175,33 @@ class LanternGameRegistry : GameRegistry {
         }
 
         builderRegistry.apply {
+            register<CatalogKeyBuilder> { LanternCatalogKeyBuilder() }
             register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
             register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }
+            register<EventContextKey.Builder<Any>> { LanternEventContextKeyBuilder() }
 
+            register<BlockSnapshot.Builder> { LanternBlockSnapshotBuilder() }
+            register<BlockSnapshotBuilder> { LanternBlockSnapshotBuilder() }
+            register<BlockEntityArchetype.Builder> { LanternBlockEntityArchetypeBuilder() }
+            register<LocatableBlock.Builder> { LanternLocatableBlockBuilder() }
+
+            register<TabListEntry.Builder> { LanternTabListEntryBuilder() }
+            register { RespawnLocation.Builder() }
+
+            register { LanternAttributeBuilder() }
+            register<BossBarBuilder> { LanternBossBarBuilder() }
             register<FireworkEffectBuilder> { LanternFireworkEffectBuilder() }
+            register<ParticleEffect.Builder> { LanternParticleEffectBuilder() }
+            register<PotionEffectBuilder> { LanternPotionEffectBuilder() }
+            register<SoundType.Builder> { LanternSoundTypeBuilder() }
+            register<EntityEffectCollection.Builder> { LanternEntityEffectCollectionBuilder() }
+
+            register<FluidStack.Builder> { LanternFluidStackBuilder() }
+            register<FluidStackSnapshot.Builder> { LanternFluidStackSnapshotBuilder() }
+            register<ItemStackBuilder> { LanternItemStackBuilder() }
+            register<Enchantment.Builder> { LanternEnchantmentBuilder() }
+            register<EnchantmentTypeBuilder> { LanternEnchantmentTypeBuilder() }
+            register< InventoryTransactionResult.Builder> { LanternInventoryTransactionResult.Builder() }
 
             register<Task.Builder> { LanternTaskBuilder() }
 
@@ -137,6 +209,13 @@ class LanternGameRegistry : GameRegistry {
             register<ScoreboardObjectiveBuilder> { LanternObjectiveBuilder() }
             register<ScoreboardTeamBuilder> { LanternTeamBuilder() }
 
+            register<Selector.Builder> { LanternSelectorBuilder() }
+
+            register<Ban.Builder> { LanternBanBuilder() }
+
+            register<GameRule.Builder<Any>> { LanternGameRuleBuilder() }
+            register<VirtualBiomeType.Builder> { LanternVirtualBiomeTypeBuilder() }
+            register<WorldArchetype.Builder> { LanternWorldArchetypeBuilder() }
             register<WorldBorder.Builder> { LanternWorldBorderBuilder() }
         }
 
@@ -154,6 +233,7 @@ class LanternGameRegistry : GameRegistry {
             register(CatTypeRegistry)
             register(DismountTypeRegistry)
             register(FireworkShapeRegistry)
+            register(GameModeRegistry)
             register(HandPreferenceRegistry)
             register(HandTypeRegistry)
             register(HorseColorRegistry)
@@ -207,6 +287,7 @@ class LanternGameRegistry : GameRegistry {
             register(TextSerializerRegistry)
 
             register(BanTypeRegistry)
+            register(RotationRegistry)
 
             register(DifficultyRegistry)
             register(PortalAgentTypeRegistry)
@@ -215,10 +296,22 @@ class LanternGameRegistry : GameRegistry {
 
         // Allow plugins to register their catalog type, builders and factories
         postBuilderRegistryEvent()
+        postFactoryRegistryEvent()
         postCatalogRegistryEvent()
 
         // Load all the catalog types
         catalogRegistry.ensureLoaded()
+    }
+
+    private fun postFactoryRegistryEvent() {
+        val cause = CauseStackManager.currentCause
+        val factoryRegistryEvent = object : RegistryEvent.Factory {
+            override fun getCause(): Cause = cause
+            override fun <T : Any> register(factoryClass: Class<T>) {
+                TODO("How is this supposed to work?")
+            }
+        }
+        EventManager.post(factoryRegistryEvent)
     }
 
     private fun postBuilderRegistryEvent() {

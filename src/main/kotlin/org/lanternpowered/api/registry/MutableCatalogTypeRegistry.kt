@@ -29,12 +29,25 @@ fun <T : CatalogType> mutableCatalogTypeRegistry(typeToken: TypeToken<T>):
 /**
  * A mutable registry for catalog types.
  */
-interface MutableCatalogTypeRegistry<T : CatalogType> : CatalogTypeRegistry<T> {
+interface MutableCatalogTypeRegistry<T : CatalogType> : CatalogTypeRegistry<T>,
+        MutableCatalogTypeRegistryBase<T, CatalogTypeRegistryBuilder<T>, MutableCatalogTypeRegistry<T>>
+
+/**
+ * A mutable registry for catalog types.
+ */
+interface MutableCatalogTypeRegistryBase<T : CatalogType, B : CatalogTypeRegistryBuilder<T>, R : MutableCatalogTypeRegistryBase<T, B, R>> :
+        CatalogTypeRegistry<T> {
+
+    /**
+     * Watches the registry for changes. Watchers will be triggered
+     * after every [load].
+     */
+    fun watch(watcher: R.() -> Unit)
 
     /**
      * Loads or reloads the [MutableCatalogTypeRegistry]. This clears the
      * registry and populates the registry again. This is the only way
      * to remove entries.
      */
-    fun load(fn: CatalogTypeRegistryBuilder<T>.() -> Unit)
+    fun load(fn: B.() -> Unit)
 }

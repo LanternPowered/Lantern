@@ -22,7 +22,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
 
-class LanternResourcePackFactory : ResourcePack.Factory {
+object LanternResourcePackFactory : ResourcePack.Factory {
 
     private val resourcePacks = ConcurrentHashMap<String, ResourcePack>()
     private val resourcePacksByKey = ConcurrentHashMap<CacheKey, ResourcePack>()

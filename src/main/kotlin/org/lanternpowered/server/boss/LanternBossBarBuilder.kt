@@ -72,8 +72,8 @@ class LanternBossBarBuilder : BossBarBuilder {
         this.name = null
         this.percent = 0f
         this.visible = true
-        this.color = BossBarColors.WHITE
-        this.overlay = BossBarOverlays.PROGRESS
+        this.color = BossBarColors.WHITE.get()
+        this.overlay = BossBarOverlays.PROGRESS.get()
         this.createFog = false
         this.darkenSky = false
         this.playEndBossMusic = false

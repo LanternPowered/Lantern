@@ -8,13 +8,10 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.data.type
+package org.lanternpowered.server.network.pipeline
 
-import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.server.catalog.DefaultCatalogType
+import io.netty.channel.ChannelHandler.Sharable
+import io.netty.channel.ChannelHandlerAdapter
 
-enum class LanternDoorHalf(id: String) : CatalogType by DefaultCatalogType.minecraft(id) {
-
-    UPPER("upper"),
-    LOWER("lower");
-}
+@Sharable
+object NoopHandler : ChannelHandlerAdapter()

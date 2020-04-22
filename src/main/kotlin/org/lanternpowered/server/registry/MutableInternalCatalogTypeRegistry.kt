@@ -11,7 +11,9 @@
 package org.lanternpowered.server.registry
 
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
 import org.lanternpowered.api.registry.MutableCatalogTypeRegistry
+import org.lanternpowered.api.registry.MutableCatalogTypeRegistryBase
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 
@@ -25,6 +27,7 @@ inline fun <reified T : CatalogType> mutableInternalCatalogTypeRegistry():
  * Constructs a new [MutableInternalCatalogTypeRegistry].
  */
 fun <T : CatalogType> mutableInternalCatalogTypeRegistry(typeToken: TypeToken<T>):
-        MutableInternalCatalogTypeRegistry<T> = LanternCatalogTypeRegistryFactory.buildMutable(typeToken)
+        MutableInternalCatalogTypeRegistry<T> = LanternCatalogTypeRegistryFactory.buildMutableInternal(typeToken)
 
-interface MutableInternalCatalogTypeRegistry<T : CatalogType> : InternalCatalogTypeRegistry<T>, MutableCatalogTypeRegistry<T>
+interface MutableInternalCatalogTypeRegistry<T : CatalogType> : InternalCatalogTypeRegistry<T>,
+        MutableCatalogTypeRegistryBase<T, InternalCatalogTypeRegistryBuilder<T, Int>, MutableInternalCatalogTypeRegistry<T>>

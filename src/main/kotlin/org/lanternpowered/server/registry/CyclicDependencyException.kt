@@ -8,13 +8,6 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.data.type
+package org.lanternpowered.server.registry
 
-import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.server.catalog.DefaultCatalogType
-
-enum class LanternDoorHalf(id: String) : CatalogType by DefaultCatalogType.minecraft(id) {
-
-    UPPER("upper"),
-    LOWER("lower");
-}
+class CyclicDependencyException(message: String) : RuntimeException(message)

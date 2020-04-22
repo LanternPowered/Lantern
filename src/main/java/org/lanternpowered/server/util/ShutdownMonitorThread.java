@@ -54,7 +54,7 @@ public class ShutdownMonitorThread extends Thread {
                 final LanternThread lanternThread = (LanternThread) thread;
                 Lantern.getLogger().warn("Rogue thread (lantern): " + lanternThread);
                 Lantern.getLogger().warn("    construction location:");
-                final Throwable constructionSource = lanternThread.getConstructionSite();
+                final Throwable constructionSource = lanternThread.constructionSite;
                 for (StackTraceElement trace : constructionSource.getStackTrace()) {
                     Lantern.getLogger().warn("        at " + trace);
                 }

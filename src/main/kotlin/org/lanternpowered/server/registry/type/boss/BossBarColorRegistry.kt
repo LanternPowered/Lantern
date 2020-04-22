@@ -14,7 +14,8 @@ import org.lanternpowered.api.boss.BossBarColor
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextColors
-import org.lanternpowered.server.boss.LanternBossBarColor
+import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import java.util.function.Supplier
 
@@ -29,4 +30,10 @@ val BossBarColorRegistry = internalCatalogTypeRegistry<BossBarColor> {
     register("yellow", TextColors.YELLOW)
     register("purple", TextColors.DARK_PURPLE)
     register("white", TextColors.WHITE)
+}
+
+private class LanternBossBarColor(key: CatalogKey, private val color: TextColor) : DefaultCatalogType(key), BossBarColor {
+    override fun getColor(): TextColor = this.color
+    override fun toStringHelper(): ToStringHelper = super.toStringHelper()
+            .add("color", this.color.key)
 }

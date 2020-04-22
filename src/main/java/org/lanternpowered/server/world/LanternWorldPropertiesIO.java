@@ -19,7 +19,8 @@ import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.type.MoonPhase;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.registry.type.data.GameModeRegistry;
+import org.lanternpowered.server.registry.type.world.DifficultyRegistryKt;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -366,7 +367,7 @@ final class LanternWorldPropertiesIO {
 
         if (copyLevelSettingsToConfig) {
             worldConfig.getGeneration().setSeed(dataView.getLong(SEED).get());
-            worldConfig.setGameMode(GameModeRegistryModule.get().getByInternalId(dataView.getInt(GAME_MODE).get())
+            worldConfig.setGameMode(GameModeRegistry.get().getOptional(dataView.getInt(GAME_MODE).get())
                     .orElseGet(GameModes.SURVIVAL));
             worldConfig.setHardcore(dataView.getInt(HARDCORE).get() > 0);
             @Nullable final Difficulty difficulty = DifficultyRegistryKt.getDifficultyRegistry().get(dataView.getInt(DIFFICULTY).get());

@@ -12,14 +12,18 @@ package org.lanternpowered.server.registry.type.boss
 
 import org.lanternpowered.api.boss.BossBarOverlay
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.server.boss.LanternBossBarOverlay
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 
 val BossBarOverlayRegistry = internalCatalogTypeRegistry<BossBarOverlay> {
-    fun register(name: String) = register(LanternBossBarOverlay(CatalogKey.minecraft(name)))
+    fun register(name: String) =
+            register(LanternBossBarOverlay(CatalogKey.minecraft(name)))
+
     register("progress")
     register("notched_6")
     register("notched_10")
     register("notched_12")
     register("notched_20")
 }
+
+private class LanternBossBarOverlay(key: CatalogKey) : DefaultCatalogType(key), BossBarOverlay

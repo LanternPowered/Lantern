@@ -29,6 +29,7 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
 import org.lanternpowered.api.registry.MutableCatalogTypeRegistry
+import org.lanternpowered.api.registry.MutableCatalogTypeRegistryBase
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.type.TypeToken
@@ -38,93 +39,136 @@ import java.util.function.Supplier
 
 object LanternCatalogTypeRegistryFactory : CatalogTypeRegistry.Factory {
 
-    override fun <T : CatalogType> build(typeToken: TypeToken<T>, fn: CatalogTypeRegistryBuilder<T>.() -> Unit): InternalCatalogTypeRegistry<T> =
-            LanternInternalImmutableCatalogTypeRegistry(typeToken, fn)
+    override fun <T : CatalogType> build(typeToken: TypeToken<T>, fn: CatalogTypeRegistryBuilder<T>.() -> Unit): CatalogTypeRegistry<T> =
+            LanternImmutableCatalogTypeRegistry(typeToken, fn)
 
     @JvmName("buildInternal")
-    fun <T : CatalogType> build(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T>.() -> Unit):
+    fun <T : CatalogType> build(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T, Int>.() -> Unit):
             InternalCatalogTypeRegistry<T> = LanternInternalImmutableCatalogTypeRegistry(typeToken, fn)
 
-    fun <T : CatalogType, I> buildGeneric(typeToken: TypeToken<T>, fn: GenericInternalCatalogTypeRegistryBuilder<T, I>.() -> Unit):
+    fun <T : CatalogType, I> buildInternalGeneric(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T, I>.() -> Unit):
             GenericInternalCatalogTypeRegistry<T, I> = LanternGenericInternalImmutableCatalogTypeRegistry(typeToken, fn)
 
-    fun <T : CatalogType, I> buildMutableGeneric(typeToken: TypeToken<T>):
-            GenericInternalCatalogTypeRegistry<T, I> = LanternGenericInternalMutableCatalogTypeRegistry(typeToken)
+    fun <T : CatalogType, I> buildMutableInternalGeneric(typeToken: TypeToken<T>):
+            MutableGenericInternalCatalogTypeRegistry<T, I> = LanternGenericInternalMutableCatalogTypeRegistry(typeToken)
 
     override fun <T : CatalogType> buildMutable(typeToken: TypeToken<T>):
+            MutableCatalogTypeRegistry<T> = LanternMutableCatalogTypeRegistry(typeToken)
+
+    fun <T : CatalogType> buildMutableInternal(typeToken: TypeToken<T>):
             MutableInternalCatalogTypeRegistry<T> = LanternInternalMutableCatalogTypeRegistry(typeToken)
 }
 
 private class LanternGenericInternalMutableCatalogTypeRegistry<T : CatalogType, I>(
         typeToken: TypeToken<T>
-) : LanternMutableCatalogTypeRegistry<T, GenericInternalRegistryData<T, I>, LanternGenericRegistryBuilder<T, I>>(typeToken),
-        GenericInternalCatalogTypeRegistry<T, I> {
+) : AbstractMutableCatalogTypeRegistry<T, GenericInternalRegistryData<T, I>, InternalCatalogTypeRegistryBuilder<T, I>,
+        MutableGenericInternalCatalogTypeRegistry<T, I>>(typeToken), MutableGenericInternalCatalogTypeRegistry<T, I> {
 
-    override fun createBuilder() = LanternGenericRegistryBuilder<T, I>(this.typeToken)
+    override fun createBuilder() = LanternGenericInternalRegistryBuilder<T, I>(this.typeToken)
     override fun getId(type: T): I? = ensureLoaded().getId(type)
     override fun get(id: I): T? = ensureLoaded().get(id)
 }
 
 private class LanternInternalMutableCatalogTypeRegistry<T : CatalogType>(
         typeToken: TypeToken<T>
-) : LanternMutableCatalogTypeRegistry<T, InternalRegistryData<T>, LanternRegistryBuilder<T>>(typeToken), MutableInternalCatalogTypeRegistry<T> {
+) : AbstractMutableCatalogTypeRegistry<T, InternalRegistryData<T>, InternalCatalogTypeRegistryBuilder<T, Int>,
+        MutableInternalCatalogTypeRegistry<T>>(typeToken), MutableInternalCatalogTypeRegistry<T> {
 
-    override fun createBuilder() = LanternRegistryBuilder(this.typeToken)
+    override fun createBuilder() = LanternInternalRegistryBuilder(this.typeToken)
     override fun getId(type: T) = ensureLoaded().getId(type)
     override fun get(id: Int): T? = ensureLoaded().get(id)
 }
 
-private abstract class LanternMutableCatalogTypeRegistry<T : CatalogType, D : RegistryData<T>, B : AbstractCatalogTypeRegistryBuilder<T, *, D>>(
+private class LanternMutableCatalogTypeRegistry<T : CatalogType>(
         typeToken: TypeToken<T>
-) : LanternCatalogTypeRegistry<T, D>(typeToken), MutableCatalogTypeRegistry<T> {
+) : AbstractMutableCatalogTypeRegistry<T, InternalRegistryData<T>, CatalogTypeRegistryBuilder<T>, MutableCatalogTypeRegistry<T>>(typeToken),
+        MutableCatalogTypeRegistry<T> {
+
+    override fun createBuilder() = LanternRegistryBuilder(this.typeToken)
+}
+
+private abstract class AbstractMutableCatalogTypeRegistry<T, D, B, R>(
+        typeToken: TypeToken<T>
+) : LanternCatalogTypeRegistry<T, D>(typeToken), MutableCatalogTypeRegistryBase<T, B, R>
+        where T : CatalogType,
+              D : RegistryData<T>,
+              B : CatalogTypeRegistryBuilder<T>,
+              R : MutableCatalogTypeRegistryBase<T, B, R> {
 
     private val lock = Any()
 
     @Suppress("LeakingThis")
     @Volatile
-    private var data = createBuilder().build()
+    private var data = createBuilder().fix().build()
+
+    private val watchers = mutableListOf<R.() -> Unit>()
+
+    private fun B.fix(): AbstractCatalogTypeRegistryBuilder<T, *, D> =
+            this as AbstractCatalogTypeRegistryBuilder<T, *, D>
 
     abstract fun createBuilder(): B
 
-    override fun load(fn: CatalogTypeRegistryBuilder<T>.() -> Unit) {
+    override fun load(fn: B.() -> Unit) {
         synchronized(this.lock) {
             val builder = createBuilder()
             builder.fn()
-            builder.registerPluginTypes()
-            this.data = builder.build()
+            builder.fix().registerPluginTypes()
+            this.data = builder.fix().build()
+            invalidateSuppliers()
+            for (watcher in this.watchers)
+                watcher(this as R)
         }
-        invalidateSuppliers()
     }
 
     override fun ensureLoaded(): D = this.data
+
+    override fun watch(watcher: R.() -> Unit) {
+        synchronized(this.lock) {
+            this.watchers += watcher
+        }
+    }
 }
 
 private class LanternGenericInternalImmutableCatalogTypeRegistry<T : CatalogType, I>(
-        typeToken: TypeToken<T>, initializer: GenericInternalCatalogTypeRegistryBuilder<T, I>.() -> Unit
-) : LanternImmutableCatalogTypeRegistry<T, GenericInternalRegistryData<T, I>, LanternGenericRegistryBuilder<T, I>>(typeToken, initializer),
+        typeToken: TypeToken<T>, initializer: InternalCatalogTypeRegistryBuilder<T, I>.() -> Unit
+) : AbstractImmutableCatalogTypeRegistry<T, GenericInternalRegistryData<T, I>, LanternGenericInternalRegistryBuilder<T, I>>(typeToken, initializer),
         GenericInternalCatalogTypeRegistry<T, I> {
 
-    override fun createBuilder() = LanternGenericRegistryBuilder<T, I>(this.typeToken)
+    override fun createBuilder() = LanternGenericInternalRegistryBuilder<T, I>(this.typeToken)
     override fun getId(type: T): I? = ensureLoaded().getId(type)
     override fun get(id: I): T? = ensureLoaded().get(id)
 }
 
 private class LanternInternalImmutableCatalogTypeRegistry<T : CatalogType>(
-        typeToken: TypeToken<T>, initializer: InternalCatalogTypeRegistryBuilder<T>.() -> Unit
-) : LanternImmutableCatalogTypeRegistry<T, InternalRegistryData<T>, LanternRegistryBuilder<T>>(typeToken, initializer),
+        typeToken: TypeToken<T>, initializer: InternalCatalogTypeRegistryBuilder<T, Int>.() -> Unit
+) : AbstractImmutableCatalogTypeRegistry<T, InternalRegistryData<T>, InternalCatalogTypeRegistryBuilder<T, Int>>(typeToken, initializer),
         InternalCatalogTypeRegistry<T> {
 
-    override fun createBuilder() = LanternRegistryBuilder(this.typeToken)
+    override fun createBuilder() = LanternInternalRegistryBuilder(this.typeToken)
     override fun getId(type: T) = ensureLoaded().getId(type)
     override fun get(id: Int): T? = ensureLoaded().get(id)
 }
 
-private abstract class LanternImmutableCatalogTypeRegistry<T : CatalogType, D : RegistryData<T>, B : AbstractCatalogTypeRegistryBuilder<T, *, D>>(
+private class LanternImmutableCatalogTypeRegistry<T : CatalogType>(
+        typeToken: TypeToken<T>, initializer: CatalogTypeRegistryBuilder<T>.() -> Unit
+) : AbstractImmutableCatalogTypeRegistry<T, RegistryData<T>, CatalogTypeRegistryBuilder<T>>(typeToken, initializer),
+        CatalogTypeRegistry<T> {
+
+    override fun createBuilder() = LanternRegistryBuilder(this.typeToken)
+}
+
+private abstract class AbstractImmutableCatalogTypeRegistry<T, D, B>(
         typeToken: TypeToken<T>, initializer: B.() -> Unit
-) : LanternCatalogTypeRegistry<T, D>(typeToken) {
+) : LanternCatalogTypeRegistry<T, D>(typeToken)
+        where T : CatalogType,
+              D : RegistryData<T>,
+              B : CatalogTypeRegistryBuilder<T> {
 
     private val lock = Any()
     private var initializer: (B.() -> Unit)? = initializer
+
+    private fun B.fix(): AbstractCatalogTypeRegistryBuilder<T, *, D> =
+            this as AbstractCatalogTypeRegistryBuilder<T, *, D>
 
     @Volatile
     private var data: D? = null
@@ -145,29 +189,33 @@ private abstract class LanternImmutableCatalogTypeRegistry<T : CatalogType, D : 
 
     private fun load(initializer: B.() -> Unit): D {
         val builder = createBuilder()
-        val dependents = dependentsThreadLocal.get()
-        // Check for circular dependencies, this is not allowed.
-        if (this in dependents) {
-            val path = (dependents + listOf(this)).joinToString(separator = " -> ") { it.typeToken.rawType.simpleName }
-            throw IllegalStateException("Circular dependency tree: $path")
+        val cycleStack = dependencyCyclesThreadLocal.get()
+        // Check for cyclic dependencies, this is not allowed.
+        if (this in cycleStack) {
+            val cycles = cycleStack + listOf(this)
+            val message = StringBuilder()
+            message.append("Dependencies are cyclic! [\n  ")
+            cycles.joinTo(message, separator = " ->\n  ") { it.typeToken.rawType.simpleName }
+            message.append("\n]")
+            throw CyclicDependencyException(message.toString())
         }
-        dependents.add(this)
+        cycleStack.add(this)
         try {
             builder.initializer()
-            builder.registerPluginTypes()
-            val data = builder.build()
+            builder.fix().registerPluginTypes()
+            val data = builder.fix().build()
             this.initializer = null
             this.data = data
             invalidateSuppliers()
             return data
         } finally {
-            dependents.removeLast()
+            cycleStack.removeLast()
         }
     }
 
     companion object {
 
-        private val dependentsThreadLocal: ThreadLocal<MutableList<CatalogTypeRegistry<*>>> =
+        private val dependencyCyclesThreadLocal: ThreadLocal<MutableList<CatalogTypeRegistry<*>>> =
                 ThreadLocal.withInitial { mutableListOf<CatalogTypeRegistry<*>>() }
     }
 }
@@ -223,21 +271,21 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
 }
 
 private class GenericInternalRegistryData<T : CatalogType, I>(
-        override val byKey: Map<CatalogKey, T> = emptyMap(),
+        byKey: Map<CatalogKey, T> = emptyMap(),
         private val byId: BiMap<I, T> = HashBiMap.create(),
-        override val suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
-) : RegistryData<T> {
+        suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
+) : RegistryData<T>(byKey, suggestedIdMatchers) {
 
     fun get(id: I): T? = this.byId[id]
     fun getId(type: T): I? = this.byId.inverse()[type]
 }
 
 private class InternalRegistryData<T : CatalogType>(
-        override val byKey: Map<CatalogKey, T> = emptyMap(),
+        byKey: Map<CatalogKey, T> = emptyMap(),
         private val byId: Int2ObjectMap<T> = Int2ObjectMaps.emptyMap(),
         private val toId: Object2IntMap<T> = Object2IntOpenHashMap<T>().apply { defaultReturnValue(Integer.MIN_VALUE) },
-        override val suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
-) : RegistryData<T> {
+        suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
+) : RegistryData<T>(byKey, suggestedIdMatchers) {
 
     fun get(id: Int): T? = this.byId[id]
 
@@ -249,10 +297,10 @@ private class InternalRegistryData<T : CatalogType>(
     }
 }
 
-private interface RegistryData<T> {
-    val byKey: Map<CatalogKey, T>
+private open class RegistryData<T>(
+    val byKey: Map<CatalogKey, T>,
     val suggestedIdMatchers: List<(String, T) -> Boolean>
-}
+)
 
 private class CatalogTypeSupplier<T : CatalogType>(
         private val suggestedId: String,
@@ -293,10 +341,8 @@ private class CatalogTypeSupplier<T : CatalogType>(
             "There's no ${registry.typeName} registered with the suggested id: $suggestedId")
 }
 
-private class LanternGenericRegistryBuilder<T : CatalogType, I>(typeToken: TypeToken<T>) :
-        AbstractCatalogTypeRegistryBuilder<T, I, GenericInternalRegistryData<T, I>>(typeToken), GenericInternalCatalogTypeRegistryBuilder<T, I> {
-
-    override fun register(internalId: I, type: T): T = register(type, internalId)
+private class LanternGenericInternalRegistryBuilder<T : CatalogType, I>(typeToken: TypeToken<T>) :
+        AbstractCatalogTypeRegistryBuilder<T, I, GenericInternalRegistryData<T, I>>(typeToken) {
 
     override fun build(): GenericInternalRegistryData<T, I> {
         val byKey = this.byKey.toImmutableMap()
@@ -306,12 +352,10 @@ private class LanternGenericRegistryBuilder<T : CatalogType, I>(typeToken: TypeT
     }
 }
 
-private class LanternRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
-        AbstractCatalogTypeRegistryBuilder<T, Int, InternalRegistryData<T>>(typeToken), InternalCatalogTypeRegistryBuilder<T> {
+private class LanternInternalRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
+        AbstractCatalogTypeRegistryBuilder<T, Int, InternalRegistryData<T>>(typeToken) {
 
     private var nextFreeId: Int = 0
-
-    override fun register(internalId: Int, type: T): T = register(type, internalId)
 
     override fun register(type: T, internalId: Int?): T {
         super.register(type, internalId ?: this.nextFreeId)
@@ -330,9 +374,19 @@ private class LanternRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
     }
 }
 
+private class LanternRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
+        AbstractCatalogTypeRegistryBuilder<T, Int, RegistryData<T>>(typeToken) {
+
+    override fun build(): RegistryData<T> {
+        val byKey = this.byKey.toImmutableMap()
+        val suggestedIdMatchers = this.suggestedIdMatchers.toImmutableList()
+        return RegistryData(byKey, suggestedIdMatchers)
+    }
+}
+
 private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D : RegistryData<T>>(
         val typeToken: TypeToken<T>
-): CatalogTypeRegistryBuilder<T> {
+): InternalCatalogTypeRegistryBuilder<T, I> {
 
     private val typeName: String get() = this.typeToken.rawType.simpleName
     protected val suggestedIdMatchers: MutableList<(String, T) -> Boolean> = mutableListOf()
@@ -341,6 +395,7 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
     private var allowPluginRegistrations = false
 
     override fun register(type: T): T = register(type, null)
+    override fun register(internalId: I, type: T): T = register(type, internalId)
 
     protected open fun register(type: T, internalId: I?): T {
         val key = type.key
@@ -348,13 +403,9 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
         if (internalId != null)
             check(!this.byId.containsKey(internalId)) { "There's already a $typeName registered with the internal id: $internalId" }
         this.byKey[key] = type
-        this.byId[internalId] = type
+        if (internalId != null)
+            this.byId[internalId] = type
         return type
-    }
-
-    open fun validate(type: T) {
-        val key = type.key
-        check(!this.byKey.containsKey(key)) { "There's already a $typeName registered with the key: $key" }
     }
 
     fun registerPluginTypes() {

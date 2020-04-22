@@ -29,6 +29,7 @@ import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerArmorInventory;
 import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory;
 import org.lanternpowered.server.item.recipe.RecipeBookState;
+import org.lanternpowered.server.registry.type.data.GameModeRegistry;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.CatalogKey;
@@ -40,7 +41,6 @@ import org.spongepowered.api.data.persistence.Queries;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.util.RespawnLocation;
@@ -150,7 +150,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             });
         }
         dataView.set(RESPAWN_LOCATIONS, respawnLocationViews);
-        dataView.set(GAME_MODE, ((LanternGameMode) valueContainer.remove(Keys.GAME_MODE).orElse(GameModes.NOT_SET)).getInternalId());
+        dataView.set(GAME_MODE, ((LanternGameMode) valueContainer.remove(Keys.GAME_MODE).orElseGet(GameModes.NOT_SET)).getInternalId());
         dataView.set(SELECTED_ITEM_SLOT, player.getInventory().getHotbar().getSelectedSlotIndex());
         dataView.set(SCORE, valueContainer.remove(LanternKeys.SCORE).get());
 
@@ -228,7 +228,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         valueContainer.set(Keys.RESPAWN_LOCATIONS, respawnLocations);
         dataView.getInt(SCORE).ifPresent(v -> valueContainer.set(LanternKeys.SCORE, v));
         final GameMode gameMode = dataView.getInt(GAME_MODE)
-                .flatMap(v -> GameModeRegistryModule.get().getByInternalId(v)).orElse(GameModes.NOT_SET);
+                .flatMap(v -> GameModeRegistry.get().getOptional(v)).orElseGet(GameModes.NOT_SET);
         valueContainer.set(Keys.GAME_MODE, gameMode);
         player.getInventory().getHotbar().setSelectedSlotIndex(dataView.getInt(SELECTED_ITEM_SLOT).orElse(0));
 
@@ -266,7 +266,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         for (Slot slot : slots) {
             ((ISlot) slot).peek().ifNotEmpty(stack -> {
                 final DataView itemView = ItemStackStore.INSTANCE.serialize(stack);
-                itemView.set(SLOT, enderChestInventory.getProperty(slot, InventoryProperties.SLOT_INDEX).get().byteValue());
+                itemView.set(SLOT, enderChestInventory.get(slot, Keys.SLOT_INDEX).get().byteValue());
                 itemViews.add(itemView);
             });
         }

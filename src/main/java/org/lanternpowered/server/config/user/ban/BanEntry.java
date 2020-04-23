@@ -14,21 +14,16 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.lanternpowered.server.console.LanternConsole;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.text.LanternTexts;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
 
-import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.time.Instant;
 import java.util.Optional;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 @ConfigSerializable
 public abstract class BanEntry implements Ban {
@@ -48,7 +43,7 @@ public abstract class BanEntry implements Ban {
     @Setting(value = "source")
     private Text source;
 
-    @Nullable private volatile WeakReference<CommandSource> commandSource;
+    // @Nullable private volatile WeakReference<CommandSource> commandSource;
 
     protected BanEntry() {
     }
@@ -72,7 +67,7 @@ public abstract class BanEntry implements Ban {
 
     @Override
     public BanType getType() {
-        return this instanceof Ban.Ip ? BanTypes.IP : BanTypes.PROFILE;
+        return this instanceof Ban.Ip ? BanTypes.IP.get() : BanTypes.PROFILE.get();
     }
 
     @Override
@@ -100,6 +95,7 @@ public abstract class BanEntry implements Ban {
         return Optional.ofNullable(this.source);
     }
 
+    /*
     @SuppressWarnings("deprecation")
     @Override
     public Optional<CommandSource> getBanCommandSource() {
@@ -121,6 +117,7 @@ public abstract class BanEntry implements Ban {
         }
         return Optional.ofNullable(source);
     }
+    */
 
     @ConfigSerializable
     public static class Ip extends BanEntry implements Ban.Ip {

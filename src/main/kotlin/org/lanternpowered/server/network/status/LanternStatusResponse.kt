@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.network.status
 
+import org.lanternpowered.api.MinecraftVersion
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
-import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.event.server.ClientPingServerEvent
 import org.spongepowered.api.network.status.Favicon
-import org.spongepowered.api.text.Text
 
 class LanternStatusResponse(
         private var version: MinecraftVersion,
@@ -36,7 +36,7 @@ class LanternStatusResponse(
      *
      * @param version The version
      */
-    fun setVersion(version: MinecraftVersion) = run { this.version = version }
+    fun setVersion(version: MinecraftVersion) { this.version = version }
 
     /**
      * Sets the [MinecraftVersion] of the status response.

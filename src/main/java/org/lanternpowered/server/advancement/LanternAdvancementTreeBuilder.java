@@ -13,8 +13,9 @@ package org.lanternpowered.server.advancement;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.api.registry.MutableCatalogTypeRegistry;
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
+import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry;
 import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
@@ -22,7 +23,7 @@ import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
-@SuppressWarnings({"NullableProblems", "ConstantConditions"})
+@SuppressWarnings({"ConstantConditions"})
 public class LanternAdvancementTreeBuilder extends AbstractNamedCatalogBuilder<AdvancementTree, AdvancementTree.Builder>
         implements AdvancementTree.Builder {
 
@@ -46,8 +47,8 @@ public class LanternAdvancementTreeBuilder extends AbstractNamedCatalogBuilder<A
     @Override
     public AdvancementTree.Builder rootAdvancement(Advancement rootAdvancement) {
         checkNotNull(rootAdvancement, "rootAdvancement");
-        final AdvancementRegistryModule registry = AdvancementRegistryModule.INSTANCE;
-        checkState(rootAdvancement.equals(registry.get(rootAdvancement.getKey()).orElse(null)),
+        final MutableCatalogTypeRegistry<Advancement> registry = AdvancementRegistry.get();
+        checkState(rootAdvancement.equals(registry.get(rootAdvancement.getKey())),
                 "The root advancement must be registered.");
         checkState(!rootAdvancement.getParent().isPresent(),
                 "The root advancement cannot have a parent.");

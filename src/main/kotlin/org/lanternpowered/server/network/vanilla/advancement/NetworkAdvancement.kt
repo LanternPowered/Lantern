@@ -35,17 +35,16 @@ class NetworkAdvancement(
         buf.writeVarInt(this.requirements.size)
         for (requirements in this.requirements) {
             buf.writeVarInt(requirements.size)
-            for (requirement in requirements) {
+            for (requirement in requirements)
                 buf.writeString(requirement)
-            }
         }
     }
 
     override fun toString(): String = ToStringHelper(this)
             .omitNullValues()
-            .add("id", id)
-            .add("parentId", parentId)
-            .add("display", display)
-            .add("criteria", Iterables.toString(criteria))
+            .add("id", this.id)
+            .add("parentId", this.parentId)
+            .add("display", this.display)
+            .add("criteria", Iterables.toString(this.criteria))
             .toString()
 }

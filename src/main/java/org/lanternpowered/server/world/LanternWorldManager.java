@@ -41,8 +41,8 @@ import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.WorldArchetypes;
-import org.spongepowered.api.world.WorldManager;
 import org.spongepowered.api.world.gen.GeneratorTypes;
+import org.spongepowered.api.world.server.WorldManager;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 

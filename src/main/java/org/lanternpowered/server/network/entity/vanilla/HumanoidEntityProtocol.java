@@ -19,7 +19,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnPlayerMessage;
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreference;
@@ -53,7 +53,7 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final double yaw = rot.getY();
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
 
-        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(entityId, this.entity.getUniqueId(),
+        context.sendToAllExceptSelf(() -> new SpawnPlayerMessage(entityId, this.entity.getUniqueId(),
                 pos, wrapAngle(yaw), wrapAngle(pitch)));
         if (headRot != null) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));

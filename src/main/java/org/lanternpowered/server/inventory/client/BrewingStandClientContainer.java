@@ -13,7 +13,7 @@ package org.lanternpowered.server.inventory.client;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
 import org.spongepowered.api.text.Text;
 
 import java.util.function.Supplier;
@@ -52,7 +52,7 @@ public class BrewingStandClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.BREWING_STAND, getTitle());
+        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.BREWING_STAND, getTitle());
     }
 
     @Override

@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.network.protocol;
 
-import org.lanternpowered.server.network.vanilla.message.codec.handshake.CodecHandshakeIn;
+import org.lanternpowered.server.network.vanilla.message.codec.handshake.HandshakeCodec;
 import org.lanternpowered.server.network.vanilla.message.handler.handshake.HandlerHandshakeIn;
-import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
+import org.lanternpowered.server.network.vanilla.message.type.handshake.HandshakeMessage;
 
 final class ProtocolHandshake extends ProtocolBase {
 
     ProtocolHandshake() {
-        inbound().bind(CodecHandshakeIn.class, MessageHandshakeIn.class)
+        inbound().bind(HandshakeCodec.class, HandshakeMessage.class)
                 .bindHandler(new HandlerHandshakeIn());
     }
 }

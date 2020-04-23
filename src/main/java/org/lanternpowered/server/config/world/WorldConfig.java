@@ -74,7 +74,7 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     private boolean lowHorizon = false;
 
     @Setting(value = "difficulty", comment = "The difficulty of this world.")
-    private Difficulty difficulty = Difficulties.NORMAL;
+    private Difficulty difficulty = Difficulties.NORMAL.get();
 
     @Setting(value = "generation", comment = "The generation settings of this world.")
     private WorldGeneration generation = new WorldGeneration();
@@ -98,7 +98,7 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     private static class WorldGameMode {
 
         @Setting(value = "mode", comment = "The default game mode of this world.")
-        private GameMode mode = GameModes.SURVIVAL;
+        private GameMode mode = GameModes.SURVIVAL.get();
 
         @Setting(value = "force", comment = "Whether players are forced to the default gamemode on join.")
         private boolean force = false;

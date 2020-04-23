@@ -25,8 +25,8 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
-import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
+import org.lanternpowered.server.network.vanilla.message.handler.login.LoginStartHandler;
+import org.lanternpowered.server.network.vanilla.message.type.handshake.HandshakeMessage;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.util.UUIDHelper;
@@ -36,14 +36,14 @@ import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
+public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
 
     private static final String FML_MARKER = "\0FML\0";
     private static final Gson GSON = new Gson();
 
     @NettyThreadOnly
     @Override
-    public void handle(NetworkContext context, MessageHandshakeIn message) {
+    public void handle(NetworkContext context, HandshakeMessage message) {
         final Optional<ProtocolState> optNextState = ProtocolState.getFromId(message.getNextState());
         final NetworkSession session = context.getSession();
         if (!optNextState.isPresent()) {
@@ -88,7 +88,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                         properties = LinkedHashMultimap.create();
                     }
 
-                    session.getChannel().attr(HandlerLoginStart.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, null, properties));
+                    session.getChannel().attr(LoginStartHandler.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, null, properties));
                 } else {
                     session.disconnect(t("Please enable client detail forwarding (also known as \"ip forwarding\") on "
                             + "your proxy if you wish to use it on this server, and also make sure that you joined through the proxy."));
@@ -125,7 +125,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                         }
                     }
 
-                    session.getChannel().attr(HandlerLoginStart.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, name, properties));
+                    session.getChannel().attr(LoginStartHandler.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, name, properties));
                     session.getChannel().attr(NetworkSession.FML_MARKER).set(false);
 
                     final int port = jsonObject.get("rP").getAsInt();

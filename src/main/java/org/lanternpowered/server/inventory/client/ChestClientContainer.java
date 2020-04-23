@@ -17,7 +17,7 @@ import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConsta
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.text.Text;
 
@@ -57,7 +57,7 @@ public class ChestClientContainer extends ClientContainer {
     protected Message createInitMessage() {
         final ClientWindowType windowType = ClientWindowTypes.INSTANCE.get(CatalogKey.minecraft("generic_9x" + this.rowIndex));
         checkState(windowType != null, "Window type for %s rows is currently not supported."); // TODO
-        return new MessagePlayOutOpenWindow(getContainerId(), windowType, getTitle());
+        return new OpenWindowMessage(getContainerId(), windowType, getTitle());
     }
 
     @Override

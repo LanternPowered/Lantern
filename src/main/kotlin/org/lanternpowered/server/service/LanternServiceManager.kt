@@ -10,38 +10,65 @@
  */
 package org.lanternpowered.server.service
 
+import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.MapMaker
+import com.google.common.collect.Multimap
 import org.lanternpowered.api.cause.CauseStack.Companion.currentOrEmpty
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.service.ServiceManager
 import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.event.cause.EventContextKeys
 import org.spongepowered.api.plugin.PluginContainer
 import org.spongepowered.api.service.ProviderRegistration
 import org.spongepowered.api.service.ProvisioningException
 import java.util.Optional
+import java.util.function.Predicate
 import kotlin.reflect.KClass
 
 object LanternServiceManager : ServiceManager {
 
+    private val serviceCallbacks: Multimap<Class<*>, Predicate<Any>> = HashMultimap.create()
     private val providers: MutableMap<Class<*>, ProviderRegistration<*>> = MapMaker()
             .concurrencyLevel(3).makeMap<Class<*>, ProviderRegistration<*>>()
 
     val providerRegistrations: Collection<ProviderRegistration<*>>
         get() = ImmutableList.copyOf(this.providers.values)
 
+    inline fun <reified T : Any> watchExpirable(noinline callback: (T) -> Boolean) = watchExpirable(T::class.java, callback)
+
+    fun <T> watchExpirable(serviceType: Class<T>, callback: (T) -> Boolean) {
+        val registration = getNullableRegistration(serviceType)
+        if (registration != null && !callback(registration.provider)) {
+            return
+        }
+        synchronized(this.serviceCallbacks) {
+            this.serviceCallbacks.put(serviceType, callback.uncheckedCast())
+        }
+    }
+
+    fun <T> watch(serviceType: Class<T>, callback: (T) -> Unit) {
+        watchExpirable(serviceType) { service ->
+            callback(service)
+            true
+        }
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun <T> setProvider(plugin: PluginContainer, service: Class<T>, provider: T) {
-        val newProvider: ProviderRegistration<T> = Provider(plugin, service, provider)
-        val oldProvider: ProviderRegistration<T>? = this.providers.put(service, newProvider) as ProviderRegistration<T>?
+        val newRegistration: ProviderRegistration<T> = Provider(plugin, service, provider)
+        val oldRegistration: ProviderRegistration<T>? = this.providers.put(service, newRegistration) as ProviderRegistration<T>?
         currentOrEmpty().withFrame { frame ->
             frame.pushCause(plugin)
             frame.addContext(EventContextKeys.SERVICE_MANAGER, this)
             EventManager.post(LanternEventFactory.createChangeServiceProviderEvent<T>(
-                    frame.currentCause, newProvider, oldProvider))
+                    frame.currentCause, newRegistration, oldRegistration))
+        }
+        synchronized(this.serviceCallbacks) {
+            this.serviceCallbacks[service].removeIf { callback -> !callback.uncheckedCast<(T) -> Boolean>()(provider) }
         }
     }
 

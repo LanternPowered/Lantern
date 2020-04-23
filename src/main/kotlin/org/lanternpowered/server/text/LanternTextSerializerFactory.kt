@@ -40,7 +40,7 @@ object LanternTextSerializerFactory : TextSerializerFactory, TextSerializers.Fac
 
     override fun formatting(code: Char): FormattingCodeTextSerializer {
         return when (code) {
-            TextConstants.LEGACY_CHAR -> LanternLegacyTextSerializer
+            LanternFormattingCodes.LEGACY_CODE -> LanternLegacyTextSerializer
             this.defaultFormattingCode -> this.defaultFormattingCodeTextSerializer
             else -> this.formattingCodeSerializers.computeIfAbsent(code) {
                 LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)

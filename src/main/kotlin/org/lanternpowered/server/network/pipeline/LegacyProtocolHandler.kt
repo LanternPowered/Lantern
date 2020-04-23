@@ -22,7 +22,7 @@ import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.SimpleRemoteConnection
 import org.lanternpowered.server.network.status.LanternStatusClient
-import org.lanternpowered.server.network.status.LanternStatusHelper.createPlayers
+import org.lanternpowered.server.network.status.LanternStatusHelper
 import org.lanternpowered.server.network.status.LanternStatusResponse
 import org.lanternpowered.server.text.LanternTexts.toLegacy
 import org.lanternpowered.server.text.translation.TranslationHelper
@@ -59,9 +59,9 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 if (buf.readableBytes() > 0)
                     return
                 legacy = true
-                sendDisconnectMessage(ctx, TranslationHelper.t("multiplayer.disconnect.outdated_client",
+                ctx.disconnect(TranslationHelper.t("multiplayer.disconnect.outdated_client",
                         Lantern.getGame().platform.minecraftVersion.name).toPlain())
-                val clientVersion: MinecraftVersion = Lantern.getGame().minecraftVersionCache.getVersionOrUnknown(protocol, true)
+                val clientVersion = Lantern.getGame().minecraftVersionCache.getVersionOrUnknown(protocol, true)
                 if (clientVersion === LanternMinecraftVersion.UNKNOWN_LEGACY) {
                     Lantern.getLogger().debug("Client with unknown legacy protocol version {} attempted to join the server.", protocol)
                 } else {
@@ -137,7 +137,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 var description = server.motd
                 val address = ctx.channel().remoteAddress() as InetSocketAddress
                 val client = LanternStatusClient(address, clientVersion, virtualAddress1)
-                val players = createPlayers(server)
+                val players = LanternStatusHelper.createPlayers(server)
                 val response = LanternStatusResponse(
                         serverVersion, description, players, server.favicon.orElse(null))
                 val connection = SimpleRemoteConnection(address, virtualAddress1)
@@ -180,7 +180,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                     String.format("%s\u00A7%s\u00A7%s",
                             description0, online, max)
                 }
-                sendDisconnectMessage(ctx, data)
+                ctx.disconnect(data)
             }
         } catch (ignore: Exception) {
         } finally {
@@ -197,16 +197,15 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
     /**
      * Sends a disconnect message to a legacy client and closes the connection.
      *
-     * @param ctx The channel handler context
      * @param message The message
      */
-    private fun sendDisconnectMessage(ctx: ChannelHandlerContext, message: String) {
+    private fun ChannelHandlerContext.disconnect(message: String) {
         val data = message.toByteArray(StandardCharsets.UTF_16BE)
-        val output = ctx.alloc().buffer()
+        val output = alloc().buffer()
         output.writeByte(0xff)
         output.writeShort(data.size shr 1)
         output.writeBytes(data)
-        val firstContext = ctx.channel().pipeline().firstContext()
+        val firstContext: ChannelHandlerContext? = channel().pipeline().firstContext()
         firstContext?.writeAndFlush(output)?.addListener(ChannelFutureListener.CLOSE)
     }
 

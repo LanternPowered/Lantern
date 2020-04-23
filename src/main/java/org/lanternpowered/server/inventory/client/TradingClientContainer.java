@@ -14,7 +14,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.inventory.behavior.event.SelectTradingOfferEvent;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
 import org.spongepowered.api.text.Text;
 
 public class TradingClientContainer extends ClientContainer {
@@ -36,7 +36,7 @@ public class TradingClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.MERCHANT, getTitle());
+        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.MERCHANT, getTitle());
     }
 
     @Override

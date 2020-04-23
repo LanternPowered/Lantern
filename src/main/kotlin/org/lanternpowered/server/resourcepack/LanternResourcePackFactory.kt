@@ -37,9 +37,8 @@ object LanternResourcePackFactory : ResourcePack.Factory {
         var actualUri = uri
         val key = CacheKey(actualUri, unchecked)
         var resourcePack = this.resourcePacksByKey[key]
-        if (resourcePack != null) {
+        if (resourcePack != null)
             return resourcePack
-        }
         val path = actualUri.toString()
         val plainPath = path.replace("[^\\p{L}\\p{Nd}]+".toRegex(), "")
         var hash: String? = null
@@ -75,4 +74,16 @@ object LanternResourcePackFactory : ResourcePack.Factory {
 
     override fun fromUri(uri: URI) = fromUri(uri, false)
     override fun fromUriUnchecked(uri: URI) = fromUri(uri, true)
+}
+
+private data class LanternResourcePack(
+        private val uri: URI,
+        private val id: String,
+        private val name: String,
+        private val hash: String?
+) : ResourcePack {
+    override fun getUri() = this.uri
+    override fun getName() = this.name
+    override fun getId() = this.id
+    override fun getHash() = this.hash.optional()
 }

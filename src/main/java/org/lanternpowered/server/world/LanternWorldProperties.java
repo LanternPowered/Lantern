@@ -12,10 +12,9 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableSet;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetDifficultyMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gamerule.GameRuleContainer;
@@ -23,8 +22,6 @@ import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
-import org.spongepowered.api.CatalogKey;
-import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -45,12 +42,9 @@ import org.spongepowered.api.world.weather.Weathers;
 import org.spongepowered.math.vector.Vector3i;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public final class LanternWorldProperties implements WorldProperties {
 
@@ -470,7 +464,7 @@ public final class LanternWorldProperties implements WorldProperties {
     public void setDifficulty(Difficulty difficulty) {
         checkNotNull(difficulty, "difficulty");
         if (this.getDifficulty() != difficulty && this.world != null) {
-            this.world.broadcast(() -> new MessagePlayOutSetDifficulty(difficulty, true));
+            this.world.broadcast(() -> new SetDifficultyMessage(difficulty, true));
         }
         this.worldConfig.setDifficulty(difficulty);
     }

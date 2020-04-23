@@ -32,5 +32,5 @@ interface CatalogTypeRegistryBuilder<T : CatalogType> {
     /**
      * Registers a new [CatalogType].
      */
-    fun register(type: T): T
+    fun <R : T> register(type: R): R
 }

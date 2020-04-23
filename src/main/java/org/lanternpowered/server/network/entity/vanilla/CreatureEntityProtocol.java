@@ -14,7 +14,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnMobMessage;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -44,7 +44,7 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
 
         final int entityTypeId = NetworkIDs.REGISTRY.require(getMobType());
 
-        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnMob(getRootEntityId(), this.entity.getUniqueId(), entityTypeId,
+        context.sendToAllExceptSelf(() -> new SpawnMobMessage(getRootEntityId(), this.entity.getUniqueId(), entityTypeId,
                 pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel));
         spawnWithMetadata(context);
         spawnWithEquipment(context);

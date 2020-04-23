@@ -15,7 +15,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnParticleMessage;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.CatalogType;
@@ -152,7 +152,7 @@ public final class CommandParticle extends CommandProvider {
                                 Arrays.toString(params), params.length, dataLength, particleType.getKey()));
                     }
 
-                    final MessagePlayOutSpawnParticle message = new MessagePlayOutSpawnParticle(
+                    final SpawnParticleMessage message = new SpawnParticleMessage(
                             particleId, position, offset, speed, count, null, longDistance);
                     if (args.hasAny("player")) {
                         args.<LanternPlayer>getOne("player").get().getConnection().send(message);

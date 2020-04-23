@@ -28,6 +28,7 @@ open class LanternTextStyle(
         private val strikethrough: Boolean? = null,
         private val obfuscated: Boolean? = null
 ) : XTextStyle {
+
     // Return true by default as the TextStyle class is composite by default
     override fun isComposite() = true
 
@@ -167,15 +168,13 @@ open class LanternTextStyle(
                 .add("obfuscated", this.obfuscated)
                 .toString()
 
-    class Real(key: CatalogKey, override val code: Char, bold: Boolean? = null, italic: Boolean? = null, underline: Boolean? = null,
-               strikethrough: Boolean? = null, obfuscated: Boolean? = null) :
-            LanternTextStyle(bold, italic, underline, strikethrough, obfuscated), TextStyleType,
-            CatalogType by DefaultCatalogType(key), FormattingCodeHolder {
-
-        override fun isComposite() = false
-    }
-
-    class None(key: CatalogKey) : LanternTextStyle(), TextStyleType, CatalogType by DefaultCatalogType(key) {
+    class Type(key: CatalogKey,
+               bold: Boolean? = null,
+               italic: Boolean? = null,
+               underline: Boolean? = null,
+               strikethrough: Boolean? = null,
+               obfuscated: Boolean? = null
+    ) : LanternTextStyle(bold, italic, underline, strikethrough, obfuscated), CatalogType by DefaultCatalogType(key), TextStyleType {
 
         override fun isComposite() = false
     }

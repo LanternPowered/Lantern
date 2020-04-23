@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.permission
 
-import org.lanternpowered.api.service.ServiceManager
 import org.lanternpowered.api.service.provide
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.server.service.LanternServiceListeners
+import org.lanternpowered.server.service.LanternServiceManager
+import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.Subject
@@ -21,6 +21,7 @@ import org.spongepowered.api.service.permission.SubjectCollection
 import org.spongepowered.api.service.permission.SubjectData
 import org.spongepowered.api.service.permission.SubjectReference
 import org.spongepowered.api.util.Tristate
+import java.lang.ref.WeakReference
 import java.util.Optional
 
 interface ProxySubject : Subject {
@@ -53,17 +54,30 @@ interface ProxySubject : Subject {
      */
     @JvmDefault
     fun initializeSubject() {
-        LanternServiceListeners.getInstance().registerExpirableServiceCallback(PermissionService::class.java, SubjectSettingCallback(this))
+        val reference = WeakReference(this)
+        LanternServiceManager.watchExpirable<PermissionService> { service ->
+            // Don't reference to this in this block, use the weak reference
+            // for this, we don't want to create a listener with a hard
+            // reference to the subject
+
+            // Returning false from this predicate means this setting callback will be removed
+            // as a listener, and will not be tested again.
+            val subject = reference.get() ?: return@watchExpirable false
+
+            // Update the internal subject
+            updateInternalSubject(subject, service)
+            true
+        }
     }
 
     @JvmDefault
     fun resolveNullableSubject(): Subject? {
         var reference = this.internalSubject
         if (reference == null) {
-            val service = ServiceManager.provide<PermissionService>()
+            val service = LanternServiceManager.provide<PermissionService>()
             if (service != null) {
                 // Try to update the internal subject
-                SubjectSettingCallback.apply(this, service)
+                updateInternalSubject(this, service)
                 // Get the new subject reference, can be null if failed
                 reference = this.internalSubject
             }
@@ -72,14 +86,11 @@ interface ProxySubject : Subject {
     }
 
     @JvmDefault
-    fun resolveSubject(): Subject {
-        return resolveNullableSubject() ?: throw IllegalStateException("No subject present for $identifier")
-    }
+    fun resolveSubject(): Subject = resolveNullableSubject() ?: throw IllegalStateException("No subject present for $identifier")
 
     // Delegated methods
 
     @JvmDefault override fun asSubjectReference() = checkNotNull(this.internalSubject) { "No internal subject reference is set" }
-
     @JvmDefault override fun getContainingCollection(): SubjectCollection = resolveSubject().containingCollection
     @JvmDefault override fun getSubjectData(): SubjectData = resolveSubject().subjectData
     @JvmDefault override fun getTransientSubjectData(): SubjectData = resolveSubject().transientSubjectData
@@ -124,4 +135,18 @@ interface ProxySubject : Subject {
     @JvmDefault
     override fun getOption(contexts: Set<Context>, key: String): Optional<String> =
             resolveNullableSubject()?.getOption(contexts, key) ?: emptyOptional()
+}
+
+fun updateInternalSubject(ref: ProxySubject, service: PermissionService) {
+    // check if we're using the native Lantern impl
+    // we can skip some unnecessary instance creation this way.
+    val subject = if (service is LanternPermissionService) {
+        service.get(ref.subjectCollectionIdentifier).get(ref.identifier).asSubjectReference()
+    } else {
+        // build a new subject reference using the permission service
+        // this doesn't actually load the subject, so it will be lazily init'd when needed.
+        service.newSubjectReference(ref.subjectCollectionIdentifier, ref.identifier)
+    }
+
+    ref.internalSubject = subject
 }

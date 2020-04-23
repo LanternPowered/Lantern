@@ -21,16 +21,13 @@ import java.util.UUID
 class LanternEntityType<E : Entity> internal constructor(
         key: CatalogKey,
         private val translation: Translation,
-        private val entityClass: Class<E>,
-        private val entityConstructor: (UUID) -> E
+        private val constructor: (UUID) -> E
 ) : DefaultCatalogType(key), EntityType<E> {
 
-    internal constructor(key: CatalogKey, translation: String, entityClass: Class<E>, entityConstructor: (UUID) -> E) :
-            this(key, tr(translation), entityClass, entityConstructor)
+    internal constructor(key: CatalogKey, translation: String, entityConstructor: (UUID) -> E) :
+            this(key, tr(translation), entityConstructor)
 
-    fun constructEntity(uniqueId: UUID) = this.entityConstructor(uniqueId)
+    fun constructEntity(uniqueId: UUID) = this.constructor(uniqueId)
 
-    override fun getEntityClass() = this.entityClass
-    override fun toStringHelper() = super.toStringHelper().add("entityClass", this.entityClass)
     override fun getTranslation() = this.translation
 }

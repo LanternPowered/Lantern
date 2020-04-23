@@ -11,7 +11,6 @@
 package org.lanternpowered.server.registry.type.effect.sound
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.effect.sound.LanternSoundCategory
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry

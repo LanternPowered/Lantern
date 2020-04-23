@@ -43,15 +43,11 @@ val NotePitchRegistry = internalCatalogTypeRegistry<NotePitch> {
             "F2",
             "F_SHARP2"
     )
-    val entries = ArrayList<LanternNotePitch>(sortedNotePitches.size)
-    for (noteName in sortedNotePitches) {
-        val notePitch = LanternNotePitch(CatalogKey.minecraft(noteName.toLowerCase()))
-        register(entries.size, notePitch)
-        entries.add(notePitch)
+
+    val entries = sortedNotePitches.mapIndexed { index, name ->
+        register(index, LanternNotePitch(CatalogKey.minecraft(name.toLowerCase())))
     }
-    for (i in entries.indices) {
-        entries[i].next = entries[(i + 1) % entries.size]
-    }
+    entries.forEachIndexed { index, notePitch -> notePitch.next = entries[(index + 1) % entries.size] }
 }
 
 private class LanternNotePitch(key: CatalogKey) : DefaultCatalogType(key), NotePitch {

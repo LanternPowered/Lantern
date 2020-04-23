@@ -177,7 +177,7 @@ public class LanternTreeLayout implements TreeLayout {
         for (TreeNode node : treeNode.children) {
             y += node.offset;
         }
-        y /= (double) treeNode.children.size();
+        y /= treeNode.children.size();
         treeNode.offset = y;
         treeNode.layout.setPosition(treeNode.x, y);
     }

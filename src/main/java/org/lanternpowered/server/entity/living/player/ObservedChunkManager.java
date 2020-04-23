@@ -27,7 +27,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockEntity;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
+import org.lanternpowered.server.network.vanilla.message.type.play.ChunkMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
 import org.lanternpowered.server.util.collect.array.VariableValueArray;
@@ -148,7 +148,7 @@ public final class ObservedChunkManager implements WorldEventListener {
         Arrays.fill(EMPTY_SECTION_SKY_LIGHT, (byte) 255);
     }*/
 
-    private static final MessagePlayOutChunkData.Section EMPTY_SECTION = new MessagePlayOutChunkData.Section(
+    private static final ChunkMessage.Section EMPTY_SECTION = new ChunkMessage.Section(
             EMPTY_SECTION_TYPES, new int[1], 0, new Short2ObjectOpenHashMap<>());
 
     private static Map<Vector3i, LanternBlockEntity> getMappedTileEntities(LanternChunk chunk) {
@@ -371,7 +371,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
         private List<Message> createLoadChunkMessages(LanternChunk chunk, int sectionsBitMask, boolean biomes) {
             final LanternChunk.ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(sectionsBitMask);
-            final MessagePlayOutChunkData.Section[] msgSections = new MessagePlayOutChunkData.Section[sections.length];
+            final ChunkMessage.Section[] msgSections = new ChunkMessage.Section[sections.length];
 
             final List<Message> messages = new ArrayList<>();
 
@@ -401,7 +401,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                             BlockEntityProtocolHelper.init(protocol, initContext);
                         }
                     }
-                    msgSections[i] = new MessagePlayOutChunkData.Section(
+                    msgSections[i] = new ChunkMessage.Section(
                             blockStates.getBacking(), intPalette, section.nonAirBlockCount, tileEntityInitData);
                 // The insert entry setting is used to send a "null" chunk
                 // after the chunk is already send to the client
@@ -419,9 +419,9 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             if (biomesArray != null) {
-                messages.add(0, new MessagePlayOutChunkData.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
+                messages.add(0, new ChunkMessage.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
             } else {
-                messages.add(0, new MessagePlayOutChunkData.Update(this.coords.getX(), this.coords.getY(), msgSections));
+                messages.add(0, new ChunkMessage.Update(this.coords.getX(), this.coords.getY(), msgSections));
             }
 
             return messages;

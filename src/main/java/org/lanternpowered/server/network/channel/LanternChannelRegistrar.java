@@ -24,7 +24,7 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.type.play.ChannelPayloadMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 import org.spongepowered.api.Platform;
@@ -126,7 +126,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (session.getRegisteredChannels().contains(channel)) {
             final ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
-            session.send(new MessagePlayInOutChannelPayload(channel, buf));
+            session.send(new ChannelPayloadMessage(channel, buf));
         }
     }
 
@@ -137,7 +137,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (players.hasNext()) {
             final ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
-            final Message msg = new MessagePlayInOutChannelPayload(channel, buf);
+            final Message msg = new ChannelPayloadMessage(channel, buf);
             players.forEachRemaining(player -> ((LanternPlayer) player).getConnection().send(msg));
         }
     }

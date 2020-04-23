@@ -55,7 +55,7 @@ public final class LanternBanBuilder implements Ban.Builder {
     @Override
     public LanternBanBuilder profile(GameProfile gameProfile) {
         checkNotNull(gameProfile, "gameProfile");
-        checkState(this.banType == BanTypes.PROFILE, "Cannot set a GameProfile if the BanType is not BanTypes.PROFILE!");
+        checkState(this.banType == BanTypes.PROFILE.get(), "Cannot set a GameProfile if the BanType is not BanTypes.PROFILE!");
         this.gameProfile = gameProfile;
         return this;
     }
@@ -63,7 +63,7 @@ public final class LanternBanBuilder implements Ban.Builder {
     @Override
     public LanternBanBuilder address(InetAddress address) {
         checkNotNull(address, "address");
-        checkState(this.banType == BanTypes.IP, "Cannot set an InetAddress if the BanType is not BanTypes.IP!");
+        checkState(this.banType == BanTypes.IP.get(), "Cannot set an InetAddress if the BanType is not BanTypes.IP!");
         this.address = address;
         return this;
     }
@@ -92,11 +92,13 @@ public final class LanternBanBuilder implements Ban.Builder {
         return this;
     }
 
+    /*
     @Override
     public LanternBanBuilder source(@Nullable CommandSource source) {
         this.source = source == null ? null : Text.of(source.getName());
         return this;
     }
+    */
 
     @Override
     public LanternBanBuilder source(@Nullable Text source) {

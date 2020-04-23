@@ -28,7 +28,6 @@ import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule
 import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule
-import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule
 import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior
 import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBehavior

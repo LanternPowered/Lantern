@@ -22,10 +22,10 @@ import org.lanternpowered.server.inventory.client.EnchantmentTableClientContaine
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClientItemRenameMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClientChangeTradeOfferMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClientClickWindowMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
@@ -277,7 +277,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleWindowClick(MessagePlayInClickWindow message) {
+    public void handleWindowClick(ClientClickWindowMessage message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             final ClientContainer clientContainer = getClientContainer();
             clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
@@ -297,14 +297,14 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleItemRename(MessagePlayInChangeItemName message) {
+    public void handleItemRename(ClientItemRenameMessage message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof AnvilClientContainer) {
             ((AnvilClientContainer) clientContainer).handleRename(message.getName());
         }
     }
 
-    public void handleOfferChange(MessagePlayInChangeOffer message) {
+    public void handleOfferChange(ClientChangeTradeOfferMessage message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof TradingClientContainer) {
             ((TradingClientContainer) clientContainer).handleSelectOffer(message.getIndex());

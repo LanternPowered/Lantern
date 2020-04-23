@@ -22,15 +22,15 @@ import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.spongepowered.api.entity.Entity
 
 class LanternPotionEffectType @JvmOverloads constructor(
-        key: CatalogKey, override val internalId: Int, translation: Translation,
+        key: CatalogKey, translation: Translation,
         private val potionTranslation: Translation,
         val effectConsumer: (Entity, PotionEffect) -> Unit = { _,_ -> },
         private var instant: Boolean = false
-) : DefaultCatalogType(key), PotionEffectType, InternalCatalogType, Translatable by Translated(translation) {
+) : DefaultCatalogType(key), PotionEffectType, Translatable by Translated(translation) {
 
-    @JvmOverloads constructor(key: CatalogKey, internalId: Int,
+    @JvmOverloads constructor(key: CatalogKey,
                               effectConsumer: (Entity, PotionEffect) -> Unit = { _,_ -> }, instant: Boolean = false) :
-            this(key, internalId,
+            this(key,
                     tr("effect.${key.namespace}.${key.value}"),
                     tr("item.minecraft.potion.effect.${key.value}"),
                     effectConsumer, instant)

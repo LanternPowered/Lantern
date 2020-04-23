@@ -18,14 +18,15 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementRegistryModule;
-import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementDisplay;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
+import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry;
+import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
@@ -53,8 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternPlayerAdvancements {
 
@@ -141,8 +140,7 @@ public class LanternPlayerAdvancements {
         cleanup();
 
         // Load all the advancements into this progress tracker
-        final AdvancementRegistryModule registryModule = AdvancementRegistryModule.INSTANCE;
-        for (Advancement advancement : registryModule.getAll()) {
+        for (Advancement advancement : AdvancementRegistry.get().getAll()) {
             final LanternAdvancementProgress progress = get(advancement);
             // Update the visibility
             progress.dirtyVisibility = true;
@@ -151,7 +149,7 @@ public class LanternPlayerAdvancements {
     }
 
     public void pulse() {
-        final MessagePlayOutAdvancements advancementsMessage = createUpdateMessage(false);
+        @Nullable final MessagePlayOutAdvancements advancementsMessage = createUpdateMessage(false);
         if (advancementsMessage != null) {
             this.player.getConnection().send(advancementsMessage);
         }
@@ -178,7 +176,7 @@ public class LanternPlayerAdvancements {
 
     public Collection<AdvancementTree> getUnlockedAdvancementTrees() {
         final ImmutableList.Builder<AdvancementTree> builder = ImmutableList.builder();
-        for (AdvancementTree tree : AdvancementTreeRegistryModule.get().getAll()) {
+        for (AdvancementTree tree : AdvancementTreeRegistry.get().getAll()) {
             final Advancement advancement = tree.getRootAdvancement();
             final LanternAdvancementProgress progress = get(advancement);
             if ((!progress.dirtyVisibility && progress.visible) ||
@@ -190,7 +188,7 @@ public class LanternPlayerAdvancements {
     }
 
     private void loadProgress(Map<String, Map<String, Instant>> progressMap) {
-        for (Advancement advancement : AdvancementRegistryModule.INSTANCE.getAll()) {
+        for (Advancement advancement : AdvancementRegistry.get().getAll()) {
             final Map<String, Instant> entry = progressMap.get(advancement.getKey().toString());
             if (entry != null) {
                 get(advancement).loadProgress(entry);
@@ -210,7 +208,7 @@ public class LanternPlayerAdvancements {
     }
 
     private void loadProgressFromJson(JsonObject json) {
-        for (Advancement advancement : AdvancementRegistryModule.INSTANCE.getAll()) {
+        for (Advancement advancement : AdvancementRegistry.get().getAll()) {
             final JsonObject entry = json.getAsJsonObject(advancement.getKey().toString());
             if (entry != null) {
                 loadAdvancementProgressFromJson(get(advancement), entry);

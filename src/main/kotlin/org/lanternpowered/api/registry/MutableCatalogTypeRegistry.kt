@@ -35,8 +35,10 @@ interface MutableCatalogTypeRegistry<T : CatalogType> : CatalogTypeRegistry<T>,
 /**
  * A mutable registry for catalog types.
  */
-interface MutableCatalogTypeRegistryBase<T : CatalogType, B : CatalogTypeRegistryBuilder<T>, R : MutableCatalogTypeRegistryBase<T, B, R>> :
-        CatalogTypeRegistry<T> {
+interface MutableCatalogTypeRegistryBase<T, B, R> : CatalogTypeRegistry<T>
+        where T : CatalogType,
+              B : CatalogTypeRegistryBuilder<T>,
+              R : MutableCatalogTypeRegistryBase<T, B, R> {
 
     /**
      * Watches the registry for changes. Watchers will be triggered

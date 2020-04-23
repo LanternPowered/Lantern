@@ -25,7 +25,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.type.play.ChannelPayloadMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 
@@ -41,8 +41,8 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         final String channel;
         final ByteBuffer content;
-        if (message instanceof MessagePlayInOutChannelPayload) {
-            final MessagePlayInOutChannelPayload channelPayload = (MessagePlayInOutChannelPayload) message;
+        if (message instanceof ChannelPayloadMessage) {
+            final ChannelPayloadMessage channelPayload = (ChannelPayloadMessage) message;
             content = channelPayload.getContent();
             // Retain because content will be released when written, MessagePlayInOutChannelPayload
             // is ReferenceCounted so it will be cleaned up later.

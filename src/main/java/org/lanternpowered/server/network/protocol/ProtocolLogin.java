@@ -11,26 +11,26 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.message.MessageRegistry;
-import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginInChannelResponse;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginInEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginInStart;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutChannelRequest;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutEncryptionRequest;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSetCompression;
-import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSuccess;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginFinish;
-import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
-import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInChannelResponse;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutChannelRequest;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
+import org.lanternpowered.server.network.vanilla.message.codec.connection.DisconnectCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.LoginChannelResponseCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.LoginEncryptionResponseCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.LoginStartCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.LoginChannelRequestCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.LoginEncryptionRequestCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.SetCompressionCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.login.LoginSuccessCodec;
+import org.lanternpowered.server.network.vanilla.message.handler.login.LoginEncryptionResponseHandler;
+import org.lanternpowered.server.network.vanilla.message.handler.login.LoginFinishHandler;
+import org.lanternpowered.server.network.vanilla.message.handler.login.LoginStartHandler;
+import org.lanternpowered.server.network.vanilla.message.type.DisconnectMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginChannelResponseMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginEncryptionResponseMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginFinishMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginStartMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginChannelRequestMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginEncryptionRequestMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.SetCompressionMessage;
+import org.lanternpowered.server.network.vanilla.message.type.login.LoginSuccessMessage;
 
 final class ProtocolLogin extends ProtocolBase {
 
@@ -38,16 +38,16 @@ final class ProtocolLogin extends ProtocolBase {
         final MessageRegistry inbound = inbound();
         final MessageRegistry outbound = outbound();
 
-        inbound.bind(CodecLoginInStart.class, MessageLoginInStart.class).bindHandler(new HandlerLoginStart());
-        inbound.bind(CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)
-                .bindHandler(new HandlerEncryptionResponse());
-        inbound.bindHandler(MessageLoginInFinish.class, new HandlerLoginFinish());
-        inbound.bind(CodecLoginInChannelResponse.class, MessageLoginInChannelResponse.class);
+        inbound.bind(LoginStartCodec.class, LoginStartMessage.class).bindHandler(new LoginStartHandler());
+        inbound.bind(LoginEncryptionResponseCodec.class, LoginEncryptionResponseMessage.class)
+                .bindHandler(new LoginEncryptionResponseHandler());
+        inbound.bindHandler(LoginFinishMessage.class, new LoginFinishHandler());
+        inbound.bind(LoginChannelResponseCodec.class, LoginChannelResponseMessage.class);
 
-        outbound.bind(CodecOutDisconnect.class, MessageOutDisconnect.class);
-        outbound.bind(CodecLoginOutEncryptionRequest.class, MessageLoginOutEncryptionRequest.class);
-        outbound.bind(CodecLoginOutSuccess.class, MessageLoginOutSuccess.class);
-        outbound.bind(CodecLoginOutSetCompression.class, MessageLoginOutSetCompression.class);
-        outbound.bind(CodecLoginOutChannelRequest.class, MessageLoginOutChannelRequest.class);
+        outbound.bind(DisconnectCodec.class, DisconnectMessage.class);
+        outbound.bind(LoginEncryptionRequestCodec.class, LoginEncryptionRequestMessage.class);
+        outbound.bind(LoginSuccessCodec.class, LoginSuccessMessage.class);
+        outbound.bind(SetCompressionCodec.class, SetCompressionMessage.class);
+        outbound.bind(LoginChannelRequestCodec.class, LoginChannelRequestMessage.class);
     }
 }

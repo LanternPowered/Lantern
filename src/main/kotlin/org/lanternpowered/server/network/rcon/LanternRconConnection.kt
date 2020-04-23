@@ -26,11 +26,7 @@ class LanternRconConnection internal constructor(
 
     private val buffer = StringBuffer()
     private val identifier: String = "Rcon[${address.hostName}]"
-
-    // Whether the rcon source is authorized
-
-    @Volatile
-    private var authorized = false
+    @Volatile private var authorized = false
 
     init {
         initializeSubject()

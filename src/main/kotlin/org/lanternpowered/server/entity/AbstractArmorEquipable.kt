@@ -11,7 +11,6 @@
 package org.lanternpowered.server.entity
 
 import org.lanternpowered.api.data.type.hand.getEquipmentType
-import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.item.inventory.ArmorEquipable
 import org.spongepowered.api.item.inventory.ItemStack

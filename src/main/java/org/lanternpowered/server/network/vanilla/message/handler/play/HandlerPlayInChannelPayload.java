@@ -13,12 +13,12 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.type.play.ChannelPayloadMessage;
 
-public final class HandlerPlayInChannelPayload implements Handler<MessagePlayInOutChannelPayload> {
+public final class HandlerPlayInChannelPayload implements Handler<ChannelPayloadMessage> {
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInOutChannelPayload message) {
+    public void handle(NetworkContext context, ChannelPayloadMessage message) {
         Lantern.getGame().getChannelRegistrar().handlePayload(message.getContent(),
                 message.getChannel(), context.getSession());
     }

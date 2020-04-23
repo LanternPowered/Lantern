@@ -18,5 +18,5 @@ interface InternalCatalogTypeRegistryBuilder<T : CatalogType, I> : CatalogTypeRe
     /**
      * Registers a new [CatalogType] with the given [internalId].
      */
-    fun register(internalId: I, type: T): T
+    fun <R : T> register(internalId: I, type: R): R
 }

@@ -33,8 +33,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerHealthUpdate;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCamera;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetGameModeMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnMobMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -112,7 +112,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         } else if (type == 101) {
             parameterList.add(EntityParameters.Ageable.IS_BABY, true);
         }
-        context.sendToAll(() -> new MessagePlayOutSpawnMob(this.passengerStack[index], UUID.randomUUID(), type, getEntity().getPosition(),
+        context.sendToAll(() -> new SpawnMobMessage(this.passengerStack[index], UUID.randomUUID(), type, getEntity().getPosition(),
                 (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO));
         context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[index], parameterList));
     }
@@ -242,7 +242,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         super.spawn(context);
         context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillSpawnParameters()));
         final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
-        context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+        context.sendToSelf(() -> new SetGameModeMessage((LanternGameMode) gameMode));
         context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
                 this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, getFlySpeed(), getFovModifier()));
 
@@ -269,7 +269,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         if (gameMode != this.lastGameMode || canFly != this.lastCanFly || flySpeed != this.lastFlySpeed
                 || fieldOfView != this.lastFieldOfView || flying != this.lastFlying) {
             if (gameMode != this.lastGameMode) {
-                context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+                context.sendToSelf(() -> new SetGameModeMessage((LanternGameMode) gameMode));
             }
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
                     flying, canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));

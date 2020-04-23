@@ -15,7 +15,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import org.lanternpowered.server.inventory.behavior.event.EnchantButtonEvent;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.text.Text;
 
@@ -81,7 +81,7 @@ public class EnchantmentTableClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.ENCHANTMENT, getTitle());
+        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.ENCHANTMENT, getTitle());
     }
 
     @Override

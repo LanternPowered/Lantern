@@ -49,11 +49,11 @@ data class LanternBossBar internal constructor(
     override fun getUniqueId(): UUID = this.uniqueId
     override fun isVisible(): Boolean = this.visible
 
-    private fun sendToViewers(message: () -> Message) {
-        if (this.viewers.isNotEmpty()) {
-            val message1 = message()
-            this.viewers.forEach { player -> player.connection.send(message1) }
-        }
+    private fun sendToViewers(supplier: () -> Message) {
+        if (this.viewers.isEmpty())
+            return
+        val message = supplier()
+        this.viewers.forEach { player -> player.connection.send(message) }
     }
 
     override fun setName(name: Text): LanternBossBar = apply {

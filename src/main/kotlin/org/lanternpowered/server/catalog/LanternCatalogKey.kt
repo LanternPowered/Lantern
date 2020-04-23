@@ -23,6 +23,7 @@ open class LanternCatalogKey(private val namespace: String, private val value: S
         return if (i != 0) i else this.value.compareTo(other.value)
     }
 
+    override fun getFormatted(): String = toString()
     override fun toString(): String = this.namespace + ':' + this.value
     override fun hashCode(): Int = Objects.hash(this.namespace, this.value)
     override fun equals(other: Any?): Boolean =

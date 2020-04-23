@@ -45,11 +45,11 @@ val DisplaySlotRegistry = internalCatalogTypeRegistry<DisplaySlot> {
 
 private class LanternDisplaySlot(
         key: CatalogKey,
-        private val teamColor: org.spongepowered.api.text.format.TextColor?,
-        private val withTeamColor: ((org.spongepowered.api.text.format.TextColor?) -> DisplaySlot)?
+        private val teamColor: TextColor?,
+        private val withTeamColor: ((TextColor?) -> DisplaySlot)?
 ) : DefaultCatalogType(key), DisplaySlot {
 
-    override fun withTeamColor(color: org.spongepowered.api.text.format.TextColor?) = this.withTeamColor?.invoke(color) ?: this
+    override fun withTeamColor(color: TextColor?) = this.withTeamColor?.invoke(color) ?: this
     override fun getTeamColor() = this.teamColor.optional()
     override fun toStringHelper() = super.toStringHelper()
             .omitNullValues()

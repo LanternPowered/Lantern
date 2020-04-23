@@ -13,7 +13,7 @@ package org.lanternpowered.server.inventory.client;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
 import org.spongepowered.api.text.Text;
 
@@ -60,7 +60,7 @@ public class FurnaceClientContainer extends ClientContainer {
 
     @Override
     protected Message createInitMessage() {
-        return new MessagePlayOutOpenWindow(getContainerId(), ClientWindowTypes.FURNACE, getTitle());
+        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.FURNACE, getTitle());
     }
 
     @Override

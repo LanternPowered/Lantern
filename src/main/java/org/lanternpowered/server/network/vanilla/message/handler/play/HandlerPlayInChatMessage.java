@@ -29,9 +29,8 @@ import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.permission.Permissions;
-import org.lanternpowered.server.text.TextConstants;
+import org.lanternpowered.server.text.LanternFormattingCodes;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
@@ -232,6 +231,6 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
     }
 
     private static boolean isAllowedCharacter(char character) {
-        return character != TextConstants.LEGACY_CHAR && character >= ' ' && character != '\u007F';
+        return character != LanternFormattingCodes.LEGACY_CODE && character >= ' ' && character != '\u007F';
     }
 }

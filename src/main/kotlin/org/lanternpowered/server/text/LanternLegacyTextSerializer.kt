@@ -14,4 +14,4 @@ import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 
 object LanternLegacyTextSerializer : LegacyTextSerializer, LanternFormattingCodeTextSerializer(
-        CatalogKey.minecraft("legacy"), TextConstants.LEGACY_CHAR)
+        CatalogKey.minecraft("legacy"), LanternFormattingCodes.LEGACY_CODE)

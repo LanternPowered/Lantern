@@ -47,11 +47,11 @@ import org.lanternpowered.server.network.message.UnknownMessage;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
-import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+import org.lanternpowered.server.network.vanilla.message.type.KeepAliveMessage;
+import org.lanternpowered.server.network.vanilla.message.type.DisconnectMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClientSettingsMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
+import org.lanternpowered.server.network.vanilla.message.type.play.PlayerJoinMessage;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
@@ -223,7 +223,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         return System.nanoTime() / 1000000L;
     }
 
-    private void handleKeepAlive(MessageInOutKeepAlive message) {
+    private void handleKeepAlive(KeepAliveMessage message) {
         if (this.keepAliveTime == message.getTime()) {
             final long time = currentTime();
             final int latency = this.latency;
@@ -244,8 +244,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (actualMessage instanceof HandlerMessage) {
             actualMessage = ((HandlerMessage) actualMessage).getMessage();
         }
-        if (actualMessage instanceof MessagePlayInClientSettings) { // Special case, keep track of the locale
-            this.locale = ((MessagePlayInClientSettings) actualMessage).getLocale();
+        if (actualMessage instanceof ClientSettingsMessage) { // Special case, keep track of the locale
+            this.locale = ((ClientSettingsMessage) actualMessage).getLocale();
             if (!this.firstClientSettingsMessage) {
                 this.firstClientSettingsMessage = true;
                 // Trigger the init
@@ -298,8 +298,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (message == UnknownMessage.INSTANCE) {
             return;
         }
-        if (message instanceof MessageInOutKeepAlive) { // Special case
-            handleKeepAlive((MessageInOutKeepAlive) message);
+        if (message instanceof KeepAliveMessage) { // Special case
+            handleKeepAlive((KeepAliveMessage) message);
         } else if (message instanceof BulkMessage) {
             ((BulkMessage) message).getMessages().forEach(this::messageReceived);
         } else if (message instanceof HandlerMessage) {
@@ -348,7 +348,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 final long time = currentTime();
                 if (this.keepAliveTime == -1L) {
                     this.keepAliveTime = time;
-                    send(new MessageInOutKeepAlive(time));
+                    send(new KeepAliveMessage(time));
                 } else {
                     disconnect(t("disconnect.timeout"));
                 }
@@ -827,7 +827,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.disconnectReason = reason;
         if (this.channel.isActive() && (this.protocolState == ProtocolState.PLAY ||
                 this.protocolState == ProtocolState.LOGIN)) {
-            sendWithFuture(new MessageOutDisconnect(reason)).addListener(ChannelFutureListener.CLOSE);
+            sendWithFuture(new DisconnectMessage(reason)).addListener(ChannelFutureListener.CLOSE);
         } else {
             this.channel.close();
         }
@@ -874,7 +874,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     /**
      * Pre initializes the {@link LanternPlayer}, after this state we need
-     * to wait for the client to send a {@link MessagePlayInClientSettings}
+     * to wait for the client to send a {@link ClientSettingsMessage}
      * so that we have the {@link Locale} before we start sending translated
      * {@link Text} objects.
      */
@@ -889,7 +889,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // Actually too early to send this, but we want to trigger
         // the client settings to be send to the server, respawn
         // messages will be send afterwards with the proper values
-        send(new MessagePlayOutPlayerJoinGame(GameModes.SURVIVAL, DimensionTypes.OVERWORLD,
+        send(new PlayerJoinMessage(GameModes.SURVIVAL.get(), DimensionTypes.OVERWORLD.get(),
                 this.player.getNetworkId(), getServer().getMaxPlayers(), false, false, false,
                 this.player.getServerViewDistance(), true, 0L));
     }

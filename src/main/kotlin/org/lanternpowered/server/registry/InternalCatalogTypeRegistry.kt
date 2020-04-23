@@ -35,13 +35,13 @@ inline fun <reified T : CatalogType> internalCatalogTypeRegistryOf(noinline prov
 /**
  * Constructs a new [InternalCatalogTypeRegistry].
  */
-inline fun <reified T : CatalogType> internalCatalogTypeRegistry(noinline fn: InternalCatalogTypeRegistryBuilder<T>.() -> Unit):
+inline fun <reified T : CatalogType> internalCatalogTypeRegistry(noinline fn: InternalCatalogTypeRegistryBuilder<T, Int>.() -> Unit):
         InternalCatalogTypeRegistry<T> = internalCatalogTypeRegistry(typeTokenOf(), fn)
 
 /**
  * Constructs a new [InternalCatalogTypeRegistry].
  */
-fun <T : CatalogType> internalCatalogTypeRegistry(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T>.() -> Unit):
+fun <T : CatalogType> internalCatalogTypeRegistry(typeToken: TypeToken<T>, fn: InternalCatalogTypeRegistryBuilder<T, Int>.() -> Unit):
         InternalCatalogTypeRegistry<T> = LanternCatalogTypeRegistryFactory.build(typeToken, fn)
 
 /**

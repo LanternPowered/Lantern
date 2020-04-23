@@ -19,6 +19,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
+import kotlin.Unit;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.inject.lazy.Lazy;
 import org.lanternpowered.api.inject.option.Option;
@@ -50,7 +51,6 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
-import org.lanternpowered.server.service.LanternServiceListeners;
 import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.permission.LanternContextCalculator;
@@ -284,11 +284,11 @@ public class LanternGame implements Game {
         // Call pre init phase for registry
         this.gameRegistry.preInit();
 
-        LanternServiceListeners.getInstance().registerServiceCallback(PermissionService.class,
-                input -> {
-                    this.server.getConsole().getContainingCollection();
-                    input.registerContextCalculator(new LanternContextCalculator());
-                });
+        LanternServiceManager.INSTANCE.watch(PermissionService.class, service -> {
+            this.server.getConsole().getContainingCollection();
+            service.registerContextCalculator(new LanternContextCalculator());
+            return Unit.INSTANCE;
+        });
 
         // Pre-init phase
         postGameStateChange(SpongeEventFactory.createGamePreInitializationEvent(gameCause));

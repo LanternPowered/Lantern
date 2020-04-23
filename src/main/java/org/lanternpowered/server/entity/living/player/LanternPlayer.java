@@ -65,21 +65,21 @@ import org.lanternpowered.server.network.vanilla.command.argument.StringArgument
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.OpenBookMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
+import org.lanternpowered.server.network.vanilla.message.type.play.PlayerRespawnMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetDifficultyMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateViewDistance;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateViewPosition;
+import org.lanternpowered.server.network.vanilla.message.type.play.UpdateViewDistanceMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.UpdateViewPositionMessage;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
@@ -203,7 +203,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
     private int viewDistance = WorldConfig.USE_SERVER_VIEW_DISTANCE;
 
     // The chat visibility
-    private ChatVisibility chatVisibility = ChatVisibilities.FULL;
+    private ChatVisibility chatVisibility = ChatVisibilities.FULL.get();
 
     // Whether the chat colors are enabled
     private boolean chatColorsEnabled;
@@ -480,7 +480,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // The player has joined the server
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon, 0L));
+                this.session.send(new PlayerRespawnMessage(gameMode, dimensionType, lowHorizon, 0L));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
@@ -538,11 +538,11 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
                                 DimensionTypes.THE_NETHER : DimensionTypes.OVERWORLD);
-                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, lowHorizon, 0L));
+                        this.session.send(new PlayerRespawnMessage(gameMode, oldDimensionType, lowHorizon, 0L));
                     }
                 }
                 // Send a respawn message
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, lowHorizon, 0L));
+                this.session.send(new PlayerRespawnMessage(gameMode, dimensionType, lowHorizon, 0L));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
             // Send the first chunks
@@ -552,8 +552,8 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             // Update the difficulty
-            this.session.send(new MessagePlayOutSetDifficulty(world.getDifficulty(), true));
-            this.session.send(new MessagePlayOutUpdateViewDistance(getServerViewDistance()));
+            this.session.send(new SetDifficultyMessage(world.getDifficulty(), true));
+            this.session.send(new UpdateViewDistanceMessage(getServerViewDistance()));
             // Update the player inventory
             this.inventoryContainer.initClientContainer();
             if (oldWorld != world) {
@@ -884,7 +884,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         }
 
         this.lastChunkPos = new Vector2i(centralX, centralZ);
-        this.session.send(new MessagePlayOutUpdateViewPosition(centralX, centralZ));
+        this.session.send(new UpdateViewPositionMessage(centralX, centralZ));
 
         final Set<Vector2i> previousChunks = new HashSet<>(this.knownChunks);
         final List<Vector2i> newChunks = new ArrayList<>();
@@ -1047,7 +1047,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         final RawItemStack rawItemStack = new RawItemStack("minecraft:written_book", 1, dataView);
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
         this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
-        this.session.send(new MessagePlayOutOpenBook(HandTypes.MAIN_HAND));
+        this.session.send(new OpenBookMessage(HandTypes.MAIN_HAND));
         this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek()));
     }
 
@@ -1134,7 +1134,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
     public void setViewDistance(int viewDistance) {
         this.viewDistance = viewDistance;
-        this.session.send(new MessagePlayOutUpdateViewDistance(getServerViewDistance()));
+        this.session.send(new UpdateViewDistanceMessage(getServerViewDistance()));
     }
 
     @Override

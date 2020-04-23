@@ -32,6 +32,7 @@ import org.lanternpowered.server.block.LanternLocatableBlockBuilder
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder
 import org.lanternpowered.server.boss.LanternBossBarBuilder
 import org.lanternpowered.server.catalog.LanternCatalogKeyBuilder
+import org.lanternpowered.server.command.LanternCommandCauseFactory
 import org.lanternpowered.server.config.user.ban.LanternBanBuilder
 import org.lanternpowered.server.data.key.SpongeValueKeyBuilder
 import org.lanternpowered.server.data.key.ValueKeyBuilder
@@ -100,6 +101,7 @@ import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistr
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
+import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
@@ -109,6 +111,7 @@ import org.lanternpowered.server.registry.type.text.ChatTypeRegistry
 import org.lanternpowered.server.registry.type.text.ChatVisibilityRegistry
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.registry.type.text.TextSerializerRegistry
+import org.lanternpowered.server.registry.type.text.TextStyleRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
 import org.lanternpowered.server.registry.type.util.RotationRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
@@ -155,7 +158,7 @@ import org.spongepowered.api.world.biome.VirtualBiomeType
 import org.spongepowered.api.world.gamerule.GameRule
 import java.util.function.Supplier
 
-class LanternGameRegistry : GameRegistry {
+object LanternGameRegistry : GameRegistry {
 
     fun init() {
         factoryRegistry.apply {
@@ -164,6 +167,7 @@ class LanternGameRegistry : GameRegistry {
             register(ValueFactory)
             register(BoundedValueFactory)
 
+            register(LanternCommandCauseFactory)
             register(ItemStackComparatorsRegistry)
             register(LanternResourcePackFactory)
 
@@ -275,6 +279,8 @@ class LanternGameRegistry : GameRegistry {
 
             register(EquipmentTypeRegistry)
 
+            register(PotionEffectTypeRegistry)
+
             register(CollisionRuleRegistry)
             register(CriterionRegistry)
             register(DisplaySlotRegistry)
@@ -285,6 +291,7 @@ class LanternGameRegistry : GameRegistry {
             register(ChatVisibilityRegistry)
             register(TextColorRegistry)
             register(TextSerializerRegistry)
+            register(TextStyleRegistry)
 
             register(BanTypeRegistry)
             register(RotationRegistry)

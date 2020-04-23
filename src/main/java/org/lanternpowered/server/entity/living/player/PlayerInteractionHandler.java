@@ -32,7 +32,7 @@ import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClientBlockPlacementMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
@@ -283,7 +283,7 @@ public final class PlayerInteractionHandler {
                 null, this.player.getItemInHand(HandTypes.MAIN_HAND));
     }
 
-    public void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
+    public void handleBlockPlacing(ClientBlockPlacementMessage message) {
         handleBlockPlacing0(message);
 
         // Send some updates to the client
@@ -296,7 +296,7 @@ public final class PlayerInteractionHandler {
                 BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
     }
 
-    private void handleBlockPlacing0(MessagePlayInPlayerBlockPlacement message) {
+    private void handleBlockPlacing0(ClientBlockPlacementMessage message) {
         final HandType handType = message.getHandType();
         // Ignore the off hand interaction type for now, a main hand message
         // will always be send before this message. So we will only listen for

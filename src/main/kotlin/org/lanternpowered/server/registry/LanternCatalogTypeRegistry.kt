@@ -24,6 +24,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.registry.CatalogTypeRegistry
@@ -33,7 +34,6 @@ import org.lanternpowered.api.registry.MutableCatalogTypeRegistryBase
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.type.TypeToken
-import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.registry.RegistryEvent
 import java.util.function.Supplier
 
@@ -96,11 +96,7 @@ private abstract class AbstractMutableCatalogTypeRegistry<T, D, B, R>(
               R : MutableCatalogTypeRegistryBase<T, B, R> {
 
     private val lock = Any()
-
-    @Suppress("LeakingThis")
-    @Volatile
-    private var data = createBuilder().fix().build()
-
+    @Suppress("LeakingThis") @Volatile private var data = createBuilder().fix().build()
     private val watchers = mutableListOf<R.() -> Unit>()
 
     private fun B.fix(): AbstractCatalogTypeRegistryBuilder<T, *, D> =
@@ -166,12 +162,10 @@ private abstract class AbstractImmutableCatalogTypeRegistry<T, D, B>(
 
     private val lock = Any()
     private var initializer: (B.() -> Unit)? = initializer
+    @Volatile private var data: D? = null
 
     private fun B.fix(): AbstractCatalogTypeRegistryBuilder<T, *, D> =
             this as AbstractCatalogTypeRegistryBuilder<T, *, D>
-
-    @Volatile
-    private var data: D? = null
 
     abstract fun createBuilder(): B
 
@@ -224,9 +218,10 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
         override val typeToken: TypeToken<T>
 ) : CatalogTypeRegistry<T> {
 
-    val typeName: String get() = this.typeToken.rawType.simpleName
-
     private val suppliers: MutableMap<String, CatalogTypeSupplier<T>> = MapMaker().weakValues().makeMap()
+
+    val typeName: String
+        get() = this.typeToken.rawType.simpleName
 
     override val all: Collection<T>
         get() {
@@ -234,10 +229,7 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
             return data.byKey.values
         }
 
-    override fun get(key: CatalogKey): T? {
-        val data = ensureLoaded()
-        return data.byKey[key]
-    }
+    override fun get(key: CatalogKey): T? = ensureLoaded().byKey[key]
 
     override fun provideSupplier(suggestedId: String): Supplier<T> =
             this.suppliers.computeIfAbsent(suggestedId) { CatalogTypeSupplier(suggestedId, this) }
@@ -312,10 +304,6 @@ private class CatalogTypeSupplier<T : CatalogType>(
     @Volatile private var value: Any? = Uninitialized
     private val lock = Any()
 
-    /**
-     * Invalidates the [Supplier], can be triggered
-     * after registry reloads.
-     */
     fun invalidate() {
         synchronized(this.lock) {
             this.value = Uninitialized
@@ -357,7 +345,7 @@ private class LanternInternalRegistryBuilder<T : CatalogType>(typeToken: TypeTok
 
     private var nextFreeId: Int = 0
 
-    override fun register(type: T, internalId: Int?): T {
+    override fun <R : T> register(type: R, internalId: Int?): R {
         super.register(type, internalId ?: this.nextFreeId)
         while (this.byId.containsKey(this.nextFreeId)) {
             this.nextFreeId++
@@ -394,10 +382,10 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
     protected val byId: BiMap<I, T> = HashBiMap.create()
     private var allowPluginRegistrations = false
 
-    override fun register(type: T): T = register(type, null)
-    override fun register(internalId: I, type: T): T = register(type, internalId)
+    override fun <R : T> register(type: R): R = register(type, null)
+    override fun <R : T> register(internalId: I, type: R): R = register(type, internalId)
 
-    protected open fun register(type: T, internalId: I?): T {
+    protected open fun <R : T> register(type: R, internalId: I?): R {
         val key = type.key
         check(!this.byKey.containsKey(key)) { "There's already a $typeName registered with the key: $key" }
         if (internalId != null)

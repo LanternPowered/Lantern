@@ -40,6 +40,7 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -124,10 +125,10 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
         c.register(LanternKeys.CAN_WALL_JUMP, false);
         c.register(LanternKeys.CAN_DUAL_WIELD, false);
         c.register(LanternKeys.SCORE, 0);
-        c.register(LanternKeys.ACTIVE_HAND, Optional.empty());
+        c.register(LanternKeys.ACTIVE_HAND);
         c.register(LanternKeys.SMELTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
         c.register(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
-        c.register(LanternKeys.OPEN_ADVANCEMENT_TREE, Optional.empty());
+        c.register(LanternKeys.OPEN_ADVANCEMENT_TREE);
         c.register(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());
         c.register(LanternKeys.POSE, Pose.STANDING);
         c.registerProvider(Keys.STATISTICS, (builder, key) -> {
@@ -186,12 +187,13 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     }
 
     @Override
-    public UUID getWorldUniqueId() {
-        if (getWorld() != null)
-            return getWorld().getUniqueId();
+    public Optional<UUID> getWorldUniqueId() {
+        @Nullable final World<?> world = getWorld();
+        if (world != null)
+            return Optional.of(world.getProperties().getUniqueId());
         if (this.userWorld != null)
-            return this.userWorld.getUniqueId();
-        throw new IllegalStateException("Unknown user world.");
+            return Optional.of(this.userWorld.getUniqueId());
+        return Optional.empty();
     }
 
     @Override

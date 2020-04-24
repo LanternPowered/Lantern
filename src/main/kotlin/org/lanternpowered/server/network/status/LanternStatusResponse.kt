@@ -23,10 +23,10 @@ class LanternStatusResponse(
         private var version: MinecraftVersion,
         private var description: Text,
         private val players: ClientPingServerEvent.Response.Players,
-        private var favicon: Favicon?
+        private var favicon: Favicon?,
+        private var hidePlayers: Boolean = false
 ) : ClientPingServerEvent.Response {
 
-    private var hidePlayers = false
 
     /**
      * Sets the [MinecraftVersion] of the status response.

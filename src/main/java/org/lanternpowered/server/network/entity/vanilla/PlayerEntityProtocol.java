@@ -31,11 +31,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerHealthUpdate;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCamera;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetCameraMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetEntityPassengersMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.SetGameModeMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.SpawnMobMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnObjectMessage;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -122,7 +122,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         for (int i = 0; i < indexes.length; i++) {
             passengers[i] = this.passengerStack[indexes[i]];
         }
-        context.sendToAll(() -> new MessagePlayOutSetEntityPassengers(this.passengerStack[index], passengers));
+        context.sendToAll(() -> new SetEntityPassengersMessage(this.passengerStack[index], passengers));
     }
 
     private void sendPassengerStack(EntityProtocolUpdateContext context) {
@@ -338,7 +338,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
                 parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, OptionalInt.of(getEntity().getNetworkId()));
 
-                context.sendToAll(() -> new MessagePlayOutSpawnObject(this.elytraRocketId, UUID.randomUUID(), 76, 0,
+                context.sendToAll(() -> new SpawnObjectMessage(this.elytraRocketId, UUID.randomUUID(), 76, 0,
                         this.entity.getPosition(), 0, 0, Vector3d.ZERO));
                 context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.elytraRocketId, parameterList));
             }
@@ -352,9 +352,9 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         if (event instanceof SpectateEntityEvent) {
             final Entity entity = ((SpectateEntityEvent) event).getSpectatedEntity().orElse(null);
             if (entity == null) {
-                context.sendToSelf(() -> new MessagePlayOutSetCamera(getRootEntityId()));
+                context.sendToSelf(() -> new SetCameraMessage(getRootEntityId()));
             } else {
-                context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new MessagePlayOutSetCamera(id)));
+                context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new SetCameraMessage(id)));
             }
         } else if (event instanceof RefreshAbilitiesPlayerEvent) {
             final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();

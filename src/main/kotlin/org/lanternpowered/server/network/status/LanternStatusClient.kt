@@ -10,13 +10,12 @@
  */
 package org.lanternpowered.server.network.status
 
-import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.network.status.StatusClient
 import java.net.InetSocketAddress
 
-class LanternStatusClient(
+data class LanternStatusClient(
         private val address: InetSocketAddress,
         private val version: MinecraftVersion,
         private val virtualHost: InetSocketAddress?
@@ -25,11 +24,4 @@ class LanternStatusClient(
     override fun getAddress() = this.address
     override fun getVersion() = this.version
     override fun getVirtualHost() = this.virtualHost.optional()
-
-    override fun toString(): String = ToStringHelper(this)
-            .omitNullValues()
-            .add("address", this.address)
-            .add("virtualHost", this.virtualHost)
-            .add("version", this.version)
-            .toString()
 }

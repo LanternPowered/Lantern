@@ -13,10 +13,8 @@ package org.lanternpowered.server.block
 import com.google.common.base.Objects
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
-import org.lanternpowered.server.data.ForwardingDataHolder
 import org.lanternpowered.server.data.SerializableForwardingDataHolder
 import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.SerializableDataHolder
 import org.spongepowered.api.data.persistence.DataContainer
@@ -29,8 +27,9 @@ import org.spongepowered.api.world.Location
 import java.util.Optional
 import java.util.function.Function
 
-class LanternLocatableBlock internal constructor(
-        internal val location: Location, internal val blockState: BlockState
+data class LanternLocatableBlock internal constructor(
+        private val location: Location,
+        private val blockState: BlockState
 ) : LocatableBlock, SerializableForwardingDataHolder {
 
     override fun getBlockState() = this.blockState
@@ -69,21 +68,4 @@ class LanternLocatableBlock internal constructor(
             LanternLocatableBlock(this.location, this.blockState.withRawData(container))
 
     override fun copy() = this
-
-    override fun toString() = ToStringHelper(this)
-            .add("blockState", this.blockState)
-            .add("location", this.location)
-            .toString()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-        if (other !is LanternLocatableBlock) {
-            return false
-        }
-        return this.blockState === other.blockState && this.location == other.location
-    }
-
-    override fun hashCode() = Objects.hashCode(this.blockState, this.location)
 }

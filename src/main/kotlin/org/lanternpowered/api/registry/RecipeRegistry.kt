@@ -10,10 +10,12 @@
  */
 package org.lanternpowered.api.registry
 
+import org.spongepowered.api.item.recipe.Recipe
+
 /**
  * The recipe registry.
  */
-interface RecipeRegistry : org.spongepowered.api.item.recipe.RecipeRegistry {
+interface RecipeRegistry : org.spongepowered.api.item.recipe.RecipeRegistry, CatalogTypeRegistry<Recipe> {
 
     /**
      * The singleton instance of the recipe registry.

@@ -10,16 +10,15 @@
  */
 package org.lanternpowered.server.boss
 
-import com.google.common.collect.ImmutableList
 import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.boss.BossBarColor
 import org.lanternpowered.api.boss.BossBarOverlay
 import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar
+import org.lanternpowered.server.network.vanilla.message.type.play.BossBarMessage
 import org.spongepowered.api.entity.living.player.Player
-import java.util.HashSet
 import java.util.UUID
 
 data class LanternBossBar internal constructor(
@@ -37,7 +36,7 @@ data class LanternBossBar internal constructor(
     /**
      * All the [LanternPlayer]s that are currently viewing this boss bar.
      */
-    private val viewers = HashSet<LanternPlayer>()
+    private val viewers = mutableSetOf<LanternPlayer>()
 
     override fun getName(): Text = this.name
     override fun getPercent(): Float = this.percent
@@ -58,13 +57,13 @@ data class LanternBossBar internal constructor(
 
     override fun setName(name: Text): LanternBossBar = apply {
         this.name = name
-        sendToViewers { MessagePlayOutBossBar.UpdateTitle(this.uniqueId, name) }
+        sendToViewers { BossBarMessage.UpdateTitle(this.uniqueId, name) }
     }
 
     override fun setPercent(percent: Float): LanternBossBar = apply {
         check(percent in 0f..1f) { "Percent must be between 0 and 1, but $percent is not" }
         if (percent != this.percent) {
-            sendToViewers { MessagePlayOutBossBar.UpdatePercent(this.uniqueId, percent) }
+            sendToViewers { BossBarMessage.UpdatePercent(this.uniqueId, percent) }
         }
         this.percent = percent
     }
@@ -86,7 +85,7 @@ data class LanternBossBar internal constructor(
     }
 
     private fun sendStyleUpdate() {
-        sendToViewers { MessagePlayOutBossBar.UpdateStyle(this.uniqueId, this.color, this.overlay) }
+        sendToViewers { BossBarMessage.UpdateStyle(this.uniqueId, this.color, this.overlay) }
     }
 
     override fun setDarkenSky(darkenSky: Boolean): LanternBossBar = apply {
@@ -114,7 +113,7 @@ data class LanternBossBar internal constructor(
     }
 
     private fun sendMiscUpdate() {
-        sendToViewers { MessagePlayOutBossBar.UpdateMisc(this.uniqueId, this.darkenSky, this.createFog, this.createFog) }
+        sendToViewers { BossBarMessage.UpdateMisc(this.uniqueId, this.darkenSky, this.createFog, this.createFog) }
     }
 
     override fun setVisible(visible: Boolean): LanternBossBar = apply {
@@ -122,13 +121,13 @@ data class LanternBossBar internal constructor(
             if (visible) {
                 sendToViewers { createAddMessage() }
             } else {
-                sendToViewers { MessagePlayOutBossBar.Remove(this.uniqueId) }
+                sendToViewers { BossBarMessage.Remove(this.uniqueId) }
             }
         }
         this.visible = visible
     }
 
-    override fun getPlayers(): Collection<Player> = ImmutableList.copyOf(this.viewers)
+    override fun getPlayers(): Collection<Player> = this.viewers.toImmutableList()
 
     override fun addPlayer(player: Player): LanternBossBar = apply {
         player as LanternPlayer
@@ -140,7 +139,7 @@ data class LanternBossBar internal constructor(
     override fun removePlayer(player: Player): LanternBossBar = apply {
         player as LanternPlayer
         if (this.viewers.remove(player) && this.visible) {
-            player.connection.send(MessagePlayOutBossBar.Remove(this.uniqueId))
+            player.connection.send(BossBarMessage.Remove(this.uniqueId))
         }
     }
 
@@ -152,6 +151,6 @@ data class LanternBossBar internal constructor(
         player.connection.send(createAddMessage())
     }
 
-    private fun createAddMessage(): MessagePlayOutBossBar.Add = MessagePlayOutBossBar.Add(this.uniqueId, this.name,
+    private fun createAddMessage(): BossBarMessage.Add = BossBarMessage.Add(this.uniqueId, this.name,
             this.color, this.overlay, this.percent, this.darkenSky, this.playEndBossMusic, this.createFog)
 }

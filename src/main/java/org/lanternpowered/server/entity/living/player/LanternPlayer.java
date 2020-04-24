@@ -70,10 +70,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.PlayerRespawnMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetMusicDiscMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.message.type.play.SetDifficultyMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetReducedDebugMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
@@ -481,7 +481,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
                 this.session.send(new PlayerRespawnMessage(gameMode, dimensionType, lowHorizon, 0L));
-                this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
+                this.session.send(new SetReducedDebugMessage(reducedDebug));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
                 // We just have to send this to prevent the client from crashing in some
@@ -543,7 +543,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 }
                 // Send a respawn message
                 this.session.send(new PlayerRespawnMessage(gameMode, dimensionType, lowHorizon, 0L));
-                this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
+                this.session.send(new SetReducedDebugMessage(reducedDebug));
             }
             // Send the first chunks
             pulseChunkChanges();
@@ -1027,7 +1027,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
     private void playOrStopMusicDisc(Vector3i position, @Nullable MusicDisc musicDisc) {
         checkNotNull(position, "position");
-        getConnection().send(new MessagePlayOutRecord(position, musicDisc));
+        getConnection().send(new SetMusicDiscMessage(position, musicDisc));
     }
 
     @Override

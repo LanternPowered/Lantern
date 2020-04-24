@@ -39,5 +39,4 @@ public interface Codec<M extends Message> {
     default M decode(CodecContext context, ByteBuffer buf) throws CodecException {
         throw new DecoderException("Decoding through this codec (" + this.getClass().getName() + ") isn't supported!");
     }
-
 }

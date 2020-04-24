@@ -223,11 +223,8 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
     val typeName: String
         get() = this.typeToken.rawType.simpleName
 
-    override val all: Collection<T>
-        get() {
-            val data = ensureLoaded()
-            return data.byKey.values
-        }
+    override val all: org.lanternpowered.api.registry.Collection<T>
+        get() = ensureLoaded().values
 
     override fun get(key: CatalogKey): T? = ensureLoaded().byKey[key]
 
@@ -292,7 +289,14 @@ private class InternalRegistryData<T : CatalogType>(
 private open class RegistryData<T>(
     val byKey: Map<CatalogKey, T>,
     val suggestedIdMatchers: List<(String, T) -> Boolean>
-)
+) {
+    val values = CustomCollection(this.byKey.values)
+}
+
+/**
+ * The custom collection interface is used to prevent JVM signature collisions. E.g. in [LanternRecipeRegistry].
+ */
+private class CustomCollection<E>(backing: Collection<E>) : org.lanternpowered.api.registry.Collection<E>, Collection<E> by backing
 
 private class CatalogTypeSupplier<T : CatalogType>(
         private val suggestedId: String,

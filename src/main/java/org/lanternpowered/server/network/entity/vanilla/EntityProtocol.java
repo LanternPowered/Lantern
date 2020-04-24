@@ -25,7 +25,6 @@ import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
@@ -33,7 +32,6 @@ import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLookAndRelativeMove;
@@ -41,12 +39,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityRelativeMove;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetEntityPassengersMessage;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -291,13 +288,13 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final IntSet passengers = getPassengerIds(context);
         if (!passengers.equals(this.lastPassengers)) {
             this.lastPassengers = passengers;
-            context.sendToAll(new MessagePlayOutSetEntityPassengers(getRootEntityId(), passengers.toIntArray()));
+            context.sendToAll(new SetEntityPassengersMessage(getRootEntityId(), passengers.toIntArray()));
         }
     }
 
     @Override
     public void postSpawn(EntityProtocolUpdateContext context) {
-        context.sendToAll(new MessagePlayOutSetEntityPassengers(getRootEntityId(), getPassengerIds(context).toIntArray()));
+        context.sendToAll(new SetEntityPassengersMessage(getRootEntityId(), getPassengerIds(context).toIntArray()));
     }
 
     protected IntSet getPassengerIds(EntityProtocolUpdateContext context) {

@@ -48,7 +48,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetMusicDiscMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
@@ -1059,7 +1059,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
 
     private void playOrStopMusicDisc(Vector3i position, @Nullable MusicDisc musicDisc) {
         checkNotNull(position, "position");
-        broadcast(() -> new MessagePlayOutRecord(position, musicDisc));
+        broadcast(() -> new SetMusicDiscMessage(position, musicDisc));
     }
 
     private void spawnParticles(Iterator<LanternPlayer> players, ParticleEffect particleEffect, Vector3d position) {

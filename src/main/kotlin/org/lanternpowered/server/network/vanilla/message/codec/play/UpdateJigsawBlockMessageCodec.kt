@@ -20,10 +20,12 @@ class UpdateJigsawBlockMessageCodec : Codec<UpdateJigsawBlockMessage> {
     override fun decode(context: CodecContext, buf: ByteBuffer): UpdateJigsawBlockMessage {
         return buf.run {
             val position = readPosition()
-            val attachmentType = readString()
-            val targetPool = readString()
+            val name = readString()
+            val target = readString()
+            val pool = readString()
             val finalState = readString()
-            UpdateJigsawBlockMessage(position, attachmentType, targetPool, finalState)
+            val jointType = readString()
+            UpdateJigsawBlockMessage(position, name, target, pool, finalState, jointType)
         }
     }
 }

@@ -14,7 +14,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnObjectMessage;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -41,7 +41,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
         double yaw = rot.getY();
         double pitch = rot.getX();
 
-        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnObject(entityId, this.entity.getUniqueId(),
+        context.sendToAllExceptSelf(() -> new SpawnObjectMessage(entityId, this.entity.getUniqueId(),
                 NetworkIDs.REGISTRY.require(getObjectType()), getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
         spawnWithMetadata(context);
     }

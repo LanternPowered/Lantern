@@ -23,14 +23,14 @@ import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
 import org.lanternpowered.server.network.vanilla.message.type.play.ClientItemRenameMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.ClientChangeTradeOfferMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.ChangeTradeOfferMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
-import org.lanternpowered.server.network.vanilla.message.type.play.ClientClickWindowMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClickWindowMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.CloseWindowMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
@@ -116,7 +116,7 @@ public class PlayerContainerSession {
         return setRawOpenContainer(causeStack, container, false, false);
     }
 
-    public void handleWindowClose(MessagePlayInOutCloseWindow message) {
+    public void handleWindowClose(CloseWindowMessage message) {
         if (this.openContainer == null || message.getWindow() != getContainerId()) {
             return;
         }
@@ -194,7 +194,7 @@ public class PlayerContainerSession {
                     container.open();
                 }
                 if (sendClose && getContainerId() != 0) {
-                    this.player.getConnection().send(new MessagePlayInOutCloseWindow(getContainerId()));
+                    this.player.getConnection().send(new CloseWindowMessage(getContainerId()));
                 }
                 if (this.openContainer != null) {
                     this.openContainer.close();
@@ -277,7 +277,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleWindowClick(ClientClickWindowMessage message) {
+    public void handleWindowClick(ClickWindowMessage message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             final ClientContainer clientContainer = getClientContainer();
             clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
@@ -304,7 +304,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleOfferChange(ClientChangeTradeOfferMessage message) {
+    public void handleOfferChange(ChangeTradeOfferMessage message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof TradingClientContainer) {
             ((TradingClientContainer) clientContainer).handleSelectOffer(message.getIndex());

@@ -49,6 +49,6 @@ public final class FilterFactory {
         final String name = this.targetPackage + eventClass.getSimpleName() + "Filter_" + handle.getSimpleName() + '_'
                 + method.getName() + this.id.incrementAndGet();
         final byte[] cls = FilterGenerator.get().generateClass(name, method);
-        return this.classLoader.defineClass(name, cls);
+        return this.classLoader.defineClass(cls);
     }
 }

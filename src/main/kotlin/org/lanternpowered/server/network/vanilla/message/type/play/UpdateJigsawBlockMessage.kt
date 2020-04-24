@@ -15,7 +15,9 @@ import org.spongepowered.math.vector.Vector3i
 
 data class UpdateJigsawBlockMessage(
         val position: Vector3i,
-        val attachmentType: String,
-        val targetPool: String,
-        val finalState: String
+        val name: String,
+        val target: String,
+        val pool: String,
+        val finalState: String,
+        val jointType: String
 ) : Message

@@ -14,7 +14,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetWindowPropertyMessage;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
@@ -54,8 +54,8 @@ public class FurnaceClientContainer extends ClientContainer {
     @Override
     protected void collectInitMessages(List<Message> messages) {
         final int containerId = getContainerId();
-        messages.add(new MessagePlayOutWindowProperty(containerId, 1, MAX_PROGRESS_VALUE));
-        messages.add(new MessagePlayOutWindowProperty(containerId, 3, MAX_PROGRESS_VALUE));
+        messages.add(new SetWindowPropertyMessage(containerId, 1, MAX_PROGRESS_VALUE));
+        messages.add(new SetWindowPropertyMessage(containerId, 3, MAX_PROGRESS_VALUE));
     }
 
     @Override

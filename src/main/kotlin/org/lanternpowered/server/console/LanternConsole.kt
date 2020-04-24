@@ -99,7 +99,7 @@ object LanternConsole : SimpleTerminalConsole(), ProxySubject, SystemSubject {
         this.active = true
         synchronized(this.lock) {
             this.readerThread = ThreadHelper.newThread({ super.start() }, "console").apply {
-                isDaemon = true
+                this.isDaemon = true
                 start()
             }
         }

@@ -24,6 +24,14 @@ import java.util.Locale
 
 class LanternGame : Game {
 
+    companion object {
+
+        /**
+         * The current protocol version number that's supported.
+         */
+        const val PROTOCOL_VERSION = 713
+    }
+
     private var state: GameState? = null
 
     /**

@@ -21,4 +21,18 @@ object BitHelper {
         }
         return 1 // 0 always needs one bit
     }
+
+    @JvmStatic
+    fun nextPowOfTwo(value: Int): Int {
+        // https://stackoverflow.com/questions/466204/rounding-up-to-next-power-of-2
+        var v = value
+        v--
+        v = v or (v shr 1)
+        v = v or (v shr 2)
+        v = v or (v shr 4)
+        v = v or (v shr 8)
+        v = v or (v shr 16)
+        v++
+        return v
+    }
 }

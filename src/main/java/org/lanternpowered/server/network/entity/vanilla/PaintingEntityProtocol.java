@@ -14,7 +14,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPainting;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnPaintingMessage;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.Arts;
@@ -55,7 +55,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
     }
 
     private void spawn(EntityProtocolUpdateContext context, Art art, Direction direction, Vector3i position) {
-        context.sendToAll(() -> new MessagePlayOutSpawnPainting(getRootEntityId(),
+        context.sendToAll(() -> new SpawnPaintingMessage(getRootEntityId(),
                 this.entity.getUniqueId(), art, position.getX(), position.getY(), position.getZ(), direction));
     }
 

@@ -86,7 +86,7 @@ import org.lanternpowered.server.registry.type.data.PortionTypeRegistry
 import org.lanternpowered.server.registry.type.data.ProfessionRegistry
 import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry
 import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
-import org.lanternpowered.server.registry.type.data.RecipeTypeRegistry
+import org.lanternpowered.server.registry.type.recipe.RecipeTypeRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
 import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
@@ -102,6 +102,7 @@ import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
 import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
+import org.lanternpowered.server.registry.type.recipe.LanternRecipeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
@@ -205,7 +206,7 @@ object LanternGameRegistry : GameRegistry {
             register<ItemStackBuilder> { LanternItemStackBuilder() }
             register<Enchantment.Builder> { LanternEnchantmentBuilder() }
             register<EnchantmentTypeBuilder> { LanternEnchantmentTypeBuilder() }
-            register< InventoryTransactionResult.Builder> { LanternInventoryTransactionResult.Builder() }
+            register<InventoryTransactionResult.Builder> { LanternInventoryTransactionResult.Builder() }
 
             register<Task.Builder> { LanternTaskBuilder() }
 
@@ -248,7 +249,6 @@ object LanternGameRegistry : GameRegistry {
             register(PickupRuleRegistry)
             register(ProfessionRegistry)
             register(RabbitTypeRegistry)
-            register(RecipeTypeRegistry)
             register(SkinPartRegistry)
             register(SpawnTypeRegistry)
             register(TeleportTypeRegistry)
@@ -280,6 +280,9 @@ object LanternGameRegistry : GameRegistry {
             register(EquipmentTypeRegistry)
 
             register(PotionEffectTypeRegistry)
+
+            register(RecipeTypeRegistry)
+            register(LanternRecipeRegistry)
 
             register(CollisionRuleRegistry)
             register(CriterionRegistry)

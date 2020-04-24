@@ -47,11 +47,11 @@ public final class CodecPlayOutDefineCommands implements Codec<MessagePlayOutDef
         buf.writeVarInt(nodes.size());
         for (Node node : nodes) {
             byte flags = 0;
-            final Node redirect = node.getRedirect();
+            final Node redirect = node.redirect;
             if (redirect != null) {
                 flags |= 0x8;
             }
-            final String command = node.getCommand();
+            final String command = node.command;
             if (command != null) {
                 flags |= 0x4;
             }
@@ -67,7 +67,7 @@ public final class CodecPlayOutDefineCommands implements Codec<MessagePlayOutDef
             // Writes the flags
             buf.writeByte(flags);
             // Write the children indexes
-            final List<Node> children = node.getChildren();
+            final List<Node> children = node.children;
             buf.writeVarInt(children.size()); // The amount of children
             children.forEach(child -> buf.writeVarInt(nodeToIndexMap.getInt(child)));
             // Write the redirect node index
@@ -79,9 +79,9 @@ public final class CodecPlayOutDefineCommands implements Codec<MessagePlayOutDef
                 final ArgumentAndType argumentAndType = argumentNode.getArgumentAndType();
                 buf.writeString(argumentNode.getName());
                 // Write the type of the argument
-                buf.writeString(argumentAndType.getType().getId());
+                buf.writeString(argumentAndType.getType().id);
                 // Write extra argument flags
-                argumentAndType.getType().getCodec().encode(buf, argumentAndType.getArgument());
+                argumentAndType.getType().codec.encode(buf, argumentAndType.getArgument());
                 final SuggestionType suggestions = argumentNode.getCustomSuggestions();
                 if (suggestions != null) {
                     buf.writeString(suggestions.getId());
@@ -100,10 +100,10 @@ public final class CodecPlayOutDefineCommands implements Codec<MessagePlayOutDef
         if (nodeToIndexMap.putIfAbsent(node, index) == ABSENT_VALUE) {
             nodes.add(node);
         }
-        final Node redirect = node.getRedirect();
+        final Node redirect = node.redirect;
         if (redirect != null) {
             collectChildren(redirect, nodeToIndexMap, nodes);
         }
-        node.getChildren().forEach(child -> collectChildren(child, nodeToIndexMap, nodes));
+        node.children.forEach(child -> collectChildren(child, nodeToIndexMap, nodes));
     }
 }

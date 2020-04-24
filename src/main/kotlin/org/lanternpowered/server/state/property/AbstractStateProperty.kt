@@ -11,7 +11,6 @@
 package org.lanternpowered.server.state.property
 
 import com.google.common.collect.ImmutableCollection
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.Iterables
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.server.catalog.DefaultCatalogType

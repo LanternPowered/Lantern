@@ -20,7 +20,7 @@ import org.lanternpowered.api.ext.optionalDouble
 import org.lanternpowered.api.ext.optionalInt
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.game.LanternGame
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown
+import org.lanternpowered.server.network.vanilla.message.type.play.SetCooldownMessage
 import org.spongepowered.api.entity.living.player.CooldownTracker
 import org.spongepowered.api.item.ItemType
 import java.util.OptionalDouble
@@ -55,7 +55,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
             else -> cooldown = -1
         }
         if (cooldown >= 0) {
-            this.player.connection.send(MessagePlayOutSetCooldown(itemType, cooldown))
+            this.player.connection.send(SetCooldownMessage(itemType, cooldown))
         }
         return true
     }

@@ -30,7 +30,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.lanternpowered.server.network.vanilla.message.type.play.SpawnObjectMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.SpawnParticleMessage;
 import org.lanternpowered.server.registry.type.data.NotePitchRegistryKt;
 import org.spongepowered.api.block.BlockState;
@@ -371,7 +371,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         @Override
         public void process(Vector3d position, List<Message> output) {
             // 76 -> The internal id used to spawn fireworks
-            output.add(new MessagePlayOutSpawnObject(ENTITY_ID, UNIQUE_ID, 76, 0, position, 0, 0, Vector3d.ZERO));
+            output.add(new SpawnObjectMessage(ENTITY_ID, UNIQUE_ID, 76, 0, position, 0, 0, Vector3d.ZERO));
             output.add(this.entityMetadataMessage);
             output.add(TRIGGER_EFFECT);
             output.add(DESTROY_ENTITY);

@@ -63,4 +63,15 @@ object ThreadHelper {
      */
     @JvmStatic
     fun newThread(runnable: Runnable, name: String): Thread = LanternThread(runnable, name)
+
+    /**
+     * Constructs a new [LanternThread] for the
+     * given [Runnable] and thread name.
+     *
+     * @param runnable The runnable
+     * @param name The thread name
+     * @return The thread
+     */
+    @JvmStatic
+    fun newThread(runnable: () -> Unit, name: String): Thread = newThread(Runnable(runnable), name)
 }

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.message.MessageRegistry;
-import org.lanternpowered.server.network.vanilla.message.codec.connection.DisconnectCodec;
+import org.lanternpowered.server.network.vanilla.message.codec.DisconnectCodec;
 import org.lanternpowered.server.network.vanilla.message.codec.login.LoginChannelResponseCodec;
 import org.lanternpowered.server.network.vanilla.message.codec.login.LoginEncryptionResponseCodec;
 import org.lanternpowered.server.network.vanilla.message.codec.login.LoginStartCodec;

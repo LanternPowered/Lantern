@@ -27,7 +27,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.ClientSendChatMessage;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.text.LanternFormattingCodes;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
@@ -54,7 +54,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChatMessage> {
+public final class HandlerPlayInChatMessage implements Handler<ClientSendChatMessage> {
 
     public static final String URL_ARGUMENT = "url";
     private final static AttributeKey<ChatData> CHAT_DATA = AttributeKey.valueOf("chat-data");
@@ -66,7 +66,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
     }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInChatMessage message) {
+    public void handle(NetworkContext context, ClientSendChatMessage message) {
         final NetworkSession session = context.getSession();
         final LanternPlayer player = session.getPlayer();
         player.resetIdleTimeoutCounter();

@@ -26,6 +26,7 @@ import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.player.CooldownEvent;
 import org.spongepowered.api.event.entity.living.player.PlayerChangeClientSettingsEvent;
+import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
@@ -48,6 +49,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.network.status.StatusClient;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.util.Transform;
@@ -215,5 +217,13 @@ public class LanternEventFactory {
 
     public static @NonNull GameStoppedEvent createGameStoppedEvent(@NonNull Cause cause) {
         return SpongeEventFactory.createGameStoppedEvent(cause);
+    }
+
+    public static @NonNull ResourcePackStatusEvent createResourcePackStatusEvent(
+            @NonNull Cause cause,
+            @NonNull ResourcePack pack,
+            @NonNull Player player,
+            ResourcePackStatusEvent.@NonNull ResourcePackStatus status) {
+        return SpongeEventFactory.createResourcePackStatusEvent(cause, pack, player, status);
     }
 }

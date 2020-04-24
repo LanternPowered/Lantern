@@ -28,8 +28,8 @@ import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior
 import org.lanternpowered.server.inventory.behavior.MouseButton;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowProperty;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetWindowItemsMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.SetWindowPropertyMessage;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -741,7 +741,7 @@ public abstract class ClientContainer implements ContainerBase {
             this.slots[i].dirtyState = 0;
         }
         // Send the inventory content
-        messages.add(new MessagePlayOutWindowItems(this.containerId, items));
+        messages.add(new SetWindowItemsMessage(this.containerId, items));
         // Send the cursor item if present
         if (!this.cursor.getRaw().isEmpty()) {
             messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
@@ -813,7 +813,7 @@ public abstract class ClientContainer implements ContainerBase {
                 final int newValue = entry.intSupplier.getAsInt();
                 if (newValue != entry.previousValue) {
                     entry.previousValue = newValue;
-                    messages.add(new MessagePlayOutWindowProperty(this.containerId, i, newValue));
+                    messages.add(new SetWindowPropertyMessage(this.containerId, i, newValue));
                 }
             }
         }

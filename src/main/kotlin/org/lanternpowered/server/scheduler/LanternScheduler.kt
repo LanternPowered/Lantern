@@ -10,7 +10,8 @@
  */
 package org.lanternpowered.server.scheduler
 
-import org.lanternpowered.api.cause.CauseStack.Companion.currentOrEmpty
+import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.plugin.PluginContainer
@@ -86,11 +87,11 @@ class LanternScheduler(private val executorService: ScheduledExecutorService) : 
     fun submit(task: Task, submitFunction: (ScheduledExecutorService, LanternScheduledTask, Runnable) -> Future<*>): LanternScheduledTask {
         val scheduledTask = LanternScheduledTask(task as LanternTask, this)
         val runnable = Runnable {
-            val causeStack = currentOrEmpty()
+            val causeStack = CauseStack.currentOrEmpty()
             causeStack.pushCause(task.owner)
             causeStack.pushCause(task)
             try {
-                causeStack.pushCauseFrame().use { task.consumer.accept(scheduledTask) }
+                causeStack.withFrame { task.consumer.accept(scheduledTask) }
             } catch (throwable: Throwable) {
                 task.owner.logger.error("Error while handling task: {}", task.name, throwable)
             }
@@ -107,9 +108,6 @@ class LanternScheduler(private val executorService: ScheduledExecutorService) : 
 
     fun <T> submit(callable: Callable<T>): CompletableFuture<T> = Functional.asyncFailableFuture(callable, this.executorService)
 
-    fun submit(runnable: Runnable): CompletableFuture<Unit> {
-        return Functional.asyncFailableFuture(Callable<Unit> {
-            runnable.run()
-        }, this.executorService)
-    }
+    fun submit(runnable: Runnable): CompletableFuture<Unit> = submit(Callable<Unit> { runnable.run() })
+    fun submit(runnable: () -> Unit): CompletableFuture<Unit> = submit(Callable<Unit> { runnable() })
 }

@@ -89,9 +89,9 @@ final class ClassEventListenerFactory implements AnnotatedEventListener.Factory 
         }
         if (filter != null) {
             filter.newInstance();
-            return this.classLoader.defineClass(name, generateClass(name, handle, method, eventClass, filter));
+            return this.classLoader.defineClass(generateClass(name, handle, method, eventClass, filter));
         }
-        return this.classLoader.defineClass(name, generateClass(name, handle, method, eventClass));
+        return this.classLoader.defineClass(generateClass(name, handle, method, eventClass));
     }
 
     private static final String BASE_HANDLER = Type.getInternalName(AnnotatedEventListener.class);

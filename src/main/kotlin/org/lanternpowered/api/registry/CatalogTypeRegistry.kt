@@ -46,6 +46,11 @@ fun <T : CatalogType> catalogTypeRegistry(typeToken: TypeToken<T>, fn: CatalogTy
         factoryOf<CatalogTypeRegistry.Factory>().build(typeToken, fn)
 
 /**
+ * A collection.
+ */
+interface Collection<E> : kotlin.collections.Collection<E>
+
+/**
  * A registry for catalog types.
  */
 interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {

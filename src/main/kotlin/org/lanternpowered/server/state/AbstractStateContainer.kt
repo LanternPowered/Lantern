@@ -17,15 +17,16 @@ import com.google.common.collect.ImmutableTable
 import com.google.common.collect.Lists
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.util.collections.immutableMapBuilderOf
 import org.lanternpowered.api.util.collections.immutableSetBuilderOf
 import org.lanternpowered.api.util.collections.toImmutableList
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.Value
-import org.spongepowered.api.registry.CatalogRegistryModule
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateContainer
 import org.spongepowered.api.state.StateProperty
@@ -125,10 +126,10 @@ abstract class AbstractStateContainer<S : State<S>>(
         private val NAME = DataQuery.of("Name")
         private val PROPERTIES = DataQuery.of("Properties")
 
-        fun <T, S : State<S>> deserializeState(dataView: DataView, registry: CatalogRegistryModule<T>):
+        fun <T, S : State<S>> deserializeState(dataView: DataView, registry: CatalogTypeRegistry<T>):
                 S where T : CatalogType, T : StateContainer<S> {
             val id = dataView.getString(NAME).get()
-            val catalogType = registry.get(CatalogKey.resolve(id)).get()
+            val catalogType = registry.require(CatalogKey.resolve(id))
 
             var state = catalogType.defaultState
             val properties = dataView.getView(PROPERTIES).orElse(null)

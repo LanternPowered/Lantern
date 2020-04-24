@@ -1,4 +1,4 @@
-# Lantern [![Build Status](https://travis-ci.org/LanternPowered/Lantern.svg?branch=master)](https://travis-ci.org/LanternPowered/Lantern) [![Discord](https://img.shields.io/badge/chat-on%20discord-6E85CF.svg)](https://discord.gg/ArSrsuU)
+# Lantern [![Build Status](https://travis-ci.org/LanternPowered/Lantern.svg?branch=1.12)](https://travis-ci.org/LanternPowered/Lantern) [![Discord](https://img.shields.io/badge/chat-on%20discord-6E85CF.svg)](https://discord.gg/ArSrsuU)
 
 A open source and compatible Minecraft server that implements the [SpongeAPI]. It is licensed under the [MIT License].
 

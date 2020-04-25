@@ -11,8 +11,55 @@
 package org.lanternpowered.api.event
 
 import org.lanternpowered.api.Lantern
+import org.lanternpowered.api.util.type.TypeToken
+import org.spongepowered.api.event.Event
+import org.spongepowered.api.event.EventListener
+import org.spongepowered.api.event.Order
+import org.spongepowered.api.plugin.PluginContainer
+import kotlin.reflect.KClass
 
+/**
+ * The event manager.
+ */
 interface EventManager : org.spongepowered.api.event.EventManager {
 
+    /**
+     * Registers an event listener for a specific event class.
+     *
+     * <p>Normally, the annotation-based way in
+     * {@link #registerListeners(PluginContainer, Object)} should be preferred over this way. This
+     * method exists primarily to support dynamic event registration like needed
+     * in scripting plugins.</p>
+     *
+     * @param plugin The plugin instance
+     * @param eventClass The event to listen to
+     * @param listener The listener to receive the events
+     * @param T The type of the event
+     */
+    fun <T : Event> registerListener(plugin: PluginContainer, eventClass: KClass<T>, listener: EventListener<in T>)
+
+    @Deprecated(
+            message = "There are no mods on Lantern. This makes beforeModifications redundant.",
+            replaceWith = ReplaceWith("registerListener(plugin, eventType, order, listener)"),
+            level = DeprecationLevel.HIDDEN
+    )
+    override fun <T : Event> registerListener(
+            plugin: PluginContainer, eventType: TypeToken<T>, order: Order, beforeModifications: Boolean, listener: EventListener<in T>) {
+        registerListener(plugin, eventType, order, listener)
+    }
+
+    @Deprecated(
+            message = "There are no mods on Lantern. This makes beforeModifications redundant.",
+            replaceWith = ReplaceWith("registerListener(plugin, eventClass, order, listener)"),
+            level = DeprecationLevel.HIDDEN
+    )
+    override fun <T : Event> registerListener(
+            plugin: PluginContainer, eventClass: Class<T>, order: Order, beforeModifications: Boolean, listener: EventListener<in T>) {
+        registerListener(plugin, eventClass, order, listener)
+    }
+
+    /**
+     * The singleton instance of the event manager.
+     */
     companion object : EventManager by Lantern.eventManager
 }

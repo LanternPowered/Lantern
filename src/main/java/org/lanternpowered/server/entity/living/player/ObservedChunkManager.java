@@ -16,6 +16,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_V
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import org.lanternpowered.api.util.palette.GlobalPalette;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -30,9 +31,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.ChunkMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
-import org.lanternpowered.server.util.collect.array.VariableValueArray;
-import org.lanternpowered.server.util.palette.Palette;
-import org.lanternpowered.server.util.palette.PaletteType;
+import org.lanternpowered.api.util.palette.Palette;
+import org.lanternpowered.server.util.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.WorldEventListener;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
@@ -140,6 +140,7 @@ public final class ObservedChunkManager implements WorldEventListener {
     }
 
     private static final VariableValueArray EMPTY_SECTION_TYPES = new VariableValueArray(4, CHUNK_SECTION_VOLUME);
+
     /*
     private static final byte[] EMPTY_SECTION_LIGHT = new byte[CHUNK_SECTION_SIZE];
     private static final byte[] EMPTY_SECTION_SKY_LIGHT = new byte[CHUNK_SECTION_SIZE];
@@ -381,7 +382,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                     final ChunkBlockStateArray blockStates = section.blockStates;
                     final Palette<BlockState> palette = blockStates.getPalette();
                     int[] intPalette = null;
-                    if (palette.getType() != PaletteType.GLOBAL) {
+                    if (!(palette instanceof GlobalPalette)) {
                         intPalette = palette.getEntries().stream()
                                 .mapToInt(state -> BlockRegistryModule.get().getStateInternalId(state))
                                 .toArray();

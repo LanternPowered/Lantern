@@ -10,4 +10,4 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login
 
-class LoginAuthData(val username: String, val sessionId: String, val verifyToken: ByteArray)
+class LoginAuthData(val username: String, val verifyToken: ByteArray)

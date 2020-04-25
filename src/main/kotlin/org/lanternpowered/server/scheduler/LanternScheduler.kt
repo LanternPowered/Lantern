@@ -107,7 +107,7 @@ class LanternScheduler(private val executorService: ScheduledExecutorService) : 
     }
 
     fun <T> submit(callable: Callable<T>): CompletableFuture<T> = Functional.asyncFailableFuture(callable, this.executorService)
+    fun <R> submit(callable: () -> R): CompletableFuture<R> = submit(Callable<R> { callable() })
 
     fun submit(runnable: Runnable): CompletableFuture<Unit> = submit(Callable<Unit> { runnable.run() })
-    fun submit(runnable: () -> Unit): CompletableFuture<Unit> = submit(Callable<Unit> { runnable() })
 }

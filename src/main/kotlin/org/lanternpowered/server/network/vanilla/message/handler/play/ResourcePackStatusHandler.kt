@@ -12,6 +12,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.play
 
 import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.server.game.Lantern
@@ -30,7 +31,7 @@ class ResourcePackStatusHandler : Handler<ResourcePackStatusMessage> {
             return
         }
         val causeStack = CauseStack.current()
-        causeStack.pushCauseFrame().use { frame ->
+        causeStack.withFrame { frame ->
             frame.addContext(CauseContextKeys.PLAYER, player)
             val event = LanternEventFactory.createResourcePackStatusEvent(
                     frame.currentCause, resourcePack, player, message.status)

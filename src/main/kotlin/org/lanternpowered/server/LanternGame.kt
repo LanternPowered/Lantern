@@ -14,23 +14,23 @@ import org.lanternpowered.api.Game
 import org.lanternpowered.api.GameState
 import org.lanternpowered.api.Server
 import org.lanternpowered.api.cause.causeOf
+import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 import org.lanternpowered.server.registry.LanternGameRegistry
 import org.lanternpowered.server.util.LocaleCache
+import org.lanternpowered.server.util.palette.LanternPaletteBasedArrayFactory
 import org.spongepowered.api.SystemSubject
 import org.spongepowered.api.event.EventManager
 import org.spongepowered.api.scheduler.Scheduler
 import java.nio.file.Path
 import java.util.Locale
+import java.util.concurrent.ScheduledExecutorService
 
-class LanternGame : Game {
+object LanternGame : Game {
 
-    companion object {
-
-        /**
-         * The current protocol version number that's supported.
-         */
-        const val PROTOCOL_VERSION = 713
-    }
+    /**
+     * The current protocol version number that's supported.
+     */
+    const val PROTOCOL_VERSION = 713
 
     private var state: GameState? = null
 
@@ -52,6 +52,11 @@ class LanternGame : Game {
         val event = state.createEvent(cause)
         this.eventManager.post(event)
     }
+
+    val syncExecutor: ScheduledExecutorService = TODO()
+
+    override val paletteBasedArrayFactory: PaletteBasedArrayFactory
+        get() = LanternPaletteBasedArrayFactory
 
     override fun getState(): GameState = checkNotNull(this.state) { "The initial state isn't set yet." }
     override fun getLocale(locale: String): Locale = LocaleCache[locale]

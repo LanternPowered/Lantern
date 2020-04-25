@@ -35,7 +35,7 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.util.SecurityHelper;
+import org.lanternpowered.server.util.EncryptionHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
 import org.lanternpowered.server.util.SyncLanternThread;
 import org.lanternpowered.server.world.LanternWorldManager;
@@ -119,7 +119,7 @@ public final class LanternServer implements Server {
     private final LanternScheduler scheduler = new LanternScheduler(this.executor);
 
     // The key pair used for authentication
-    private final KeyPair keyPair = SecurityHelper.generateKeyPair();
+    private final KeyPair keyPair = EncryptionHelper.generateRsaKeyPair();
 
     // The broadcast channel
     private volatile MessageChannel broadcastChannel = MessageChannel.toPlayersAndServer();

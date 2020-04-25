@@ -8,12 +8,12 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.util.palette;
+package org.lanternpowered.api.util.palette
 
 /**
- * Represents the type of a {@link Palette}.
+ * Represents a serialized [PaletteBasedArray].
  */
-public enum PaletteType {
-    LOCAL,
-    GLOBAL,
-}
+class SerializedPaletteBasedArray<T : Any>(
+        val palette: Collection<T>,
+        val values: LongArray
+)

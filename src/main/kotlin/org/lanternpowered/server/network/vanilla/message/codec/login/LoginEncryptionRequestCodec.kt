@@ -19,7 +19,7 @@ class LoginEncryptionRequestCodec : Codec<LoginEncryptionRequestMessage> {
 
     override fun encode(context: CodecContext, message: LoginEncryptionRequestMessage): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {
-            writeString(message.sessionId)
+            writeString("")
             writeByteArray(message.publicKey)
             writeByteArray(message.verifyToken)
         }

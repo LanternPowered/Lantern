@@ -10,9 +10,26 @@
  */
 package org.lanternpowered.api
 
-typealias Game = org.spongepowered.api.Game
+import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
+
 typealias GameState = org.spongepowered.api.GameState
 typealias MinecraftVersion = org.spongepowered.api.MinecraftVersion
 typealias Platform = org.spongepowered.api.Platform
 typealias Server = org.spongepowered.api.Server
 typealias Sponge = org.spongepowered.api.Sponge
+
+/**
+ * The game.
+ */
+interface Game : org.spongepowered.api.Game {
+
+    /**
+     * The [PaletteBasedArrayFactory].
+     */
+    val paletteBasedArrayFactory: PaletteBasedArrayFactory
+
+    /**
+     * The game singleton.
+     */
+    companion object : Game by Lantern.game
+}

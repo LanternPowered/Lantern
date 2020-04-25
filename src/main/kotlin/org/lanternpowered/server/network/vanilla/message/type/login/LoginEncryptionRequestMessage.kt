@@ -13,8 +13,7 @@ package org.lanternpowered.server.network.vanilla.message.type.login
 import org.lanternpowered.server.network.message.Message
 
 /**
- * @property sessionId The session id (hash) that should be used for authenticating
  * @property publicKey The public key
  * @property verifyToken The verify token
  */
-class LoginEncryptionRequestMessage(val sessionId: String, val publicKey: ByteArray, val verifyToken: ByteArray) : Message
+class LoginEncryptionRequestMessage(val publicKey: ByteArray, val verifyToken: ByteArray) : Message

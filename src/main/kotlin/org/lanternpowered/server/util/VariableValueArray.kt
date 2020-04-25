@@ -73,18 +73,19 @@ class VariableValueArray {
         check(bitsPerValue >= 1) { "bitsPerValue ($bitsPerValue) may not be smaller then 1" }
         check(bitsPerValue <= Int.SIZE_BITS) { "bitsPerValue ($bitsPerValue) may not be greater then ${Int.SIZE_BITS}}" }
 
-        val backingSize = ceil((bitsPerValue.toDouble() * size.toDouble()) / Long.SIZE_BITS.toDouble()).toInt()
+        this.size = size
+        this.bitsPerValue = bitsPerValue
+        this.valueMask = (1L shl bitsPerValue) - 1L
+        this.valuesPerLong = Long.SIZE_BITS / this.bitsPerValue
+        this.powOfTwoBitsVerValue = BitHelper.nextPowOfTwo(bitsPerValue)
+
+        val backingSize = ceil(size.toDouble() / this.valuesPerLong.toDouble()).toInt()
         if (backing == null) {
             this.backing = LongArray(backingSize)
         } else {
             check(backingSize == backing.size) { "expected backing size of $backingSize, but got ${backing.size}" }
             this.backing = backing
         }
-        this.size = size
-        this.bitsPerValue = bitsPerValue
-        this.valueMask = (1L shl bitsPerValue) - 1L
-        this.valuesPerLong = Long.SIZE_BITS / this.bitsPerValue
-        this.powOfTwoBitsVerValue = BitHelper.nextPowOfTwo(bitsPerValue)
     }
 
     /**
@@ -99,6 +100,8 @@ class VariableValueArray {
      * fit in the new [bitsPerValue].
      */
     fun copyWithBitsPerValue(bitsPerValue: Int): VariableValueArray {
+        if (bitsPerValue == this.bitsPerValue)
+            return copy()
         val copy = VariableValueArray(bitsPerValue, this.size)
         for (index in 0 until this.size)
             copy[index] = get(index)
@@ -133,7 +136,7 @@ class VariableValueArray {
         if (index < 0)
             throw IndexOutOfBoundsException("index ($index) must not be negative")
         if (index >= this.size)
-            throw IndexOutOfBoundsException("index ($index) must not be greater then the capacity ($size)")
+            throw IndexOutOfBoundsException("index ($index) must not be greater than the size ($size)")
 
         // The long the value is located in
         val longIndex: Int

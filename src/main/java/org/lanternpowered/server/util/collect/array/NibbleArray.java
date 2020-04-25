@@ -12,13 +12,10 @@ package org.lanternpowered.server.util.collect.array;
 
 import static org.lanternpowered.server.util.Conditions.checkArrayRange;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.Arrays;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@NonnullByDefault
 public class NibbleArray {
 
     private final int length;

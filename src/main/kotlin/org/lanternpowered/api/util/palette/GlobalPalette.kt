@@ -8,10 +8,17 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.util.function;
+package org.lanternpowered.api.util.palette
 
-@FunctionalInterface
-public interface Object2LongFunction<O> {
+/**
+ * Represents a global palette. Should be immutable.
+ */
+interface GlobalPalette<T : Any> : Palette<T> {
 
-    long apply(O object);
+    /**
+     * The default or fallback value of the global palette.
+     */
+    val default: T
+
+    override fun copy(): GlobalPalette<T> = this
 }

@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
 import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.util.collect.array.VariableValueArray
+import org.lanternpowered.server.util.VariableValueArray
 import org.spongepowered.api.data.persistence.DataView
 
 sealed class ChunkMessage(

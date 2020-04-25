@@ -17,13 +17,11 @@ import com.google.common.reflect.TypeToken;
 import org.junit.Test;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.advancement.Advancement;
-import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.manipulator.mutable.LoreData;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.complex.EnderDragon;
-import org.spongepowered.api.entity.living.monster.Slime;
+import org.spongepowered.api.entity.living.monster.boss.dragon.EnderDragon;
+import org.spongepowered.api.entity.living.monster.slime.Slime;
 
 public final class TypeTokenHelperTest {
 
@@ -73,6 +71,7 @@ public final class TypeTokenHelperTest {
                 TypeToken.of(Key.class),
                 new TypeToken<Key<Value<? extends Living>>>() {}));
 
+        /*
         assertTrue(TypeTokenHelper.isAssignable(
                 new TypeToken<DataRegistration>() {},
                 new TypeToken<DataRegistration<?,?>>() {}));
@@ -92,6 +91,7 @@ public final class TypeTokenHelperTest {
         assertTrue(TypeTokenHelper.isAssignable(
                 new TypeToken<DataRegistration<LoreData,?>>() {},
                 new TypeToken<DataRegistration<?,?>>() {}));
+        */
     }
 
     @Test

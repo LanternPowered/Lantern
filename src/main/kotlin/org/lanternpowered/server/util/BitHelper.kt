@@ -15,9 +15,8 @@ object BitHelper {
     @JvmStatic
     fun requiredBits(value: Int): Int {
         for (i in Integer.SIZE - 1 downTo 0) {
-            if (value shr i != 0) {
+            if (value shr i != 0)
                 return i + 1
-            }
         }
         return 1 // 0 always needs one bit
     }

@@ -8,5 +8,8 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.util.collect.array.concurrent;
+package org.lanternpowered.api.block
+
+typealias BlockState = org.spongepowered.api.block.BlockState
+typealias BlockType = org.spongepowered.api.block.BlockType
+typealias BlockTypes = org.spongepowered.api.block.BlockTypes

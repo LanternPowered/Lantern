@@ -30,6 +30,7 @@ class DefineableClassLoader : ClassLoader {
     fun <T> defineClass(b: ByteArray): Class<T> {
         val reader = ClassReader(b)
         val name = reader.className.replace('/', '.')
+        @Suppress("UNCHECKED_CAST")
         return defineClass(name, b, 0, b.size) as Class<T>
     }
 }

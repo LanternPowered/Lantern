@@ -42,12 +42,10 @@ import org.lanternpowered.server.network.vanilla.message.type.login.LoginEncrypt
 import org.lanternpowered.server.network.vanilla.message.type.login.LoginFinishMessage
 import org.lanternpowered.server.network.vanilla.message.type.login.LoginStartMessage
 import org.lanternpowered.server.profile.LanternGameProfile
-import org.lanternpowered.server.util.SecurityHelper
+import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.UncheckedThrowables
-import java.nio.charset.StandardCharsets
 import java.util.UUID
 import java.util.concurrent.ExecutionException
-import java.util.concurrent.ThreadLocalRandom
 
 class LoginStartHandler : Handler<LoginStartMessage> {
 
@@ -57,14 +55,13 @@ class LoginStartHandler : Handler<LoginStartMessage> {
         val username = message.username
         if (session.server.onlineMode) {
             // Convert to X509 format
-            val publicKey = SecurityHelper.generateX509Key(session.server.keyPair.public).encoded
-            val verifyToken = SecurityHelper.generateVerifyToken()
-            val sessionId = ThreadLocalRandom.current().nextLong().toString(16).trim()
+            val publicKey = session.server.keyPair.public.encoded
+            val verifyToken = EncryptionHelper.generateVerifyToken()
 
             // Store the auth data
-            context.channel.attr(AUTH_DATA).set(LoginAuthData(username, sessionId, verifyToken))
+            context.channel.attr(AUTH_DATA).set(LoginAuthData(username, verifyToken))
             // Send created request message and wait for the response
-            session.send(LoginEncryptionRequestMessage(sessionId, publicKey, verifyToken))
+            session.send(LoginEncryptionRequestMessage(publicKey, verifyToken))
         } else {
             // Remove the encryption handler placeholder
             context.channel.pipeline().remove(NetworkSession.ENCRYPTION)
@@ -79,7 +76,7 @@ class LoginStartHandler : Handler<LoginStartMessage> {
                     throw UncheckedThrowables.throwUnchecked(e)
                 } catch (e: ExecutionException) {
                     // Generate a offline id
-                    val uniqueId = UUID.nameUUIDFromBytes("OfflinePlayer:$username".toByteArray(StandardCharsets.UTF_8))
+                    val uniqueId = UUID.nameUUIDFromBytes("OfflinePlayer:$username".toByteArray(Charsets.UTF_8))
                     LanternGameProfile(uniqueId, username)
                 }
             }
@@ -90,7 +87,6 @@ class LoginStartHandler : Handler<LoginStartMessage> {
     companion object {
 
         // The data that will be used for authentication.
-        @JvmField
         val AUTH_DATA: AttributeKey<LoginAuthData> = AttributeKey.valueOf<LoginAuthData>("login-auth-data")
 
         // The spoofed game profile that may be provided by proxies

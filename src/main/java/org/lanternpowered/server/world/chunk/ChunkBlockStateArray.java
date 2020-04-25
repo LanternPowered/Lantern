@@ -12,10 +12,9 @@ package org.lanternpowered.server.world.chunk;
 
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
 
-import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.game.registry.InternalIDRegistries;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.util.palette.AbstractGlobalPalette;
+import org.lanternpowered.api.util.palette.GlobalPalette;
 import org.lanternpowered.server.util.palette.LanternPaletteBasedArray;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -53,13 +52,13 @@ public class ChunkBlockStateArray extends LanternPaletteBasedArray<BlockState> {
     /**
      * The global palette of {@link BlockState}s.
      */
-    static class LanternGlobalPalette implements AbstractGlobalPalette<BlockState> {
+    static class LanternGlobalPalette implements GlobalPalette<BlockState> {
 
         static final LanternGlobalPalette INSTANCE = new LanternGlobalPalette();
 
         @Override
-        public int getId(BlockState object) {
-            return BlockRegistryModule.get().getStateInternalId(object);
+        public int getId(BlockState type) {
+            return BlockRegistryModule.get().getStateInternalId(type);
         }
 
         @Override

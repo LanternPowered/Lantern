@@ -42,10 +42,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.SetEntityPassengersMessage;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.property.PropertyMatcher;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.InventoryProperties;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
@@ -62,12 +60,12 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
         private final static EquipmentType[] EQUIPMENT_TYPES =
                 {
-                        EquipmentTypes.MAIN_HAND,
-                        EquipmentTypes.OFF_HAND,
-                        EquipmentTypes.BOOTS,
-                        EquipmentTypes.LEGGINGS,
-                        EquipmentTypes.CHESTPLATE,
-                        EquipmentTypes.HEADWEAR
+                        EquipmentTypes.MAIN_HAND.get(),
+                        EquipmentTypes.OFF_HAND.get(),
+                        EquipmentTypes.BOOTS.get(),
+                        EquipmentTypes.LEGGINGS.get(),
+                        EquipmentTypes.CHESTPLATE.get(),
+                        EquipmentTypes.HEADWEAR.get()
                 };
 
         /*
@@ -341,7 +339,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     boolean isCustomNameVisible() {
-        return this.entity.get(Keys.CUSTOM_NAME_VISIBLE).orElse(true);
+        return this.entity.get(Keys.IS_CUSTOM_NAME_VISIBLE).orElse(true);
     }
 
     Optional<Text> getCustomName() {
@@ -373,10 +371,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (pose == Pose.SWIMMING) {
             flags |= 0x10;
         }
-        if (this.entity.get(Keys.INVISIBLE).orElse(false)) {
+        if (this.entity.get(Keys.IS_INVISIBLE).orElse(false)) {
             flags |= 0x20;
         }
-        if (this.entity.get(Keys.GLOWING).orElse(false)) {
+        if (this.entity.get(Keys.IS_GLOWING).orElse(false)) {
             flags |= 0x40;
         }
         if (this.entity.get(Keys.IS_ELYTRA_FLYING).orElse(false)) {

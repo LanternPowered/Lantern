@@ -19,9 +19,9 @@ import org.apache.logging.log4j.io.IoBuilder
 import org.apache.logging.log4j.io.LoggerPrintStream
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.util.Named
 import org.lanternpowered.server.cause.LanternCauseStack
+import org.lanternpowered.server.ext.inject
 import org.lanternpowered.server.game.DirectoryKeys
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.LanternGame

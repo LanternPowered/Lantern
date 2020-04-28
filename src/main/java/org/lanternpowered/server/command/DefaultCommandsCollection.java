@@ -15,7 +15,7 @@ import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
-import org.lanternpowered.api.inject.service.ServiceRef;
+import org.lanternpowered.server.inject.service.ServiceRef;
 import org.lanternpowered.server.command.test.CommandOpenTestContainer;
 import org.lanternpowered.server.command.test.CommandSpawnEntity;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;

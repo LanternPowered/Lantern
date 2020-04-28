@@ -110,6 +110,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
             '-Xuse-experimental=kotlin.ExperimentalUnsignedTypes',
             '-Xuse-experimental=kotlin.contracts.ExperimentalContracts',
             '-Xuse-experimental=kotlin.ExperimentalStdlibApi',
+            '-Xuse-experimental=kotlin.time.ExperimentalTime',
             '-XXLanguage:+InlineClasses',
             '-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes',
             '-Xjvm-default=enable'

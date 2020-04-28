@@ -11,6 +11,7 @@
 package org.lanternpowered.server.registry
 
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.registry.DuplicateRegistrationException
 import org.lanternpowered.api.registry.FactoryRegistry
 
 object LanternFactoryRegistry : FactoryRegistry {
@@ -27,5 +28,11 @@ object LanternFactoryRegistry : FactoryRegistry {
                 .filter { it.isInterface }
         for (factoryType in factoryTypes)
             this.factories.putIfAbsent(factoryType, factory)
+    }
+
+    fun <T : Any> register(factoryClass: Class<T>, factory: T) {
+        val old = this.factories.putIfAbsent(factoryClass, factory)
+        if (old != null)
+            throw DuplicateRegistrationException("There's already a factory registered fot the type: $factoryClass")
     }
 }

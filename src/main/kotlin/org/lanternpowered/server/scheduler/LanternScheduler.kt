@@ -30,7 +30,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-class LanternScheduler(private val executorService: ScheduledExecutorService) : Scheduler {
+class LanternScheduler(val service: ScheduledExecutorService) : Scheduler {
 
     private val tasksByUniqueId: MutableMap<UUID, LanternScheduledTask> = ConcurrentHashMap()
 
@@ -38,9 +38,9 @@ class LanternScheduler(private val executorService: ScheduledExecutorService) : 
         for (task in this.tasksByUniqueId.values)
             task.cancel()
         try {
-            this.executorService.shutdown()
-            if (!this.executorService.awaitTermination(timeout, unit))
-                this.executorService.shutdownNow()
+            this.service.shutdown()
+            if (!this.service.awaitTermination(timeout, unit))
+                this.service.shutdownNow()
         } catch (ignored: InterruptedException) {
         }
     }
@@ -101,12 +101,12 @@ class LanternScheduler(private val executorService: ScheduledExecutorService) : 
             if (scheduledTask.task.intervalNanos == 0L || scheduledTask.scheduledRemoval)
                 remove(scheduledTask)
         }
-        scheduledTask.future = submitFunction(this.executorService, scheduledTask, runnable)
+        scheduledTask.future = submitFunction(this.service, scheduledTask, runnable)
         this.tasksByUniqueId[scheduledTask.uniqueId] = scheduledTask
         return scheduledTask
     }
 
-    fun <T> submit(callable: Callable<T>): CompletableFuture<T> = Functional.asyncFailableFuture(callable, this.executorService)
+    fun <T> submit(callable: Callable<T>): CompletableFuture<T> = Functional.asyncFailableFuture(callable, this.service)
     fun <R> submit(callable: () -> R): CompletableFuture<R> = submit(Callable<R> { callable() })
 
     fun submit(runnable: Runnable): CompletableFuture<Unit> = submit(Callable<Unit> { runnable.run() })

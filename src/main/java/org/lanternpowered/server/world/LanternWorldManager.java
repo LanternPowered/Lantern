@@ -19,7 +19,7 @@ import com.google.inject.Provider;
 import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.api.inject.lazy.Lazy;
+import org.lanternpowered.server.inject.lazy.Lazy;
 import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;

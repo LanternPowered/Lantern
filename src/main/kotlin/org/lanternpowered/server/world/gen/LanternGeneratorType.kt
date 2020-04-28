@@ -26,7 +26,7 @@ abstract class LanternGeneratorType protected constructor(key: CatalogKey) : Def
 
     var defaultSeaLevel: Int = 62
 
-    override fun getGeneratorSettings(): DataContainer = DataContainer.createNew()
+    override fun getDefaultGeneratorSettings(): DataContainer = DataContainer.createNew()
 
     override fun getSeaLevel(settings: DataView): Int =
             settings.getInt(IGeneratorType.SEA_LEVEL).orElse(this.defaultSeaLevel)

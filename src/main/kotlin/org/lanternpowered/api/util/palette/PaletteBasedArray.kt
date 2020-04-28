@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.util.palette
 
-import org.lanternpowered.server.util.VariableValueArray
+import org.lanternpowered.api.util.VariableValueArray
 
 /**
  * Represents an object array that stores objects

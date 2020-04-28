@@ -12,16 +12,17 @@ package org.lanternpowered.server.world.update
 
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.world.BlockPosition
+import org.lanternpowered.api.world.scheduler.ScheduledUpdate
+import org.lanternpowered.api.world.scheduler.ScheduledUpdateState
 import org.lanternpowered.server.world.LanternLocation
-import org.spongepowered.api.scheduler.ScheduledUpdate
 import java.time.Duration
 import java.util.Objects
 
-class LanternScheduledUpdate<T>(
+class LanternScheduledUpdate<T : Any>(
         private val list: ChunkScheduledUpdateList<T>,
-        private val position: BlockPosition,
+        override val position: BlockPosition,
         private val target: T,
-        private val priority: LanternTaskPriority,
+        private val priority: LanternUpdatePriority,
         val updateId: Long,
         private val scheduledTime: Long
 ) : ScheduledUpdate<T>, Comparable<LanternScheduledUpdate<T>> {
@@ -29,8 +30,9 @@ class LanternScheduledUpdate<T>(
     private val theLocation by lazy { LanternLocation(this.list.world, this.position.toVector3i()) }
 
     // The state of the scheduled task
-    private var state = ScheduledUpdate.State.WAITING
+    private var state = ScheduledUpdateState.WAITING
 
+    override fun getWorld() = this.list.world
     override fun getLocation() = this.theLocation
     override fun getTarget() = this.target
     override fun getPriority() = this.priority
@@ -45,10 +47,10 @@ class LanternScheduledUpdate<T>(
     }
 
     override fun cancel(): Boolean {
-        if (this.state != ScheduledUpdate.State.WAITING) {
+        if (this.state != ScheduledUpdateState.WAITING) {
             return false
         }
-        this.state = ScheduledUpdate.State.CANCELLED
+        this.state = ScheduledUpdateState.CANCELLED
         return true
     }
 
@@ -58,9 +60,9 @@ class LanternScheduledUpdate<T>(
      * @param time The current system time
      * @return The next state
      */
-    fun update(time: Long): ScheduledUpdate.State {
-        if (this.state != ScheduledUpdate.State.CANCELLED && time >= this.scheduledTime) {
-            this.state = ScheduledUpdate.State.FINISHED
+    fun update(time: Long): ScheduledUpdateState {
+        if (this.state != ScheduledUpdateState.CANCELLED && time >= this.scheduledTime) {
+            this.state = ScheduledUpdateState.FINISHED
         }
         return this.state
     }
@@ -69,7 +71,7 @@ class LanternScheduledUpdate<T>(
         return compareTo(other.priority, other.updateId, other.scheduledTime)
     }
 
-    internal fun compareTo(priority: LanternTaskPriority, updateId: Long, scheduledTime: Long): Int {
+    internal fun compareTo(priority: LanternUpdatePriority, updateId: Long, scheduledTime: Long): Int {
         return when {
             this.scheduledTime < scheduledTime -> -1
             this.scheduledTime > scheduledTime -> 1

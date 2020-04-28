@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.testserver
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.text.serializer.TextSerializers
+import org.lanternpowered.server.ext.inject
 import org.slf4j.Logger
 import org.spongepowered.api.Sponge
 import org.spongepowered.api.event.Listener

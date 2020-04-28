@@ -11,6 +11,8 @@
 package org.lanternpowered.server.registry
 
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.attribute.AttributeModifierBuilder
+import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.boss.BossBarBuilder
 import org.lanternpowered.api.catalog.CatalogKeyBuilder
 import org.lanternpowered.api.cause.CauseStackManager
@@ -25,7 +27,8 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.scoreboard.ScoreboardBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
-import org.lanternpowered.server.attribute.LanternAttributeBuilder
+import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder
+import org.lanternpowered.server.attribute.LanternAttributeTypeBuilder
 import org.lanternpowered.server.block.BlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder
@@ -59,8 +62,12 @@ import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
+import org.lanternpowered.server.registry.type.attribute.AttributeOperationRegistry
+import org.lanternpowered.server.registry.type.attribute.AttributeTypeRegistry
 import org.lanternpowered.server.registry.type.boss.BossBarColorRegistry
 import org.lanternpowered.server.registry.type.boss.BossBarOverlayRegistry
+import org.lanternpowered.server.registry.type.cause.DamageModifierTypeRegistry
+import org.lanternpowered.server.registry.type.cause.DamageTypeRegistry
 import org.lanternpowered.server.registry.type.data.ArtTypeRegistry
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.BedPartRegistry
@@ -86,12 +93,12 @@ import org.lanternpowered.server.registry.type.data.PortionTypeRegistry
 import org.lanternpowered.server.registry.type.data.ProfessionRegistry
 import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry
 import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
-import org.lanternpowered.server.registry.type.recipe.RecipeTypeRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
 import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
 import org.lanternpowered.server.registry.type.data.SurfaceRegistry
 import org.lanternpowered.server.registry.type.data.TeleportTypeRegistry
+import org.lanternpowered.server.registry.type.data.TopHatRegistry
 import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
 import org.lanternpowered.server.registry.type.data.WireAttachmentTypeRegistry
 import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
@@ -101,8 +108,10 @@ import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistr
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
+import org.lanternpowered.server.registry.type.persistence.DataFormatRegistry
 import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
 import org.lanternpowered.server.registry.type.recipe.LanternRecipeRegistry
+import org.lanternpowered.server.registry.type.recipe.RecipeTypeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
@@ -118,6 +127,8 @@ import org.lanternpowered.server.registry.type.util.RotationRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
 import org.lanternpowered.server.registry.type.world.PortalAgentTypeRegistry
 import org.lanternpowered.server.registry.type.world.SerializationBehaviorRegistry
+import org.lanternpowered.server.registry.type.world.UpdatePriorityRegistry
+import org.lanternpowered.server.registry.type.world.WorldArchetypeRegistry
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory
 import org.lanternpowered.server.scheduler.LanternTaskBuilder
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder
@@ -128,6 +139,7 @@ import org.lanternpowered.server.text.LanternTextSerializerFactory
 import org.lanternpowered.server.text.LanternTextTemplateFactory
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder
 import org.lanternpowered.server.timings.DummyTimingsFactory
+import org.lanternpowered.server.world.LanternBlockChangeFlag
 import org.lanternpowered.server.world.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.LanternWorldBorderBuilder
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
@@ -176,6 +188,8 @@ object LanternGameRegistry : GameRegistry {
             register(LanternTextSerializerFactory)
             register(LanternTextTemplateFactory)
 
+            register(LanternBlockChangeFlag.Factory)
+
             register(DummyTimingsFactory)
         }
 
@@ -193,7 +207,8 @@ object LanternGameRegistry : GameRegistry {
             register<TabListEntry.Builder> { LanternTabListEntryBuilder() }
             register { RespawnLocation.Builder() }
 
-            register { LanternAttributeBuilder() }
+            register<AttributeModifierBuilder> { LanternAttributeModifierBuilder() }
+            register<AttributeTypeBuilder> { LanternAttributeTypeBuilder() }
             register<BossBarBuilder> { LanternBossBarBuilder() }
             register<FireworkEffectBuilder> { LanternFireworkEffectBuilder() }
             register<ParticleEffect.Builder> { LanternParticleEffectBuilder() }
@@ -230,8 +245,14 @@ object LanternGameRegistry : GameRegistry {
             register(AdvancementTriggerRegistry)
             register(AdvancementTypeRegistry)
 
+            register(AttributeOperationRegistry)
+            register(AttributeTypeRegistry)
+
             register(BossBarColorRegistry)
             register(BossBarOverlayRegistry)
+
+            register(DamageModifierTypeRegistry)
+            register(DamageTypeRegistry)
 
             register(ArtTypeRegistry)
             register(BannerPatternShapeRegistry)
@@ -252,6 +273,7 @@ object LanternGameRegistry : GameRegistry {
             register(SkinPartRegistry)
             register(SpawnTypeRegistry)
             register(TeleportTypeRegistry)
+            register(TopHatRegistry)
             register(VillagerTypeRegistry)
             register(WoodTypeRegistry)
 
@@ -278,6 +300,7 @@ object LanternGameRegistry : GameRegistry {
             register(FluidTypeRegistry)
 
             register(EquipmentTypeRegistry)
+            register(DataFormatRegistry)
 
             register(PotionEffectTypeRegistry)
 
@@ -302,6 +325,8 @@ object LanternGameRegistry : GameRegistry {
             register(DifficultyRegistry)
             register(PortalAgentTypeRegistry)
             register(SerializationBehaviorRegistry)
+            register(UpdatePriorityRegistry)
+            register(WorldArchetypeRegistry)
         }
 
         // Allow plugins to register their catalog type, builders and factories
@@ -317,9 +342,8 @@ object LanternGameRegistry : GameRegistry {
         val cause = CauseStackManager.currentCause
         val factoryRegistryEvent = object : RegistryEvent.Factory {
             override fun getCause(): Cause = cause
-            override fun <T : Any> register(factoryClass: Class<T>) {
-                TODO("How is this supposed to work?")
-            }
+            override fun <T : Any> register(factoryClass: Class<T>, factory: T) =
+                    factoryRegistry.register(factoryClass, factory)
         }
         EventManager.post(factoryRegistryEvent)
     }

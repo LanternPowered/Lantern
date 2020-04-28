@@ -26,31 +26,6 @@ import java.util.WeakHashMap
 import java.util.stream.Stream
 
 /**
- * Converts this [Iterable] into a [ImmutableList].
- */
-inline fun <T> Iterable<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
-
-/**
- * Converts this [Array] into a [ImmutableList].
- */
-inline fun <T> Array<T>.toImmutableList(): ImmutableList<T> = ImmutableList.copyOf(this)
-
-/**
- * Converts this [IntArray] into a [ImmutableList].
- */
-fun IntArray.toImmutableList(): ImmutableList<Int> = ImmutableList.builder<Int>().apply { forEach { add(it) } }.build()
-
-/**
- * Converts this [DoubleArray] into a [ImmutableList].
- */
-fun DoubleArray.toImmutableList(): ImmutableList<Double> = ImmutableList.builder<Double>().apply { forEach { add(it) } }.build()
-
-/**
- * Converts this [LongArray] into a [ImmutableList].
- */
-fun LongArray.toImmutableList(): ImmutableList<Long> = ImmutableList.builder<Long>().apply { forEach { add(it) } }.build()
-
-/**
  * Converts this [Iterable] into a [ImmutableSet].
  */
 inline fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
@@ -78,12 +53,11 @@ fun LongArray.toImmutableSet(): ImmutableSet<Long> = ImmutableSet.builder<Long>(
 inline fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> = ImmutableMap.copyOf(this)
 inline fun <K, V> Multimap<K, V>.toImmutableMultimap(): ImmutableMultimap<K, V> = ImmutableMultimap.copyOf(this)
 
-inline fun <T> immutableListOf(): ImmutableList<T> = ImmutableList.of()
+/**
+ * Constructs a new [ImmutableList] with the given values.
+ */
+inline fun <T> immutableSetOf(vararg values: T) = values.asList().toImmutableSet()
 
-inline fun <T> immutableListOf(vararg args: T) = args.asList().toImmutableList()
-inline fun <T> immutableSetOf(vararg args: T) = args.asList().toImmutableSet()
-
-inline fun <T> immutableListBuilderOf(): ImmutableList.Builder<T> = ImmutableList.builder<T>()
 inline fun <T> immutableSetBuilderOf(): ImmutableSet.Builder<T> = ImmutableSet.builder<T>()
 
 inline fun <K, V> immutableMapOf(): ImmutableMap<K, V> = ImmutableMap.of()
@@ -109,11 +83,6 @@ fun <E> weakSetOf(vararg args: E): MutableSet<E> = weakSetOf<E>().apply { addAll
 fun <E> immutableWeakSetOf(): Set<E> = Collections.unmodifiableSet(weakSetOf())
 fun <E> immutableWeakSetOf(iterable: Iterable<E>): Set<E> = Collections.unmodifiableSet(weakSetOf<E>().apply { addAll(iterable) })
 fun <E> immutableWeakSetOf(vararg args: E): Set<E> = Collections.unmodifiableSet(weakSetOf<E>().apply { addAll(args) })
-
-/**
- * Returns a [ImmutableList] containing all elements produced by this stream.
- */
-inline fun <T> Stream<T>.toImmutableList(): ImmutableList<T> = collect(ImmutableList.toImmutableList())
 
 /**
  * Returns a [ImmutableSet] containing all elements produced by this stream.

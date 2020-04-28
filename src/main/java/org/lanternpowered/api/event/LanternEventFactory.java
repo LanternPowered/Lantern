@@ -42,10 +42,13 @@ import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
+import org.spongepowered.api.event.server.query.QueryServerEvent;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.network.RconConnection;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.network.status.StatusClient;
 import org.spongepowered.api.profile.GameProfile;
@@ -55,8 +58,10 @@ import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.World;
 
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -225,5 +230,55 @@ public class LanternEventFactory {
             @NonNull Player player,
             ResourcePackStatusEvent.@NonNull ResourcePackStatus status) {
         return SpongeEventFactory.createResourcePackStatusEvent(cause, pack, player, status);
+    }
+
+    public static RconConnectionEvent.@NonNull Connect createRconConnectionEventConnect(
+            @NonNull Cause cause,
+            @NonNull RconConnection connection) {
+        return SpongeEventFactory.createRconConnectionEventConnect(cause, connection);
+    }
+
+    public static RconConnectionEvent.@NonNull Auth createRconConnectionEventAuth(
+            @NonNull Cause cause,
+            @NonNull RconConnection connection) {
+        return SpongeEventFactory.createRconConnectionEventAuth(cause, connection);
+    }
+
+    public static RconConnectionEvent.@NonNull Disconnect createRconConnectionEventDisconnect(
+            @NonNull Cause cause,
+            @NonNull RconConnection connection) {
+        return SpongeEventFactory.createRconConnectionEventDisconnect(cause, connection);
+    }
+
+    public static QueryServerEvent.@NonNull Basic createQueryServerEventBasic(
+            @NonNull Cause cause,
+            @NonNull InetSocketAddress address,
+            @NonNull String gameType,
+            @NonNull String map,
+            @NonNull String motd,
+            int maxPlayerCount,
+            int maxSize,
+            int playerCount,
+            int size) {
+        return SpongeEventFactory.createQueryServerEventBasic(cause, address, gameType, map, motd, maxPlayerCount, maxSize, playerCount, size);
+    }
+
+    public static QueryServerEvent.@NonNull Full createQueryServerEventFull(
+            @NonNull Cause cause,
+            @NonNull InetSocketAddress address,
+            @NonNull Map<String, String> customValuesMap,
+            @NonNull String gameId,
+            @NonNull String gameType,
+            @NonNull String map,
+            @NonNull String motd,
+            @NonNull List<String> players,
+            @NonNull String plugins,
+            @NonNull String version,
+            int maxPlayerCount,
+            int maxSize,
+            int playerCount,
+            int size) {
+        return SpongeEventFactory.createQueryServerEventFull(cause, address, customValuesMap, gameId, gameType,
+                map, motd, players, plugins, version, maxPlayerCount, maxSize, playerCount, size);
     }
 }

@@ -13,6 +13,7 @@ package org.lanternpowered.server.util;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.lanternpowered.api.util.VariableValueArray;
 
 public class VariableValueArrayTest {
 

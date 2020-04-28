@@ -79,7 +79,7 @@ public final class TypeTokenHelper {
             return toType.isAssignableFrom((Class<?>) other.getRawType());
         }
         if (type instanceof TypeVariable) {
-            final TypeVariable other = (TypeVariable) type;
+            final TypeVariable<?> other = (TypeVariable<?>) type;
             return allSupertypes(toType, other.getBounds());
         }
         if (type instanceof WildcardType) {
@@ -164,7 +164,7 @@ public final class TypeTokenHelper {
             return true;
         }
         if (type instanceof TypeVariable) {
-            final TypeVariable other = (TypeVariable) type;
+            final TypeVariable<?> other = (TypeVariable<?>) type;
             return allSupertypes(toType, other.getBounds());
         }
         if (type instanceof WildcardType) {
@@ -181,7 +181,7 @@ public final class TypeTokenHelper {
         throw new IllegalStateException("Unsupported type: " + type);
     }
 
-    private static boolean isAssignable(Type type, TypeVariable toType, @Nullable Type parent, int index) {
+    private static boolean isAssignable(Type type, TypeVariable<?> toType, @Nullable Type parent, int index) {
         return allAssignable(type, toType.getBounds());
     }
 
@@ -201,7 +201,7 @@ public final class TypeTokenHelper {
             return rawType.isArray() && isAssignable(rawType.getComponentType(), toType.getGenericComponentType(), parent, index);
         }
         if (type instanceof TypeVariable) {
-            final TypeVariable other = (TypeVariable) type;
+            final TypeVariable<?> other = (TypeVariable<?>) type;
             return allSupertypes(toType, other.getBounds());
         }
         if (type instanceof WildcardType) {
@@ -219,14 +219,14 @@ public final class TypeTokenHelper {
     private static Type[] processBounds(Type[] bounds, @Nullable Type parent, int index) {
         if (bounds.length == 0 ||
                 (bounds.length == 1 && bounds[0].equals(Object.class))) {
-            Class<?> theClass = null;
+            @Nullable Class<?> theClass = null;
             if (parent instanceof Class) {
                 theClass = (Class<?>) parent;
             } else if (parent instanceof ParameterizedType) {
                 theClass = (Class<?>) ((ParameterizedType) parent).getRawType();
             }
             if (theClass != null) {
-                final TypeVariable[] typeVariables = theClass.getTypeParameters();
+                final TypeVariable<?>[] typeVariables = theClass.getTypeParameters();
                 bounds = typeVariables[index].getBounds();
                 // Strip the new bounds down
                 for (int i = 0; i < bounds.length; i++) {

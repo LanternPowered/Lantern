@@ -57,6 +57,16 @@ inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: CatalogKe
 inline fun <reified T : CatalogType> CatalogRegistry.provideSupplier(suggestedId: String): Supplier<T> = provideSupplier(T::class, suggestedId)
 
 /**
+ * Provides the T that will be used to get [CatalogType] instances.
+ *
+ * @param suggestedId The suggested id to use
+ * @param T The type of catalog
+ * @return The supplier
+ * @throws UnknownTypeException If the type provided has not been registered
+ */
+inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String): T = provide(T::class, suggestedId)
+
+/**
  * Gets a collection of all available found specific types of
  * [CatalogType] requested.
  *
@@ -85,6 +95,18 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @throws UnknownTypeException If the type provided has not been registered
      */
     fun <T : CatalogType, E : T> provideSupplier(catalogClass: KClass<T>, suggestedId: String): Supplier<E>
+
+    /**
+     * Creates a [Supplier] that will be used to get [CatalogType] instances.
+     *
+     * @param catalogClass The catalog class
+     * @param suggestedId The suggested id to use
+     * @param T The type of catalog
+     * @param E The generic of the catalog (if applicable)
+     * @return The supplier
+     * @throws UnknownTypeException If the type provided has not been registered
+     */
+    fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): E
 
     /**
      * Attempts to retrieve the specific type of [CatalogType] based on

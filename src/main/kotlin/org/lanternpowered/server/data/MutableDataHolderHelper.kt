@@ -82,7 +82,7 @@ object MutableDataHolderHelper {
             val dataHolder = store as DataHolder
             val listeners = (key as ValueKey<*,*>).listeners
             for (listener in listeners) {
-                if ((listener.handler as ValueKeyEventListener).dataHolderFilter(dataHolder)) {
+                if ((listener.listener as ValueKeyEventListener).dataHolderFilter(dataHolder)) {
                     return true
                 }
             }

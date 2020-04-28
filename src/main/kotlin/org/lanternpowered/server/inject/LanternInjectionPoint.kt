@@ -11,7 +11,6 @@
 package org.lanternpowered.server.inject
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.inject.InjectionPoint
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.uncheckedCast
 import java.lang.reflect.Executable

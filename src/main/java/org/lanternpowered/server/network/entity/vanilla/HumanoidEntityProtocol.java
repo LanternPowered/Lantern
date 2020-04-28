@@ -46,7 +46,7 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final int entityId = getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity.get(Keys.HEAD_ROTATION).orElse(null);
+        @Nullable final Vector3d headRot = this.entity.get(Keys.HEAD_ROTATION).orElse(null);
         final Vector3d pos = this.entity.getPosition();
         final Vector3d vel = this.entity.get(Keys.VELOCITY).orElse(Vector3d.ZERO);
 
@@ -70,8 +70,8 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         super.spawn(parameterList);
         // Ignore the NoAI tag, isn't used on the client
         parameterList.add(EntityParameters.Humanoid.MAIN_HAND,
-                (byte) (this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT) == HandPreferences.RIGHT ? 1 : 0));
-        final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
+                (byte) (this.entity.get(Keys.DOMINANT_HAND).orElseGet(HandPreferences.RIGHT) == HandPreferences.RIGHT.get() ? 1 : 0));
+        @Nullable final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
         parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
                 (byte) (skinParts == null ? 0xff : SkinPartRegistry.INSTANCE.toBitPattern(skinParts)));
     }
@@ -79,12 +79,12 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final HandPreference dominantHand = this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT);
+        final HandPreference dominantHand = this.entity.get(Keys.DOMINANT_HAND).orElseGet(HandPreferences.RIGHT);
         if (dominantHand != this.lastDominantHand) {
-            parameterList.add(EntityParameters.Humanoid.MAIN_HAND, (byte) (dominantHand == HandPreferences.RIGHT ? 1 : 0));
+            parameterList.add(EntityParameters.Humanoid.MAIN_HAND, (byte) (dominantHand == HandPreferences.RIGHT.get() ? 1 : 0));
             this.lastDominantHand = dominantHand;
         }
-        final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
+        @Nullable final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
         if (!Objects.equals(this.lastSkinParts, skinParts)) {
             parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
                     (byte) (skinParts == null ? 0xff : SkinPartRegistry.INSTANCE.toBitPattern(skinParts)));

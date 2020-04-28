@@ -94,9 +94,6 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25563;
-
-        @Setting(value = "network-transport", comment = "Settings related to networking transport.")
-        private NetworkTransport networkTransport = new NetworkTransport();
     }
 
     @ConfigSerializable
@@ -110,9 +107,6 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25575;
-
-        @Setting(value = "network-transport", comment = "Settings related to networking transport.")
-        private NetworkTransport networkTransport = new NetworkTransport();
     }
 
     @ConfigSerializable
@@ -125,9 +119,6 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25565;
-
-        @Setting(value = "network-transport", comment = "Settings related to networking transport.")
-        private NetworkTransport networkTransport = new NetworkTransport();
 
         @Setting(value = "name", comment = "The name of the server.")
         private String name = "Lantern Server";
@@ -263,24 +254,6 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
                         + "\nThe value must be greater than or equal to " + MIN_VIEW_DISTANCE + " and less than or equal to " + MAX_VIEW_DISTANCE
         )
         private int viewDistance = 10;
-    }
-
-    @ConfigSerializable
-    public static final class NetworkTransport {
-
-        @Setting(value = "allow-epoll", comment = "Enables Epoll if it's supported by the os.")
-        private boolean allowEpoll = true;
-
-        @Setting(value = "allow-kqueue", comment = "Enables KQueue if it's supported by the os.")
-        private boolean allowKQueue = true;
-
-        public boolean allowsEpoll() {
-            return this.allowEpoll;
-        }
-
-        public boolean allowsKQueue() {
-            return this.allowKQueue;
-        }
     }
 
     @Setting(value = "metrics")
@@ -431,18 +404,6 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public void setPlayerIdleTimeout(int playerIdleTimeout) {
         this.server.playerIdleTimeout = playerIdleTimeout;
-    }
-
-    public NetworkTransport getServerNetworkTransport() {
-        return this.server.networkTransport;
-    }
-
-    public NetworkTransport getRconNetworkTransport() {
-        return this.rcon.networkTransport;
-    }
-
-    public NetworkTransport getQueryNetworkTransport() {
-        return this.query.networkTransport;
     }
 
     public String getDefaultResourcePack() {

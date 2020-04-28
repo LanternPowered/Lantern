@@ -18,7 +18,6 @@ import com.google.inject.matcher.AbstractMatcher
 import com.google.inject.spi.DependencyAndSource
 import com.google.inject.spi.ProviderInstanceBinding
 import com.google.inject.spi.ProvisionListener
-import org.lanternpowered.api.inject.InjectionPoint
 import org.lanternpowered.api.util.type.typeToken
 import java.lang.reflect.Executable
 import java.lang.reflect.Field

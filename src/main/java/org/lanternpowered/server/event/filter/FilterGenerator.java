@@ -26,21 +26,19 @@ import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_6;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.event.filter.delegate.AfterCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.AllCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.BeforeCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.CancellationEventFilterDelegate;
-import org.lanternpowered.server.event.filter.delegate.ExcludeSubtypeFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.FilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.FirstCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.GetterFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.HasDataFilterDelegate;
-import org.lanternpowered.server.event.filter.delegate.IncludeSubtypeFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.LastCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.ParameterFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.ParameterFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.RootCauseFilterSourceDelegate;
-import org.lanternpowered.server.event.filter.delegate.SubtypeFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.SupportsDataFilterDelegate;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.SystemProperties;
@@ -59,8 +57,6 @@ import org.spongepowered.api.event.filter.cause.Last;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.filter.data.Has;
 import org.spongepowered.api.event.filter.data.Supports;
-import org.spongepowered.api.event.filter.type.Exclude;
-import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.util.generator.GeneratorUtils;
@@ -75,8 +71,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 final class FilterGenerator {
 
@@ -99,7 +93,6 @@ final class FilterGenerator {
 
         cw.visit(V1_6, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, name, null, "java/lang/Object", new String[] { Type.getInternalName(EventFilter.class) });
 
-        SubtypeFilterDelegate sfilter = null;
         final List<FilterDelegate> additional = new ArrayList<>();
         boolean cancellation = false;
         for (Annotation anno : method.getAnnotations()) {
@@ -107,12 +100,7 @@ final class FilterGenerator {
             if (obj == null) {
                 continue;
             }
-            if (obj instanceof SubtypeFilter) {
-                if (sfilter != null) {
-                    throw new IllegalStateException("Cannot have both @Include and @Exclude annotations present at once");
-                }
-                sfilter = ((SubtypeFilter) obj).getDelegate(anno);
-            } else if (obj instanceof EventTypeFilter) {
+            if (obj instanceof EventTypeFilter) {
                 final EventTypeFilter etf = (EventTypeFilter) obj;
                 additional.add(etf.getDelegate(anno));
                 if (etf == EventTypeFilter.CANCELLATION) {
@@ -124,17 +112,11 @@ final class FilterGenerator {
             additional.add(new CancellationEventFilterDelegate(Tristate.FALSE));
         }
 
-        if (sfilter != null) {
-            sfilter.createFields(cw);
-        }
         {
             mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-            if (sfilter != null) {
-                sfilter.writeCtor(name, cw, mv);
-            }
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);
             mv.visitEnd();
@@ -144,9 +126,6 @@ final class FilterGenerator {
             mv.visitCode();
             // index of the next available local variable
             int local = 2;
-            if (sfilter != null) {
-                local = sfilter.write(name, cw, mv, method, local);
-            }
             for (FilterDelegate eventFilter : additional) {
                 local = eventFilter.write(name, cw, mv, method, local);
             }
@@ -239,8 +218,6 @@ final class FilterGenerator {
     @Nullable
     private static Object filterFromAnnotation(Class<? extends Annotation> cls) {
         Object filter;
-        if ((filter = SubtypeFilter.valueOf(cls)) != null)
-            return filter;
         if ((filter = EventTypeFilter.valueOf(cls)) != null)
             return filter;
         if ((filter = ParameterSource.valueOf(cls)) != null)
@@ -248,37 +225,6 @@ final class FilterGenerator {
         if ((filter = ParameterFilter.valueOf(cls)) != null)
             return filter;
         return null;
-    }
-
-    private enum SubtypeFilter {
-        INCLUDE(Include.class),
-        EXCLUDE(Exclude.class),
-        ;
-
-        private final Class<? extends Annotation> cls;
-
-        SubtypeFilter(Class<? extends Annotation> cls) {
-            this.cls = cls;
-        }
-
-        public SubtypeFilterDelegate getDelegate(Annotation anno) {
-            if (this == INCLUDE) {
-                return new IncludeSubtypeFilterDelegate((Include) anno);
-            } else if (this == EXCLUDE) {
-                return new ExcludeSubtypeFilterDelegate((Exclude) anno);
-            }
-            throw new UnsupportedOperationException();
-        }
-
-        @Nullable
-        public static SubtypeFilter valueOf(Class<? extends Annotation> cls) {
-            for (SubtypeFilter value : values()) {
-                if (value.cls.equals(cls)) {
-                    return value;
-                }
-            }
-            return null;
-        }
     }
 
     private enum EventTypeFilter {

@@ -17,8 +17,8 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.asUnmodifiableList
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.data.value.ValueConstructorFactory
+import org.lanternpowered.server.event.LanternEventManager
 import org.lanternpowered.server.event.RegisteredListener
-import org.lanternpowered.server.game.Lantern
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.data.DataHolder
@@ -73,8 +73,8 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
 
     override fun <E : DataHolder> registerEvent(holderFilter: Class<E>, listener: EventListener<ChangeDataHolderEvent.ValueChange>) {
         val keyEventListener = ValueKeyEventListener(listener, holderFilter::isInstance, this)
-        val plugin = CauseStack.current().first<PluginContainer>()
-        val registeredListener = Lantern.getGame().eventManager.register(
+        val plugin = CauseStack.current().first<PluginContainer>() ?: error("There no plugin in the cause stack.")
+        val registeredListener = LanternEventManager.register(
                 plugin, valueChangeEventTypeToken, Order.DEFAULT, keyEventListener)
         this.mutableListeners.add(registeredListener)
     }

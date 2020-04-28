@@ -12,3 +12,4 @@ package org.lanternpowered.api.catalog
 
 typealias CatalogType = org.spongepowered.api.CatalogType
 typealias CatalogTypes = org.spongepowered.api.CatalogTypes
+typealias CatalogedBy = org.spongepowered.api.util.annotation.CatalogedBy

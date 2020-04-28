@@ -24,7 +24,7 @@ typealias Marker = org.slf4j.Marker
  * @param clazz The target class
  * @return The constructed logger
  */
-inline fun <T: Any> Logger(clazz: KClass<T>): Logger = LoggerFactory.getLogger(clazz.java)
+inline fun <T: Any> loggerOf(clazz: KClass<T>): Logger = LoggerFactory.getLogger(clazz.java)
 
 /**
  * Constructs a new [Logger] with the specified name.
@@ -32,4 +32,4 @@ inline fun <T: Any> Logger(clazz: KClass<T>): Logger = LoggerFactory.getLogger(c
  * @param name The name
  * @return The constructed logger
  */
-inline fun Logger(name: String): Logger = LoggerFactory.getLogger(name)
+inline fun loggerOf(name: String): Logger = LoggerFactory.getLogger(name)

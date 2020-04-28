@@ -21,7 +21,7 @@ import com.google.inject.matcher.Matchers
 import com.google.inject.name.Names
 import com.google.inject.spi.TypeEncounter
 import com.google.inject.spi.TypeListener
-import org.lanternpowered.api.inject.property.InjectedProperty
+import org.lanternpowered.server.inject.property.InjectedProperty
 import org.lanternpowered.api.util.Named
 import org.lanternpowered.api.util.type.typeLiteral
 import org.lanternpowered.api.util.type.typeToken

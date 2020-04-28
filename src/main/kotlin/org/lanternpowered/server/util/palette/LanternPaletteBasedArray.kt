@@ -20,7 +20,7 @@ import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 import org.lanternpowered.api.util.palette.SerializedPaletteBasedArray
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.util.BitHelper
-import org.lanternpowered.server.util.VariableValueArray
+import org.lanternpowered.api.util.VariableValueArray
 import java.util.ArrayList
 
 object LanternPaletteBasedArrayFactory : PaletteBasedArrayFactory {

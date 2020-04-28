@@ -10,22 +10,21 @@
  */
 package org.lanternpowered.server.world.update
 
-import org.spongepowered.api.scheduler.ScheduledUpdate
-import org.spongepowered.api.scheduler.ScheduledUpdateList
-import org.spongepowered.api.scheduler.TaskPriority
+import org.lanternpowered.api.world.scheduler.ScheduledUpdate
+import org.lanternpowered.api.world.scheduler.ScheduledUpdateList
+import org.lanternpowered.api.world.scheduler.UpdatePriority
 import java.time.Duration
 import java.time.temporal.TemporalUnit
 
-abstract class AbstractScheduledUpdateList<T> : ScheduledUpdateList<T> {
+abstract class AbstractScheduledUpdateList<T : Any> : ScheduledUpdateList<T> {
 
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit, priority: TaskPriority): ScheduledUpdate<T> {
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit, priority: UpdatePriority): ScheduledUpdate<T> {
         return schedule(x, y, z, target, temporalUnit.duration.toMillis() * delay, priority)
     }
 
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: TaskPriority): ScheduledUpdate<T> {
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: UpdatePriority): ScheduledUpdate<T> {
         return schedule(x, y, z, target, delay.toMillis(), priority)
     }
 
-    abstract fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: TaskPriority): ScheduledUpdate<T>
+    abstract fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: UpdatePriority): ScheduledUpdate<T>
 }
-

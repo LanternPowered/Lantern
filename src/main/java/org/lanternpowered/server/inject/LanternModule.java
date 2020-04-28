@@ -27,7 +27,8 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 import joptsimple.OptionParser;
 import org.apache.logging.log4j.LogManager;
-import org.lanternpowered.api.inject.option.Option;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.lanternpowered.api.registry.GameRegistry;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.asset.LanternAssetManager;
@@ -38,26 +39,25 @@ import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.data.LanternDataManager;
-import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternGameRegistry;
 import org.lanternpowered.server.game.LanternPlatform;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.inject.config.ConfigDirAnnotation;
+import org.lanternpowered.server.inject.option.Option;
 import org.lanternpowered.server.inject.option.OptionModule;
 import org.lanternpowered.server.inject.provider.ChannelBindingProvider;
 import org.lanternpowered.server.inject.provider.NamedLog4jLoggerProvider;
 import org.lanternpowered.server.inject.provider.NamedSlf4jLoggerProvider;
 import org.lanternpowered.server.inject.provider.PluginAssetProvider;
 import org.lanternpowered.server.inject.provider.PluginContainerProvider;
-import org.lanternpowered.server.inject.provider.SpongeExecutorServiceProvider;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.InternalPluginContainer;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
+import org.lanternpowered.server.registry.LanternGameRegistry;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceManager;
 import org.lanternpowered.server.util.PathUtils;
@@ -66,7 +66,6 @@ import org.lanternpowered.server.util.metric.LanternMetricsConfigManager;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
@@ -74,10 +73,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.asset.AssetManager;
-import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.DataManager;
-import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.network.ChannelBinding;
@@ -86,10 +83,7 @@ import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.profile.GameProfileManager;
-import org.spongepowered.api.scheduler.AsynchronousExecutor;
 import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SynchronousExecutor;
-import org.spongepowered.api.scheduler.TaskExecutorService;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.util.metric.MetricsConfigManager;
 import org.spongepowered.api.world.TeleportHelper;
@@ -103,8 +97,6 @@ import java.lang.annotation.Annotation;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class LanternModule extends PrivateModule {
 
@@ -186,13 +178,11 @@ public class LanternModule extends PrivateModule {
         bindAndExpose(AssetManager.class)
                 .to(LanternAssetManager.class);
         bindAndExpose(GameRegistry.class)
-                .to(LanternGameRegistry.class);
+                .toInstance(LanternGameRegistry.INSTANCE);
         bindAndExpose(TeleportHelper.class)
-                .to(LanternTeleportHelper.class);
+                .toInstance(LanternTeleportHelper.INSTANCE);
         bindAndExpose(Scheduler.class)
                 .to(LanternScheduler.class);
-        bindAndExpose(CommandManager.class)
-                .to(LanternCommandManager.class);
         bindAndExpose(Platform.class)
                 .to(LanternPlatform.class);
         bindAndExpose(EventManager.class)
@@ -201,16 +191,12 @@ public class LanternModule extends PrivateModule {
                 .to(LanternChannelRegistrar.class);
         bindAndExpose(GameProfileManager.class)
                 .to(LanternGameProfileManager.class);
-        bindAndExpose(PropertyRegistry.class)
-                .to(LanternPropertyRegistry.class);
         bindAndExpose(ConfigManager.class)
                 .to(LanternConfigManager.class);
         bindAndExpose(PluginManager.class)
                 .to(LanternPluginManager.class);
         bindAndExpose(DataManager.class)
                 .to(LanternDataManager.class);
-        bindAndExpose(PropertyRegistry.class)
-                .to(LanternPropertyRegistry.class);
         bindAndExpose(CauseStackManager.class)
                 .toInstance(LanternCauseStackManager.INSTANCE);
         bindAndExpose(MetricsConfigManager.class)
@@ -257,12 +243,6 @@ public class LanternModule extends PrivateModule {
         // Other Plugin Containers
         bindAndExpose(PluginContainer.class, Named.class)
                 .toProvider(PluginContainerProvider.class);
-
-        // Sponge Executor Services
-        bindAndExpose(TaskExecutorService.class, SynchronousExecutor.class)
-                .toProvider(SpongeExecutorServiceProvider.Synchronous.class);
-        bindAndExpose(TaskExecutorService.class, AsynchronousExecutor.class)
-                .toProvider(SpongeExecutorServiceProvider.Asynchronous.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindAndExpose(Class<T> clazz, Annotation annotation) {

@@ -15,7 +15,6 @@ import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.type.LanternDyeColor;
-import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.meta.BannerPatternLayer;

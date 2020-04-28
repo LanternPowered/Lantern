@@ -13,85 +13,65 @@
 package org.lanternpowered.api.cause.entity.damage.source
 
 import org.lanternpowered.api.cause.entity.damage.DamageType
+import org.lanternpowered.api.entity.Entity
+import org.lanternpowered.api.registry.builderOf
 import org.spongepowered.api.block.BlockSnapshot
-import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.FallingBlock
 import org.spongepowered.api.world.Location
 
 typealias DamageSource = org.spongepowered.api.event.cause.entity.damage.source.DamageSource
-typealias DamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.DamageSource.Builder
-typealias DamageSources = org.spongepowered.api.event.cause.entity.damage.source.DamageSources
 typealias BlockDamageSource = org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource
-typealias BlockDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource.Builder
 typealias EntityDamageSource = org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource
-typealias EntityDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource.Builder
 typealias FallingBlockDamageSource = org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource
-typealias FallingBlockDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource.Builder
 typealias IndirectEntityDamageSource = org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource
-typealias IndirectEntityDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource.Builder
+
+private typealias DamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.DamageSource.Builder
+private typealias BlockDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource.Builder
+private typealias EntityDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource.Builder
+private typealias IndirectEntityDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource.Builder
+private typealias FallingBlockDamageSourceBuilder = org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource.Builder
 
 /**
- * Constructs a new [DamageSource] with the given [DamageType] and builder function.
+ * Constructs a new [DamageSource] with the given [DamageType].
  */
-inline fun DamageSource(type: DamageType, fn: DamageSourceBuilder.() -> Unit = {}): DamageSource =
-        DamageSourceBuilder().type(type).apply(fn).build()
+inline fun damageSourceOf(type: DamageType): DamageSource =
+        builderOf<DamageSourceBuilder>().type(type).build()
 
 /**
- * Constructs a new [BlockDamageSource] with the given [DamageType], [Location] and builder function.
+ * Constructs a new [BlockDamageSource] with the given [DamageType] and [Location].
  */
-inline fun BlockDamageSource(type: DamageType, location: Location,
-                             fn: BlockDamageSourceBuilder.() -> Unit = {}): BlockDamageSource =
-        BlockDamageSource.builder().type(type).block(location).apply(fn).build()
+inline fun blockDamageSourceOf(type: DamageType, location: Location): BlockDamageSource =
+        builderOf<BlockDamageSourceBuilder>().type(type).block(location).build()
 
 /**
- * Constructs a new [BlockDamageSource] with the given [DamageType], [BlockSnapshot] and builder function.
+ * Constructs a new [BlockDamageSource] with the given [DamageType] and [BlockSnapshot].
  */
-inline fun BlockDamageSource(type: DamageType, snapshot: BlockSnapshot,
-                             fn: BlockDamageSourceBuilder.() -> Unit = {}): BlockDamageSource =
-        BlockDamageSourceBuilder().type(type).block(snapshot).apply(fn).build()
+inline fun blockDamageSourceOf(type: DamageType, snapshot: BlockSnapshot): BlockDamageSource =
+        builderOf<BlockDamageSourceBuilder>().type(type).block(snapshot).build()
 
 /**
- * Constructs a new [EntityDamageSource] with the given [DamageType], [Entity] and builder function.
+ * Constructs a new [EntityDamageSource] with the given [DamageType] and [Entity].
  */
-inline fun EntityDamageSource(type: DamageType, entity: Entity,
-                              fn: EntityDamageSourceBuilder.() -> Unit = {}): EntityDamageSource =
-        EntityDamageSourceBuilder().type(type).entity(entity).apply(fn).build()
-
-/**
- * Constructs a new [IndirectEntityDamageSource] with the given [DamageType], [Entity], indirect [Entity] and builder function.
- */
-inline fun IndirectEntityDamageSource(type: DamageType, entity: Entity, indirectSource: Entity,
-                                      fn: IndirectEntityDamageSourceBuilder.() -> Unit = {}): IndirectEntityDamageSource =
-        IndirectEntityDamageSourceBuilder().type(type).entity(entity).proxySource(indirectSource).apply(fn).build()
+inline fun entityDamageSourceOf(type: DamageType, entity: Entity): EntityDamageSource =
+        builderOf<EntityDamageSourceBuilder>().type(type).entity(entity).build()
 
 /**
  * Constructs a new [FallingBlockDamageSource] with the given [DamageType], [FallingBlock] and builder function.
  */
-inline fun FallingBlockDamageSource(type: DamageType, fallingBlock: FallingBlock,
-                                    fn: FallingBlockDamageSourceBuilder.() -> Unit = {}): FallingBlockDamageSource =
-        FallingBlockDamageSourceBuilder().type(type).entity(fallingBlock).apply(fn).build()
+inline fun entityDamageSourceOf(type: DamageType, fallingBlock: FallingBlock): FallingBlockDamageSource =
+        builderOf<FallingBlockDamageSourceBuilder>().type(type).entity(fallingBlock).build()
 
-/**
- * Constructs a new [DamageSourceBuilder].
- */
-inline fun DamageSourceBuilder(): DamageSourceBuilder = DamageSource.builder()
-
-/**
- * Constructs a new [BlockDamageSourceBuilder].
- */
-inline fun BlockDamageSourceBuilder(): BlockDamageSourceBuilder = BlockDamageSource.builder()
-
-/**
- * Constructs a new [EntityDamageSourceBuilder].
- */
-inline fun EntityDamageSourceBuilder(): EntityDamageSourceBuilder = EntityDamageSource.builder()
-
-/**
- * Constructs a new [IndirectEntityDamageSourceBuilder].
- */
-inline fun IndirectEntityDamageSourceBuilder(): IndirectEntityDamageSourceBuilder = IndirectEntityDamageSource.builder()
-
-/**
- * Constructs a new [FallingBlockDamageSourceBuilder].
- */
-inline fun FallingBlockDamageSourceBuilder(): FallingBlockDamageSourceBuilder = FallingBlockDamageSource.builder()
+fun EntityDamageSource.indirectBy(entity: Entity): IndirectEntityDamageSource =
+        builderOf<IndirectEntityDamageSourceBuilder>().apply {
+            val source = this@indirectBy
+            if (source.isAbsolute)
+                absolute()
+            if (source.isBypassingArmor)
+                bypassesArmor()
+            if (source.isExplosive)
+                explosion()
+            if (source.isFire)
+                fire()
+            if (source.isMagic)
+                magical()
+        }.build()

@@ -40,13 +40,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public abstract class AbstractServer {
 
     /**
-     * Whether the debug message of the epoll/kqueue
-     * availability is already logged.
-     */
-    private static boolean epollAvailabilityLogged = false;
-    private static boolean kqueueAvailabilityLogged = false;
-
-    /**
      * Whether the server is initialized.
      */
     private boolean initialized = false;
@@ -58,57 +51,10 @@ public abstract class AbstractServer {
      * @return The channel future
      */
     public final ChannelFuture init(SocketAddress address) {
-        return init(address, true, true);
-    }
-
-    /**
-     * Initializes the network server.
-     *
-     * @param address The address to bind the server to
-     * @param useEpollWhenAvailable Whether you want to use epoll if it's available
-     * @return The channel future
-     */
-    public final ChannelFuture init(SocketAddress address,
-            boolean useEpollWhenAvailable,
-            boolean useKQueueWhenAvailable) {
         if (this.initialized) {
             throw new IllegalStateException("The network server can only be initialized once.");
         }
-        TransportType channelType = null;
-        if (useEpollWhenAvailable) {
-            final boolean epoll = Epoll.isAvailable();
-            if (!epollAvailabilityLogged) {
-                if (epoll) {
-                    Lantern.getLogger().info("Epoll is enabled.");
-                } else {
-                    // Debug the reason why it is unavailable
-                    Lantern.getLogger().warn("Epoll is unavailable: {}", getMessage(Epoll.unavailabilityCause()));
-                }
-                epollAvailabilityLogged = true;
-            }
-            if (epoll) {
-                channelType = TransportType.EPOLL;
-            }
-        }
-        if (channelType == null && useKQueueWhenAvailable) {
-            final boolean kqueue = KQueue.isAvailable();
-            if (!kqueueAvailabilityLogged) {
-                if (kqueue) {
-                    Lantern.getLogger().info("KQueue is enabled.");
-                } else {
-                    // Debug the reason why it is unavailable
-                    Lantern.getLogger().warn("KQueue is unavailable: {}", getMessage(KQueue.unavailabilityCause()));
-                }
-                kqueueAvailabilityLogged = true;
-            }
-            if (kqueue) {
-                channelType = TransportType.KQUEUE;
-            }
-        }
-        if (channelType == null) {
-            channelType = TransportType.NIO;
-        }
-        final ChannelFuture future = init(address, channelType);
+        final ChannelFuture future = init(address);
         this.initialized = true;
         return future;
     }

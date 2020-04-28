@@ -11,11 +11,11 @@
 package org.lanternpowered.server.entity.weather;
 
 import org.lanternpowered.api.cause.CauseStack;
+import org.lanternpowered.api.cause.entity.damage.DamageTypes;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.sound.weather.LightningSoundEffect;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
@@ -116,7 +116,7 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
                 if (!strikeEvent.isCancelled()) {
                     // Construct the damage source
                     final EntityDamageSource damageSource = EntityDamageSource.builder()
-                            .entity(this).type(DamageTypeRegistryModule.LIGHTNING).build();
+                            .entity(this).type(DamageTypes.INSTANCE.getLIGHTNING()).build();
                     // Apply all the block changes
                     for (Transaction<BlockSnapshot> transaction : blockChanges) {
                         if (transaction.isValid()) {

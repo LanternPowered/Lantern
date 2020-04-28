@@ -18,7 +18,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import joptsimple.OptionParser;
 import org.junit.Test;
-import org.lanternpowered.api.inject.option.Option;
+import org.lanternpowered.server.inject.option.Option;
 import org.lanternpowered.server.inject.option.OptionModule;
 import org.spongepowered.math.GenericMath;
 

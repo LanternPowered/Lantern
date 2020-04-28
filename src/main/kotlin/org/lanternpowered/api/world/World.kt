@@ -10,12 +10,50 @@
  */
 package org.lanternpowered.api.world
 
+import org.lanternpowered.api.world.weather.WeatherUniverse
+import org.spongepowered.api.world.server.ServerWorld
+import kotlin.contracts.contract
+import org.spongepowered.api.world.World as SpongeWorld
+
+typealias World = ServerWorld
 typealias BlockChangeFlag = org.spongepowered.api.world.BlockChangeFlag
 typealias BlockChangeFlags = org.spongepowered.api.world.BlockChangeFlags
 typealias Locatable = org.spongepowered.api.world.Locatable
 typealias LocatableBlock = org.spongepowered.api.world.LocatableBlock
 typealias Location = org.spongepowered.api.world.Location
-typealias World<W> = org.spongepowered.api.world.World<W>
 typealias WorldBorder = org.spongepowered.api.world.WorldBorder
-typealias WorldArchetype = org.spongepowered.api.world.WorldArchetype
-typealias WorldArchetypes = org.spongepowered.api.world.WorldArchetypes
+
+/**
+ * Gets the sponge world as a lantern world.
+ */
+@Suppress("NOTHING_TO_INLINE")
+inline fun SpongeWorld<*>.fix(): World {
+    contract {
+        returns() implies (this@fix is World)
+    }
+    return this as World
+}
+
+/**
+ * Gets the sponge world as a lantern world.
+ */
+@Deprecated(message = "Redundant call.", replaceWith = ReplaceWith(""))
+@Suppress("NOTHING_TO_INLINE")
+inline fun World.fix(): World = this
+
+/**
+ * The weather universe of the world, if it exists.
+ */
+val World.weatherUniverse: WeatherUniverse?
+    get() = (this as ExtendedWorld).weatherUniverse
+
+/**
+ * World extensions.
+ */
+interface ExtendedWorld : ServerWorld {
+
+    /**
+     * The weather universe of the world, if it exists.
+     */
+    val weatherUniverse: WeatherUniverse?
+}

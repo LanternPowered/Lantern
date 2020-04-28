@@ -11,12 +11,15 @@
 package org.lanternpowered.server.world.update
 
 import org.lanternpowered.api.world.World
-import org.spongepowered.api.scheduler.ScheduledUpdate
-import org.spongepowered.api.scheduler.TaskPriority
+import org.lanternpowered.api.world.scheduler.ScheduledUpdate
+import org.lanternpowered.api.world.scheduler.UpdatePriority
 
-class WorldScheduledUpdateList<T>(val world: World, val lookup: (Int, Int) -> AbstractScheduledUpdateList<T>) : AbstractScheduledUpdateList<T>() {
+class WorldScheduledUpdateList<T : Any>(
+        val world: World,
+        val lookup: (Int, Int) -> AbstractScheduledUpdateList<T>
+) : AbstractScheduledUpdateList<T>() {
 
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: TaskPriority): ScheduledUpdate<T> {
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: UpdatePriority): ScheduledUpdate<T> {
         val chunkX = x shr 4
         val chunkZ = z shr 4
         val localX = x and 0xf

@@ -43,7 +43,6 @@ import org.lanternpowered.server.network.vanilla.message.type.login.LoginFinishM
 import org.lanternpowered.server.network.vanilla.message.type.login.LoginStartMessage
 import org.lanternpowered.server.profile.LanternGameProfile
 import org.lanternpowered.server.util.EncryptionHelper
-import org.lanternpowered.server.util.UncheckedThrowables
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 
@@ -72,8 +71,6 @@ class LoginStartHandler : Handler<LoginStartMessage> {
                 // Try the online id first
                 try {
                     Lantern.getGame().gameProfileManager[username].get() as LanternGameProfile
-                } catch (e: InterruptedException) {
-                    throw UncheckedThrowables.throwUnchecked(e)
                 } catch (e: ExecutionException) {
                     // Generate a offline id
                     val uniqueId = UUID.nameUUIDFromBytes("OfflinePlayer:$username".toByteArray(Charsets.UTF_8))

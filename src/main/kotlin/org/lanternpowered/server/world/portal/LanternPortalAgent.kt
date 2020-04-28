@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.server.world.portal
 
+import org.lanternpowered.api.world.teleport.PortalAgent
+import org.lanternpowered.api.world.teleport.PortalAgentType
 import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.teleport.PortalAgent
-import org.spongepowered.api.world.teleport.PortalAgentType
 import java.util.Optional
 
 abstract class LanternPortalAgent(private val portalAgentType: PortalAgentType) : PortalAgent {
@@ -33,8 +33,8 @@ abstract class LanternPortalAgent(private val portalAgentType: PortalAgentType) 
     }
 
     override fun findOrCreatePortal(targetLocation: Location): Optional<Location> {
-        val optLoc = this.findPortal(targetLocation)
-        return if (optLoc.isPresent) optLoc else this.createPortal(targetLocation)
+        val optLoc = findPortal(targetLocation)
+        return if (optLoc.isPresent) optLoc else createPortal(targetLocation)
     }
 
     override fun getType(): PortalAgentType = this.portalAgentType

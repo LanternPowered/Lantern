@@ -13,13 +13,13 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.lanternpowered.server.extra.accessory.TopHat;
+import org.lanternpowered.api.data.type.TopHat;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
@@ -46,12 +46,10 @@ import org.spongepowered.math.vector.Vector3d;
 import java.util.OptionalInt;
 import java.util.UUID;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
 
     private boolean lastHasNoGravity;
-    private GameMode lastGameMode = GameModes.NOT_SET;
+    private GameMode lastGameMode = GameModes.NOT_SET.get();
 
     private int elytraRocketId = INVALID_ENTITY_ID;
     private boolean lastElytraFlying;
@@ -84,7 +82,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         super.init(context);
         this.elytraRocketId = context.acquire();
         context.acquire(this.passengerStack);
-        getEntity().offer(Keys.INVISIBLE, false);
+        getEntity().offer(Keys.IS_INVISIBLE, false);
     }
 
     @Override
@@ -241,13 +239,13 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
         context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillSpawnParameters()));
-        final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
-        context.sendToSelf(() -> new SetGameModeMessage((LanternGameMode) gameMode));
-        context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, getFlySpeed(), getFovModifier()));
+        final GameMode gameMode = getEntity().require(Keys.GAME_MODE);
+        context.sendToSelf(() -> new SetGameModeMessage(gameMode));
+        context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(this.entity.get(Keys.IS_FLYING).orElse(false),
+                canFly(), false, gameMode == GameModes.CREATIVE.get(), getFlySpeed(), getFovModifier()));
 
-        final TopHat topHat = getTopHat();
-        if (topHat != null && !getEntity().get(Keys.INVISIBLE).get()) {
+        @Nullable final TopHat topHat = getTopHat();
+        if (topHat != null && !getEntity().require(Keys.IS_INVISIBLE)) {
             sendPassengerStack(context);
             sendHat(context, topHat);
         }
@@ -255,13 +253,13 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     @Nullable
     private TopHat getTopHat() {
-        return (TopHat) getEntity().get(LanternKeys.ACCESSORIES).get().stream()
+        return (TopHat) getEntity().require(LanternKeys.ACCESSORIES).stream()
                 .filter(a -> a instanceof TopHat).findFirst().orElse(null);
     }
 
     @Override
     protected void update(EntityProtocolUpdateContext context) {
-        final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
+        final GameMode gameMode = this.entity.require(Keys.GAME_MODE);
         final boolean canFly = canFly();
         final float flySpeed = getFlySpeed();
         final float fieldOfView = getFovModifier();
@@ -269,19 +267,19 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         if (gameMode != this.lastGameMode || canFly != this.lastCanFly || flySpeed != this.lastFlySpeed
                 || fieldOfView != this.lastFieldOfView || flying != this.lastFlying) {
             if (gameMode != this.lastGameMode) {
-                context.sendToSelf(() -> new SetGameModeMessage((LanternGameMode) gameMode));
+                context.sendToSelf(() -> new SetGameModeMessage(gameMode));
             }
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    flying, canFly, false, gameMode == GameModes.CREATIVE, flySpeed, fieldOfView));
+                    flying, canFly, false, gameMode == GameModes.CREATIVE.get(), flySpeed, fieldOfView));
             this.lastGameMode = gameMode;
             this.lastCanFly = canFly;
             this.lastFlySpeed = flySpeed;
             this.lastFieldOfView = fieldOfView;
             this.lastFlying = flying;
         }
-        final float health = this.entity.get(Keys.HEALTH).get().floatValue();
-        final int foodLevel = this.entity.get(Keys.FOOD_LEVEL).get();
-        final float saturation = this.entity.get(Keys.SATURATION).get().floatValue();
+        final float health = this.entity.require(Keys.HEALTH).floatValue();
+        final int foodLevel = this.entity.require(Keys.FOOD_LEVEL);
+        final float saturation = this.entity.require(Keys.SATURATION).floatValue();
         if (health != this.lastHealth || foodLevel != this.lastFoodLevel || saturation == 0.0f != this.lastHungry) {
             context.sendToSelf(() -> new MessagePlayOutPlayerHealthUpdate(health, foodLevel, saturation));
             this.lastHealth = health;
@@ -289,7 +287,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastHungry = saturation == 0.0f;
         }
         super.update(context);
-        final TopHat topHat = getTopHat();
+        @Nullable final TopHat topHat = getTopHat();
         if (topHat != this.lastTopHat) {
             if (this.lastTopHat == null) {
                 sendPassengerStack(context);
@@ -331,7 +329,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.elytraRocketId));
             } else if (elytraFlying && elytraSpeedBoost) {
                 // Create the fireworks data item
-                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORK_ROCKET);
+                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORK_ROCKET.get());
 
                 // Write the item to a parameter list
                 final DefaultParameterList parameterList = new DefaultParameterList();
@@ -350,18 +348,18 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
         if (event instanceof SpectateEntityEvent) {
-            final Entity entity = ((SpectateEntityEvent) event).getSpectatedEntity().orElse(null);
+            @Nullable final Entity entity = ((SpectateEntityEvent) event).getSpectatedEntity().orElse(null);
             if (entity == null) {
                 context.sendToSelf(() -> new SetCameraMessage(getRootEntityId()));
             } else {
                 context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new SetCameraMessage(id)));
             }
         } else if (event instanceof RefreshAbilitiesPlayerEvent) {
-            final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
+            final GameMode gameMode = this.entity.require(Keys.GAME_MODE);
             final float flySpeed = getFlySpeed();
             final float fov = getFovModifier();
-            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, flySpeed, fov));
+            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(this.entity.get(Keys.IS_FLYING).orElse(false),
+                    canFly(), false, gameMode == GameModes.CREATIVE.get(), flySpeed, fov));
         } else {
             super.handleEvent(context, event);
         }
@@ -392,7 +390,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     private float getAbsorption() {
-        return getEntity().get(Keys.ABSORPTION).get().floatValue();
+        return getEntity().require(Keys.ABSORPTION).floatValue();
     }
 
     @Override
@@ -420,7 +418,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     @Override
     boolean hasNoGravity() {
-        return !this.entity.get(Keys.HAS_GRAVITY).orElse(true);
+        return !this.entity.get(Keys.IS_GRAVITY_AFFECTED).orElse(true);
     }
 
     @Override

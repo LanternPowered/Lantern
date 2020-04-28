@@ -12,15 +12,15 @@ package org.lanternpowered.server.world.portal
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.world.World
+import org.lanternpowered.api.world.teleport.PortalAgent
+import org.lanternpowered.api.world.teleport.PortalAgentType
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.world.LanternWorld
-import org.spongepowered.api.world.teleport.PortalAgent
-import org.spongepowered.api.world.teleport.PortalAgentType
 
 class LanternPortalAgentType<T : PortalAgent>(
         key: CatalogKey,
         private val portalAgentClass: Class<T>,
-        private val supplier: (World<*>, LanternPortalAgentType<T>) -> T
+        private val supplier: (World, LanternPortalAgentType<T>) -> T
 ) : DefaultCatalogType(key), PortalAgentType {
 
     /**
@@ -29,9 +29,7 @@ class LanternPortalAgentType<T : PortalAgent>(
      * @param world The target world
      * @return The portal agent instance
      */
-    fun newPortalAgent(world: LanternWorld): T {
-        return this.supplier(world, this)
-    }
+    fun newPortalAgent(world: World): T = this.supplier(world, this)
 
     override fun getPortalAgentClass() = this.portalAgentClass
     override fun toStringHelper() = super.toStringHelper()

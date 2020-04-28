@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.lanternpowered.api.inject.service.ServiceRef;
+import org.lanternpowered.server.inject.service.ServiceRef;
 import org.lanternpowered.server.config.user.OpsConfig;
 import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.config.user.WhitelistConfig;

@@ -14,7 +14,7 @@ import static org.lanternpowered.server.inject.provider.ProviderHelper.provideNa
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.lanternpowered.api.inject.InjectionPoint;
+import org.lanternpowered.server.inject.InjectionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

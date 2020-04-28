@@ -32,7 +32,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.ChunkMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
 import org.lanternpowered.api.util.palette.Palette;
-import org.lanternpowered.server.util.VariableValueArray;
+import org.lanternpowered.api.util.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.WorldEventListener;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;

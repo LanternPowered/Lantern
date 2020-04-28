@@ -38,11 +38,12 @@ internal data class LanternWorldArchetype(
         private val loadsOnStartup: Boolean,
         private val pvpEnabled: Boolean,
         private val generateStructures: Boolean,
-        private val commandsAllowed: Boolean,
+        private val commandsEnabled: Boolean,
         private val generateSpawnOnLoad: Boolean,
         private val isSeedRandomized: Boolean,
+        private val generateBonusChest: Boolean,
         private val seed: Long,
-        internal val keepsSpawnLoaded: Boolean?,
+        internal val keepSpawnLoaded: Boolean?,
         internal val waterEvaporates: Boolean?,
         internal val allowPlayerRespawns: Boolean?,
         val buildHeight: Int
@@ -51,20 +52,21 @@ internal data class LanternWorldArchetype(
     override fun getDifficulty() = this.difficulty
     override fun isEnabled() = this.enabled
     override fun doesLoadOnStartup() = this.loadsOnStartup
-    override fun doesKeepSpawnLoaded() = this.keepsSpawnLoaded ?: this.dimensionType.keepSpawnLoaded
+    override fun doesKeepSpawnLoaded() = this.keepSpawnLoaded ?: this.dimensionType.keepSpawnLoaded
     override fun doesGenerateSpawnOnLoad() = this.generateSpawnOnLoad
     override fun getSeed() = this.seed
     override fun isSeedRandomized() = this.isSeedRandomized
     override fun getGameMode() = this.gameMode
     override fun getGeneratorType() = this.generatorType ?: this.dimensionType.defaultGeneratorType
     override fun isHardcore() = this.hardcore
-    override fun areCommandsAllowed() = this.commandsAllowed
+    override fun areCommandsEnabled() = this.commandsEnabled
+    override fun doesGenerateBonusChest() = this.generateBonusChest
     override fun getDimensionType() = this.dimensionType
     override fun getPortalAgentType() = this.portalAgentType
     override fun getSerializationBehavior() = this.serializationBehavior
     override fun isPVPEnabled() = this.pvpEnabled
     override fun areStructuresEnabled() = this.generateStructures
-    override fun getGeneratorSettings(): DataContainer = this.generatorSettings?.copy() ?: getGeneratorType().generatorSettings
+    override fun getGeneratorSettings(): DataContainer = this.generatorSettings?.copy() ?: getGeneratorType().defaultGeneratorSettings
 
     fun allowPlayerRespawns() = this.allowPlayerRespawns ?: this.dimensionType.allowsPlayerRespawns
     fun waterEvaporates() = this.waterEvaporates ?: this.dimensionType.doesWaterEvaporate

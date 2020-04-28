@@ -16,7 +16,6 @@ import com.google.inject.PrivateBinder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.name.Names;
 import joptsimple.OptionParser;
-import org.lanternpowered.api.inject.option.Option;
 import org.lanternpowered.server.inject.InjectionPointProvider;
 
 import java.io.File;

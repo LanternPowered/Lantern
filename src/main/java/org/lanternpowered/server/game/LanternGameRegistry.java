@@ -36,10 +36,10 @@ import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterionBuilder;
 import org.lanternpowered.server.advancement.criteria.trigger.LanternFilteredTriggerBuilder;
 import org.lanternpowered.server.advancement.criteria.trigger.LanternTriggerBuilder;
-import org.lanternpowered.server.attribute.LanternAttribute;
-import org.lanternpowered.server.attribute.LanternAttributeBuilder;
-import org.lanternpowered.server.attribute.LanternAttributeCalculator;
-import org.lanternpowered.server.attribute.LanternOperation;
+import org.lanternpowered.server.attribute.LanternAttributeType;
+import org.lanternpowered.server.attribute.LanternAttributeTypeBuilder;
+import org.lanternpowered.server.attribute.AttributeCalculator;
+import org.lanternpowered.server.attribute.LanternAttributeOperation;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
@@ -76,7 +76,6 @@ import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
-import org.lanternpowered.server.event.registry.LanternGameRegistryRegisterEvent;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder;
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder;
@@ -90,9 +89,6 @@ import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeL
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.TriggerRegistryModule;
-import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
-import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
-import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockSoundGroupRegistryModule;
@@ -112,7 +108,6 @@ import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.ArtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
@@ -121,7 +116,6 @@ import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.VillagerTypeRegistryModule;
@@ -162,9 +156,7 @@ import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryM
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
-import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.inventory.LanternInventoryBuilder;
 import org.lanternpowered.server.inventory.LanternItemStackBuilder;
@@ -421,7 +413,7 @@ public class LanternGameRegistry implements XGameRegistry {
 
     private final LanternGame game;
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
-    private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
+    private final AttributeCalculator attributeCalculator = new AttributeCalculator();
 
     private final LanternSmeltingRecipeRegistry smeltingRecipeRegistry = new LanternSmeltingRecipeRegistry();
     private final LanternCraftingRecipeRegistry craftingRecipeRegistry = new LanternCraftingRecipeRegistry();
@@ -444,7 +436,7 @@ public class LanternGameRegistry implements XGameRegistry {
     }
 
     public void registerDefaults() {
-        registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
+        registerBuilderSupplier(LanternAttributeTypeBuilder.class, LanternAttributeTypeBuilder::new)
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
@@ -529,8 +521,8 @@ public class LanternGameRegistry implements XGameRegistry {
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
-        registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
-                .registerModule(LanternAttribute.class, new AttributeRegistryModule())
+        registerModule(LanternAttributeOperation.class, new AttributeOperationRegistryModule())
+                .registerModule(LanternAttributeType.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
                 .registerModule(new BlockSoundGroupRegistryModule())
                 .registerModule(BlockType.class, BlockRegistryModule.get())
@@ -1045,7 +1037,7 @@ public class LanternGameRegistry implements XGameRegistry {
         return getRegistryModule(TranslationManagerRegistryModule.class).get().getTranslationManager();
     }
 
-    public LanternAttributeCalculator getAttributeCalculator() {
+    public AttributeCalculator getAttributeCalculator() {
         return this.attributeCalculator;
     }
 

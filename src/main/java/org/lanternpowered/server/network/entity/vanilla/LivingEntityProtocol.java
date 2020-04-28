@@ -50,11 +50,11 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
     }
 
     private byte getLivingFlags() {
-        final Optional<HandType> activeHand = this.entity.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty());
+        final Optional<HandType> activeHand = this.entity.get(LanternKeys.ACTIVE_HAND);
         byte value = 0;
         if (activeHand.isPresent()) {
             value = 0x1;
-            if (activeHand.get() == HandTypes.OFF_HAND) {
+            if (activeHand.get() == HandTypes.OFF_HAND.get()) {
                 value |= 0x2;
             }
         }
@@ -116,7 +116,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
                         oldEntry.getDuration() - delay != potionEffect.getDuration() ||
                         oldEntry.getAmplifier() != potionEffect.getAmplifier() ||
                         oldEntry.isAmbient() != potionEffect.isAmbient() ||
-                        oldEntry.getShowParticles() != potionEffect.getShowParticles()) {
+                        oldEntry.showsParticles() != potionEffect.showsParticles()) {
                     context.sendToAll(() -> createAddMessage(potionEffect));
                 }
             }
@@ -129,7 +129,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
 
     private MessagePlayOutAddPotionEffect createAddMessage(PotionEffect potionEffect) {
         return new MessagePlayOutAddPotionEffect(getRootEntityId(), potionEffect.getType(), potionEffect.getDuration(),
-                potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.getShowParticles());
+                potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.showsParticles());
     }
 
     @Override
@@ -138,9 +138,9 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
             context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 1));
         } else if (event instanceof SwingHandEntityEvent) {
             final HandType handType = ((SwingHandEntityEvent) event).getHandType();
-            if (handType == HandTypes.MAIN_HAND) {
+            if (handType == HandTypes.MAIN_HAND.get()) {
                 context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 0));
-            } else if (handType == HandTypes.OFF_HAND) {
+            } else if (handType == HandTypes.OFF_HAND.get()) {
                 context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 3));
             } else {
                 super.handleEvent(context, event);

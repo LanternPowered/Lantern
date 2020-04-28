@@ -18,7 +18,9 @@ import org.spongepowered.api.data.type.WoodType
 import org.spongepowered.api.text.translation.Translatable
 
 val WoodTypeRegistry = catalogTypeRegistry<WoodType> {
-    fun register(id: String) = register(LanternWoodType(CatalogKey.minecraft(id), "tree.$id"))
+    fun register(id: String) =
+            register(LanternWoodType(CatalogKey.minecraft(id), "tree.$id"))
+
     register("oak")
     register("spruce")
     register("birch")

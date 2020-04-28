@@ -17,7 +17,6 @@ typealias DamageModifier = org.spongepowered.api.event.cause.entity.damage.Damag
 typealias DamageModifierType = org.spongepowered.api.event.cause.entity.damage.DamageModifierType
 typealias DamageModifierTypes = org.spongepowered.api.event.cause.entity.damage.DamageModifierTypes
 typealias DamageType = org.spongepowered.api.event.cause.entity.damage.DamageType
-typealias DamageTypes = org.spongepowered.api.event.cause.entity.damage.DamageTypes
 
 /**
  * Constructs a new [DamageFunction].

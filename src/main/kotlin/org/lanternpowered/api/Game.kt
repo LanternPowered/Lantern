@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api
 
+import org.lanternpowered.api.inject.Injector
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 
 typealias GameState = org.spongepowered.api.GameState
@@ -27,6 +28,11 @@ interface Game : org.spongepowered.api.Game {
      * The [PaletteBasedArrayFactory].
      */
     val paletteBasedArrayFactory: PaletteBasedArrayFactory
+
+    /**
+     * The injector.
+     */
+    val injector: Injector
 
     /**
      * The game singleton.

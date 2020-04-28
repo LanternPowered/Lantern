@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.util.math
 
-import org.lanternpowered.api.world.BlockVector
+import org.lanternpowered.api.world.BlockPosition
 import org.spongepowered.math.imaginary.Quaterniond
 import org.spongepowered.math.imaginary.Quaternionf
 import org.spongepowered.math.vector.Vector2d
@@ -20,8 +20,8 @@ import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3f
 import org.spongepowered.math.vector.Vector3i
 
-operator fun Vector2d.component1(): Double = x
-operator fun Vector2d.component2(): Double = y
+operator fun Vector2d.component1(): Double = this.x
+operator fun Vector2d.component2(): Double = this.y
 operator fun Vector2d.times(value: Double): Vector2d = mul(value)
 operator fun Vector2d.times(value: Float): Vector2d = mul(value)
 operator fun Vector2d.times(value: Int): Vector2d = mul(value.toDouble())
@@ -37,8 +37,8 @@ operator fun Vector2d.plus(value: Vector2i): Vector2d = add(value.x.toDouble(), 
 operator fun Vector2d.unaryMinus(): Vector2d = negate()
 operator fun Vector2d.unaryPlus(): Vector2d = this
 
-operator fun Vector2f.component1(): Float = x
-operator fun Vector2f.component2(): Float = y
+operator fun Vector2f.component1(): Float = this.x
+operator fun Vector2f.component2(): Float = this.y
 operator fun Vector2f.times(value: Double): Vector2f = mul(value)
 operator fun Vector2f.times(value: Float): Vector2f = mul(value)
 operator fun Vector2f.times(value: Int): Vector2f = mul(value.toDouble())
@@ -54,8 +54,8 @@ operator fun Vector2f.plus(value: Vector2i): Vector2f = add(value.x.toFloat(), v
 operator fun Vector2f.unaryMinus(): Vector2f = negate()
 operator fun Vector2f.unaryPlus(): Vector2f = this
 
-operator fun Vector2i.component1(): Int = x
-operator fun Vector2i.component2(): Int = y
+operator fun Vector2i.component1(): Int = this.x
+operator fun Vector2i.component2(): Int = this.y
 operator fun Vector2i.times(value: Int): Vector2i = mul(value)
 operator fun Vector2i.times(value: Float): Vector2i = mul(value.toInt())
 operator fun Vector2i.times(value: Double): Vector2i = mul(value)
@@ -71,9 +71,9 @@ operator fun Vector2i.plus(value: Vector2f): Vector2i = add(value.x.toDouble(), 
 operator fun Vector2i.unaryMinus(): Vector2i = negate()
 operator fun Vector2i.unaryPlus(): Vector2i = this
 
-operator fun Vector3d.component1(): Double = x
-operator fun Vector3d.component2(): Double = y
-operator fun Vector3d.component3(): Double = z
+operator fun Vector3d.component1(): Double = this.x
+operator fun Vector3d.component2(): Double = this.y
+operator fun Vector3d.component3(): Double = this.z
 operator fun Vector3d.times(value: Double): Vector3d = mul(value)
 operator fun Vector3d.times(value: Float): Vector3d = mul(value)
 operator fun Vector3d.times(value: Int): Vector3d = mul(value.toDouble())
@@ -89,11 +89,11 @@ operator fun Vector3d.plus(value: Vector3i): Vector3d = add(value.x.toDouble(), 
 operator fun Vector3d.unaryMinus(): Vector3d = negate()
 operator fun Vector3d.unaryPlus(): Vector3d = this
 
-fun Vector3d.toBlockVector() = BlockVector(this.floorX, this.floorY, this.floorZ)
+fun Vector3d.toBlockPosition() = BlockPosition(this.floorX, this.floorY, this.floorZ)
 
-operator fun Vector3f.component1(): Float = x
-operator fun Vector3f.component2(): Float = y
-operator fun Vector3f.component3(): Float = z
+operator fun Vector3f.component1(): Float = this.x
+operator fun Vector3f.component2(): Float = this.y
+operator fun Vector3f.component3(): Float = this.z
 operator fun Vector3f.times(value: Double): Vector3f = mul(value)
 operator fun Vector3f.times(value: Float): Vector3f = mul(value)
 operator fun Vector3f.times(value: Int): Vector3f = mul(value.toDouble())
@@ -109,11 +109,11 @@ operator fun Vector3f.plus(value: Vector3i): Vector3f = add(value.x.toFloat(), v
 operator fun Vector3f.unaryMinus(): Vector3f = negate()
 operator fun Vector3f.unaryPlus(): Vector3f = this
 
-fun Vector3f.toBlockVector() = BlockVector(this.floorX, this.floorY, this.floorZ)
+fun Vector3f.toBlockPosition() = BlockPosition(this.floorX, this.floorY, this.floorZ)
 
-operator fun Vector3i.component1(): Int = x
-operator fun Vector3i.component2(): Int = y
-operator fun Vector3i.component3(): Int = z
+operator fun Vector3i.component1(): Int = this.x
+operator fun Vector3i.component2(): Int = this.y
+operator fun Vector3i.component3(): Int = this.z
 operator fun Vector3i.times(value: Int): Vector3i = mul(value)
 operator fun Vector3i.times(value: Float): Vector3i = mul(value.toInt())
 operator fun Vector3i.times(value: Double): Vector3i = mul(value)
@@ -129,7 +129,7 @@ operator fun Vector3i.plus(value: Vector3f): Vector3i = add(value.x.toDouble(), 
 operator fun Vector3i.unaryMinus(): Vector3i = negate()
 operator fun Vector3i.unaryPlus(): Vector3i = this
 
-fun Vector3i.toBlockVector() = BlockVector(this.x, this.y, this.z)
+fun Vector3i.toBlockPosition() = BlockPosition(this.x, this.y, this.z)
 
 operator fun Quaterniond.times(value: Vector3d): Vector3d = rotate(value)
 operator fun Quaterniond.times(value: Vector3f): Vector3d = rotate(value.x, value.y, value.z)

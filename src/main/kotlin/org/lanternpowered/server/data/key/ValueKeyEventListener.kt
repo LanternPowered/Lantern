@@ -10,19 +10,17 @@
  */
 package org.lanternpowered.server.data.key
 
+import org.lanternpowered.api.event.EventListener
 import org.lanternpowered.server.event.LanternEventListener
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
 
 class ValueKeyEventListener internal constructor(
-        private val listener: EventListener<ChangeDataHolderEvent.ValueChange>, val dataHolderFilter: (DataHolder) -> Boolean, val key: Key<*>
+        override val handle: EventListener<ChangeDataHolderEvent.ValueChange>, val dataHolderFilter: (DataHolder) -> Boolean, val key: Key<*>
 ) : LanternEventListener<ChangeDataHolderEvent.ValueChange> {
 
-    override fun getHandle() = this.listener
-
     override fun handle(event: ChangeDataHolderEvent.ValueChange) {
-        this.listener.handle(event)
+        this.handle.handle(event)
     }
 }

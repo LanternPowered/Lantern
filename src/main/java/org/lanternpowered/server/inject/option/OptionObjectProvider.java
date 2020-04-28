@@ -20,9 +20,7 @@ import joptsimple.OptionSpecBuilder;
 import joptsimple.ValueConverter;
 import joptsimple.internal.Reflection;
 import joptsimple.util.PathConverter;
-import org.lanternpowered.api.inject.InjectionPoint;
-import org.lanternpowered.api.inject.option.Flag;
-import org.lanternpowered.api.inject.option.Option;
+import org.lanternpowered.server.inject.InjectionPoint;
 
 import java.io.File;
 import java.nio.file.Path;

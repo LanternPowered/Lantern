@@ -16,7 +16,8 @@ import com.google.inject.Provider
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.server.ext.inject
+import org.lanternpowered.server.ext.injectLazily
 
 class LazyInjectionTest {
 

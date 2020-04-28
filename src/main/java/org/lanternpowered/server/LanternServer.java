@@ -289,11 +289,9 @@ public final class LanternServer implements Server {
 
     private void bind() throws BindException {
         final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
-        final GlobalConfig.NetworkTransport networkTransport = this.game.getGlobalConfig().getServerNetworkTransport();
 
         ProtocolState.init();
-        final ChannelFuture future = this.networkManager.init(address,
-                networkTransport.allowsEpoll(), networkTransport.allowsKQueue());
+        final ChannelFuture future = this.networkManager.init(address);
         final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             final Throwable cause = future.cause();
@@ -312,11 +310,9 @@ public final class LanternServer implements Server {
         }
 
         final InetSocketAddress address = getBindAddress(this.game.getGlobalConfig().getQueryPort());
-        final GlobalConfig.NetworkTransport networkTransport = this.game.getGlobalConfig().getQueryNetworkTransport();
         this.game.getLogger().info("Binding query to address: " + address + "...");
 
-        final ChannelFuture future = this.queryServer.init(address,
-                networkTransport.allowsEpoll(), networkTransport.allowsKQueue());
+        final ChannelFuture future = this.queryServer.init(address);
         final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             this.game.getLogger().warn("Failed to bind query. Address already in use?");
@@ -329,11 +325,9 @@ public final class LanternServer implements Server {
         }
 
         final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getRconPort());
-        final GlobalConfig.NetworkTransport networkTransport = this.game.getGlobalConfig().getRconNetworkTransport();
         this.game.getLogger().info("Binding rcon to address: " + address + "...");
 
-        final ChannelFuture future = this.rconServer.init(address,
-                networkTransport.allowsEpoll(), networkTransport.allowsKQueue());
+        final ChannelFuture future = this.rconServer.init(address);
         final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             this.game.getLogger().warn("Failed to bind rcon. Address already in use?");

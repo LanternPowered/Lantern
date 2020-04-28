@@ -18,7 +18,7 @@ import java.util.OptionalDouble
 import java.util.OptionalInt
 import java.util.OptionalLong
 
-interface ForwardingDataHolder : DataHolder, ValueContainerBase {
+interface ForwardingDataHolder : ValueContainerBase, DataHolder {
 
     /**
      * The delegate [DataHolder].

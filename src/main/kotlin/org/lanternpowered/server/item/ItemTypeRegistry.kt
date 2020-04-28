@@ -25,7 +25,6 @@ import org.lanternpowered.server.effect.potion.LanternPotionType
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule
-import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule
 import org.lanternpowered.server.game.registry.type.data.MusicDiscRegistryModule
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule

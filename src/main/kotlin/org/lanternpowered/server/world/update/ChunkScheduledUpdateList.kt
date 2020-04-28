@@ -12,21 +12,21 @@ package org.lanternpowered.server.world.update
 
 import it.unimi.dsi.fastutil.objects.ObjectRBTreeSet
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap
-import org.lanternpowered.api.world.BlockPos
+import org.lanternpowered.api.world.BlockPosition
 import org.lanternpowered.api.world.World
-import org.spongepowered.api.scheduler.ScheduledUpdate
-import org.spongepowered.api.scheduler.TaskPriority
+import org.lanternpowered.api.world.scheduler.ScheduledUpdate
+import org.lanternpowered.api.world.scheduler.UpdatePriority
 
 @Suppress("UNCHECKED_CAST")
-class ChunkScheduledUpdateList<T>(val world: World, private val chunkX: Int, private val chunkZ: Int) : AbstractScheduledUpdateList<T>() {
+class ChunkScheduledUpdateList<T : Any>(val world: World, private val chunkX: Int, private val chunkZ: Int) : AbstractScheduledUpdateList<T>() {
 
     private var updateCounter = 0L
 
     private val updatesLookup = Short2ObjectOpenHashMap<LanternScheduledUpdate<T>>()
     private val sortedUpdates = ObjectRBTreeSet<LanternScheduledUpdate<T>>()
 
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: TaskPriority): ScheduledUpdate<T> {
-        priority as LanternTaskPriority
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: UpdatePriority): ScheduledUpdate<T> {
+        priority as LanternUpdatePriority
 
         val index = index(x, y, z)
         var update = this.updatesLookup[index]
@@ -48,7 +48,7 @@ class ChunkScheduledUpdateList<T>(val world: World, private val chunkX: Int, pri
         }
 
         val updateId = this.updateCounter++
-        val blockPos = BlockPos((this.chunkX shl 4) or x, y, (this.chunkZ shl 4) or z)
+        val blockPos = BlockPosition((this.chunkX shl 4) or x, y, (this.chunkZ shl 4) or z)
 
         update = LanternScheduledUpdate(this, blockPos, target, priority, updateId, delay)
 

@@ -13,12 +13,9 @@ package org.lanternpowered.server.service.permission;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.RemoteSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
@@ -26,16 +23,14 @@ import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
 
 import java.net.InetAddress;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 
 /**
  * A context calculator handling world contexts.
  */
 public class LanternContextCalculator implements ContextCalculator<Subject> {
 
-    private final LoadingCache<RemoteSource, Set<Context>> remoteIpCache = buildAddressCache(Context.REMOTE_IP_KEY,
+    private final LoadingCache<RemoteConnection, Set<Context>> remoteIpCache = buildAddressCache(Context.REMOTE_IP_KEY,
             input -> input.getConnection().getAddress().getAddress());
 
     private final LoadingCache<RemoteSource, Set<Context>> localIpCache = buildAddressCache(Context.LOCAL_IP_KEY,

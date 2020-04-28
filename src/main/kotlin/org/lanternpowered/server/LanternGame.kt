@@ -16,6 +16,7 @@ import org.lanternpowered.api.Server
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 import org.lanternpowered.server.registry.LanternGameRegistry
+import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.util.LocaleCache
 import org.lanternpowered.server.util.palette.LanternPaletteBasedArrayFactory
 import org.spongepowered.api.SystemSubject
@@ -54,6 +55,7 @@ object LanternGame : Game {
     }
 
     val syncExecutor: ScheduledExecutorService = TODO()
+    val syncScheduler: LanternScheduler = TODO()
 
     override val paletteBasedArrayFactory: PaletteBasedArrayFactory
         get() = LanternPaletteBasedArrayFactory

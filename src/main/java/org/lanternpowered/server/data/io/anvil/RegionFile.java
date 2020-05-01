@@ -285,7 +285,7 @@ public final class RegionFile {
         private final int z;
 
         ChunkBuffer(int x, int z) {
-            super(8096); // initialize to 8KB
+            super(8192); // initialize to 8KB
             this.x = x;
             this.z = z;
         }

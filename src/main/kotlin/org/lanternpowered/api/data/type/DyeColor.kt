@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.data
+package org.lanternpowered.api.data.type
 
 typealias DyeColor = org.spongepowered.api.data.type.DyeColor
 typealias DyeColors = org.spongepowered.api.data.type.DyeColors

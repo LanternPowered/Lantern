@@ -87,9 +87,18 @@ interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
     /**
      * Gets a [Supplier] for a type with the suggested id. The suggested
      * id doesn't contain a namespace. By default, the priority of namespaces
-     * is the following: `minecraft`, `lantern`, `sponge`, plugin namespaces
+     * is the following: `minecraft`, `lantern`, `sponge`, plugin namespaces.
      */
     fun provideSupplier(suggestedId: String): Supplier<T>
+
+    /**
+     * Gets a provided type with the suggested id. The suggested id doesn't
+     * contain a namespace. By default, the priority of namespaces  is the
+     * following: `minecraft`, `lantern`, `sponge`, plugin namespaces.
+     *
+     * @throws UnsupportedOperationException If the registry is a mutable registry
+     */
+    fun provide(suggestedId: String): T
 
     interface Factory {
 

@@ -34,7 +34,6 @@ import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
-import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;

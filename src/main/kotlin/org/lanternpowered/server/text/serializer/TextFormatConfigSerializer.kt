@@ -13,9 +13,8 @@ package org.lanternpowered.server.text.serializer
 import com.google.common.reflect.TypeToken
 import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
-import org.lanternpowered.api.registry.CatalogRegistry
-import org.lanternpowered.api.registry.getAllOf
-import org.lanternpowered.api.registry.require
+import org.lanternpowered.server.registry.type.text.TextColorRegistry
+import org.lanternpowered.server.registry.type.text.TextStyleRegistry
 import org.lanternpowered.server.text.format.LanternTextFormat
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.text.format.TextColor
@@ -33,12 +32,12 @@ class TextFormatConfigSerializer : TypeSerializer<TextFormat> {
         var color: TextColor = TextColors.NONE.get()
         val colorId = value.getNode(FORMAT_NODE_COLOR).string
         if (colorId != null) {
-            color = CatalogRegistry.require(CatalogKey.resolve(colorId))
+            color = TextColorRegistry.require(CatalogKey.resolve(colorId))
         }
 
         var style = TextStyle.of()
         val styleNode = value.getNode(FORMAT_NODE_STYLE)
-        for (component in CatalogRegistry.getAllOf<TextStyle.Type>()) {
+        for (component in TextStyleRegistry) {
             if (styleNode.getNode(component.key.toString()).boolean) {
                 style = style.and(component)
             }
@@ -54,7 +53,7 @@ class TextFormatConfigSerializer : TypeSerializer<TextFormat> {
         value.getNode(FORMAT_NODE_COLOR).value = obj.color.key.toString()
         val styleNode = value.getNode(FORMAT_NODE_STYLE)
         val composite = obj.style
-        CatalogRegistry.getAllOf<TextStyle.Type>().forEach { styleType ->
+        TextStyleRegistry.forEach { styleType ->
             styleNode.getNode(styleType.key.toString()).value = composite.contains(styleType)
         }
     }

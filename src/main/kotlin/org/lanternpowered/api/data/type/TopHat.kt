@@ -11,7 +11,6 @@
 package org.lanternpowered.api.data.type
 
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.data.DyeColor
 import org.lanternpowered.api.catalog.CatalogedBy
 
 /**

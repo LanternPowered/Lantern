@@ -12,7 +12,7 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeys
-import org.lanternpowered.api.data.DyeColor
+import org.lanternpowered.api.data.type.DyeColor
 import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType

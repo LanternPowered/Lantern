@@ -20,7 +20,7 @@ import org.spongepowered.api.scheduler.Scheduler
 
 object Lantern {
 
-    @JvmStatic inline val server: Server get() = Sponge.getServer()
+    @JvmStatic inline val server: Server get() = Sponge.getServer() as Server
     @JvmStatic inline val game: Game get() = Sponge.getGame() as Game
     @JvmStatic inline val registry: GameRegistry get() = Sponge.getRegistry() as GameRegistry
     @JvmStatic inline val causeStackManager: CauseStackManager get() = Sponge.getCauseStackManager() as CauseStackManager
@@ -29,5 +29,5 @@ object Lantern {
     @JvmStatic inline val syncScheduler: Scheduler get() = Sponge.getServer().scheduler
     @JvmStatic inline val asyncScheduler: Scheduler get() = Sponge.getGame().asyncScheduler
     @JvmStatic inline val serviceManager: ServiceManager get() = Sponge.getServiceManager() as ServiceManager
-    @JvmStatic inline val worldManager: WorldManager get() = Sponge.getServer().worldManager as WorldManager
+    @JvmStatic inline val worldManager: WorldManager get() = this.server.worldManager
 }

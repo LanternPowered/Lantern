@@ -25,7 +25,7 @@ object BlockPositionHelper {
     private const val yMask: Long = (1 shl this.yBits).toLong() - 1
     private const val xzMask: Long = (1 shl this.xzBits).toLong() - 1
     private const val yPos: Int = this.xzBits
-    private const val xPos: Int = this.yPos + this.yBits
+    private const val xPos: Int = this.yPos + this.xzBits
 
     private const val clearYMask: Long = (this.yMask shl this.yPos).inv()
     private const val clearXMask: Long = (this.xzMask shl this.xPos).inv()

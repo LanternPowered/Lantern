@@ -14,6 +14,7 @@ import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.DuplicateRegistrationException
+import org.lanternpowered.api.registry.UnknownTypeException
 import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.api.CatalogKey
 import java.util.Optional
@@ -55,7 +56,7 @@ object LanternCatalogRegistry : CatalogRegistry {
             this.registriesByType[catalogClass] as CatalogTypeRegistry<T>?
 
     private fun <T : CatalogType> requireRegistry(catalogClass: Class<T>): CatalogTypeRegistry<T> =
-            getRegistry(catalogClass) ?: error("No registry is registered for the type ${catalogClass.simpleName}")
+            getRegistry(catalogClass) ?: throw UnknownTypeException("No registry is registered for the type ${catalogClass.simpleName}")
 
     private fun <T : CatalogType> requireRegistry(catalogClass: KClass<T>): CatalogTypeRegistry<T> =
             requireRegistry(catalogClass.java)
@@ -66,6 +67,10 @@ object LanternCatalogRegistry : CatalogRegistry {
     @Suppress("UNCHECKED_CAST")
     override fun <T : CatalogType, E : T> provideSupplier(catalogClass: Class<T>, suggestedId: String): Supplier<E> =
             requireRegistry(catalogClass).provideSupplier(suggestedId) as Supplier<E>
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): E =
+            requireRegistry(catalogClass).provide(suggestedId) as E
 
     override fun <T : CatalogType> get(typeClass: KClass<T>, key: CatalogKey): T? = getNullable(typeClass.java, key)
     override fun <T : CatalogType> get(typeClass: Class<T>, key: CatalogKey): Optional<T> = getNullable(typeClass, key).optional()

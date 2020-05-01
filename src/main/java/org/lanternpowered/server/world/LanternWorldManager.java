@@ -24,7 +24,6 @@ import org.lanternpowered.server.cause.LanternCauseStack;
 import org.lanternpowered.server.cause.LanternCauseStackManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;

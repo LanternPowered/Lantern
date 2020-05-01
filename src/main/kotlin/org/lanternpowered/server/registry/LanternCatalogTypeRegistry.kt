@@ -231,6 +231,8 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
     override fun provideSupplier(suggestedId: String): Supplier<T> =
             this.suppliers.computeIfAbsent(suggestedId) { CatalogTypeSupplier(suggestedId, this) }
 
+    override fun provide(suggestedId: String): T = find(suggestedId) ?: error("There's no $typeName registered with the suggested id: $suggestedId")
+
     protected fun invalidateSuppliers() {
         this.suppliers.values.forEach { supplier -> supplier.invalidate() }
     }

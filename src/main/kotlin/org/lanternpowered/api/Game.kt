@@ -10,13 +10,12 @@
  */
 package org.lanternpowered.api
 
-import org.lanternpowered.api.inject.Injector
+import org.lanternpowered.api.injector.Injector
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 
 typealias GameState = org.spongepowered.api.GameState
 typealias MinecraftVersion = org.spongepowered.api.MinecraftVersion
 typealias Platform = org.spongepowered.api.Platform
-typealias Server = org.spongepowered.api.Server
 typealias Sponge = org.spongepowered.api.Sponge
 
 /**

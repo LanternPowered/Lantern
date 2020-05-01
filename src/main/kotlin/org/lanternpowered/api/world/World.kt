@@ -16,6 +16,7 @@ import kotlin.contracts.contract
 import org.spongepowered.api.world.World as SpongeWorld
 
 typealias World = ServerWorld
+typealias WorldProperties = org.spongepowered.api.world.storage.WorldProperties
 typealias BlockChangeFlag = org.spongepowered.api.world.BlockChangeFlag
 typealias BlockChangeFlags = org.spongepowered.api.world.BlockChangeFlags
 typealias Locatable = org.spongepowered.api.world.Locatable

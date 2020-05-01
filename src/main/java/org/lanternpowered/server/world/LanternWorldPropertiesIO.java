@@ -22,7 +22,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.registry.type.data.GameModeRegistry;
 import org.lanternpowered.server.registry.type.world.DifficultyRegistryKt;
 import org.lanternpowered.server.util.UncheckedThrowables;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.weather.LanternWeather;
@@ -33,8 +32,6 @@ import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -159,6 +156,7 @@ final class LanternWorldPropertiesIO {
         if (worldName == null) {
             worldName = dataView.getString(NAME).get();
         }
+
         final DataView spongeRootDataView = IOHelper.read(directory.resolve(SPONGE_LEVEL_DATA),
                 file -> NbtStreamUtils.read(Files.newInputStream(file), true)).orElse(null);
         final DataView spongeContainer = spongeRootDataView != null ? spongeRootDataView.getView(DataQueries.SPONGE_DATA).orElse(null) : null;

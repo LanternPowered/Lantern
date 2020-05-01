@@ -24,7 +24,6 @@ import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.launch.transformer.Exclusion;
 import org.lanternpowered.server.inject.LanternModule;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.lanternpowered.server.transformer.FinalFieldClassTransformer;
 import org.lanternpowered.server.util.SyncLanternThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +40,6 @@ public final class LanternServerLaunch {
         classLoader.addTransformerExclusion(Exclusion.forPackage("org.lanternpowered.server.transformer"));
         classLoader.addTransformerExclusion(Exclusion.forClass("org.lanternpowered.server.util.BytecodeUtils"));
         classLoader.addTransformerExclusion(Exclusion.forClass("org.lanternpowered.server.util.UncheckedExceptions"));
-        classLoader.addTransformer(new FinalFieldClassTransformer());
         // TODO: Re-add the fast value container transformer, but with a more flexible and type-safe system
 
         final SyncLanternThread thread = new SyncLanternThread(() -> start(args), "init");

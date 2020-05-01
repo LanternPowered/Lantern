@@ -11,13 +11,13 @@
 package org.lanternpowered.server.item
 
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
-import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
-import org.lanternpowered.api.ext.optionalDouble
-import org.lanternpowered.api.ext.optionalInt
+import org.lanternpowered.api.util.optional.optionalDouble
+import org.lanternpowered.api.util.optional.optionalInt
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.game.LanternGame
 import org.lanternpowered.server.network.vanilla.message.type.play.SetCooldownMessage
@@ -40,7 +40,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
         val optionalStartCooldown = if (time <= 0) emptyOptionalInt() else time.toInt().optionalInt()
         val event = LanternEventFactory.createCooldownEventSet(CauseStack.current().currentCause,
                 cooldown, cooldown, itemType, this.player, optionalStartCooldown)
-        Lantern.eventManager.post(event)
+        EventManager.post(event)
         if (event.isCancelled)
             return false
         cooldown = event.newCooldown
@@ -97,7 +97,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
             if (entry.longValue < current) {
                 val event = LanternEventFactory.createCooldownEventEnd(
                         CauseStack.current().currentCause, entry.key, this.player)
-                Lantern.eventManager.post(event)
+                EventManager.post(event)
                 true
             } else false
         }

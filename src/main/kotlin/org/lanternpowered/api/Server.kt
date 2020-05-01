@@ -8,14 +8,19 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.util
+package org.lanternpowered.api
 
-import org.lanternpowered.api.injector.Injector
+import org.lanternpowered.api.world.WorldManager
 
 /**
- * A named annotation that can be used in
- * combination with the [Injector].
+ * Represents the server.
  */
-@Retention(AnnotationRetention.RUNTIME)
-@Target(AnnotationTarget.TYPE)
-annotation class Named(val value: String)
+interface Server : org.spongepowered.api.Server {
+
+    override fun getWorldManager(): WorldManager
+
+    /**
+     * A singleton instance of the server.
+     */
+    companion object : Server by Lantern.server
+}

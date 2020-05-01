@@ -57,12 +57,17 @@ inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: CatalogKe
 inline fun <reified T : CatalogType> CatalogRegistry.provideSupplier(suggestedId: String): Supplier<T> = provideSupplier(T::class, suggestedId)
 
 /**
- * Provides the T that will be used to get [CatalogType] instances.
+ * Provides the [T] that will be used to get [CatalogType] instances.
+ *
+ * This method isn't supported by [MutableCatalogTypeRegistry]s, using this for
+ * that registry will result in an [UnsupportedOperationException]. Since there's
+ * no guarantee that every time the same instance will be returned.
  *
  * @param suggestedId The suggested id to use
  * @param T The type of catalog
  * @return The supplier
  * @throws UnknownTypeException If the type provided has not been registered
+ * @throws UnsupportedOperationException If the registry is a mutable registry
  */
 inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String): T = provide(T::class, suggestedId)
 
@@ -97,7 +102,11 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
     fun <T : CatalogType, E : T> provideSupplier(catalogClass: KClass<T>, suggestedId: String): Supplier<E>
 
     /**
-     * Creates a [Supplier] that will be used to get [CatalogType] instances.
+     * Gets a [CatalogType] instance.
+     *
+     * This method isn't supported by [MutableCatalogTypeRegistry]s, using this for
+     * that registry will result in an [UnsupportedOperationException]. Since there's
+     * no guarantee that every time the same instance will be returned.
      *
      * @param catalogClass The catalog class
      * @param suggestedId The suggested id to use
@@ -105,6 +114,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @param E The generic of the catalog (if applicable)
      * @return The supplier
      * @throws UnknownTypeException If the type provided has not been registered
+     * @throws UnsupportedOperationException If the registry is a mutable registry
      */
     fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): E
 

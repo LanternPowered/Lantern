@@ -141,7 +141,7 @@ class VariableValueArray {
             var index = 0
             override fun hasNext(): Boolean = this.index < size
             override fun nextInt(): Int {
-                if (hasNext())
+                if (!hasNext())
                     throw NoSuchElementException()
                 return get(this.index++)
             }

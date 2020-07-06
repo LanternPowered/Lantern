@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.x.world.weather
 
+import org.lanternpowered.api.world.weather.WeatherOption
 import org.lanternpowered.api.world.weather.WeatherUniverse
 
 /**
@@ -18,12 +19,7 @@ import org.lanternpowered.api.world.weather.WeatherUniverse
 interface XWeatherUniverse : WeatherUniverse {
 
     /**
-     * The current darkness of the sky.
+     * Gets the current value for the given [WeatherOption].
      */
-    val skyDarkness: Double
-
-    /**
-     * The current rain strength.
-     */
-    val rainStrength: Double
+    fun <V> get(option: WeatherOption<V>): V
 }

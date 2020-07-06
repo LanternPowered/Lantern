@@ -19,6 +19,7 @@ import org.apache.logging.log4j.io.IoBuilder
 import org.apache.logging.log4j.io.LoggerPrintStream
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
+import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.util.Named
 import org.lanternpowered.server.cause.LanternCauseStack
 import org.lanternpowered.server.ext.inject
@@ -33,7 +34,7 @@ import org.lanternpowered.server.util.ThreadHelper
 import org.spongepowered.api.SystemSubject
 import org.spongepowered.api.command.exception.CommandException
 import org.spongepowered.api.command.manager.CommandManager
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.scheduler.TaskExecutorService
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.SubjectReference

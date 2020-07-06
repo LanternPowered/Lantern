@@ -17,6 +17,7 @@ import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.Event
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.Order
+import org.lanternpowered.api.plugin.id
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.uncheckedCast
@@ -36,7 +37,7 @@ import org.spongepowered.api.event.data.ChangeDataHolderEvent.ValueChange
 import org.spongepowered.api.event.filter.type.Exclude
 import org.spongepowered.api.event.filter.type.Include
 import org.spongepowered.api.event.impl.AbstractEvent
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
@@ -46,7 +47,6 @@ object LanternEventManager : EventManager {
     private val allShouldFire = SystemProperties.get().getBooleanProperty("sponge.shouldFireAll")
 
     private val logger = LoggerFactory.getLogger("EventManager")
-
     private val lock = Any()
     private val registeredListeners = mutableSetOf<Any>()
     private val listenersByEvent = HashMultimap.create<Class<*>, RegisteredListener<*>>()
@@ -101,7 +101,7 @@ object LanternEventManager : EventManager {
 
     private fun <T : Event> bakeHandlers(eventType: EventType<T>): List<RegisteredListener<T>> {
         val handlers = mutableListOf<RegisteredListener<T>>()
-        val types = eventType.token.types.rawTypes()
+        val types = TypeToken.of(eventType.eventClass).types.rawTypes()
 
         synchronized(this.lock) {
             for (type in types) {
@@ -139,7 +139,7 @@ object LanternEventManager : EventManager {
     }
 
     fun <T : Event> register(plugin: PluginContainer, eventType: TypeToken<T>, order: Order, listener: EventListener<in T>): RegisteredListener<T> {
-        val registered = RegisteredListener(plugin, listener, EventType(eventType), order)
+        val registered = RegisteredListener(plugin, listener, EventType.of(eventType), order)
         register(plugin, listener, listOf(registered))
         return registered
     }
@@ -165,7 +165,7 @@ object LanternEventManager : EventManager {
                     val excludedTypes = method.getAnnotation<Exclude>()?.value?.asList()?.map { it.java }
                     val includedTypes = method.getAnnotation<Include>()?.value?.asList()?.map { it.java }
 
-                    val eventType = EventType<Event>(eventToken.uncheckedCast())
+                    val eventType = EventType.of(eventToken.uncheckedCast<TypeToken<Event>>())
                     val registeredListener = RegisteredListener(
                             plugin, handler, eventType, subscribe.order, includedTypes, excludedTypes)
                     handlers.add(registeredListener)
@@ -220,7 +220,7 @@ object LanternEventManager : EventManager {
         return if (errors.isEmpty()) null else errors.joinToString(", ")
     }
 
-    private val keyEventTypes = TypeToken.of(ValueChange::class.java).types.rawTypes().stream()
+    private val keyEventTypes: Set<Class<*>> = TypeToken.of(ValueChange::class.java).types.rawTypes().stream()
             .filter { cls -> Event::class.java.isAssignableFrom(cls) }.toImmutableSet()
 
     private fun register(plugin: PluginContainer, instance: Any, listeners: List<RegisteredListener<*>>) {
@@ -230,7 +230,7 @@ object LanternEventManager : EventManager {
                         plugin.id, instance.javaClass.name, IllegalStateException("Duplicate listener instance: $instance"))
             }
             listeners.filter { listener ->
-                if (listener.listener !is ValueKeyEventListener && this.keyEventTypes.contains(listener.eventType.token.rawType)) {
+                if (listener.listener !is ValueKeyEventListener && this.keyEventTypes.contains(listener.eventType.eventClass)) {
                     // Check if somebody has been naughty, this will show a warning
                     // if there is a listener directly listening to a ChangeDataHolderEvent.ValueChange
                     // event, it's a bad idea, the Key#registerEvent should be used instead
@@ -241,7 +241,7 @@ object LanternEventManager : EventManager {
                             listener.plugin.id, listener.handle.javaClass.name)
                     return@filter false // Gotcha
                 }
-                this.listenersByEvent.put(listener.eventType.token.rawType, listener)
+                this.listenersByEvent.put(listener.eventType.eventClass, listener)
             }
         }
         if (listenersToInvalidate.isNotEmpty()) {
@@ -258,7 +258,7 @@ object LanternEventManager : EventManager {
                 val listener = it.next()
                 if (unregister(listener)) {
                     this.registeredListeners.remove(listener.handle)
-                    changes.add(listener.eventType.token.rawType)
+                    changes.add(listener.eventType.eventClass)
                     it.remove()
                 }
             }
@@ -279,8 +279,8 @@ object LanternEventManager : EventManager {
     }
 
     override fun post(event: Event): Boolean {
-        val eventToken = if (event is GenericEvent) event.genericType else TypeToken.of(event.javaClass)
-        val listeners = this.listenersCache.get(EventType(eventToken))!!
+        val eventType = EventType(event.javaClass, (event as? GenericEvent<*>)?.genericType)
+        val listeners = this.listenersCache.get(eventType)!!
         /* TODO
         // Special case
         if (event instanceof AbstractValueChangeEvent) {

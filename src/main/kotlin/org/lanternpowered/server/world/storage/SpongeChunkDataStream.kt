@@ -25,16 +25,18 @@ class SpongeChunkDataStream(
     private var read: Int = 0
     private var available: Int = -1
 
-    override fun next(): DataContainer {
+    override fun next(): DataContainer? {
         val entry = this.sequence.next()
         try {
-            return entry.load().get()
+            return entry.load()
         } finally {
             this.read++
         }
     }
 
     override fun available(): Int {
+        // This will be an estimate, the stream can still change
+        // if chunks are being saved in the meantime
         if (this.available == -1)
             this.available = this.chunkStorage.sequence().count()
         return this.available - this.read

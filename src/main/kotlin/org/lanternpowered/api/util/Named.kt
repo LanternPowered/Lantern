@@ -11,11 +11,13 @@
 package org.lanternpowered.api.util
 
 import org.lanternpowered.api.injector.Injector
+import javax.inject.Qualifier
 
 /**
  * A named annotation that can be used in
  * combination with the [Injector].
  */
+@Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.TYPE)
 annotation class Named(val value: String)

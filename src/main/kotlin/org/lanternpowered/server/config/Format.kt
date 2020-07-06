@@ -8,10 +8,8 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.util.function;
+package org.lanternpowered.server.config
 
-@FunctionalInterface
-public interface ThrowableConsumer<T, X extends Throwable> {
+interface Format {
 
-    void accept(T object) throws X;
 }

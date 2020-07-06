@@ -15,6 +15,7 @@ import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.title.Title
 import org.lanternpowered.api.text.title.TitleBuilder
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.optional.optional
 
 data class LanternTitle(
         internal val title: Text?,

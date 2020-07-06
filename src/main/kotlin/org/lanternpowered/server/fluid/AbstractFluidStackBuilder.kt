@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.fluid
 
-import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataHolderBuilder
 import org.spongepowered.api.data.DataManipulator
 import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.SerializableDataHolder
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.Value
@@ -23,7 +23,7 @@ import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.fluid.FluidTypes
 import java.util.Optional
 
-abstract class AbstractFluidStackBuilder<T : DataHolder, B : DataHolderBuilder<T, B>> internal constructor(type: Class<T>) :
+abstract class AbstractFluidStackBuilder<T : SerializableDataHolder, B : DataHolderBuilder<T, B>> internal constructor(type: Class<T>) :
         AbstractDataBuilder<T>(type, 1), DataHolderBuilder<T, B> {
 
     private var fluidStack: LanternFluidStack? = null
@@ -48,7 +48,7 @@ abstract class AbstractFluidStackBuilder<T : DataHolder, B : DataHolderBuilder<T
             }
             this.fluidTypeSet = true
         } else if (fluidStack == null) {
-            fluidStack = LanternFluidStack(FluidTypes.WATER, 0)
+            fluidStack = LanternFluidStack(FluidTypes.WATER.get(), 0)
         }
         this.fluidStack = fluidStack
         return fluidStack

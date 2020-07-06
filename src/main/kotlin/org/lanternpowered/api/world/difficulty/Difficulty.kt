@@ -11,4 +11,4 @@
 package org.lanternpowered.api.world.difficulty
 
 typealias Difficulty = org.spongepowered.api.world.difficulty.Difficulty
-typealias Difficulties = org.spongepowered.api.world.difficulty.Difficulty
+typealias Difficulties = org.spongepowered.api.world.difficulty.Difficulties

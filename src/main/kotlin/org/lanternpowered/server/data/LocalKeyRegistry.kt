@@ -41,6 +41,25 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
     }
 
     /**
+     * A collection of delegate [DataHolder]s that will be used
+     * in addition to the local registry. Locally stored data has
+     * still priority over the delegate holder.
+     */
+    abstract val delegates: Collection<DataHolder>
+
+    /**
+     * Registers a delegate [DataHolder] that will be used
+     * in addition to the local registry. Locally stored data
+     * has still priority over the delegate holder.
+     */
+    abstract fun registerDelegate(dataHolder: DataHolder)
+
+    /**
+     * Removes a delegate [DataHolder].
+     */
+    abstract fun removeDelegate(dataHolder: DataHolder)
+
+    /**
      * Gets this [LocalKeyRegistry] as a collection which targets the given [DataHolder] type.
      *
      * @param holderType The data holder type

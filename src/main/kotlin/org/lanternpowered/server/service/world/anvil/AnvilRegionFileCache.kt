@@ -20,9 +20,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.streams.asSequence
 
-class AnvilRegionFileCache(worldDirectory: Path) {
+class AnvilRegionFileCache(private val directory: Path) {
 
-    private val directory = worldDirectory.resolve(REGION_DIRECTORY_NAME)
     private val cache: Cache<Long, AnvilRegionFile> = Caffeine.newBuilder()
             .maximumSize(256)
             .softValues()
@@ -34,6 +33,14 @@ class AnvilRegionFileCache(worldDirectory: Path) {
     init {
         if (!Files.exists(this.directory))
             Files.createDirectories(this.directory)
+    }
+
+    /**
+     * Clears the complete cache, this closes
+     * all the region files.
+     */
+    fun clear() {
+        this.cache.invalidateAll()
     }
 
     /**
@@ -74,6 +81,12 @@ class AnvilRegionFileCache(worldDirectory: Path) {
     private fun ChunkRegionPosition.getFile(): Path = directory.resolve("r.$x.$z.${AnvilRegionFile.REGION_FILE_EXTENSION}")
 
     /**
+     * Deletes the chunk at the given [ChunkPosition].
+     */
+    fun delete(position: ChunkPosition): Boolean =
+            getIfPresent(position.toRegion())?.delete(position) ?: false
+
+    /**
      * Gets whether the chunk at the given [ChunkPosition] exists.
      */
     fun exists(position: ChunkPosition): Boolean =
@@ -94,7 +107,6 @@ class AnvilRegionFileCache(worldDirectory: Path) {
 
     companion object {
 
-        private const val REGION_DIRECTORY_NAME = "region"
         private val REGION_FILE_PATTERN = "^r\\.([-]?[0-9]+)\\.([-]?[0-9]+)\\.${AnvilRegionFile.REGION_FILE_EXTENSION}$".toRegex()
     }
 }

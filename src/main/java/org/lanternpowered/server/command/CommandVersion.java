@@ -17,7 +17,7 @@ import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public final class CommandVersion extends CommandProvider {
 

@@ -10,10 +10,8 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
@@ -57,22 +55,22 @@ public final class CommandHelper {
                 t("The world %s must be loaded.", worldProperties.getWorldName())));
     }
 
-    public static LanternWorldProperties getWorldProperties(@Nullable CommandSource src,
+    public static LanternWorldPropertiesOld getWorldProperties(@Nullable CommandSource src,
             CommandContext args) throws CommandException {
         return getWorldProperties(src, args, PLAIN_WORLD_KEY);
     }
 
-    public static LanternWorldProperties getWorldProperties(@Nullable CommandSource src,
+    public static LanternWorldPropertiesOld getWorldProperties(@Nullable CommandSource src,
             CommandContext args, String key) throws CommandException {
         return getWorldProperties0(src, args.getOne(key));
     }
 
-    public static LanternWorldProperties getWorldProperties(@Nullable CommandSource src,
+    public static LanternWorldPropertiesOld getWorldProperties(@Nullable CommandSource src,
             CommandContext args, Text key) throws CommandException {
         return getWorldProperties0(src, args.getOne(key));
     }
 
-    private static LanternWorldProperties getWorldProperties0(@Nullable CommandSource src,
+    private static LanternWorldPropertiesOld getWorldProperties0(@Nullable CommandSource src,
             Optional<WorldProperties> optWorldProperties) throws CommandException {
         WorldProperties world;
         if (optWorldProperties.isPresent()) {
@@ -86,7 +84,7 @@ public final class CommandHelper {
                 throw new CommandException(Text.of("Unable to find the default world."));
             }
         }
-        return (LanternWorldProperties) world;
+        return (LanternWorldPropertiesOld) world;
     }
 
     private CommandHelper() {

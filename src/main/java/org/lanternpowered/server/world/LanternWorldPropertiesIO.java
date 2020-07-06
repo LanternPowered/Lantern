@@ -189,7 +189,7 @@ final class LanternWorldPropertiesIO {
         if (rootDataView.contains(FORGE)) {
             final DataView forgeView = rootDataView.getView(FORGE).get();
             if (forgeView.contains(DIMENSION_DATA)) {
-                dimensionMap = new BitSet(LanternWorldManager.DIMENSION_MAP_SIZE);
+                dimensionMap = new BitSet(LanternWorldManagerOld.DIMENSION_MAP_SIZE);
                 final int[] intArray = (int[]) forgeView.getView(DIMENSION_DATA).get().get(DIMENSION_ARRAY).get();
                 for (int i = 0; i < intArray.length; i++) {
                     for (int j = 0; j < Integer.SIZE; j++) {
@@ -203,8 +203,8 @@ final class LanternWorldPropertiesIO {
         return new LevelData(worldName, uniqueId, rootDataView, spongeRootDataView, dimensionId, dimensionMap);
     }
 
-    static LanternWorldProperties convert(LevelData levelData, WorldConfig worldConfig, boolean copyLevelSettingsToConfig) {
-        final LanternWorldProperties properties = new LanternWorldProperties(levelData.uniqueId, levelData.worldName, worldConfig);
+    static LanternWorldPropertiesOld convert(LevelData levelData, WorldConfig worldConfig, boolean copyLevelSettingsToConfig) {
+        final LanternWorldPropertiesOld properties = new LanternWorldPropertiesOld(levelData.uniqueId, levelData.worldName, worldConfig);
 
         final DataView dataView = levelData.worldData.getView(DATA).get();
         final DataView spongeRootDataView = levelData.spongeWorldData;
@@ -434,7 +434,7 @@ final class LanternWorldPropertiesIO {
         return properties;
     }
 
-    static LevelData convert(LanternWorldProperties properties, @Nullable Integer dimensionId, @Nullable BitSet dimensionMap) {
+    static LevelData convert(LanternWorldPropertiesOld properties, @Nullable Integer dimensionId, @Nullable BitSet dimensionMap) {
         final DataContainer rootContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         final DataView dataView = rootContainer.createView(DATA);
         final DataContainer spongeRootContainer = properties.getAdditionalProperties().copy();

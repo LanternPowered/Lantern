@@ -20,7 +20,7 @@ import org.spongepowered.api.data.type.ToolType
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
 fun <H : ItemType> PropertyRegistry<H>.applicablePotionEffects(vararg effects: PotionEffect) {
-    register(Properties.APPLICABLE_POTION_EFFECTS, effects.toImmutableList())
+    register(ItemKeys.APPLICABLE_POTION_EFFECTS, effects.toImmutableList())
 }
 
 fun <H : ItemType> PropertyRegistry<H>.applicablePotionEffects(effects: List<PotionEffect>) {

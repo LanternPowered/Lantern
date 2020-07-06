@@ -25,6 +25,7 @@ class PlayerRespawnCodec : Codec<PlayerRespawnMessage> {
             writeLong(message.seed)
             writeByte(GameModeRegistry.getId(message.gameMode).toByte())
             writeString(if (message.lowHorizon) "flat" else "default")
+            writeBoolean(message.copyMetadata)
         }
     }
 }

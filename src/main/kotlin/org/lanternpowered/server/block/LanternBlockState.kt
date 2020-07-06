@@ -10,23 +10,26 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.server.data.property.DirectionRelativePropertyHolderBase
-import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
+import org.lanternpowered.server.registry.type.block.BlockRegistry
 import org.lanternpowered.server.state.AbstractState
 import org.lanternpowered.server.state.AbstractStateContainer
 import org.lanternpowered.server.state.StateBuilder
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
+import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
+import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.fluid.FluidState
+import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.Location
+import java.util.Optional
 
 class LanternBlockState(
         builder: StateBuilder<BlockState>
-) : AbstractState<BlockState, BlockType>(builder), BlockState, DirectionRelativePropertyHolderBase {
+) : AbstractState<BlockState, BlockType>(builder), BlockState {
 
     private val serialized: DataContainer = toContainer()
 
@@ -34,6 +37,18 @@ class LanternBlockState(
 
     override fun snapshotFor(location: Location): BlockSnapshot {
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun <E : Any?> get(direction: Direction?, key: Key<out Value<E>>?): Optional<E> {
+        TODO("Not yet implemented")
+    }
+
+    override fun validateRawData(container: DataView?): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun withRawData(container: DataView): BlockState {
+        TODO("Not yet implemented")
     }
 
     override fun getFluidState(): FluidState {
@@ -81,6 +96,6 @@ class LanternBlockState(
          * @return The deserialized block state
          */
         fun deserialize(dataView: DataView): BlockState
-                = AbstractStateContainer.deserializeState(dataView, BlockRegistryModule.get())
+                = AbstractStateContainer.deserializeState(dataView, BlockRegistry)
     }
 }

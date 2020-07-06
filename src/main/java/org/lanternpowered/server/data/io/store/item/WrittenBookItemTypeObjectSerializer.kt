@@ -26,10 +26,10 @@ class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer
 
     override fun serializeValues(itemStack: ItemStack, valueContainer: SimpleValueContainer, dataView: DataView) {
         super.serializeValues(itemStack, valueContainer, dataView)
-        valueContainer.remove(Keys.BOOK_PAGES).ifPresent { pages ->
+        valueContainer.remove(Keys.PAGES).ifPresent { pages ->
             dataView[PAGES] = pages.map { page -> JsonTextSerializer.serialize(page) }
         }
-        valueContainer.remove(Keys.BOOK_AUTHOR).ifPresent { text ->
+        valueContainer.remove(Keys.AUTHOR).ifPresent { text ->
             dataView[AUTHOR] = toLegacy(text)
         }
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent { text ->
@@ -43,10 +43,10 @@ class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer
     override fun deserializeValues(itemStack: ItemStack, valueContainer: SimpleValueContainer, dataView: DataView) {
         super.deserializeValues(itemStack, valueContainer, dataView)
         dataView.getStringList(PAGES).ifPresent { lines ->
-            valueContainer[Keys.BOOK_PAGES] = lines.map { page -> JsonTextSerializer.deserializeUnchecked(page) }
+            valueContainer[Keys.PAGES] = lines.map { page -> JsonTextSerializer.deserializeUnchecked(page) }
         }
         dataView.getString(AUTHOR).ifPresent { author ->
-            valueContainer[Keys.BOOK_AUTHOR] = fromLegacy(author)
+            valueContainer[Keys.AUTHOR] = fromLegacy(author)
         }
         dataView.getString(TITLE).ifPresent { title ->
             valueContainer[Keys.DISPLAY_NAME] = fromLegacy(title)

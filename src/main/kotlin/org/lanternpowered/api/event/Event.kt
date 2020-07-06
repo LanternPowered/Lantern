@@ -13,6 +13,6 @@ package org.lanternpowered.api.event
 typealias Cancellable = org.spongepowered.api.event.Cancellable
 typealias Event = org.spongepowered.api.event.Event
 typealias EventListener<T> = org.spongepowered.api.event.EventListener<T>
-typealias GenericEvent = org.spongepowered.api.event.GenericEvent
+typealias GenericEvent<T> = org.spongepowered.api.event.GenericEvent<T>
 typealias Listener = org.spongepowered.api.event.Listener
 typealias Order = org.spongepowered.api.event.Order

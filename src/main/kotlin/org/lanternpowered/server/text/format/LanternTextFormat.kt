@@ -16,7 +16,6 @@ import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextColors
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.api.text.format.TextStyle
-import org.lanternpowered.api.text.format.TextStyles
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.text.serializer.TextFormatConfigSerializer
 
@@ -40,7 +39,7 @@ data class LanternTextFormat(
             color = this.color
         // If the given format's color is RESET use NONE
         } else if (color == TextColors.RESET) {
-            color = TextColors.NONE
+            color = TextColors.NONE.get()
         }
         return LanternTextFormat(color, this.style.and(format.style))
     }
@@ -58,6 +57,6 @@ data class LanternTextFormat(
          * static field initialization, mostly during tests due to such early
          * class referencing occurring.
          */
-        val EMPTY: LanternTextFormat by lazy { LanternTextFormat(TextColors.NONE, TextStyles.NONE) }
+        val EMPTY: LanternTextFormat by lazy { LanternTextFormat(TextColors.NONE.get(), LanternTextStyle()) }
     }
 }

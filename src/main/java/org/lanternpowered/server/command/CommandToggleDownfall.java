@@ -11,13 +11,13 @@
 package org.lanternpowered.server.command;
 
 import org.lanternpowered.api.world.weather.WeatherUniverse;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.world.weather.Weathers;
 
 public class CommandToggleDownfall extends CommandProvider {
@@ -35,7 +35,7 @@ public class CommandToggleDownfall extends CommandProvider {
                                 .buildWith(GenericArguments.none())
                 )
                 .executor((src, args) -> {
-                    final LanternWorldProperties world = CommandHelper.getWorldProperties(src, args);
+                    final LanternWorldPropertiesOld world = CommandHelper.getWorldProperties(src, args);
                     final WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse().orElse(null);
                     final LanternWeather weather = (LanternWeather) weatherUniverse.getWeather();
                     if (weather.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0) {

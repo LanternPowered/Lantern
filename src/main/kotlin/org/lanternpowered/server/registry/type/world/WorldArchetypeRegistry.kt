@@ -44,7 +44,7 @@ val WorldArchetypeRegistry = catalogTypeRegistry<WorldArchetype> {
 
     register("the_nether") {
         from(overworld)
-        generatorType(GeneratorTypes.NETHER)
+        generatorType(GeneratorTypes.THE_NETHER)
         dimensionType(DimensionTypes.THE_NETHER)
     }
 

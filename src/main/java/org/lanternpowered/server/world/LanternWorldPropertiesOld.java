@@ -46,7 +46,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public final class LanternWorldProperties implements WorldProperties {
+public final class LanternWorldPropertiesOld implements WorldProperties {
 
     // The unique id of the world
     private final UUID uniqueId;
@@ -99,11 +99,11 @@ public final class LanternWorldProperties implements WorldProperties {
     // The last time the world was played in
     private long lastPlayed;
 
-    public LanternWorldProperties(String name, WorldConfig worldConfig) {
+    public LanternWorldPropertiesOld(String name, WorldConfig worldConfig) {
         this(UUID.randomUUID(), name, worldConfig);
     }
 
-    public LanternWorldProperties(UUID uniqueId, String name, WorldConfig worldConfig) {
+    public LanternWorldPropertiesOld(UUID uniqueId, String name, WorldConfig worldConfig) {
         this.worldConfig = worldConfig;
         this.uniqueId = uniqueId;
         this.name = name;

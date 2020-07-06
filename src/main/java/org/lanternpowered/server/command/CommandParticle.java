@@ -32,7 +32,7 @@ import org.spongepowered.api.command.args.PatternMatchingCommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.math.vector.Vector3d;

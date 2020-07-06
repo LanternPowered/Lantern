@@ -22,7 +22,7 @@ import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.plugin.LanternPluginContainer;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.ConfigRoot;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.nio.file.Path;
 

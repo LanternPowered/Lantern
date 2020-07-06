@@ -23,7 +23,7 @@ import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.slf4j.Logger;
 import org.spongepowered.api.event.EventManager;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.plugin.meta.PluginMetadata;
 

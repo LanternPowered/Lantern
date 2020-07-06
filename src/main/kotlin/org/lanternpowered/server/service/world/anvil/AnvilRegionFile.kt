@@ -80,6 +80,26 @@ class AnvilRegionFile(
         return list
     }
 
+    fun delete(position: ChunkPosition): Boolean {
+        synchronized(this.lock) {
+            return deleteUnsafe(position)
+        }
+    }
+
+    private fun deleteUnsafe(position: ChunkPosition): Boolean {
+        val locationPosition = position.toLocal()
+        val sector = getChunkSector(locationPosition)
+        if (!sector.exists)
+            return false
+        this.usedSectors.freeChunkSector(sector)
+        setChunkSector(locationPosition, ChunkSector.NONE)
+        setTimestamp(locationPosition, getTimestamp())
+        Files.deleteIfExists(position.getExternalFile())
+        return true
+    }
+
+    private fun getTimestamp(): Int = Instant.now().epochSecond.toInt()
+
     /**
      * Gets whether data exists at the given [ChunkPosition].
      */
@@ -102,6 +122,23 @@ class AnvilRegionFile(
     fun getInputStream(position: ChunkPosition): InputStream? {
         synchronized(this.lock) {
             return getInputStreamUnsafe(position)
+        }
+    }
+
+    /**
+     * Clear all data from unused sectors, so that leftover compressed
+     * code from previous chunks gets removed. This will reduce the world
+     * size if it were to be zipped.
+     */
+    private fun cleanup() {
+        // Calculate how many sectors blocks are available in the file
+        val blocks = ceil(this.file.length().toDouble() / SECTOR_BLOCK_BYTES.toDouble()).toInt()
+        // Loop through them and clear all non allocated sectors
+        for (block in 0 until blocks) {
+            if (this.usedSectors.get(block))
+                continue
+            this.file.seek(ChunkSector(block, 1))
+            this.file.write(EMPTY_SECTOR_BLOCK)
         }
     }
 
@@ -203,7 +240,7 @@ class AnvilRegionFile(
         }
 
         setChunkSector(localPosition, sector)
-        setTimestamp(localPosition, Instant.now().epochSecond.toInt())
+        setTimestamp(localPosition, getTimestamp())
 
         // Everything was successful, so cleanup
         cleanup()
@@ -315,9 +352,13 @@ class AnvilRegionFile(
     /**
      * Closes this region file.
      */
-    fun close() {
-        this.file.channel.force(true)
-        this.file.close()
+    fun close(fast: Boolean = false) {
+        synchronized(this.lock) {
+            if (!fast)
+                cleanup()
+            this.file.channel.force(true)
+            this.file.close()
+        }
     }
 
     companion object {
@@ -331,7 +372,7 @@ class AnvilRegionFile(
 
         private const val CHUNK_HEADER_SIZE = 5
         private const val SECTOR_BLOCK_BYTES = 4096
-        private const val SECTOR_BLOCK_INTS = 4096 / Int.SIZE_BYTES
+        private const val SECTOR_BLOCK_INTS = SECTOR_BLOCK_BYTES / Int.SIZE_BYTES
         private val EMPTY_SECTOR_BLOCK = ByteArray(SECTOR_BLOCK_BYTES)
 
         private val REGION_FILE_MARKER = MarkerFactory.getMarker("REGION_FILE")
@@ -469,7 +510,7 @@ private inline class ChunkSector(val packed: Int) {
     /**
      * Whether the sector exists.
      */
-    val exists: Boolean get() = this.packed != 0
+    val exists: Boolean get() = this.packed != NONE.packed
 
     /**
      * The sector start index.
@@ -485,4 +526,9 @@ private inline class ChunkSector(val packed: Int) {
     inline operator fun component2(): Int = this.size
 
     override fun toString(): String = if (this.exists) "ChunkSector(index=$index,size=$size)" else "ChunkSector(empty)"
+
+    companion object {
+
+        val NONE = ChunkSector(0)
+    }
 }

@@ -56,7 +56,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -113,7 +113,7 @@ public final class LanternChunkManager {
     private static final long UNLOAD_DELAY = TimeUnit.SECONDS.toMillis(1);
 
     // All the attached tickets mapped by the forced chunk coordinates
-    private final Map<Vector2i, Set<ChunkLoadingTicket>> ticketsByPos = new ConcurrentHashMap<>();
+    private final Map<Vector2i, Set<LanternChunkLoadingTicket>> ticketsByPos = new ConcurrentHashMap<>();
 
     // All the loading tickets that are still usable
     private final Set<LanternLoadingTicket> tickets = Sets.newConcurrentHashSet();
@@ -166,7 +166,7 @@ public final class LanternChunkManager {
     private class PopulationData {
 
         private final Random random = new Random();
-        private final ChunkLoadingTicket lockTicket = new InternalLoadingTicket();
+        private final LanternChunkLoadingTicket lockTicket = new InternalLoadingTicket();
     }
 
     private LanternChunkQueueTask queueTask(Vector2i coords, Runnable runnable) {
@@ -266,7 +266,7 @@ public final class LanternChunkManager {
     }
 
     private void doChunkLoad(Vector2i coords) {
-        Set<ChunkLoadingTicket> tickets = this.ticketsByPos.get(coords);
+        Set<LanternChunkLoadingTicket> tickets = this.ticketsByPos.get(coords);
         if (tickets == null) {
             return;
         }
@@ -385,10 +385,10 @@ public final class LanternChunkManager {
     public ImmutableSetMultimap<Vector3i, LoadingTicket> getForced() {
         final ImmutableSetMultimap.Builder<Vector3i, LoadingTicket> builder =
                 ImmutableSetMultimap.builder();
-        for (Entry<Vector2i, Set<ChunkLoadingTicket>> en : this.ticketsByPos.entrySet()) {
+        for (Entry<Vector2i, Set<LanternChunkLoadingTicket>> en : this.ticketsByPos.entrySet()) {
             final Vector2i pos0 = en.getKey();
             final Vector3i pos = new Vector3i(pos0.getX(), 0, pos0.getY());
-            for (ChunkLoadingTicket ticket : en.getValue()) {
+            for (LanternChunkLoadingTicket ticket : en.getValue()) {
                 builder.put(pos, ticket);
             }
         }
@@ -1287,7 +1287,7 @@ public final class LanternChunkManager {
      * @param coords the coordinates
      * @return whether it was previously empty
      */
-    private boolean lockInternally(Vector2i coords, ChunkLoadingTicket ticket) {
+    private boolean lockInternally(Vector2i coords, LanternChunkLoadingTicket ticket) {
         final boolean[] empty = new boolean[1];
         this.ticketsByPos.computeIfAbsent(coords, coords0 -> {
             empty[0] = true;
@@ -1296,8 +1296,8 @@ public final class LanternChunkManager {
         return empty[0];
     }
 
-    private boolean unlockInternally(Vector2i coords, ChunkLoadingTicket ticket) {
-        final Set<ChunkLoadingTicket> set = this.ticketsByPos.get(coords);
+    private boolean unlockInternally(Vector2i coords, LanternChunkLoadingTicket ticket) {
+        final Set<LanternChunkLoadingTicket> set = this.ticketsByPos.get(coords);
         if (set != null && set.remove(ticket)) {
             if (set.isEmpty()) {
                 this.ticketsByPos.remove(coords);
@@ -1545,7 +1545,7 @@ public final class LanternChunkManager {
             }
 
             // Remove all the tickets that are already released
-            resultLoadedTickets.removeIf(ticket -> ((ChunkLoadingTicket) ticket).isReleased());
+            resultLoadedTickets.removeIf(ticket -> ((LanternChunkLoadingTicket) ticket).isReleased());
 
             if (resultLoadedTickets.size() > maxTickets) {
                 Lantern.getLogger().warn("The plugin {} has too many open chunk loading tickets {}. "

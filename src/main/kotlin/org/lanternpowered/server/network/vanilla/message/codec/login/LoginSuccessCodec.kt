@@ -19,7 +19,7 @@ class LoginSuccessCodec : Codec<LoginSuccessMessage> {
 
     override fun encode(context: CodecContext, message: LoginSuccessMessage): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {
-            writeString(message.uniqueId.toString())
+            writeUniqueId(message.uniqueId)
             writeString(message.username)
         }
     }

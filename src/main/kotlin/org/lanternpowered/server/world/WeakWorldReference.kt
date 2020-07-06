@@ -12,6 +12,7 @@ package org.lanternpowered.server.world
 
 import com.google.common.base.Objects
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.fix
@@ -65,7 +66,7 @@ class WeakWorldReference {
         var world = reference?.get()
         if (world != null)
             return world
-        world = WorldManager[this.uniqueId]
+        world = WorldManager.getWorld(this.uniqueId).orNull()
         if (world != null) {
             this.reference = WeakReference(world)
             return world

@@ -80,7 +80,7 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
 import org.spongepowered.api.network.ChannelRegistrar;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.scheduler.Scheduler;

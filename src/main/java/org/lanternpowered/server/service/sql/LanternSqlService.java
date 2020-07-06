@@ -19,7 +19,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.CloseableService;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.service.sql.SqlService;
 
 import java.nio.file.Path;

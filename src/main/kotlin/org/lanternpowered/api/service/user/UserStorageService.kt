@@ -8,14 +8,14 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.world.weather;
+package org.lanternpowered.api.service.user
 
-public interface WeatherUniverse extends org.spongepowered.api.world.weather.WeatherUniverse {
+import java.util.UUID
+
+interface UserStorageService {
 
     /**
-     * Gets the current darkness level of the sky.
-     *
-     * @return The current darkness level
+     * Gets the user storage for the user with the given [UUID].
      */
-    double getDarkness();
+    fun get(uniqueId: UUID): UserStorage
 }

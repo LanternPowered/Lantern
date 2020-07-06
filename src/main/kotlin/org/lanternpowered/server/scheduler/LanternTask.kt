@@ -11,7 +11,7 @@
 package org.lanternpowered.server.scheduler
 
 import org.lanternpowered.api.util.ToStringHelper
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Task
 import java.time.Duration

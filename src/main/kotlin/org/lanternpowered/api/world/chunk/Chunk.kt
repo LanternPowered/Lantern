@@ -12,4 +12,9 @@ package org.lanternpowered.api.world.chunk
 
 typealias Chunk = org.spongepowered.api.world.chunk.Chunk
 typealias ChunkState = org.spongepowered.api.world.chunk.ChunkState
-typealias ChunkTicketManager = org.spongepowered.api.world.chunk.ChunkTicketManager
+
+/**
+ * The position of a chunk.
+ */
+val Chunk.position: ChunkPosition
+    get() = ChunkPosition(this.chunkPosition.x, this.chunkPosition.z)

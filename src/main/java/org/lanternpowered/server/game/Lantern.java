@@ -13,9 +13,9 @@ package org.lanternpowered.server.game;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.scheduler.LanternScheduler;
-import org.lanternpowered.server.world.LanternWorldManager;
+import org.lanternpowered.server.world.LanternWorldManagerOld;
 import org.slf4j.Logger;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public class Lantern {
 
@@ -63,7 +63,7 @@ public class Lantern {
         return LanternGame.game.getServer();
     }
 
-    public static LanternWorldManager getWorldManager() {
+    public static LanternWorldManagerOld getWorldManager() {
         return LanternGame.game.getServer().getWorldManager();
     }
 

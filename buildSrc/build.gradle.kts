@@ -7,6 +7,7 @@ repositories {
     mavenCentral()
     gradlePluginPortal()
     jcenter()
+    maven("https://repo-new.spongepowered.org/repository/maven-public/")
     maven("https://repo.spongepowered.org/maven")
     maven("https://dl.bintray.com/lanternpowered/maven")
 }

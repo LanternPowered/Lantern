@@ -12,7 +12,7 @@ package org.lanternpowered.server.inject.provider;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.TaskExecutorService;
 

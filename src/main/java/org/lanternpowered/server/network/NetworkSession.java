@@ -56,7 +56,7 @@ import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -904,18 +904,18 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         LanternWorld world = this.player.getWorld();
         if (world == null) {
-            LanternWorldProperties worldProperties = this.player.getUserWorld();
+            LanternWorldPropertiesOld worldProperties = this.player.getUserWorld();
             boolean fixSpawnLocation = false;
             if (worldProperties == null) {
                 Lantern.getLogger().warn("The player [{}] attempted to login in a non-existent world, this is not possible "
                         + "so we have moved them to the default's world spawn point.", this.gameProfile.getName().get());
-                worldProperties = (LanternWorldProperties) Lantern.getServer().getDefaultWorld().get();
+                worldProperties = (LanternWorldPropertiesOld) Lantern.getServer().getDefaultWorld().get();
                 fixSpawnLocation = true;
             } else if (!worldProperties.isEnabled()) {
                 Lantern.getLogger().warn("The player [{}] attempted to login in a unloaded and not-enabled world [{}], this is not possible "
                         + "so we have moved them to the default's world spawn point.", this.gameProfile.getName().get(),
                         worldProperties.getWorldName());
-                worldProperties = (LanternWorldProperties) Lantern.getServer().getDefaultWorld().get();
+                worldProperties = (LanternWorldPropertiesOld) Lantern.getServer().getDefaultWorld().get();
                 fixSpawnLocation = true;
             }
             final Optional<World> optWorld = Lantern.getWorldManager().loadWorld(worldProperties);

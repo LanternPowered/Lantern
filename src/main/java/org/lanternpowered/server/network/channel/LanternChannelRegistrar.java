@@ -35,7 +35,7 @@ import org.spongepowered.api.network.ChannelBinding.IndexedMessageChannel;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Collections;
 import java.util.Iterator;

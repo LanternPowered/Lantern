@@ -17,35 +17,42 @@ import org.lanternpowered.api.service.world.ChunkStorage
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils
 import java.nio.file.Path
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import java.util.function.Supplier
 
-class AnvilChunkStorage(private val executorService: ExecutorService, worldDirectory: Path) : ChunkStorage {
+class AnvilChunkStorage(worldDirectory: Path) : ChunkStorage {
 
+    @Volatile private var closed = false
     private val anvilRegionFileCache = AnvilRegionFileCache(worldDirectory)
 
-    override fun exists(position: ChunkPosition): CompletableFuture<Boolean> =
-            CompletableFuture.supplyAsync(Supplier { this.anvilRegionFileCache.exists(position) }, this.executorService)
-
-    override fun save(position: ChunkPosition, chunkData: DataView): CompletableFuture<Unit> {
-        return CompletableFuture.supplyAsync(Supplier {
-            val output = this.anvilRegionFileCache.getOutputStream(position)
-            val data = fixSavedData(position, chunkData)
-            NbtStreamUtils.write(data, output, false)
-        }, this.executorService)
+    private fun checkOpen() {
+        check(!this.closed) { "The chunk storage is closed." }
     }
 
-    override fun load(position: ChunkPosition): CompletableFuture<DataContainer?> {
-        return CompletableFuture.supplyAsync(Supplier {
-            val input = this.anvilRegionFileCache.getInputStream(position)
-                    ?: return@Supplier null
-            val data = NbtStreamUtils.read(input, false)
-            fixLoadedData(data)
-        }, this.executorService)
+    override fun exists(position: ChunkPosition): Boolean {
+        checkOpen()
+        return this.anvilRegionFileCache.exists(position)
+    }
+
+    override fun delete(position: ChunkPosition): Boolean {
+        checkOpen()
+        return this.anvilRegionFileCache.delete(position)
+    }
+
+    override fun save(position: ChunkPosition, chunkData: DataView) {
+        checkOpen()
+        val output = this.anvilRegionFileCache.getOutputStream(position)
+        val data = fixSavedData(position, chunkData)
+        NbtStreamUtils.write(data, output, false)
+    }
+
+    override fun load(position: ChunkPosition): DataContainer? {
+        checkOpen()
+        val input = this.anvilRegionFileCache.getInputStream(position) ?: return null
+        val data = NbtStreamUtils.read(input, false)
+        return fixLoadedData(data)
     }
 
     override fun sequence(): Sequence<ChunkStorage.Entry> {
+        checkOpen()
         return this.anvilRegionFileCache.sequence()
                 .flatMap { file ->
                     file.all.asSequence().map { position -> Entry(position) }
@@ -53,8 +60,8 @@ class AnvilChunkStorage(private val executorService: ExecutorService, worldDirec
     }
 
     private inner class Entry(override val position: ChunkPosition) : ChunkStorage.Entry {
-        override fun load(): CompletableFuture<DataContainer> = load(this.position)
-                .thenApplyAsync { container -> container ?: throw IllegalStateException("The data for chunk $position is no longer available.") }
+        override fun load(): DataContainer =
+                load(this.position) ?: throw IllegalStateException("The data for chunk $position is no longer available.")
     }
 
     private fun fixLoadedData(data: DataContainer): DataContainer {
@@ -69,6 +76,13 @@ class AnvilChunkStorage(private val executorService: ExecutorService, worldDirec
         data.set(X_POS, position.x)
         data.set(Z_POS, position.z)
         return data
+    }
+
+    fun close() {
+        if (this.closed)
+            return
+        this.closed = true
+        this.anvilRegionFileCache.clear()
     }
 
     companion object {

@@ -14,7 +14,7 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.optional
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.scheduler.Task

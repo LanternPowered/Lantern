@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.type.LanternArmorType;
+import org.lanternpowered.server.data.type.LanternArmorMaterial;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.type.ArmorType;
@@ -26,10 +26,10 @@ public final class ArmorTypeRegistryModule extends DefaultCatalogRegistryModule<
 
     @Override
     public void registerDefaults() {
-        register(new LanternArmorType(CatalogKey.minecraft("chain")));
-        register(new LanternArmorType(CatalogKey.minecraft("diamond"), () -> Ingredient.of(ItemTypes.DIAMOND)));
-        register(new LanternArmorType(CatalogKey.minecraft("gold"), () -> Ingredient.of(ItemTypes.GOLD_INGOT)));
-        register(new LanternArmorType(CatalogKey.minecraft("iron"), () -> Ingredient.of(ItemTypes.IRON_INGOT)));
-        register(new LanternArmorType(CatalogKey.minecraft("leather"), () -> Ingredient.of(ItemTypes.LEATHER)));
+        register(new LanternArmorMaterial(CatalogKey.minecraft("chain")));
+        register(new LanternArmorMaterial(CatalogKey.minecraft("diamond"), () -> Ingredient.of(ItemTypes.DIAMOND)));
+        register(new LanternArmorMaterial(CatalogKey.minecraft("gold"), () -> Ingredient.of(ItemTypes.GOLD_INGOT)));
+        register(new LanternArmorMaterial(CatalogKey.minecraft("iron"), () -> Ingredient.of(ItemTypes.IRON_INGOT)));
+        register(new LanternArmorMaterial(CatalogKey.minecraft("leather"), () -> Ingredient.of(ItemTypes.LEATHER)));
     }
 }

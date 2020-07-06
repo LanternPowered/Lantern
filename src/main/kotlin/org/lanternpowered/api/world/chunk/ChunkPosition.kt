@@ -15,7 +15,9 @@ import org.lanternpowered.server.world.chunk.ChunkPositionHelper
 /**
  * Represents a position of a chunk.
  */
-inline class ChunkPosition @Deprecated(message = "Internal use only.", level = DeprecationLevel.WARNING) constructor(private val packed: Long) {
+inline class ChunkPosition @Deprecated(message = "Internal use only.", level = DeprecationLevel.WARNING) constructor(
+        @Deprecated(message = "Internal use only.", level = DeprecationLevel.WARNING) val packed: Long
+) {
 
     /**
      * Constructs a new [ChunkPosition] from the given x and z values.
@@ -33,6 +35,20 @@ inline class ChunkPosition @Deprecated(message = "Internal use only.", level = D
      */
     val z: Int
         get() = ChunkPositionHelper.unpackZ(this.packed)
+
+    fun offset(xOffset: Int, zOffset: Int): ChunkPosition = ChunkPosition(this.x + xOffset, this.z + zOffset)
+
+    fun west(): ChunkPosition = west(1)
+    fun west(offset: Int): ChunkPosition = offset(-offset, 0)
+
+    fun east(): ChunkPosition = east(1)
+    fun east(offset: Int): ChunkPosition = offset(offset, 0)
+
+    fun north(): ChunkPosition = north(1)
+    fun north(offset: Int): ChunkPosition = offset(0, -offset)
+
+    fun south(): ChunkPosition = south(1)
+    fun south(offset: Int): ChunkPosition = offset(0, offset)
 
     override fun toString(): String = "($x, $z)"
 }

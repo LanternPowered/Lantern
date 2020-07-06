@@ -80,30 +80,24 @@ interface DataHolderBase : DataHolder, ValueContainerBase {
     @JvmDefault
     private fun <V : Value<E>, E : Any> supportsKey(key: Key<V>): Boolean {
         val globalRegistration = GlobalKeyRegistry[key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.anyDataProvider().isSupported(this)
-        }
-
         return false
     }
 
     @JvmDefault
     override fun <E : Any, V : Value<E>> getValue(key: Key<V>): Optional<V> {
         val globalRegistration = GlobalKeyRegistry[key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.dataProvider<V, E>().getValue(this)
-        }
-
         return emptyOptional()
     }
 
     @JvmDefault
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
         val globalRegistration = GlobalKeyRegistry[key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.dataProvider<Value<E>, E>().get(this)
-        }
-
         return emptyOptional()
     }
 

@@ -13,6 +13,7 @@ package org.lanternpowered.server.config.category
 import ninja.leaping.configurate.objectmapping.Setting
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable
 import org.lanternpowered.api.plugin.PluginContainer
+import org.lanternpowered.api.plugin.id
 import org.spongepowered.api.util.Tristate
 import java.util.*
 

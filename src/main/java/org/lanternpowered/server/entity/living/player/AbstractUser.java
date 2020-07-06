@@ -28,7 +28,7 @@ import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.entity.living.player.User;
@@ -73,7 +73,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
      * world to spawn the player in. Used at {@link NetworkSession#initPlayer()} and
      * {@link UserStore}. Will also be used by {@link OfflineUser}s.
      */
-    @Nullable private LanternWorldProperties userWorld;
+    @Nullable private LanternWorldPropertiesOld userWorld;
 
     AbstractUser(ProxyUser user) {
         super(user.getUniqueId());
@@ -141,11 +141,11 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     }
 
     @Nullable
-    public LanternWorldProperties getUserWorld() {
+    public LanternWorldPropertiesOld getUserWorld() {
         return this.userWorld;
     }
 
-    public void setUserWorld(@Nullable LanternWorldProperties userWorld) {
+    public void setUserWorld(@Nullable LanternWorldPropertiesOld userWorld) {
         this.userWorld = userWorld;
     }
 
@@ -202,7 +202,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
         checkNotNull(worldUniqueId, "worldUniqueId");
         final WorldProperties world = Lantern.getServer().getWorldManager().getWorldProperties(worldUniqueId)
                 .orElseThrow(() -> new IllegalStateException("Cannot find World with the given UUID: " + worldUniqueId));
-        this.userWorld = (LanternWorldProperties) world;
+        this.userWorld = (LanternWorldPropertiesOld) world;
         setRawPosition(position);
         return true;
     }

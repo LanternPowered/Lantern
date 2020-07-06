@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.meta.PluginDependency;
 import org.spongepowered.plugin.meta.PluginMetadata;
 import org.spongepowered.plugin.meta.version.DefaultArtifactVersion;

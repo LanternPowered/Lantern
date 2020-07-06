@@ -14,7 +14,6 @@ import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataQuery
 import org.lanternpowered.api.data.persistence.DataView
 import org.lanternpowered.api.data.persistence.getOrCreateView
-import org.lanternpowered.api.service.world.ChunkStorage
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils
@@ -34,36 +33,43 @@ import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 import java.time.Instant
 import java.util.UUID
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import java.util.function.Supplier
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
+import kotlin.concurrent.write
 
-class DefaultWorldDataProvider(
-        private val uniqueId: UUID,
-        private val directory: Path,
-        private val executorService: ExecutorService
+class LanternWorldStorage(
+        @Volatile private var uniqueId: UUID,
+        private val directory: Path
 ) : WorldStorage {
 
-    private var providerLock: Lock? = null
-    private val lock = Any()
+    private var sessionLock: Lock? = null
+    private val lock = ReentrantReadWriteLock()
 
     override fun getUniqueId(): UUID = this.uniqueId
 
     override val directoryName: String
         get() = this.directory.fileName.toString()
 
-    override val chunkStorage: ChunkStorage = AnvilChunkStorage(this.executorService, this.directory)
+    private val dataDirectory: Path = this.directory.resolve(WORLD_DATA_DIRECTORY_NAME)
+
+    override val chunks: AnvilChunkStorage = AnvilChunkStorage(this.dataDirectory.resolve(REGION_DIRECTORY_NAME))
+
+    override fun getConfigPath(name: String): Path = this.directory.resolve(name)
+
+    fun close() {
+        this.chunks.close()
+    }
 
     override fun acquireLock(): WorldStorage.Lock? {
-        synchronized(this.lock) {
-            var providerLock = this.providerLock
-            if (providerLock != null)
+        this.lock.write {
+            var sessionLock = this.sessionLock
+            if (sessionLock != null)
+                return sessionLock
+            sessionLock = Lock()
+            if (!sessionLock.acquire())
                 return null
-            providerLock = Lock()
-            if (!providerLock.acquire())
-                return null
-            this.providerLock = null
-            return providerLock
+            this.sessionLock = null
+            return sessionLock
         }
     }
 
@@ -75,7 +81,7 @@ class DefaultWorldDataProvider(
         private var released: Boolean = false
 
         fun acquire(): Boolean {
-            val file = directory.resolve(SESSION_LOCK_FILE)
+            val file = dataDirectory.resolve(SESSION_LOCK_FILE)
 
             val channel = RandomAccessFile(file.toFile(), "rw").channel
             val lock = try {
@@ -104,11 +110,11 @@ class DefaultWorldDataProvider(
                     channel.close()
                 }
             }
-            return true
+            return !release
         }
 
-        override fun release() {
-            synchronized(lock) {
+        override fun close() {
+            lock.write {
                 if (this.released)
                     throw IllegalStateException("The lock is already released.")
                 this.released = true
@@ -118,38 +124,54 @@ class DefaultWorldDataProvider(
         }
     }
 
-    override fun delete(): CompletableFuture<Boolean> {
-        return CompletableFuture.supplyAsync(Supplier {
-            if (!Files.exists(this.directory))
-                return@Supplier false
-            Files.walkFileTree(this.directory, object : SimpleFileVisitor<Path>() {
-                override fun visitFile(path: Path, attrs: BasicFileAttributes): FileVisitResult {
-                    Files.delete(path)
-                    return FileVisitResult.CONTINUE
-                }
-                override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
-                    Files.delete(dir)
-                    return FileVisitResult.CONTINUE
-                }
-            })
-            true
-        }, this.executorService)
+    override fun uniqueId(uniqueId: UUID) {
+        this.lock.write { uniqueId0(uniqueId) }
     }
 
-    override fun load(): CompletableFuture<DataContainer> =
-            CompletableFuture.supplyAsync(Supplier { loadBlocking() }, this.executorService)
+    private fun uniqueId0(uniqueId: UUID) {
+        val spongeData = loadSpongeData(this.dataDirectory) ?: DataContainer.createNew()
+        spongeData.addUniqueId(uniqueId)
+        saveSpongeData(this.dataDirectory, spongeData)
+        this.uniqueId = uniqueId
+    }
 
-    private fun loadBlocking(): DataContainer {
-        val data = SafeIO.read(this.directory.resolve(LEVEL_DATA_FILE)) { path ->
+    override fun delete(): Boolean {
+        if (!Files.exists(this.dataDirectory))
+            return false
+        this.lock.write { delete0() }
+        return true
+    }
+
+    private fun delete0() {
+        Files.walkFileTree(this.dataDirectory, object : SimpleFileVisitor<Path>() {
+            override fun visitFile(path: Path, attrs: BasicFileAttributes): FileVisitResult {
+                Files.delete(path)
+                return FileVisitResult.CONTINUE
+            }
+
+            override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
+                Files.delete(dir)
+                return FileVisitResult.CONTINUE
+            }
+        })
+    }
+
+    override fun load(): DataContainer = this.lock.read { load0() }
+
+    private fun load0(): DataContainer {
+        val data = SafeIO.read(this.dataDirectory.resolve(LEVEL_DATA_FILE)) { path ->
             NbtStreamUtils.read(Files.newInputStream(path), true)
         }
         check(data != null) { "The level.dat file of the world is missing." }
 
-        val spongeLevelData = loadSpongeData(this.directory)
-        if (spongeLevelData != null)
-            data.getOrCreateView(LEVEL_DATA).set(SPONGE_DATA, spongeLevelData)
+        val spongeData = loadSpongeData(this.dataDirectory)
+        if (spongeData != null) {
+            spongeData.remove(UUID_MOST)
+            spongeData.remove(UUID_LEAST)
+            data.getOrCreateView(LEVEL_DATA).set(SPONGE_DATA, spongeData)
+        }
 
-        val scoreboardData = SafeIO.read(this.directory.resolve(SCOREBOARD_DATA_FILE)) { path ->
+        val scoreboardData = SafeIO.read(this.dataDirectory.resolve(SCOREBOARD_DATA_FILE)) { path ->
             NbtStreamUtils.read(Files.newInputStream(path), true)
         }?.getView(DATA)?.orNull()
 
@@ -159,53 +181,87 @@ class DefaultWorldDataProvider(
         return data
     }
 
-    override fun save(data: DataView): CompletableFuture<Unit> =
-            CompletableFuture.supplyAsync(Supplier { saveBlocking(data) }, this.executorService)
+    override fun save(data: DataView) {
+        this.lock.write { save0(data) }
+    }
 
-    private fun saveBlocking(data: DataView) {
+    private fun save0(data: DataView) {
         // In vanilla minecraft, some pieces of world data are in multiple files
-        val scoreboardView = data.getView(SCOREBOARD).orNull()
-        if (scoreboardView != null) {
-            val rootScoreboardView = DataContainer.createNew()
-                    .set(DATA, scoreboardView)
+        val scoreboardData = data.getView(SCOREBOARD).orNull()
+        if (scoreboardData != null) {
+            val rootScoreboardData = DataContainer.createNew()
+                    .set(DATA, scoreboardData)
             data.remove(SCOREBOARD)
-            SafeIO.write(this.directory.resolve(SCOREBOARD_DATA_FILE)) { path ->
-                NbtStreamUtils.write(rootScoreboardView, Files.newOutputStream(path), true)
+            SafeIO.write(this.dataDirectory.resolve(SCOREBOARD_DATA_FILE)) { path ->
+                NbtStreamUtils.write(rootScoreboardData, Files.newOutputStream(path), true)
             }
         }
 
         val levelData = data.getView(LEVEL_DATA).orNull()
 
-        val spongeData: DataView? = if (levelData != null) {
+        val spongeData: DataView = if (levelData != null) {
             val spongeData = levelData.getView(SPONGE_DATA).orNull()
-            if (spongeData != null) {
+            if (spongeData != null)
                 levelData.remove(SPONGE_DATA)
-            }
-            spongeData
-        } else null
+            spongeData?.copy() ?: DataContainer.createNew()
+        } else DataContainer.createNew()
+        spongeData.addUniqueId(this.uniqueId)
+        saveSpongeData(this.dataDirectory, spongeData)
 
-        val spongeDataFile = this.directory.resolve(SPONGE_LEVEL_DATA_FILE)
-        if (spongeData != null) {
-            val rootSpongeLevelData = DataContainer.createNew()
-                    .set(SPONGE_DATA, spongeData)
-            SafeIO.write(spongeDataFile) { path ->
-                NbtStreamUtils.write(rootSpongeLevelData, Files.newOutputStream(path), true)
-            }
-        } else {
-            Files.deleteIfExists(spongeDataFile)
-        }
-
-        SafeIO.write(this.directory.resolve(LEVEL_DATA_FILE)) { path ->
+        SafeIO.write(this.dataDirectory.resolve(LEVEL_DATA_FILE)) { path ->
             NbtStreamUtils.write(data, Files.newOutputStream(path), true)
         }
     }
 
     companion object {
 
+        private fun DataView.addUniqueId(uniqueId: UUID) {
+            set(UUID_MOST, uniqueId.mostSignificantBits)
+            set(UUID_LEAST, uniqueId.leastSignificantBits)
+        }
+
+        private fun saveSpongeData(directory: Path, data: DataView) {
+            val spongeDataFile = directory.resolve(SPONGE_LEVEL_DATA_FILE)
+            val rootData = DataContainer.createNew()
+                    .set(SPONGE_DATA, data)
+            SafeIO.write(spongeDataFile) { path ->
+                NbtStreamUtils.write(rootData, Files.newOutputStream(path), true)
+            }
+        }
+
         private fun loadSpongeData(directory: Path): DataView? {
             return SafeIO.read(directory.resolve(SPONGE_LEVEL_DATA_FILE)) { path ->
                 NbtStreamUtils.read(Files.newInputStream(path), true)
             }?.getView(SPONGE_DATA)?.orNull()
+        }
+
+        /**
+         * Whether the directory name is reserved so it
+         * can't be used as a world name.
+         */
+        fun isReservedDirectoryName(name: String): Boolean {
+            return name == REGION_DIRECTORY_NAME
+        }
+
+        /**
+         * Checks whether the target directory is considered a world directory.
+         */
+        fun isWorld(directory: Path): Boolean {
+            if (!Files.exists(directory))
+                return false
+            if (Files.exists(directory.resolve(REGION_DIRECTORY_NAME)))
+                return true
+            if (Files.exists(directory.resolve(LEVEL_DATA_FILE)))
+                return true
+            return false
+        }
+
+        fun cleanupWorld(directory: Path) {
+            Files.deleteIfExists(directory.resolve(REGION_DIRECTORY_NAME))
+            // Not used, user data will be moved somewhere else
+            Files.deleteIfExists(directory.resolve(USER_DATA_DIRECTORY))
+            Files.deleteIfExists(directory.resolve(USER_ADVANCEMENTS_DATA_DIRECTORY))
+            Files.deleteIfExists(directory.resolve(USER_STATISTICS_DATA_DIRECTORY))
         }
 
         /**
@@ -236,11 +292,16 @@ class DefaultWorldDataProvider(
             return null
         }
 
+        private const val WORLD_DATA_DIRECTORY_NAME = "data"
         private const val SCOREBOARD_DATA_FILE = "scoreboard.dat"
         private const val LEVEL_DATA_FILE = "level.dat"
         private const val SPONGE_LEVEL_DATA_FILE = "level_sponge.dat"
         private const val BUKKIT_UUID_DATA_FILE = "uid.dat"
         private const val SESSION_LOCK_FILE = "session.lock"
+        private const val REGION_DIRECTORY_NAME = "region"
+        private const val USER_DATA_DIRECTORY = "playerdata"
+        private const val USER_ADVANCEMENTS_DATA_DIRECTORY = "advancements"
+        private const val USER_STATISTICS_DATA_DIRECTORY = "stats"
 
         private val UUID_MOST = DataQuery.of("UUIDMost")
         private val UUID_LEAST = DataQuery.of("UUIDLeast")

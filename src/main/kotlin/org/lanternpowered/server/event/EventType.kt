@@ -11,31 +11,51 @@
 package org.lanternpowered.server.event
 
 import com.google.common.reflect.TypeToken
-import org.spongepowered.api.event.Event
-import org.spongepowered.api.event.GenericEvent
+import org.lanternpowered.api.event.Event
+import org.lanternpowered.api.event.GenericEvent
+import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.uncheckedCast
+import java.lang.reflect.TypeVariable
 import java.util.Objects
 
-class EventType<T : Event> internal constructor(val token: TypeToken<T>) {
+class EventType<T : Event> internal constructor(val eventClass: Class<T>, val genericParameter: TypeToken<*>?) {
 
     /**
      * Whether the event is generic.
      */
-    val isGeneric = GenericEvent::class.java.isAssignableFrom(this.token.rawType)
+    val isGeneric = GenericEvent::class.java.isAssignableFrom(this.eventClass)
 
     private var hashCode = 0
 
-    override fun toString(): String = this.token.toString()
+    override fun toString(): String = ToStringHelper(this)
+            .add("eventClass", this.eventClass.name)
+            .add("genericParameter", this.genericParameter)
+            .omitNullValues()
+            .toString()
 
     override fun equals(other: Any?): Boolean {
         if (other !is EventType<*>)
             return false
-        return other.token == this.token
+        return other.eventClass == this.eventClass &&
+                other.genericParameter == this.genericParameter
     }
 
     override fun hashCode(): Int {
         if (this.hashCode == 0) {
-            this.hashCode = Objects.hash(this.token)
+            this.hashCode = Objects.hash(this.eventClass, this.genericParameter)
         }
         return this.hashCode
+    }
+
+    companion object {
+
+        private val genericEventType: TypeVariable<*> = org.spongepowered.api.event.GenericEvent::class.java.typeParameters[0]
+
+        fun <T : Event> of(typeToken: TypeToken<T>): EventType<T> {
+            if (!GenericEvent::class.java.isAssignableFrom(typeToken.rawType))
+                return EventType(typeToken.rawType.uncheckedCast(), null)
+            val genericParameter = typeToken.resolveType(this.genericEventType)
+            return EventType(typeToken.rawType.uncheckedCast(), genericParameter)
+        }
     }
 }

@@ -18,6 +18,7 @@ import org.lanternpowered.server.data.type.LanternPortionType
 import org.lanternpowered.server.data.type.LanternRailDirection
 import org.lanternpowered.server.data.type.LanternSlabPortion
 import org.lanternpowered.server.data.type.LanternWireAttachmentType
+import org.lanternpowered.server.registry.type.data.NotePitchRegistry
 import org.lanternpowered.server.state.property.booleanStatePropertyOf
 import org.lanternpowered.server.state.property.enumStatePropertyOf
 import org.lanternpowered.server.state.property.intStatePropertyOf
@@ -34,25 +35,25 @@ object BlockStateProperties {
 
     // Boolean state properties
 
-    @JvmField val SNOWY = booleanStatePropertyOf(minecraft("snowy"), Keys.SNOWED)
+    @JvmField val SNOWY = booleanStatePropertyOf(minecraft("snowy"), Keys.IS_SNOWY)
 
-    @JvmField val PERSISTENT = booleanStatePropertyOf(minecraft("persistent"), Keys.PERSISTENT)
+    @JvmField val PERSISTENT = booleanStatePropertyOf(minecraft("persistent"), Keys.IS_PERSISTENT)
 
     @JvmField val IS_WET = booleanStatePropertyOf(minecraft("wet"), Keys.IS_WET)
 
-    @JvmField val OCCUPIED = booleanStatePropertyOf(minecraft("occupied"), Keys.OCCUPIED)
+    @JvmField val OCCUPIED = booleanStatePropertyOf(minecraft("occupied"), Keys.IS_OCCUPIED)
 
     @JvmField val ENABLED = booleanStatePropertyOf(minecraft("enabled"), LanternKeys.ENABLED)
 
     @JvmField val TRIGGERED = booleanStatePropertyOf(minecraft("triggered"), LanternKeys.TRIGGERED)
 
-    @JvmField val POWERED = booleanStatePropertyOf(minecraft("powered"), Keys.POWERED)
+    @JvmField val POWERED = booleanStatePropertyOf(minecraft("powered"), Keys.IS_POWERED)
 
     @JvmField val UNSTABLE = booleanStatePropertyOf(minecraft("explode"), LanternKeys.UNSTABLE)
 
     @JvmField val HAS_MUSIC_DISC = booleanStatePropertyOf(minecraft("has_record"), LanternKeys.HAS_MUSIC_DISC)
 
-    @JvmField val LIT = booleanStatePropertyOf(minecraft("lit"), Keys.LIT)
+    @JvmField val LIT = booleanStatePropertyOf(minecraft("lit"), Keys.IS_LIT)
 
     @JvmField val WATERLOGGED = booleanStatePropertyOf(minecraft("waterlogged"), LanternKeys.WATERLOGGED)
 
@@ -129,8 +130,8 @@ object BlockStateProperties {
 
     @JvmField val NOTE = intStatePropertyOf(minecraft("note"), Keys.NOTE_PITCH, 0..24,
             stateKeyValueTransformer(
-                    { stateValue -> NotePitchRegistryModule.getByInternalId(stateValue).get() },
-                    { keyValue -> (keyValue as LanternNotePitch).internalId }))
+                    { stateValue -> NotePitchRegistry.require(stateValue) },
+                    { keyValue -> NotePitchRegistry.getId(keyValue) }))
 
     @JvmField val DECAY_DISTANCE = intStatePropertyOf(minecraft("distance"), Keys.DECAY_DISTANCE, 1..7)
 }

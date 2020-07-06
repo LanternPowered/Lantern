@@ -29,10 +29,10 @@ object UUIDHelper {
     }
 
     /**
-     * Converts the uuid to a flat string (without dashes).
+     * Converts the [UUID] to a flat string (without dashes).
      *
-     * @param uuid the uuid
-     * @return the flat string
+     * @param uuid The uuid
+     * @return The flat string
      */
     @JvmStatic
     fun toFlatString(uuid: UUID): String {

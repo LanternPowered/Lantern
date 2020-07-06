@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.network.vanilla.message.type.play.UpdateWorldSkyMessage;
 import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.weather.LanternWeather;

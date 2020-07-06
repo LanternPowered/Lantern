@@ -22,7 +22,7 @@ import org.lanternpowered.api.service.ServiceManager
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.event.cause.EventContextKeys
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.service.ProviderRegistration
 import org.spongepowered.api.service.ProvisioningException
 import java.util.Optional

@@ -12,7 +12,7 @@ package org.lanternpowered.server.scheduler
 
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.first
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Task
 import java.time.Duration
@@ -45,7 +45,7 @@ class LanternTaskBuilder : Task.Builder {
         val plugin = this.plugin ?: CauseStack.currentOrEmpty().first() ?: error("No PluginContainer found in the CauseStack.")
         val name = this.name ?: run {
             val number = taskCounter.incrementAndGet()
-            String.format("%s-%s", plugin.id, number)
+            String.format("%s-%s", plugin.metadata.id, number)
         }
         val delay = this.delay.toNanos()
         val interval = this.interval.toNanos()

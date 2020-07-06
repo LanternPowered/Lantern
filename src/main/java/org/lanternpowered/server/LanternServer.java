@@ -38,7 +38,7 @@ import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.EncryptionHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
 import org.lanternpowered.server.util.SyncLanternThread;
-import org.lanternpowered.server.world.LanternWorldManager;
+import org.lanternpowered.server.world.LanternWorldManagerOld;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.slf4j.Logger;
 import org.spongepowered.api.Server;
@@ -47,7 +47,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.network.status.Favicon;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -93,7 +93,7 @@ public final class LanternServer implements Server {
             runnable -> new SyncLanternThread(runnable, "server"));
 
     // The world manager
-    @Inject private LanternWorldManager worldManager;
+    @Inject private LanternWorldManagerOld worldManager;
 
     // The network manager
     @Inject private NetworkManager networkManager;
@@ -682,7 +682,7 @@ public final class LanternServer implements Server {
     }
 
     @Override
-    public LanternWorldManager getWorldManager() {
+    public LanternWorldManagerOld getWorldManager() {
         return this.worldManager;
     }
 

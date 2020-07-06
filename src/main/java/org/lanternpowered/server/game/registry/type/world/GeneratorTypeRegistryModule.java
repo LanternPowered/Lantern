@@ -29,7 +29,7 @@ import org.lanternpowered.server.world.gen.thevoid.TheVoidGeneratorType;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.util.CustomCatalogRegistration;
 import org.spongepowered.api.registry.util.DelayedRegistration;

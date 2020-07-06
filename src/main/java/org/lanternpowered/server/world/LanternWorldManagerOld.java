@@ -75,7 +75,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Singleton
-public final class LanternWorldManager implements WorldManager {
+public final class LanternWorldManagerOld implements WorldManager {
 
     // The counter for the executor threads
     private final AtomicInteger counter = new AtomicInteger();
@@ -93,7 +93,7 @@ public final class LanternWorldManager implements WorldManager {
     private static class WorldLookupEntry {
 
         // The world properties
-        public final LanternWorldProperties properties;
+        public final LanternWorldPropertiesOld properties;
 
         // The folder where all the world files are stored
         public final Path folder;
@@ -104,7 +104,7 @@ public final class LanternWorldManager implements WorldManager {
         // The reference to the world instance
         @Nullable public volatile LanternWorld world;
 
-        WorldLookupEntry(LanternWorldProperties properties, Path folder, int dimensionId) {
+        WorldLookupEntry(LanternWorldPropertiesOld properties, Path folder, int dimensionId) {
             this.dimensionId = dimensionId;
             this.properties = properties;
             this.folder = folder;
@@ -115,7 +115,7 @@ public final class LanternWorldManager implements WorldManager {
     private final Map<LanternWorld, Thread> worldThreads = new ConcurrentHashMap<>();
 
     // The world entries indexed by the name
-    private final Map<LanternWorldProperties, WorldLookupEntry> worldByProperties = new ConcurrentHashMap<>();
+    private final Map<LanternWorldPropertiesOld, WorldLookupEntry> worldByProperties = new ConcurrentHashMap<>();
 
     // The world entries indexed by the name
     private final Map<String, WorldLookupEntry> worldByName = new ConcurrentHashMap<>();
@@ -145,7 +145,7 @@ public final class LanternWorldManager implements WorldManager {
     private final Phaser tickEnd = new Phaser(1);
 
     @Inject
-    private LanternWorldManager() {
+    private LanternWorldManagerOld() {
     }
 
     /**
@@ -291,7 +291,7 @@ public final class LanternWorldManager implements WorldManager {
         // Remove the tick task
         removeWorldTask(world0);
         // Get the lookup entry and properties to remove all the references
-        final LanternWorldProperties properties = world0.getProperties();
+        final LanternWorldPropertiesOld properties = world0.getProperties();
         final WorldLookupEntry entry = this.worldByProperties.get(properties);
         properties.setWorld(null);
         entry.world = null;
@@ -373,7 +373,7 @@ public final class LanternWorldManager implements WorldManager {
             result.config.save();
 
             final LevelData levelData;
-            final LanternWorldProperties properties;
+            final LanternWorldPropertiesOld properties;
             try {
                 levelData = LanternWorldPropertiesIO.read(folder, copyName, null);
                 properties = LanternWorldPropertiesIO.convert(levelData, result.config, false);
@@ -416,7 +416,7 @@ public final class LanternWorldManager implements WorldManager {
         if (entry.world != null || this.getWorld(worldProperties.getWorldName()).isPresent()) {
             return Optional.empty();
         }
-        final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
+        final LanternWorldPropertiesOld worldProperties0 = (LanternWorldPropertiesOld) worldProperties;
         this.worldByName.put(newName, entry);
         this.worldByName.remove(worldProperties0.getWorldName());
         worldProperties0.setName(newName);
@@ -474,7 +474,7 @@ public final class LanternWorldManager implements WorldManager {
         checkNotNull(worldProperties, "worldProperties");
         final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
         checkNotNull(entry, "entry");
-        final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
+        final LanternWorldPropertiesOld worldProperties0 = (LanternWorldPropertiesOld) worldProperties;
         final BitSet dimensionMap = entry.dimensionId == 0 ? (BitSet) this.dimensionMap.clone() : null;
         try {
             final LevelData levelData = LanternWorldPropertiesIO.convert(worldProperties0, entry.dimensionId, dimensionMap);
@@ -527,7 +527,7 @@ public final class LanternWorldManager implements WorldManager {
      * @param dimensionId The dimension id
      * @return The new or existing world properties, if creation was successful
      */
-    private LanternWorldProperties createWorld(WorldArchetype worldArchetype, String folderName, int dimensionId) throws IOException {
+    private LanternWorldPropertiesOld createWorld(WorldArchetype worldArchetype, String folderName, int dimensionId) throws IOException {
         final LanternWorldArchetype settings0 = (LanternWorldArchetype) checkNotNull(worldArchetype, "worldArchetype");
         final String worldName = worldArchetype.getName();
         final WorldLookupEntry entry = this.worldByName.get(worldName);
@@ -543,7 +543,7 @@ public final class LanternWorldManager implements WorldManager {
                     + " creating the world.", e);
         }
         // Create the world properties
-        final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0.getName(), worldConfigResult.config);
+        final LanternWorldPropertiesOld worldProperties = new LanternWorldPropertiesOld(settings0.getName(), worldConfigResult.config);
         if (worldConfigResult.newCreated) {
             worldProperties.update(settings0);
         }
@@ -807,7 +807,7 @@ public final class LanternWorldManager implements WorldManager {
         }
     }
 
-    private void addUpdatedWorldProperties(LanternWorldProperties properties, Path worldFolder, @Nullable Integer dimensionId) {
+    private void addUpdatedWorldProperties(LanternWorldPropertiesOld properties, Path worldFolder, @Nullable Integer dimensionId) {
         // The world is already added
         if (this.worldByUUID.containsKey(properties.getUniqueId())) {
             return;
@@ -830,7 +830,7 @@ public final class LanternWorldManager implements WorldManager {
      * @param dimensionId The id of the world (dimension)
      * @return The world lookup entry
      */
-    private WorldLookupEntry addWorldProperties(LanternWorldProperties properties, Path worldDirectory, int dimensionId) {
+    private WorldLookupEntry addWorldProperties(LanternWorldPropertiesOld properties, Path worldDirectory, int dimensionId) {
         final WorldLookupEntry entry = new WorldLookupEntry(properties, worldDirectory, dimensionId);
         this.worldByUUID.put(properties.getUniqueId(), entry);
         this.worldByName.put(properties.getWorldName(), entry);
@@ -852,7 +852,7 @@ public final class LanternWorldManager implements WorldManager {
     public void init() throws IOException {
         final Path rootWorldDir = this.rootWorldDirectory.get();
         // The properties of the root world
-        LanternWorldProperties rootWorldProperties = null;
+        LanternWorldPropertiesOld rootWorldProperties = null;
         LevelData levelData;
 
         if (Files.exists(rootWorldDir)) {
@@ -884,7 +884,7 @@ public final class LanternWorldManager implements WorldManager {
         // refreshed if needed
         this.dimensionMap = new BitSet();
 
-        LanternWorldProperties rootWorldProperties0 = rootWorldProperties;
+        LanternWorldPropertiesOld rootWorldProperties0 = rootWorldProperties;
         // Generate the root (default) world if missing
         if (rootWorldProperties0 == null) {
             rootWorldProperties0 = createWorld(WorldArchetype.builder()
@@ -948,7 +948,7 @@ public final class LanternWorldManager implements WorldManager {
         // Load the world properties and config files for all the worlds
         for (Map.Entry<Integer, Tuple<Path, LevelData>> entry : idToLevelData.entrySet()) {
             levelData = entry.getValue().getSecond();
-            final LanternWorldProperties worldProperties;
+            final LanternWorldPropertiesOld worldProperties;
             try {
                 final WorldConfigResult result = getOrCreateWorldConfig(levelData.worldName);
                 worldProperties = LanternWorldPropertiesIO.convert(levelData, result.config, result.newCreated);

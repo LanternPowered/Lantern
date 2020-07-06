@@ -176,7 +176,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return true;
         }
         if (this.itemStack.isNotEmpty()) {
-            if (!this.itemStack.similarTo(stack)) {
+            if (!this.itemStack.isSimilarTo(stack)) {
                 return false;
             }
         } else if (!isValidItem(stack)) {
@@ -286,7 +286,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return;
         }
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
-        if ((this.itemStack.isNotEmpty() && (!this.itemStack.similarTo(stack) || this.itemStack.getQuantity() >= maxStackSize)) ||
+        if ((this.itemStack.isNotEmpty() && (!this.itemStack.isSimilarTo(stack) || this.itemStack.getQuantity() >= maxStackSize)) ||
                 !isValidItem(stack)) {
             return;
         }
@@ -330,7 +330,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             return;
         }
         final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
-        if (this.itemStack.isNotEmpty() && (!this.itemStack.similarTo(stack) ||
+        if (this.itemStack.isNotEmpty() && (!this.itemStack.isSimilarTo(stack) ||
                 this.itemStack.getQuantity() >= maxStackSize) || !isValidItem(stack)) {
             return;
         }
@@ -460,7 +460,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
 
     @Override
     public boolean containsAny(ItemStack stack) {
-        return this.itemStack.similarTo(stack);
+        return this.itemStack.isSimilarTo(stack);
     }
 
     @Override

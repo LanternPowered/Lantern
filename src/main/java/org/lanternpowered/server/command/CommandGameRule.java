@@ -13,7 +13,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.spongepowered.api.Sponge;
@@ -25,7 +25,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -99,7 +99,7 @@ public final class CommandGameRule extends CommandProvider {
                     WorldProperties world = CommandHelper.getWorldProperties(src, args);
                     Object value = args.getOne("value").get();
                     RuleType ruleType = args.<RuleType>getOne("rule").get();
-                    ((LanternWorldProperties) world).getRules()
+                    ((LanternWorldPropertiesOld) world).getRules()
                             .getOrCreateRule(ruleType)
                             .setValue(value);
                     src.sendMessage(t("commands.gamerule.success", ruleType.getName(), ruleType.getDataType().serialize(value)));

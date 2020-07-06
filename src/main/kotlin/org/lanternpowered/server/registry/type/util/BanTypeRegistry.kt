@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.util
 
 import org.lanternpowered.api.registry.catalogTypeRegistry
-import org.lanternpowered.server.config.user.ban.LanternBanType
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.CatalogKey
 import org.spongepowered.api.util.ban.Ban
 import org.spongepowered.api.util.ban.BanType
@@ -23,4 +23,8 @@ val BanTypeRegistry = catalogTypeRegistry<BanType> {
 
     register("profile", Ban.Profile::class)
     register("ip", Ban.Ip::class)
+}
+
+private class LanternBanType(key: CatalogKey, private val banClass: Class<out Ban>) : DefaultCatalogType(key), BanType {
+    override fun getBanClass(): Class<out Ban> = this.banClass
 }

@@ -25,11 +25,7 @@ import org.spongepowered.api.data.value.Value
 object ValueKeyRegistryModule : AdditionalPluginCatalogRegistryModule<Key<*>>(Keys::class) {
 
     override fun <A : Key<*>> register(catalogType: A): A {
-        return super.register(catalogType).apply {
-            if (catalogType is OptionalValueKey<*,*>) {
-                register(catalogType.unwrappedKey)
-            }
-        }
+        return super.register(catalogType)
     }
 
     override fun registerDefaults() {

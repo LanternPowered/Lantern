@@ -13,7 +13,7 @@ package org.lanternpowered.server.game
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.spongepowered.api.Platform
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import java.util.HashMap
 
 class LanternPlatform(
@@ -31,10 +31,10 @@ class LanternPlatform(
         val apiContainer = getContainer(Platform.Component.API)
         val implContainer = getContainer(Platform.Component.IMPLEMENTATION)
         this.platformMap["Type"] = this.type
-        this.platformMap["ApiName"] = apiContainer.name
-        this.platformMap["ApiVersion"] = apiContainer.version
-        this.platformMap["ImplementationName"] = implContainer.name
-        this.platformMap["ImplementationVersion"] = implContainer.version
+        this.platformMap["ApiName"] = apiContainer.metadata.name
+        this.platformMap["ApiVersion"] = apiContainer.metadata.version
+        this.platformMap["ImplementationName"] = implContainer.metadata.name
+        this.platformMap["ImplementationVersion"] = implContainer.metadata.version
         this.platformMap["MinecraftVersion"] = this.minecraftVersion
     }
 
@@ -49,8 +49,8 @@ class LanternPlatform(
     override fun toString(): String = ToStringHelper(this)
             .add("type", this.type)
             .add("executionType", this.executionType)
-            .add("version", getContainer(Platform.Component.IMPLEMENTATION).version)
-            .add("apiVersion", getContainer(Platform.Component.API).version)
+            .add("version", getContainer(Platform.Component.IMPLEMENTATION).metadata.version)
+            .add("apiVersion", getContainer(Platform.Component.API).metadata.version)
             .add("minecraftVersion", this.minecraftVersion)
             .toString()
 }

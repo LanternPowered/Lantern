@@ -17,20 +17,6 @@ import org.lanternpowered.api.util.type.typeTokenOf
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
-fun test() {
-    val injector = Game.injector.createChild {
-        bind<String>().toSingleton("Test")
-        bind<@Named("name") String>().toSingleton("Named Test")
-        bind<Int>().to { 1 }
-    }
-
-    injector.use {
-        val value = inject<Int>()
-        val named: @Named("name") String = inject()
-        val test: Int by lazyInject()
-    }
-}
-
 /**
  * Injects an object for the given type [T].
  *
@@ -127,7 +113,27 @@ inline fun <reified T : Any> Injector.getLazy(): Lazy<T> = getLazy(typeTokenOf()
  * @param block The block to execute
  * @return The result of the block
  */
-fun <R> Injector.use(block: () -> R): R = openContext().use { block() }
+fun <R> ChildInjector.use(block: () -> R): R = openContext().use { block() }
+
+/**
+ * An injector that was creates from another injector.
+ */
+interface ChildInjector : Injector {
+
+    /**
+     * An injection context.
+     */
+    interface Context : AutoCloseable
+
+    /**
+     * Opens a new injection [Context]. While the context is active, all injections
+     * will go through this injector instead of the global one. This should be used
+     * in combination with child injectors.
+     *
+     * @return The context
+     */
+    fun openContext(): Context
+}
 
 /**
  * Represents an injector which will provide injections
@@ -147,20 +153,6 @@ interface Injector {
      * @return The child injector
      */
     fun createChild(fn: InjectorBuilder.() -> Unit): Injector
-
-    /**
-     * An injection context.
-     */
-    interface Context : AutoCloseable
-
-    /**
-     * Opens a new injection [Context]. While the context is active, all injections
-     * will go through this injector instead of the global one. This should be used
-     * in combination with child injectors.
-     *
-     * @return The context
-     */
-    fun openContext(): Context
 
     /**
      * Gets an injection for the given [type].

@@ -40,6 +40,8 @@ import io.netty.channel.socket.DatagramPacket
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.plugin.name
+import org.lanternpowered.api.plugin.version
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.SimpleRemoteConnection
 import org.lanternpowered.server.util.future.thenAsync
@@ -186,9 +188,8 @@ internal class QueryHandler(
         val cause = causeOf(connection)
         val address = channel.localAddress() as InetSocketAddress
 
-        return LanternEventFactory.createQueryServerEventFull(cause, address, mutableMapOf<String, String>(),
-                "MINECRAFT", "SMP", worldName, server.motd.toPlain(), playerNames, plugins.toString(),
-                mc.version.orElse("unknown"), server.maxPlayers, Int.MAX_VALUE, playerNames.size, 0)
+        return LanternEventFactory.createQueryServerEventFull(cause, address, mutableMapOf<String, String>(), "MINECRAFT", "SMP",
+                worldName, server.motd.toPlain(), playerNames, plugins.toString(), mc.version, server.maxPlayers, Int.MAX_VALUE, playerNames.size, 0)
     }
 
     private fun ByteBuf.write(event: QueryServerEvent.Full, sessionId: Int) {

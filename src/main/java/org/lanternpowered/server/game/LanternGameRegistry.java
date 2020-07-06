@@ -330,7 +330,7 @@ import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.item.recipe.smelting.SmeltingRecipeRegistry;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.CatalogRegistryModule;

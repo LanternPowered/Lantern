@@ -30,6 +30,7 @@ repositories {
     mavenCentral()
     maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://oss.sonatype.org/content/groups/public' }
+    maven { url "https://repo-new.spongepowered.org/repository/maven-public/" }
 }
 
 if (!api.projectDir.exists() || api.projectDir.list().length == 0) {

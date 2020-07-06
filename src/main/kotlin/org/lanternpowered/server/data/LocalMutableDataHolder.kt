@@ -32,37 +32,56 @@ interface LocalMutableDataHolder : LocalDataHolder, MutableDataHolder {
             return localRegistration.dataProvider<Value<E>, E>().offerFast(this, element)
         }
 
-        if (super.offerFastNoEvents(key, element)) {
+        key as ValueKey<*,*>
+        // Implicitly register the key locally if it doesn't require explicit
+        // registration, implicit keys will never reach the delegates when
+        // offering data.
+        if (!key.requiresExplicitRegistration) {
+            this.keyRegistry.register(key, element).removable()
             return true
         }
 
-        key as ValueKey<*,*>
-        // Implicitly register the key locally
-        if (!key.requiresExplicitRegistration) {
-            this.keyRegistry.register(key, element).removable()
+        // Handle the delegate registrations
+        for (delegate in this.keyRegistry.delegates) {
+            // Only check if the key is supported, because isSuccessful doesn't say
+            // whether the key existed before, or if the data was invalid
+            if (delegate is DataHolder.Mutable&& delegate.supports(key)) {
+                return when (delegate) {
+                    is MutableDataHolder -> delegate.offerFastNoEvents(key, element)
+                    else -> delegate.offer(key, element).isSuccessful
+                }
+            }
         }
 
-        return false
+        // Forward to the global registrations
+        return super.offerFastNoEvents(key, element)
     }
 
     @JvmDefault
     override fun <E : Any> offerNoEvents(key: Key<out Value<E>>, element: E): DataTransactionResult {
         // Check the local key registration
         val localRegistration = this.keyRegistry[key]
-        if (localRegistration != null) {
+        if (localRegistration != null)
             return localRegistration.dataProvider<Value<E>, E>().offer(this, element)
-        }
-
-        val result = super.offerNoEvents(key, element)
-        if (result.isSuccessful) {
-            return result
-        }
 
         key as ValueKey<*,*>
         // Implicitly register the key locally
         if (!key.requiresExplicitRegistration) {
             this.keyRegistry.register(key, element).removable()
+            return DataTransactionResult.successNoData()
         }
+
+        // Handle the delegate registrations
+        for (delegate in this.keyRegistry.delegates) {
+            // Only check if the key is supported, because isSuccessful doesn't say
+            // whether the key existed before, or if the data was invalid
+            if (delegate is DataHolder.Mutable && delegate.supports(key))
+                return delegate.offer(key, element)
+        }
+
+        val result = super.offerNoEvents(key, element)
+        if (result.isSuccessful)
+            return result
 
         return DataTransactionResult.failNoData()
     }
@@ -73,18 +92,16 @@ interface LocalMutableDataHolder : LocalDataHolder, MutableDataHolder {
 
         // Check the local key registration
         val localRegistration = this.keyRegistry[key]
-        if (localRegistration != null) {
+        if (localRegistration != null)
             return localRegistration.dataProvider<Value<E>, E>().offerValueFast(this, value)
-        }
-
-        if (super.offerFastNoEvents(value)) {
-            return true
-        }
 
         key as ValueKey<*,*>
         // Implicitly register the key locally
-        if (!key.requiresExplicitRegistration) {
+        if (!key.requiresExplicitRegistration)
             this.keyRegistry.register(key, value.get()).removable()
+
+        if (super.offerFastNoEvents(value)) {
+            return true
         }
 
         return false

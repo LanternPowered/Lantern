@@ -13,7 +13,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.Sponge;
@@ -22,7 +22,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.args.PatternMatchingCommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.WeatherUniverse;
@@ -78,7 +78,7 @@ public final class CommandWeather extends CommandProvider {
                         GenericArguments.optional(GenericArguments.integer(Text.of("duration")))
                 )
                 .executor((src, args) -> {
-                    LanternWorldProperties world = CommandHelper.getWorldProperties(src, args);
+                    LanternWorldPropertiesOld world = CommandHelper.getWorldProperties(src, args);
                     WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse().orElse(null);
                     Weather type = args.<Weather>getOne("type").get();
                     if (weatherUniverse != null) {

@@ -12,6 +12,15 @@
 
 package org.lanternpowered.api.plugin
 
-typealias Plugin = org.spongepowered.api.plugin.Plugin
-typealias PluginContainer = org.spongepowered.api.plugin.PluginContainer
+typealias Plugin = org.spongepowered.plugin.jvm.Plugin
+typealias PluginContainer = org.spongepowered.plugin.PluginContainer
 typealias PluginManager = org.spongepowered.api.plugin.PluginManager
+
+val PluginContainer.id: String
+    get() = metadata.id
+
+val PluginContainer.name: String
+    get() = metadata.name.orElse(metadata.id)
+
+val PluginContainer.version: String
+    get() = metadata.version

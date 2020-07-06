@@ -14,7 +14,7 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 abstract class LanternChannelBinding implements ChannelBinding {
 

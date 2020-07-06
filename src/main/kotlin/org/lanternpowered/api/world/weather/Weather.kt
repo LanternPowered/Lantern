@@ -15,13 +15,13 @@ package org.lanternpowered.api.world.weather
 
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.x.world.weather.XWeather
+import org.lanternpowered.api.x.world.weather.XWeatherUniverse
 import org.spongepowered.api.CatalogKey
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 typealias Weather = org.spongepowered.api.world.weather.Weather
 typealias Weathers = org.spongepowered.api.world.weather.Weathers
-typealias WeatherUniverse = org.spongepowered.api.world.weather.WeatherUniverse
 
 @JvmName("of")
 inline fun weatherOf(key: CatalogKey, fn: WeatherBuilder.() -> Unit): XWeather {

@@ -11,13 +11,13 @@
 package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.data.type.ArmorType
+import org.spongepowered.api.data.type.ArmorMaterial
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 
-class LanternArmorType @JvmOverloads constructor(key: CatalogKey, repairIngredient: () -> Ingredient? = { null }) :
-        DefaultCatalogType(key), ArmorType {
+class LanternArmorMaterial @JvmOverloads constructor(key: CatalogKey, repairIngredient: () -> Ingredient? = { null }) :
+        DefaultCatalogType(key), ArmorMaterial {
 
     private val ingredient by lazy(repairIngredient)
 

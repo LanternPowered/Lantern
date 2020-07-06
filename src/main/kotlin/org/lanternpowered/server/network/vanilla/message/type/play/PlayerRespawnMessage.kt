@@ -18,5 +18,6 @@ data class PlayerRespawnMessage(
         val gameMode: GameMode,
         val dimensionType: DimensionType,
         val lowHorizon: Boolean,
-        val seed: Long
+        val seed: Long,
+        val copyMetadata: Boolean = false
 ) : Message

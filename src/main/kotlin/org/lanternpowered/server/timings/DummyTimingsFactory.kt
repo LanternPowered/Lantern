@@ -12,7 +12,7 @@ package org.lanternpowered.server.timings
 
 import co.aikar.timings.Timing
 import co.aikar.timings.TimingsFactory
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.text.channel.MessageChannel
 
 object DummyTimingsFactory : TimingsFactory {

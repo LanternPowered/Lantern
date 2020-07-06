@@ -13,7 +13,7 @@ package org.lanternpowered.server
 import org.lanternpowered.api.Game
 import org.lanternpowered.api.GameState
 import org.lanternpowered.api.Server
-import org.lanternpowered.api.cause.causeOf
+import org.lanternpowered.api.injector.Injector
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 import org.lanternpowered.server.registry.LanternGameRegistry
 import org.lanternpowered.server.scheduler.LanternScheduler
@@ -31,34 +31,18 @@ object LanternGame : Game {
     /**
      * The current protocol version number that's supported.
      */
-    const val PROTOCOL_VERSION = 713
+    const val PROTOCOL_VERSION = 714
 
     private var state: GameState? = null
-
-    /**
-     * Switches to the next [state].
-     *
-     * Passing the [state] makes it clear when a state
-     * should happen, and validates against wrong switches.
-     */
-    fun switchState(state: GameState) {
-        val currentState = this.state
-        check(currentState == null || state.ordinal == currentState.ordinal + 1) {
-            "It's only possible to the next state. Attempted to switch from $currentState to $state."
-        }
-
-        this.state = state
-
-        val cause = causeOf(this)
-        val event = state.createEvent(cause)
-        this.eventManager.post(event)
-    }
 
     val syncExecutor: ScheduledExecutorService = TODO()
     val syncScheduler: LanternScheduler = TODO()
 
     override val paletteBasedArrayFactory: PaletteBasedArrayFactory
         get() = LanternPaletteBasedArrayFactory
+
+    override val injector: Injector
+        get() = TODO("Not yet implemented")
 
     override fun getState(): GameState = checkNotNull(this.state) { "The initial state isn't set yet." }
     override fun getLocale(locale: String): Locale = LocaleCache[locale]

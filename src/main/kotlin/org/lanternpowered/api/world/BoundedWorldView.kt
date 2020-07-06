@@ -21,9 +21,7 @@ typealias BoundedProtoWorldView<P> = org.spongepowered.api.world.BoundedWorldVie
  */
 @Suppress("NOTHING_TO_INLINE")
 inline fun BoundedProtoWorldView<out World<*>>.fix(): BoundedWorldView {
-    contract {
-        returns() implies (this@fix is BoundedWorldView)
-    }
+    contract { returns() implies (this@fix is BoundedWorldView) }
     return this as BoundedWorldView
 }
 

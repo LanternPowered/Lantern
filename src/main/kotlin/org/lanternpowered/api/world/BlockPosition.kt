@@ -12,6 +12,7 @@
 
 package org.lanternpowered.api.world
 
+import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.world.BlockPositionHelper
 import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3i
@@ -104,6 +105,12 @@ inline class BlockPosition @Deprecated(message = "Internal use only.", level = D
      * Converts this [BlockPosition] into a [BlockPosition].
      */
     fun toVector3d(): Vector3d = Vector3d.from(this.x.toDouble(), this.y.toDouble(), this.z.toDouble())
+
+    /**
+     * Gets the chunk position of this block position.
+     */
+    val chunkPosition: ChunkPosition
+        get() = ChunkPosition(this.x shr 4, this.z shr 4)
 
     /**
      * Converts this position to a string representation.

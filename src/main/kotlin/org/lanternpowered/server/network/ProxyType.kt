@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.network
 
+import org.lanternpowered.api.util.optional.optional
 import java.util.Optional
 
 enum class ProxyType(val displayName: String) {
@@ -51,13 +52,7 @@ enum class ProxyType(val displayName: String) {
     companion object {
 
         @JvmStatic
-        fun getByName(name: String): Optional<ProxyType> {
-            for (type in values()) {
-                if (type.name.equals(name, ignoreCase = true)) {
-                    return Optional.of(type)
-                }
-            }
-            return Optional.empty()
-        }
+        fun getByName(name: String): Optional<ProxyType> =
+                values().firstOrNull { it.name.equals(name, ignoreCase = true) }.optional()
     }
 }

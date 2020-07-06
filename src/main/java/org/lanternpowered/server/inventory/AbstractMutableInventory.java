@@ -21,7 +21,7 @@ import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.ArrayList;
 import java.util.Collections;

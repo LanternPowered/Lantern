@@ -31,8 +31,8 @@ idea.module.sourceDirs += file('src/java6/java')
 // dependency dirty when we call this on our project.
 [/*api.tasks.javadoc,*/
  /*api.tasks.javadocJar,*/
- api.tasks.checkstyleMain,
- api.tasks.checkstyleTest,
+ /*api.tasks.checkstyleMain,*/
+ /*api.tasks.checkstyleTest,*/
  /*api.tasks.wrapper*/
 ]*.enabled = false
 
@@ -97,6 +97,9 @@ dependencies {
     // Asm
     compile 'org.ow2.asm:asm:7.1'
     compile 'org.ow2.asm:asm-tree:7.1'
+
+    // Compression
+    compile 'org.lz4:lz4-java:1.7.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

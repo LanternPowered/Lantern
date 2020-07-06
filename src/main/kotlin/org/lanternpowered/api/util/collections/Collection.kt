@@ -25,40 +25,8 @@ import java.util.LinkedList
 import java.util.WeakHashMap
 import java.util.stream.Stream
 
-/**
- * Converts this [Iterable] into a [ImmutableSet].
- */
-inline fun <T> Iterable<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
-
-/**
- * Converts this [Array] into a [ImmutableSet].
- */
-inline fun <T> Array<T>.toImmutableSet(): ImmutableSet<T> = ImmutableSet.copyOf(this)
-
-/**
- * Converts this [IntArray] into a [ImmutableSet].
- */
-fun IntArray.toImmutableSet(): ImmutableSet<Int> = ImmutableSet.builder<Int>().apply { forEach { add(it) } }.build()
-
-/**
- * Converts this [DoubleArray] into a [ImmutableSet].
- */
-fun DoubleArray.toImmutableSet(): ImmutableSet<Double> = ImmutableSet.builder<Double>().apply { forEach { add(it) } }.build()
-
-/**
- * Converts this [LongArray] into a [ImmutableSet].
- */
-fun LongArray.toImmutableSet(): ImmutableSet<Long> = ImmutableSet.builder<Long>().apply { forEach { add(it) } }.build()
-
 inline fun <K, V> Map<K, V>.toImmutableMap(): ImmutableMap<K, V> = ImmutableMap.copyOf(this)
 inline fun <K, V> Multimap<K, V>.toImmutableMultimap(): ImmutableMultimap<K, V> = ImmutableMultimap.copyOf(this)
-
-/**
- * Constructs a new [ImmutableList] with the given values.
- */
-inline fun <T> immutableSetOf(vararg values: T) = values.asList().toImmutableSet()
-
-inline fun <T> immutableSetBuilderOf(): ImmutableSet.Builder<T> = ImmutableSet.builder<T>()
 
 inline fun <K, V> immutableMapOf(): ImmutableMap<K, V> = ImmutableMap.of()
 inline fun <K, V> immutableMapBuilderOf(): ImmutableMap.Builder<K, V> = ImmutableMap.builder()
@@ -83,11 +51,6 @@ fun <E> weakSetOf(vararg args: E): MutableSet<E> = weakSetOf<E>().apply { addAll
 fun <E> immutableWeakSetOf(): Set<E> = Collections.unmodifiableSet(weakSetOf())
 fun <E> immutableWeakSetOf(iterable: Iterable<E>): Set<E> = Collections.unmodifiableSet(weakSetOf<E>().apply { addAll(iterable) })
 fun <E> immutableWeakSetOf(vararg args: E): Set<E> = Collections.unmodifiableSet(weakSetOf<E>().apply { addAll(args) })
-
-/**
- * Returns a [ImmutableSet] containing all elements produced by this stream.
- */
-inline fun <T> Stream<T>.toImmutableSet(): ImmutableSet<T> = collect(ImmutableSet.toImmutableSet())
 
 /**
  * Returns this collection as a unmodifiable view.

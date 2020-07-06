@@ -26,7 +26,7 @@ class LanternBanner : LanternBlockEntity(), Banner {
         super.registerKeys()
 
         keyRegistry {
-            register(Keys.BANNER_BASE_COLOR, DyeColors.WHITE)
+            register(Keys.DYE_COLOR, DyeColors.WHITE)
             register(Keys.BANNER_PATTERN_LAYERS, mutableListOf())
         }
     }

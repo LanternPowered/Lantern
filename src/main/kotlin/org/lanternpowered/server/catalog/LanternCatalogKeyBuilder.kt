@@ -13,6 +13,7 @@ package org.lanternpowered.server.catalog
 import org.lanternpowered.api.catalog.CatalogKey
 import org.lanternpowered.api.catalog.CatalogKeyBuilder
 import org.lanternpowered.api.plugin.PluginContainer
+import org.lanternpowered.api.plugin.id
 
 class LanternCatalogKeyBuilder : CatalogKeyBuilder {
 

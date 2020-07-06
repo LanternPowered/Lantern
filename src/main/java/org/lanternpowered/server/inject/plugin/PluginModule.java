@@ -13,7 +13,7 @@ package org.lanternpowered.server.inject.plugin;
 import com.google.inject.AbstractModule;
 import org.lanternpowered.server.inject.InjectablePropertyProvider;
 import org.slf4j.Logger;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public abstract class PluginModule extends AbstractModule {
 

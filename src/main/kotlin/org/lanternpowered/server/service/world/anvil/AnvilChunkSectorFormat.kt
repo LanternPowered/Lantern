@@ -11,6 +11,8 @@
 package org.lanternpowered.server.service.world.anvil
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import net.jpountz.lz4.LZ4BlockInputStream
+import net.jpountz.lz4.LZ4BlockOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.zip.Deflater
@@ -31,11 +33,12 @@ sealed class AnvilChunkSectorFormat(
     object Gzip : AnvilChunkSectorFormat(1, ::GZIPInputStream, ::GZIPOutputStream)
     object Zlib : AnvilChunkSectorFormat(2, ::InflaterInputStream, { DeflaterOutputStream(it, Deflater(Deflater.BEST_SPEED)) })
     object Uncompressed : AnvilChunkSectorFormat(3, { it }, { it })
+    object Lz4 : AnvilChunkSectorFormat(10, ::LZ4BlockInputStream, { LZ4BlockOutputStream(it, 1024) }) // TODO: Best block size?
 
     companion object {
 
         private val lookup = Int2ObjectOpenHashMap<AnvilChunkSectorFormat>().apply {
-            for (format in arrayOf(Gzip, Zlib, Uncompressed))
+            for (format in arrayOf(Gzip, Zlib, Uncompressed, Lz4))
                 put(format.id, format)
         }
 

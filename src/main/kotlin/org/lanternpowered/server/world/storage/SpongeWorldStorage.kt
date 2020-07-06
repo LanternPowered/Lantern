@@ -19,23 +19,25 @@ import org.spongepowered.api.world.storage.ChunkDataStream
 import org.spongepowered.math.vector.Vector3i
 import java.util.Optional
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.function.Supplier
 
 /**
  * A sponge world storage that wraps around the lantern [WorldStorage].
  */
 class SpongeWorldStorage(
+        private val executorService: ExecutorService,
         private val properties: WorldProperties,
         private val worldStorage: WorldStorage
 ) : org.spongepowered.api.world.storage.WorldStorage {
 
     override fun getWorldProperties(): WorldProperties = this.properties
 
-    override fun doesChunkExist(chunkCoords: Vector3i): CompletableFuture<Boolean> =
-            this.worldStorage.chunkStorage.exists(ChunkPosition(chunkCoords.x, chunkCoords.z))
+    override fun doesChunkExist(chunkCoords: Vector3i): CompletableFuture<Boolean> = CompletableFuture.supplyAsync(
+            Supplier { this.worldStorage.chunks.exists(ChunkPosition(chunkCoords.x, chunkCoords.z)) }, this.executorService)
 
-    override fun getChunkData(chunkCoords: Vector3i): CompletableFuture<Optional<DataContainer>> =
-            this.worldStorage.chunkStorage.load(ChunkPosition(chunkCoords.x, chunkCoords.z))
-                    .thenApply { container -> container.optional() }
+    override fun getChunkData(chunkCoords: Vector3i): CompletableFuture<Optional<DataContainer>> = CompletableFuture.supplyAsync(
+            Supplier { this.worldStorage.chunks.load(ChunkPosition(chunkCoords.x, chunkCoords.z)).optional() }, this.executorService)
 
-    override fun getGeneratedChunks(): ChunkDataStream = SpongeChunkDataStream(this.worldStorage.chunkStorage)
+    override fun getGeneratedChunks(): ChunkDataStream = SpongeChunkDataStream(this.worldStorage.chunks)
 }

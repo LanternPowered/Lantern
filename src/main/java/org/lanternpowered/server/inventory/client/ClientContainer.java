@@ -1123,7 +1123,7 @@ public abstract class ClientContainer implements ContainerBase {
                 }
                 final BaseClientSlot slot1 = this.slots[i];
                 final ItemStack itemStack1 = slot1.getRaw();
-                if (itemStack1.isEmpty() || !itemStack.similarTo(itemStack1)) {
+                if (itemStack1.isEmpty() || !itemStack.isSimilarTo(itemStack1)) {
                     continue;
                 }
                 // Increase quantity

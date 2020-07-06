@@ -22,7 +22,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
  */
 internal class SimilarItemPredicate(private val itemStack: LanternItemStack) : ItemPredicate {
 
-    override fun test(stack: ItemStack) = this.itemStack.similarTo(stack)
-    override fun test(type: ItemType) = this.itemStack.similarTo(itemStackOf(type))
-    override fun test(stack: ItemStackSnapshot) = this.itemStack.similarTo(stack)
+    override fun test(stack: ItemStack) = this.itemStack.isSimilarTo(stack)
+    override fun test(type: ItemType) = this.itemStack.isSimilarTo(itemStackOf(type))
+    override fun test(stack: ItemStackSnapshot) = this.itemStack.isSimilarTo(stack)
 }

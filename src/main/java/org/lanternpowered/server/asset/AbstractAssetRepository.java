@@ -22,7 +22,7 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.SimplePluginContainer;
 import org.lanternpowered.server.util.PathUtils;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.plugin.meta.PluginMetadata;
 
 import java.io.File;

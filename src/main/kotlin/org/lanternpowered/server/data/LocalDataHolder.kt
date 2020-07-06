@@ -42,27 +42,44 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
     @JvmDefault
     private fun <V : Value<E>, E : Any> supportsKey(key: Key<V>): Boolean {
         val localRegistration = this.keyRegistry[key]
-        if (localRegistration != null) {
+        if (localRegistration != null)
             return localRegistration.anyDataProvider().isSupported(this)
+
+        for (delegate in this.keyRegistry.delegates) {
+            if (delegate.supports(key))
+                return true
         }
+
         return super<DataHolderBase>.supports(key)
     }
 
     @JvmDefault
     override fun <E : Any, V : Value<E>> getValue(key: Key<V>): Optional<V> {
         val localRegistration = this.keyRegistry[key]
-        if (localRegistration != null) {
+        if (localRegistration != null)
             return localRegistration.dataProvider<V, E>().getValue(this)
+
+        for (delegate in this.keyRegistry.delegates) {
+            val result = delegate.getValue(key)
+            if (result.isPresent)
+                return result
         }
+
         return super<DataHolderBase>.getValue(key)
     }
 
     @JvmDefault
     override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
         val localRegistration = this.keyRegistry[key]
-        if (localRegistration != null) {
+        if (localRegistration != null)
             return localRegistration.dataProvider<Value<E>, E>().get(this)
+
+        for (delegate in this.keyRegistry.delegates) {
+            val result = delegate.get(key)
+            if (result.isPresent)
+                return result
         }
+
         return super<DataHolderBase>.get(key)
     }
 
@@ -71,6 +88,8 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
         val keys = ImmutableSet.builder<Key<*>>()
         keys.addAll(this.keyRegistry.keys)
         keys.addAll(super.getKeys())
+        for (delegate in this.keyRegistry.delegates)
+            keys.addAll(delegate.keys)
         return keys.build()
     }
 

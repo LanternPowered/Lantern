@@ -21,7 +21,7 @@ import org.lanternpowered.server.command.test.CommandSpawnEntity;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;

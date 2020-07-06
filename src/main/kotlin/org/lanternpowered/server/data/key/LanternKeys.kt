@@ -11,13 +11,13 @@
 package org.lanternpowered.server.data.key
 
 import org.lanternpowered.api.catalog.CatalogKeys.lantern
+import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.data.valueKeyOf
 import org.lanternpowered.api.util.ranges.rangeTo
 import org.lanternpowered.server.data.type.LanternBedPart
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.LanternWireAttachmentType
 import org.lanternpowered.server.entity.Pose
-import org.lanternpowered.server.extra.accessory.Accessory
 import org.lanternpowered.server.inventory.InventorySnapshot
 import org.lanternpowered.server.item.recipe.RecipeBookState
 import org.spongepowered.api.advancement.AdvancementTree
@@ -185,7 +185,7 @@ object LanternKeys {
      */
     @JvmField val SMELTING_RECIPE_BOOK_STATE: Key<Value<RecipeBookState>> = valueKeyOf(lantern("smelting_recipe_book_state"))
 
-    @JvmField val ACCESSORIES: Key<ListValue<Accessory>> = valueKeyOf(lantern("accessories"))
+    @JvmField val TOP_HAT: Key<Value<TopHat>> = valueKeyOf(lantern("top_hat"))
 
     @JvmField val OPEN_ADVANCEMENT_TREE: Key<Value<AdvancementTree>> = valueKeyOf(lantern("open_advancement_tree"))
 

@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
 import org.lanternpowered.server.behavior.ContextKeys;
@@ -52,10 +51,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
-import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
+import org.lanternpowered.server.world.chunk.ticket.ChunkLoadingTicket;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
-import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
@@ -210,7 +208,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
     private final WorldConfig worldConfig;
 
     // The properties of this world
-    final LanternWorldProperties properties;
+    final LanternWorldPropertiesOld properties;
 
     private final PortalAgent portalAgent;
 
@@ -236,7 +234,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
     private EntityProtocolManager entityProtocolManager = new EntityProtocolManager();
 
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path directory,
-            Scoreboard scoreboard, LanternWorldProperties properties) {
+            Scoreboard scoreboard, LanternWorldPropertiesOld properties) {
         this.logger = LoggerFactory.getLogger("world/" + properties.getWorldName());
         this.directory = directory;
         this.worldConfig = worldConfig;

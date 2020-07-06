@@ -19,7 +19,7 @@ import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjec
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;

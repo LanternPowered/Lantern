@@ -31,7 +31,7 @@ import org.lanternpowered.server.inventory.vanilla.LanternPrimaryPlayerInventory
 import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.registry.type.data.GameModeRegistry;
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.spongepowered.api.CatalogKey;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -102,7 +102,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
         super.deserialize(player, dataView);
         final int dimension = dataView.getInt(DIMENSION).orElse(0);
         Lantern.getWorldManager().getWorldProperties(dimension).ifPresent(worldProperties -> {
-            final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
+            final LanternWorldPropertiesOld worldProperties0 = (LanternWorldPropertiesOld) worldProperties;
             final Optional<LanternWorld> optWorld = worldProperties0.getWorld();
             if (optWorld.isPresent()) {
                 player.setRawWorld(optWorld.get());

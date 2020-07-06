@@ -154,22 +154,22 @@ object DataRegistrar {
 
     private fun registerBigMushroomPoresProvider() {
         val directionKeys = mapOf(
-                Keys.BIG_MUSHROOM_PORES_UP to Direction.UP,
-                Keys.BIG_MUSHROOM_PORES_WEST to Direction.WEST,
-                Keys.BIG_MUSHROOM_PORES_SOUTH to Direction.SOUTH,
-                Keys.BIG_MUSHROOM_PORES_NORTH to Direction.NORTH,
-                Keys.BIG_MUSHROOM_PORES_EAST to Direction.EAST,
-                Keys.BIG_MUSHROOM_PORES_DOWN to Direction.DOWN
+                Keys.HAS_PORES_UP to Direction.UP,
+                Keys.HAS_PORES_WEST to Direction.WEST,
+                Keys.HAS_PORES_SOUTH to Direction.SOUTH,
+                Keys.HAS_PORES_NORTH to Direction.NORTH,
+                Keys.HAS_PORES_EAST to Direction.EAST,
+                Keys.HAS_PORES_DOWN to Direction.DOWN
         ).entries.associate { (key, value) -> key.get() to value }
-        registerDirectionBasedProvider(Keys.BIG_MUSHROOM_PORES, directionKeys)
+        registerDirectionBasedProvider(Keys.PORES, directionKeys)
     }
 
     private fun registerConnectedDirectionsProvider() {
         val directionKeys = mapOf(
-                Keys.CONNECTED_WEST to Direction.WEST,
-                Keys.CONNECTED_EAST to Direction.EAST,
-                Keys.CONNECTED_NORTH to Direction.NORTH,
-                Keys.CONNECTED_SOUTH to Direction.SOUTH
+                Keys.IS_CONNECTED_WEST to Direction.WEST,
+                Keys.IS_CONNECTED_EAST to Direction.EAST,
+                Keys.IS_CONNECTED_NORTH to Direction.NORTH,
+                Keys.IS_CONNECTED_SOUTH to Direction.SOUTH
         ).entries.associate { (key, value) -> key.get() to value }
         registerDirectionBasedProvider(Keys.CONNECTED_DIRECTIONS, directionKeys)
     }

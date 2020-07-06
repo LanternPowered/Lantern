@@ -25,33 +25,43 @@ import java.util.function.Consumer
 
 class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
 
-    private val map = ConcurrentHashMap<Key<*>, LocalKeyRegistration<*, *, H>>()
+    private val internalRegistrations = ConcurrentHashMap<Key<*>, LocalKeyRegistration<*, *, H>>()
+    private val internalDelegates = mutableSetOf<DataHolder>()
 
-    override val registrations = this.map.values.asUnmodifiableCollection()
-    override val keys = this.map.keys.asUnmodifiableCollection()
+    override val delegates = this.internalDelegates.asUnmodifiableCollection()
+    override val registrations = this.internalRegistrations.values.asUnmodifiableCollection()
+    override val keys = this.internalRegistrations.keys.asUnmodifiableCollection()
 
-    override fun <V : Value<E>, E : Any> get(key: Key<V>): LocalKeyRegistration<V, E, H>? = this.map[key].uncheckedCast()
+    override fun registerDelegate(dataHolder: DataHolder) {
+        this.internalDelegates += dataHolder
+    }
+
+    override fun removeDelegate(dataHolder: DataHolder) {
+        this.internalDelegates -= dataHolder
+    }
+
+    override fun <V : Value<E>, E : Any> get(key: Key<V>): LocalKeyRegistration<V, E, H>? = this.internalRegistrations[key].uncheckedCast()
 
     override fun <V : Value<E>, E : Any> getAsElement(key: Key<V>): ElementKeyRegistration<V, E, H>? =
-            (this.map[key] as? ElementKeyRegistration<*,*,*>).uncheckedCast()
+            (this.internalRegistrations[key] as? ElementKeyRegistration<*,*,*>).uncheckedCast()
 
     override fun <H : DataHolder> forHolder(holderType: Class<H>): LocalKeyRegistry<H> = uncheckedCast()
 
     private fun checkRegistration(key: Key<*>) {
-        check(!this.map.containsKey(key)) { "The key ${key.key} is already registered." }
+        check(!this.internalRegistrations.containsKey(key)) { "The key ${key.key} is already registered." }
     }
 
     private fun <V : Value<E>, E : Any> registerElement(key: Key<V>): ElementKeyRegistration<V, E, H> {
         checkRegistration(key)
         val registration = LanternElementKeyRegistration<V, E, H>(key)
-        this.map[key] = registration
+        this.internalRegistrations[key] = registration
         return registration
     }
 
     private fun <V : BoundedValue<E>, E : Any> registerBoundedElement(key: Key<V>): BoundedElementKeyRegistration<V, E, H> {
         checkRegistration(key)
         val registration = LanternBoundedElementKeyRegistration<V, E, H>(key)
-        this.map[key] = registration
+        this.internalRegistrations[key] = registration
         return registration
     }
 
@@ -87,7 +97,7 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
             else -> WrappedDataProvider(provider)
         }
         val registration = LanternLocalProviderKeyRegistration<V, E, H>(key, dataProvider)
-        this.map[key] = registration
+        this.internalRegistrations[key] = registration
         return registration
     }
 
@@ -98,7 +108,7 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
         builder.fn(key)
         val provider = builder.build()
         val registration = LanternLocalProviderKeyRegistration<V, E, H>(key, provider)
-        this.map[key] = registration
+        this.internalRegistrations[key] = registration
         return registration
     }
 
@@ -119,13 +129,13 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
 
     override fun copy(): LocalKeyRegistry<H> {
         val copy = LanternLocalKeyRegistry<H>()
-        for ((key, registration) in this.map) {
-            copy.map[key] = (registration as LanternLocalKeyRegistration<*, *, H>).copy()
+        for ((key, registration) in this.internalRegistrations) {
+            copy.internalRegistrations[key] = (registration as LanternLocalKeyRegistration<*, *, H>).copy()
         }
         return copy
     }
 
     override fun remove(key: Key<*>) {
-        this.map.remove(key)
+        this.internalRegistrations.remove(key)
     }
 }

@@ -23,7 +23,7 @@ import org.lanternpowered.server.inject.provider.PathAsFileProvider;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.File;
 import java.nio.file.Path;

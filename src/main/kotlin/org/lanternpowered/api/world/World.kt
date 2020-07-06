@@ -12,8 +12,8 @@ package org.lanternpowered.api.world
 
 import org.lanternpowered.api.world.weather.WeatherUniverse
 import org.spongepowered.api.world.server.ServerWorld
-import kotlin.contracts.contract
 import org.spongepowered.api.world.World as SpongeWorld
+import kotlin.contracts.contract
 
 typealias World = ServerWorld
 typealias WorldProperties = org.spongepowered.api.world.storage.WorldProperties

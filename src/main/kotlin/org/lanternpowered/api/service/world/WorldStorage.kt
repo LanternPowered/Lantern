@@ -14,10 +14,14 @@ import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataView
 import org.lanternpowered.api.util.Identifiable
 import org.lanternpowered.api.world.WorldProperties
-import java.util.concurrent.CompletableFuture
+import java.nio.file.Path
+import java.util.UUID
 
 /**
  * Represents a provider for world data.
+ *
+ * Scoreboard data will be located in `DataQuery.of("Scoreboard")`,
+ * if it's present.
  */
 interface WorldStorage : Identifiable {
 
@@ -27,30 +31,37 @@ interface WorldStorage : Identifiable {
     val directoryName: String
 
     /**
-     * The chunk data provider.
+     * The chunk storage.
      */
-    val chunkStorage: ChunkStorage
+    val chunks: ChunkStorage
 
     /**
-     * Acquires a lock to the world data provider. While the
-     * lock is active, worlds cannot be moved or deleted.
+     * Attempts to get a [Path] in the world storage to
+     * store configuration files.
+     */
+    fun getConfigPath(name: String): Path
+
+    /**
+     * Acquires a lock to the world storage. While the
+     * lock is active, worlds cannot be modified by
+     * other sources.
      *
-     * This also prevents other server instances from
-     * loading the world.
+     * Returns the current one if there's already a
+     * lock active.
      *
-     * Returns `null` if there's already another lock active.
+     * Returns `null` if the lock can't be acquired.
      */
     fun acquireLock(): Lock?
 
     /**
      * Deletes the world.
      */
-    fun delete(): CompletableFuture<Boolean>
+    fun delete(): Boolean
 
     /**
      * Loads the world [DataContainer].
      */
-    fun load(): CompletableFuture<DataContainer>
+    fun load(): DataContainer
 
     /**
      * Saves the world [DataView].
@@ -58,22 +69,25 @@ interface WorldStorage : Identifiable {
      * This view will contain all the fields of [WorldProperties], and
      * may contain extra information of the world, like scoreboard data.
      *
-     * Scoreboard data will be located in `DataQuery.of("Scoreboard")`, if it's present.
-     *
      * @param data The world data
-     * @return The future that will be completed when the saving is done
-     * @throws IllegalArgumentException If the unique id isn't the same as [getUniqueId]
      */
-    fun save(data: DataView): CompletableFuture<Unit>
+    fun save(data: DataView)
 
     /**
-     * Represents a lock that holds a world data provider.
+     * Modifies the unique id of the world.
+     *
+     * @param uniqueId The unique id to set
      */
-    interface Lock {
+    fun uniqueId(uniqueId: UUID)
+
+    /**
+     * Represents a lock that holds a world storage.
+     */
+    interface Lock : AutoCloseable {
 
         /**
          * Releases the lock.
          */
-        fun release()
+        override fun close()
     }
 }

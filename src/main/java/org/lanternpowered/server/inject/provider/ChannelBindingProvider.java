@@ -18,7 +18,7 @@ import org.lanternpowered.server.inject.InjectionPoint;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelId;
 import org.spongepowered.api.network.ChannelRegistrar;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 public abstract class ChannelBindingProvider<B extends ChannelBinding> implements Provider<B> {
 

@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.Optional;
 

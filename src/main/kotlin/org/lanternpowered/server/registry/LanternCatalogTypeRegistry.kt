@@ -16,7 +16,6 @@ import com.google.common.collect.BiMap
 import com.google.common.collect.HashBiMap
 import com.google.common.collect.ImmutableBiMap
 import com.google.common.collect.MapMaker
-import com.google.common.reflect.TypeParameter
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
@@ -406,11 +405,9 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
         if (!this.allowPluginRegistrations)
             return
         val cause = CauseStackManager.currentCause
-        val genericType = object : TypeToken<RegistryEvent.Catalog<T>>() {}
-                .where(object : TypeParameter<T>() {}, this.typeToken)
         val event = object : RegistryEvent.Catalog<T> {
             override fun getCause(): Cause = cause
-            override fun getGenericType(): TypeToken<out RegistryEvent.Catalog<T>> = genericType
+            override fun getGenericType(): TypeToken<T> = typeToken
             override fun register(catalogType: T) { this@AbstractCatalogTypeRegistryBuilder.register(catalogType) }
         }
         EventManager.post(event)

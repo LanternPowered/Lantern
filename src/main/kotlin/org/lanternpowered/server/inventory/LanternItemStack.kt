@@ -50,13 +50,14 @@ class LanternItemStack private constructor(
     @JvmOverloads
     constructor(itemType: ItemType, quantity: Int = 1) : this(itemType, quantity, LocalKeyRegistry.of()) {
         check(quantity >= 0) { "quantity may not be negative" }
-        registerKeys()
+        registerKeys(itemType)
     }
 
-    private fun registerKeys() {
+    private fun registerKeys(itemType: ItemType) {
         keyRegistry {
+            registerDelegate(itemType) // Delegate to item properties
             register(Keys.DISPLAY_NAME)
-            register(Keys.ITEM_LORE, mutableListOf())
+            register(Keys.LORE, mutableListOf())
             register(Keys.BREAKABLE_BLOCK_TYPES, mutableSetOf())
             register(Keys.APPLIED_ENCHANTMENTS, mutableListOf())
         }
@@ -105,7 +106,7 @@ class LanternItemStack private constructor(
     }
 
     override fun equalTo(that: ItemStack): Boolean {
-        return similarTo(that) && getQuantity() == that.quantity
+        return isSimilarTo(that) && getQuantity() == that.quantity
     }
 
     /**
@@ -116,7 +117,7 @@ class LanternItemStack private constructor(
      * @return Is equal
      */
     fun equalTo(that: ItemStackSnapshot): Boolean {
-        return similarTo(that) && getQuantity() == that.quantity
+        return isSimilarTo(that) && getQuantity() == that.quantity
     }
 
     override fun isEmpty(): Boolean {
@@ -150,8 +151,8 @@ class LanternItemStack private constructor(
      * @param that The other snapshot
      * @return Is similar
      */
-    fun similarTo(that: ItemStackSnapshot): Boolean {
-        return similarTo((that as LanternItemStackSnapshot).unwrap())
+    fun isSimilarTo(that: ItemStackSnapshot): Boolean {
+        return isSimilarTo((that as LanternItemStackSnapshot).unwrap())
     }
 
     /**
@@ -163,7 +164,7 @@ class LanternItemStack private constructor(
      * @param that The other snapshot
      * @return Is similar
      */
-    fun similarTo(that: ItemStack): Boolean {
+    fun isSimilarTo(that: ItemStack): Boolean {
         val emptyA = isEmpty
         val emptyB = that.isEmpty
         return if (emptyA != emptyB) {
@@ -217,7 +218,7 @@ class LanternItemStack private constructor(
             else if (itemStackA == null || itemStackB == null)
                 false
             else
-                (itemStackA as LanternItemStack).similarTo(itemStackB)
+                (itemStackA as LanternItemStack).isSimilarTo(itemStackB)
         }
 
         @JvmStatic
@@ -227,7 +228,7 @@ class LanternItemStack private constructor(
             else if (itemStackA == null || itemStackB == null)
                 false
             else
-                (itemStackA as LanternItemStack).similarTo(itemStackB)
+                (itemStackA as LanternItemStack).isSimilarTo(itemStackB)
         }
 
         @JvmStatic
@@ -237,14 +238,14 @@ class LanternItemStack private constructor(
             else if (itemStackA == null || itemStackB == null)
                 false
             else
-                (itemStackB as LanternItemStack).similarTo(itemStackA)
+                (itemStackB as LanternItemStack).isSimilarTo(itemStackA)
         }
 
         @JvmStatic
         fun areSimilar(itemStackA: ItemStackSnapshot?, itemStackB: ItemStackSnapshot?): Boolean {
             return if ((itemStackA as LanternItemStackSnapshot).unwrap() === (itemStackA as LanternItemStackSnapshot).unwrap())
                 true
-            else if (itemStackA == null || itemStackB == null) false else (itemStackB as LanternItemStackSnapshot).unwrap().similarTo(itemStackA)
+            else if (itemStackA == null || itemStackB == null) false else (itemStackB as LanternItemStackSnapshot).unwrap().isSimilarTo(itemStackA)
         }
 
         @JvmStatic

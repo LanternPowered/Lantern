@@ -20,7 +20,7 @@ import org.spongepowered.api.world.teleport.PortalAgentType
 import kotlin.reflect.KClass
 
 val PortalAgentTypeRegistry = catalogTypeRegistry<PortalAgentType> {
-    fun <T : PortalAgent> register(id: String, agentType: KClass<T>, agentProvider: (World<*>, LanternPortalAgentType<T>) -> T) =
+    fun <T : PortalAgent> register(id: String, agentType: KClass<T>, agentProvider: (World, LanternPortalAgentType<T>) -> T) =
             register(LanternPortalAgentType(CatalogKey.minecraft(id), agentType.java, agentProvider))
 
     register("empty", EmptyPortalAgent::class) { _, type -> EmptyPortalAgent(type) }

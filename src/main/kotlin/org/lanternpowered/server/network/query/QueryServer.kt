@@ -33,7 +33,6 @@
 package org.lanternpowered.server.network.query
 
 import io.netty.bootstrap.Bootstrap
-import io.netty.channel.ChannelFactory
 import io.netty.channel.ChannelFuture
 import io.netty.channel.EventLoopGroup
 import org.lanternpowered.server.game.LanternGame
@@ -43,7 +42,6 @@ import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ScheduledFuture
-import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
@@ -60,7 +58,7 @@ class QueryServer(
     private lateinit var bootstrap: Bootstrap
     private lateinit var flushTask: ScheduledFuture<*>
 
-    private val challengeTokens: MutableMap<InetSocketAddress, Int> = ConcurrentHashMap()
+    private val challengeTokens = ConcurrentHashMap<InetSocketAddress, Int>()
 
     /**
      * Initializes the query server.
@@ -68,7 +66,7 @@ class QueryServer(
     fun init(address: SocketAddress): ChannelFuture {
         val transportType = TransportType.findBestType()
 
-        this.group = transportType.eventLoopGroupSupplier(0, ThreadFactory { target -> ThreadHelper.newThread(target) })
+        this.group = transportType.eventLoopGroupSupplier(0, ThreadHelper.newThreadFactory())
         this.bootstrap = Bootstrap()
                 .group(this.group)
                 .channelFactory(transportType.datagramChannelFactory)

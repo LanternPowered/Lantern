@@ -125,10 +125,8 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
     fun <E : Any> offerFastNoEvents(key: Key<out Value<E>>, element: E): Boolean {
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.dataProvider<Value<E>, E>().offerFast(this, element)
-        }
-
         return false
     }
 
@@ -141,10 +139,8 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
     fun <E : Any> offerNoEvents(key: Key<out Value<E>>, element: E): DataTransactionResult {
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.dataProvider<Value<E>, E>().offer(this, element)
-        }
-
         return DataTransactionResult.failNoData()
     }
 
@@ -164,10 +160,8 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
     fun <E : Any> offerFastNoEvents(value: Value<E>): Boolean {
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[value.key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.dataProvider<Value<E>, E>().offerValueFast(this, value)
-        }
-
         return false
     }
 
@@ -180,10 +174,8 @@ interface MutableDataHolder : DataHolderBase, DataHolder.Mutable {
     fun <E : Any> offerNoEvents(value: Value<E>): DataTransactionResult {
         // Check for a global registration
         val globalRegistration = GlobalKeyRegistry[value.key]
-        if (globalRegistration != null) {
+        if (globalRegistration != null)
             return globalRegistration.dataProvider<Value<E>, E>().offerValue(this, value)
-        }
-
         return DataTransactionResult.failNoData()
     }
 

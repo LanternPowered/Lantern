@@ -18,7 +18,7 @@ import org.lanternpowered.server.inject.InjectionPoint;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetId;
 import org.spongepowered.api.asset.AssetManager;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.util.NoSuchElementException;
 

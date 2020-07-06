@@ -28,7 +28,7 @@ import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
-import org.spongepowered.api.plugin.PluginContainer
+import org.spongepowered.plugin.PluginContainer
 import java.util.Objects
 import java.util.function.BiPredicate
 

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item.predicate
 
-import org.spongepowered.api.data.property.Properties
+import org.spongepowered.api.data.Keys
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
@@ -70,13 +70,13 @@ interface EquipmentItemPredicate : ItemPredicate {
                         = predicate(equipmentType)
 
                 override fun test(stack: ItemStack)
-                        = stack.getProperty(Properties.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
+                        = stack.get(Keys.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
 
                 override fun test(stack: ItemStackSnapshot)
-                        = stack.getProperty(Properties.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
+                        = stack.get(Keys.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
 
                 override fun test(type: ItemType)
-                        = type.getProperty(Properties.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
+                        = type.get(Keys.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
             }
         }
 

@@ -54,16 +54,16 @@ class LanternLocatableBlockBuilder : AbstractDataBuilder<LocatableBlock>(Locatab
         this.location = null
     }
 
-    override fun world(world: World) = apply {
+    override fun world(world: World<*>) = apply {
         this.worldReference = WeakWorldReference(world)
         this.location = null
     }
 
     override fun from(value: LocatableBlock) = apply {
         val block = value as LanternLocatableBlock
-        this.blockState = block.getBlockState()
-        val location = block.getLocation()
-        this.position = block.getLocation().position.toInt()
+        this.blockState = block.blockState
+        val location = block.location
+        this.position = block.location.position.toInt()
         this.worldReference = location.worldIfAvailable.map { WeakWorldReference(it) }.orElse(null)
         this.location = null
     }
@@ -73,7 +73,7 @@ class LanternLocatableBlockBuilder : AbstractDataBuilder<LocatableBlock>(Locatab
         val worldReference = checkNotNull(this.worldReference) { "world must be set" }
         var blockState: BlockState? = this.blockState
         if (blockState == null) {
-            val world = worldReference.world.orElseThrow { IllegalStateException("World is unavailable.") }
+            val world = worldReference.world ?: throw IllegalStateException("World is unavailable.")
             blockState = world.getBlock(position)!!
         }
         val location = this.location ?: worldReference.toLocation(position)

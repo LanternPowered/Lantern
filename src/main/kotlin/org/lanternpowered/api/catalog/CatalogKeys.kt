@@ -42,7 +42,7 @@ object CatalogKeys {
     fun activePlugin(value: String): CatalogKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return CatalogKey(plugin.id, value)
+        return CatalogKey(plugin.metadata.id, value)
     }
 
     /**
@@ -56,7 +56,7 @@ object CatalogKeys {
     fun activePlugin(value: String, name: String): CatalogKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return CatalogKey(plugin.id, value)
+        return CatalogKey(plugin.metadata.id, value)
     }
 
     /**
@@ -101,6 +101,6 @@ object CatalogKeys {
      */
     @JvmStatic
     fun resolve(value: String): CatalogKey {
-        return Sponge.getRegistry().resolveKey(value) as CatalogKey
+        return CatalogKey.resolve(value) as CatalogKey
     }
 }

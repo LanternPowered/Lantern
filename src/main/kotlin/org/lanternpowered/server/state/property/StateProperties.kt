@@ -19,6 +19,7 @@ import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.BooleanStateProperty
 import org.spongepowered.api.state.EnumStateProperty
 import org.spongepowered.api.state.IntegerStateProperty
+import java.util.function.Supplier
 import kotlin.reflect.KClass
 
 /**
@@ -28,8 +29,18 @@ import kotlin.reflect.KClass
  * @param valueKey The value key this property is mapped to
  * @return The constructed boolean state property
  */
-fun booleanStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<Boolean>>): BooleanStateProperty
-        = LanternBooleanStateProperty(key, valueKey, identityStateKeyValueTransformer())
+fun booleanStatePropertyOf(key: CatalogKey, valueKey: Supplier<out Key<out Value<Boolean>>>): BooleanStateProperty =
+        booleanStatePropertyOf(key, valueKey.get())
+
+/**
+ * Creates a [BooleanStateProperty].
+ *
+ * @param key The catalog key of the state property
+ * @param valueKey The value key this property is mapped to
+ * @return The constructed boolean state property
+ */
+fun booleanStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<Boolean>>): BooleanStateProperty =
+        LanternBooleanStateProperty(key, valueKey, identityStateKeyValueTransformer())
 
 /**
  * Creates a [BooleanStateProperty] with a [StateKeyValueTransformer].
@@ -55,6 +66,17 @@ fun <T> booleanStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<T>>,
  */
 fun <E : Enum<E>> enumStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<E>>, values: Iterable<E>): EnumStateProperty<E>
         = LanternEnumStateProperty(key, values.iterator().next().javaClass, values.toImmutableSet(), valueKey)
+
+/**
+ * Creates a [EnumStateProperty] with the given values.
+ *
+ * @param key The catalog key of the state property
+ * @param valueKey The value key this property is mapped to
+ * @param values The values that are available for the state property
+ * @return The constructed enum state property
+ */
+fun <E : Enum<E>> enumStatePropertyOf(key: CatalogKey, valueKey: Supplier<out Key<out Value<E>>>, vararg values: E): EnumStateProperty<E>
+        = enumStatePropertyOf(key, valueKey.get(), values.toImmutableSet())
 
 /**
  * Creates a [EnumStateProperty] with the given values.
@@ -121,8 +143,30 @@ fun intStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<Int>>, values: I
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
+fun intStatePropertyOf(key: CatalogKey, valueKey: Supplier<out Key<out Value<Int>>>, vararg values: Int): IntegerStateProperty
+        = intStatePropertyOf(key, valueKey.get(), *values)
+
+/**
+ * Creates a [IntegerStateProperty] with all the values from the given array.
+ *
+ * @param key The catalog key of the state property
+ * @param valueKey The value key this property is mapped to
+ * @param values The values that are available for the state property
+ * @return The constructed int state property
+ */
 fun intStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<Int>>, vararg values: Int): IntegerStateProperty
         = LanternIntStateProperty(key, values.toImmutableSet(), valueKey, identityStateKeyValueTransformer())
+
+/**
+ * Creates a [IntegerStateProperty] with all the values within the given [IntRange].
+ *
+ * @param key The catalog key of the state property
+ * @param valueKey The value key this property is mapped to
+ * @param valueRange The range of values that are available for the state property
+ * @return The constructed int state property
+ */
+fun intStatePropertyOf(key: CatalogKey, valueKey: Supplier<out Key<out Value<Int>>>, valueRange: IntRange): IntegerStateProperty =
+        intStatePropertyOf(key, valueKey.get(), valueRange)
 
 /**
  * Creates a [IntegerStateProperty] with all the values within the given [IntRange].
@@ -148,6 +192,20 @@ fun intStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<Int>>, valueRang
 fun <T> intStatePropertyOf(key: CatalogKey, valueKey: Key<out Value<T>>, values: Iterable<Int>,
                            keyValueTransformer: StateKeyValueTransformer<Int, T>): IntegerStateProperty
         = LanternIntStateProperty(key, values.toImmutableSet(), valueKey, keyValueTransformer)
+
+/**
+ * Creates a [IntegerStateProperty] with all the values from the given collection. An
+ * additional [StateKeyValueTransformer] can be used to translate between int and key
+ * based values of type [T].
+ *
+ * @param key The catalog key of the state property
+ * @param valueKey The value key this property is mapped to
+ * @param values The values that are available for the state property
+ * @return The constructed int state property
+ */
+fun <T> intStatePropertyOf(key: CatalogKey, valueKey: Supplier<out Key<out Value<T>>>, values: Iterable<Int>,
+                           keyValueTransformer: StateKeyValueTransformer<Int, T>): IntegerStateProperty
+        = intStatePropertyOf(key, valueKey.get(), values, keyValueTransformer)
 
 /**
  * Creates a [IntegerStateProperty] with all the values from the given array. An

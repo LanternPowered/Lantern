@@ -12,12 +12,21 @@ package org.lanternpowered.api.service.world
 
 import java.nio.file.Path
 import java.util.UUID
-import java.util.concurrent.CompletableFuture
 
 /**
  * A service that will handle all the loading and saving data related to worlds.
  */
 interface WorldStorageService {
+
+    /**
+     * Is called when a new world storage is discovered.
+     */
+    val onDiscover: MutableCollection<(storage: WorldStorage) -> Unit>
+
+    /**
+     * Is called when a world storage is removed.
+     */
+    val onRemove: MutableCollection<(storage: WorldStorage) -> Unit>
 
     /**
      * The directory path where all the data is located.
@@ -28,6 +37,12 @@ interface WorldStorageService {
      * A collection of all the providers of known worlds.
      */
     val all: Collection<WorldStorage>
+
+    /**
+     * Attempts to get a [Path] in the storage service to
+     * store configuration files.
+     */
+    fun getConfigPath(name: String): Path
 
     /**
      * Gets a data provider for the given world [UUID].
@@ -51,7 +66,7 @@ interface WorldStorageService {
      * @param directoryName The directory name
      * @param uniqueId The unique id to use for the world
      */
-    fun create(directoryName: String, uniqueId: UUID? = UUID.randomUUID()): CompletableFuture<WorldStorage?>
+    fun create(directoryName: String, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
@@ -60,7 +75,7 @@ interface WorldStorageService {
      * @param copyName The copy or destination directory name
      * @return The provider of the new copy
      */
-    fun copy(sourceName: String, copyName: String, uniqueId: UUID? = UUID.randomUUID()): CompletableFuture<WorldStorage?>
+    fun copy(sourceName: String, copyName: String, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
@@ -69,6 +84,5 @@ interface WorldStorageService {
      * @param newName The new directory name
      * @return The provider of the new copy
      */
-    fun move(oldName: String, newName: String): CompletableFuture<WorldStorage?>
-
+    fun move(oldName: String, newName: String): WorldStorage?
 }

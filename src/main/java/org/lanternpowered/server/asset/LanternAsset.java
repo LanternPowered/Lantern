@@ -12,7 +12,7 @@ package org.lanternpowered.server.asset;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.api.asset.Asset;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.net.URL;
 import java.nio.file.Path;

@@ -24,7 +24,7 @@ import org.lanternpowered.server.text.action.LanternClickActionCallbacks.command
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks.getCallbackForUUID
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks.getOrCreateIdForCallback
 import org.lanternpowered.server.text.translation.TranslationContext
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
@@ -120,7 +120,7 @@ internal object JsonTextEventHelper {
                 val uuid = UUID.fromString(dataView.getString(SHOW_ENTITY_ID).get())
                 val name = dataView.getString(SHOW_ENTITY_NAME).get()
                 val entityType = if (dataView.contains(SHOW_ENTITY_TYPE)) {
-                    CatalogRegistry.get<EntityType<*>>(CatalogKey.resolve(dataView.getString(SHOW_ENTITY_TYPE).get()))
+                    CatalogRegistry.get<EntityType<*>>(ResourceKey.resolve(dataView.getString(SHOW_ENTITY_TYPE).get()))
                 } else null
                 TextActions.showEntity(uuid, name, entityType)
             }

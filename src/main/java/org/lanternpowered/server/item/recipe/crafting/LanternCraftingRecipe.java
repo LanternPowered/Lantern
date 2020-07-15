@@ -11,7 +11,7 @@
 package org.lanternpowered.server.item.recipe.crafting;
 
 import org.lanternpowered.server.item.recipe.LanternRecipe;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import java.util.Optional;
@@ -22,7 +22,7 @@ abstract class LanternCraftingRecipe extends LanternRecipe implements ISimpleCra
 
     @Nullable private final String group;
 
-    LanternCraftingRecipe(CatalogKey key, ItemStackSnapshot exemplaryResult, @Nullable String group) {
+    LanternCraftingRecipe(ResourceKey key, ItemStackSnapshot exemplaryResult, @Nullable String group) {
         super(key, exemplaryResult);
         this.group = group;
     }

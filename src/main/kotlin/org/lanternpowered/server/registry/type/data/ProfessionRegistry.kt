@@ -13,13 +13,13 @@ package org.lanternpowered.server.registry.type.data
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.type.Profession
 
 val ProfessionRegistry = internalCatalogTypeRegistry<Profession> {
     InternalRegistries.visit("villager_profession") { key, internalId ->
-        register(internalId, LanternProfession(CatalogKey.resolve(key)))
+        register(internalId, LanternProfession(ResourceKey.resolve(key)))
     }
 }
 
-private class LanternProfession(key: CatalogKey) : DefaultCatalogType(key), Profession
+private class LanternProfession(key: ResourceKey) : DefaultCatalogType(key), Profession

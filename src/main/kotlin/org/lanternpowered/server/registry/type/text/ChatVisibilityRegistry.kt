@@ -12,14 +12,14 @@ package org.lanternpowered.server.registry.type.text
 
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.lanternpowered.server.text.chat.LanternChatVisibility
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.text.chat.ChatType
 import org.spongepowered.api.text.chat.ChatTypes
 import org.spongepowered.api.text.chat.ChatVisibility
 
 val ChatVisibilityRegistry = internalCatalogTypeRegistry<ChatVisibility> {
     fun register(id: String, isChatVisible: (ChatType) -> Boolean) =
-            register(LanternChatVisibility(CatalogKey.minecraft(id), isChatVisible))
+            register(LanternChatVisibility(ResourceKey.minecraft(id), isChatVisible))
 
     register("full") { true }
     register("system") { type -> type == ChatTypes.SYSTEM.get() || type == ChatTypes.ACTION_BAR.get() }

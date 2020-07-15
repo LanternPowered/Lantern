@@ -17,7 +17,7 @@ import org.lanternpowered.api.registry.MutableCatalogTypeRegistry;
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder;
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry;
 import org.lanternpowered.server.text.translation.TextTranslation;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.text.translation.FixedTranslation;
@@ -68,7 +68,7 @@ public class LanternAdvancementTreeBuilder extends AbstractNamedCatalogBuilder<A
     }
 
     @Override
-    protected AdvancementTree build(CatalogKey key, Translation name) {
+    protected AdvancementTree build(ResourceKey key, Translation name) {
         checkState(this.rootAdvancement != null, "The root advancement must be set");
         checkState(!this.rootAdvancement.getTree().isPresent(),
                 "The root advancement is already used by a different Advancement Tree.");

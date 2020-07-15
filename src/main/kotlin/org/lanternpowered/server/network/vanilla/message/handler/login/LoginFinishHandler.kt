@@ -20,7 +20,7 @@ import org.lanternpowered.server.network.vanilla.message.type.login.LoginFinishM
 import org.lanternpowered.server.network.vanilla.message.type.login.LoginSuccessMessage
 import org.lanternpowered.server.network.vanilla.message.type.login.SetCompressionMessage
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.Platform
 import org.spongepowered.api.Sponge
 import java.util.stream.Collectors
@@ -52,7 +52,7 @@ class LoginFinishHandler : Handler<LoginFinishMessage> {
                     session.setGameProfile(gameProfile)
                     session.protocolState = ProtocolState.PLAY
                     val channels = Sponge.getChannelRegistrar().getRegisteredChannels(Platform.Type.SERVER)
-                            .stream().map { obj: CatalogKey -> obj.toString() }.collect(Collectors.toSet())
+                            .stream().map { obj: ResourceKey -> obj.toString() }.collect(Collectors.toSet())
                     if (channels.isNotEmpty())
                         session.send(MessagePlayInOutRegisterChannels(channels))
                     session.initPlayer()

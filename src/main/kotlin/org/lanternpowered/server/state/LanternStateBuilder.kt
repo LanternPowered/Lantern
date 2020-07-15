@@ -12,14 +12,14 @@ package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateProperty
 
 internal class LanternStateBuilder<S : State<S>>(
-        val key: CatalogKey,
+        val key: ResourceKey,
         val dataContainer: DataContainer,
         val stateContainer: AbstractStateContainer<S>,
         val stateValues: ImmutableMap<StateProperty<*>, Comparable<*>>,

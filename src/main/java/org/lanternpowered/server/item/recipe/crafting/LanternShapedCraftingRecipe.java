@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -37,7 +37,7 @@ final class LanternShapedCraftingRecipe extends LanternCraftingRecipe implements
     final ICraftingResultProvider resultProvider;
     private final IIngredient[][] ingredients;
 
-    LanternShapedCraftingRecipe(CatalogKey key,
+    LanternShapedCraftingRecipe(ResourceKey key,
             ItemStackSnapshot exemplaryResult, @Nullable String group,
             ICraftingResultProvider resultProvider, IIngredient[][] ingredients) {
         super(key, exemplaryResult, group);

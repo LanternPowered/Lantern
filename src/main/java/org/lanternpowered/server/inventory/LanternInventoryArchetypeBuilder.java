@@ -18,7 +18,7 @@ import org.lanternpowered.server.inventory.type.LanternGridInventory;
 import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperties;
@@ -101,7 +101,7 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
         return this;
     }
 
-    private LanternInventoryArchetype<?> buildArchetype(CatalogKey key,
+    private LanternInventoryArchetype<?> buildArchetype(ResourceKey key,
             Map<Property<?>, Object> properties, LanternInventoryArchetype<?> archetype) {
         final AbstractArchetypeBuilder archetypeBuilder = archetype.getBuilder().copy();
         properties.forEach(archetypeBuilder::property);
@@ -113,7 +113,7 @@ public class LanternInventoryArchetypeBuilder extends AbstractCatalogBuilder<Inv
     }
 
     @Override
-    protected InventoryArchetype build(CatalogKey key, Translation name) {
+    protected InventoryArchetype build(ResourceKey key, Translation name) {
         final Map<Property<?>, Object> properties = new HashMap<>(this.properties);
 
         final Vector2i inventoryDimension = (Vector2i) properties.remove(InventoryProperties.DIMENSION);

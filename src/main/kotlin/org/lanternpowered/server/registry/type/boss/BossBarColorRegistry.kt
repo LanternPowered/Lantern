@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.boss
 
 import org.lanternpowered.api.boss.BossBarColor
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextColors
 import org.lanternpowered.api.util.ToStringHelper
@@ -21,7 +21,7 @@ import java.util.function.Supplier
 
 val BossBarColorRegistry = internalCatalogTypeRegistry<BossBarColor> {
     fun register(name: String, color: Supplier<out TextColor>) =
-            register(LanternBossBarColor(CatalogKey.minecraft(name), color.get()))
+            register(LanternBossBarColor(ResourceKey.minecraft(name), color.get()))
 
     register("pink", TextColors.LIGHT_PURPLE)
     register("blue", TextColors.BLUE)
@@ -32,7 +32,7 @@ val BossBarColorRegistry = internalCatalogTypeRegistry<BossBarColor> {
     register("white", TextColors.WHITE)
 }
 
-private class LanternBossBarColor(key: CatalogKey, private val color: TextColor) : DefaultCatalogType(key), BossBarColor {
+private class LanternBossBarColor(key: ResourceKey, private val color: TextColor) : DefaultCatalogType(key), BossBarColor {
     override fun getColor(): TextColor = this.color
     override fun toStringHelper(): ToStringHelper = super.toStringHelper()
             .add("color", this.color.key)

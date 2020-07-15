@@ -10,10 +10,11 @@
  */
 package org.lanternpowered.api.registry
 
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.registry.UnknownTypeException
 import java.util.function.Supplier
+import kotlin.collections.Collection
 import kotlin.reflect.KClass
 
 /**
@@ -29,7 +30,7 @@ import kotlin.reflect.KClass
  * @return The found type, if available
  * @see CatalogType
  */
-inline fun <reified T : CatalogType> CatalogRegistry.require(key: CatalogKey): T = require(T::class, key)
+inline fun <reified T : CatalogType> CatalogRegistry.require(key: ResourceKey): T = require(T::class, key)
 
 /**
  * Attempts to retrieve the specific type of {@link CatalogType} based on
@@ -44,7 +45,7 @@ inline fun <reified T : CatalogType> CatalogRegistry.require(key: CatalogKey): T
  * @return The found type, if available
  * @see CatalogType
  */
-inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: CatalogKey): T? = get(T::class, key)
+inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: ResourceKey): T? = get(T::class, key)
 
 /**
  * Creates a [Supplier] that will be used to get [CatalogType] instances.
@@ -82,7 +83,7 @@ inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String
  * @param T The type of [CatalogType]
  * @return A collection of all known types of the requested catalog type
  */
-inline fun <reified T : CatalogType> CatalogRegistry.getAllOf(): Sequence<T> = getAllOf(T::class)
+inline fun <reified T : CatalogType> CatalogRegistry.getAllOf(): Collection<T> = getAllOf(T::class)
 
 /**
  * The catalog registry.
@@ -132,7 +133,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @return The found type, if available
      * @see CatalogType
      */
-    fun <T : CatalogType> get(typeClass: KClass<T>, key: CatalogKey): T?
+    fun <T : CatalogType> get(typeClass: KClass<T>, key: ResourceKey): T?
 
     /**
      * Attempts to retrieve the specific type of [CatalogType] based on
@@ -148,7 +149,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @return The found type, if available
      * @see CatalogType
      */
-    fun <T : CatalogType> require(typeClass: KClass<T>, key: CatalogKey): T =
+    fun <T : CatalogType> require(typeClass: KClass<T>, key: ResourceKey): T =
             get(typeClass, key) ?: throw IllegalArgumentException("Can't find a ${typeClass.simpleName} with the key: $key")
 
     /**
@@ -163,7 +164,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @param T The type of [CatalogType]
      * @return A collection of all known types of the requested catalog type
      */
-    fun <T : CatalogType> getAllOf(typeClass: KClass<T>): Sequence<T>
+    fun <T : CatalogType> getAllOf(typeClass: KClass<T>): Collection<T>
 
     /**
      * The singleton instance of the catalog registry.

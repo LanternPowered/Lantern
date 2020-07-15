@@ -15,7 +15,7 @@ import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.message.handler.Handler
 import org.lanternpowered.server.network.vanilla.message.type.play.ChangeAdvancementTreeMessage
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 
 class ClientAdvancementTreeHandler : Handler<ChangeAdvancementTreeMessage> {
 
@@ -23,7 +23,7 @@ class ClientAdvancementTreeHandler : Handler<ChangeAdvancementTreeMessage> {
         if (message is ChangeAdvancementTreeMessage.Open) {
             val id = message.id
             context.session.player.offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
-                    AdvancementTreeRegistry.require(CatalogKey.resolve(id)))
+                    AdvancementTreeRegistry.require(ResourceKey.resolve(id)))
         } else {
             // Do we need the close event?
         }

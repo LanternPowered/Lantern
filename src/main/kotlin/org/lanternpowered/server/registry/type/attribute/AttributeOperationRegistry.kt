@@ -14,12 +14,12 @@ import org.lanternpowered.api.attribute.AttributeOperation
 import org.lanternpowered.server.attribute.LanternAttributeOperation
 import org.lanternpowered.server.attribute.attributeOperationFunction
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 
 val AttributeOperationRegistry = internalCatalogTypeRegistry<AttributeOperation> {
     fun register(id: String, priority: Int, changeValueImmediately: Boolean = false,
                  function: (base: Double, modifier: Double, currentValue: Double) -> Double) =
-            register(LanternAttributeOperation(CatalogKey.minecraft(id), priority, changeValueImmediately, attributeOperationFunction(function)))
+            register(LanternAttributeOperation(ResourceKey.minecraft(id), priority, changeValueImmediately, attributeOperationFunction(function)))
 
     register("add_amount", 0, false) { _, modifier, _ -> modifier }
     register("multiply_base", 1, false) { base, modifier, current -> base * modifier - current }

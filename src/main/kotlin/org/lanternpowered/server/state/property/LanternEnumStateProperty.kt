@@ -15,14 +15,14 @@ import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.EnumStateProperty
 import java.util.Optional
 
 internal class LanternEnumStateProperty<E : Enum<E>>(
-        key: CatalogKey, valueClass: Class<E>, possibleValues: ImmutableSet<E>, valueKey: Key<out Value<E>>
+        key: ResourceKey, valueClass: Class<E>, possibleValues: ImmutableSet<E>, valueKey: Key<out Value<E>>
 ) : AbstractStateProperty<E, E>(key, valueClass, possibleValues, valueKey, identityStateKeyValueTransformer()), EnumStateProperty<E> {
 
     override var sortedPossibleValues: List<E> = ImmutableList.sortedCopyOf(this.possibleValues)

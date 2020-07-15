@@ -11,7 +11,7 @@
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.catalog.CatalogKeys.sponge
+import org.lanternpowered.api.ResourceKeys.sponge
 import org.lanternpowered.api.data.valueKeyOf
 import org.lanternpowered.api.util.ranges.rangeTo
 import org.lanternpowered.api.util.type.typeToken
@@ -33,13 +33,13 @@ object ValueKeyRegistryModule : AdditionalPluginCatalogRegistryModule<Key<*>>(Ke
 
         val valueTypeParameter = Key::class.java.typeParameters[0]
         for (field in Keys::class.java.fields) {
-            val catalogKey = sponge(field.name.toLowerCase())
+            val ResourceKey = sponge(field.name.toLowerCase())
             // Already registered manually
-            if (get(catalogKey).isPresent) {
+            if (get(ResourceKey).isPresent) {
                 continue
             }
             val valueToken = field.genericType.typeToken.resolveType(valueTypeParameter)
-            register(valueKeyOf(catalogKey, valueToken.uncheckedCast<TypeToken<Value<Any>>>()))
+            register(valueKeyOf(ResourceKey, valueToken.uncheckedCast<TypeToken<Value<Any>>>()))
         }
 
         for (field in LanternKeys::class.java.fields) {

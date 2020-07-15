@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.serializer.FormattingCodeTextSerializer
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
@@ -25,7 +25,7 @@ object LanternTextSerializerFactory : TextSerializerFactory, TextSerializers.Fac
 
     private const val defaultFormattingCode = '&'
     private val defaultFormattingCodeTextSerializer = LanternFormattingCodeTextSerializer(
-            CatalogKey.minecraft("formatting_code"), this.defaultFormattingCode)
+            ResourceKey.minecraft("formatting_code"), this.defaultFormattingCode)
 
     override fun createFormattingCodeSerializer(code: Char): FormattingCodeTextSerializer = formatting(code)
 
@@ -43,7 +43,7 @@ object LanternTextSerializerFactory : TextSerializerFactory, TextSerializers.Fac
             LanternFormattingCodes.LEGACY_CODE -> LanternLegacyTextSerializer
             this.defaultFormattingCode -> this.defaultFormattingCodeTextSerializer
             else -> this.formattingCodeSerializers.computeIfAbsent(code) {
-                LanternFormattingCodeTextSerializer(CatalogKey.minecraft("formatting_code_$it"), it)
+                LanternFormattingCodeTextSerializer(ResourceKey.minecraft("formatting_code_$it"), it)
             }
         }
     }

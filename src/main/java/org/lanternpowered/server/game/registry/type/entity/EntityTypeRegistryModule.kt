@@ -10,9 +10,8 @@
  */
 package org.lanternpowered.server.game.registry.type.entity
 
-import org.lanternpowered.api.catalog.CatalogKeys.minecraft
-import org.lanternpowered.api.catalog.CatalogKeys.sponge
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.ResourceKeys.minecraft
+import org.lanternpowered.api.ResourceKeys.sponge
 import org.lanternpowered.server.data.key.ValueKeyRegistryModule
 import org.lanternpowered.server.entity.LanternHuman
 import org.lanternpowered.server.entity.LanternItem

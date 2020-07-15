@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.recipe
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.item.recipe.Recipe
@@ -21,7 +21,7 @@ import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe
 
 val RecipeTypeRegistry = catalogTypeRegistry<RecipeType<*>> {
     fun <T : Recipe> register(id: String) =
-            register(LanternRecipeType<T>(CatalogKey.minecraft(id)))
+            register(LanternRecipeType<T>(ResourceKey.minecraft(id)))
 
     register<CraftingRecipe>("crafting")
     register<SmeltingRecipe>("smelting")
@@ -31,4 +31,4 @@ val RecipeTypeRegistry = catalogTypeRegistry<RecipeType<*>> {
     register<StoneCutterRecipe>("stonecutting")
 }
 
-private class LanternRecipeType<T : Recipe>(key: CatalogKey) : DefaultCatalogType(key), RecipeType<T>
+private class LanternRecipeType<T : Recipe>(key: ResourceKey) : DefaultCatalogType(key), RecipeType<T>

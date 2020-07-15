@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.advancement.layout.LanternTreeLayoutElement;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.AdvancementType;
@@ -53,7 +53,7 @@ public class LanternAdvancement extends DefaultCatalogType.Named implements Adva
     // Criteria data that will be used to sync criteria with the client
     final Tuple<List<AdvancementCriterion>, String[][]> clientCriteria;
 
-    LanternAdvancement(CatalogKey key, Translation name,
+    LanternAdvancement(ResourceKey key, Translation name,
             @Nullable Advancement parent, @Nullable DisplayInfo displayInfo, AdvancementCriterion criterion) {
         super(key, name);
         this.layoutElement = displayInfo == null ? null : new LanternTreeLayoutElement(this);

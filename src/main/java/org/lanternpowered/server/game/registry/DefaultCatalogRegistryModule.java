@@ -22,7 +22,7 @@ import kotlin.jvm.JvmClassMappingKt;
 import kotlin.reflect.KClass;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.util.Tuple;
 
@@ -50,7 +50,7 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
     /**
      * The types mapped by their catalog key.
      */
-    private Map<CatalogKey, T> types = new HashMap<>();
+    private Map<ResourceKey, T> types = new HashMap<>();
 
     /**
      * Patterns to validate the catalog keys.
@@ -142,7 +142,7 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
         checkFinalizedContent();
         checkState(this.values == null, "The content is finalized and doesn't allow any new entries.");
         checkNotNull(catalogType, "catalogType");
-        final CatalogKey key = catalogType.getKey();
+        final ResourceKey key = catalogType.getKey();
         checkArgument(this.keyPattern.matcher(key.toString()).matches(),
                 "The catalog type id %s must match the regex: %s", key, this.keyPatternValue);
         checkState(!this.types.containsKey(key), "There is already a catalog type registered with the id: %s", key);
@@ -182,7 +182,7 @@ public abstract class DefaultCatalogRegistryModule<T extends CatalogType>
     }
 
     @Override
-    public Optional<T> get(CatalogKey key) {
+    public Optional<T> get(ResourceKey key) {
         checkNotNull(key, "key");
         return Optional.ofNullable(this.types.get(key));
     }

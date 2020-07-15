@@ -16,7 +16,7 @@ import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -37,7 +37,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
         dataView.remove(ID);
 
         final LanternEntityType entityType = (LanternEntityType) Sponge.getRegistry()
-                .getType(EntityType.class, CatalogKey.resolve(id))
+                .getType(EntityType.class, ResourceKey.resolve(id))
                 .orElseThrow(() -> new InvalidDataException("Unknown entity id: " + id));
         //noinspection unchecked
         final ObjectStore<LanternEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(entityType.getEntityClass()).get();

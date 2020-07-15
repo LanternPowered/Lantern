@@ -13,12 +13,12 @@ package org.lanternpowered.server.boss
 import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.boss.BossBarColor
 import org.lanternpowered.api.boss.BossBarOverlay
+import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.network.message.Message
 import org.lanternpowered.server.network.vanilla.message.type.play.BossBarMessage
-import org.spongepowered.api.entity.living.player.Player
 import java.util.UUID
 
 data class LanternBossBar internal constructor(

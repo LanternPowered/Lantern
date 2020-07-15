@@ -25,7 +25,7 @@ import com.google.common.reflect.TypeToken;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.util.EqualsHelper;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -248,8 +248,8 @@ class MemoryDataView implements DataView {
             copyDataView(path, valueContainer);
         } else if (value instanceof CatalogType) {
             return set(path, ((CatalogType) value).getKey().toString());
-        } else if (value instanceof CatalogKey) {
-            return set(path, ((CatalogKey) value).toString());
+        } else if (value instanceof ResourceKey) {
+            return set(path, ((ResourceKey) value).toString());
         } else if (value instanceof Integer ||
                 value instanceof Byte ||
                 value instanceof Short ||
@@ -715,7 +715,7 @@ class MemoryDataView implements DataView {
     public <T extends CatalogType> Optional<T> getCatalogType(DataQuery path, Class<T> catalogType) {
         checkNotNull(path, "path");
         checkNotNull(catalogType, "dummy type");
-        return getString(path).flatMap(string -> Sponge.getRegistry().getType(catalogType, CatalogKey.resolve(string)));
+        return getString(path).flatMap(string -> Sponge.getRegistry().getType(catalogType, ResourceKey.resolve(string)));
     }
 
     @Override
@@ -723,7 +723,7 @@ class MemoryDataView implements DataView {
         checkNotNull(path, "path");
         checkNotNull(catalogType, "catalogType");
         return getStringList(path).map(list -> list.stream()
-                .map(value -> Sponge.getRegistry().getType(catalogType, CatalogKey.resolve(value)))
+                .map(value -> Sponge.getRegistry().getType(catalogType, ResourceKey.resolve(value)))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));

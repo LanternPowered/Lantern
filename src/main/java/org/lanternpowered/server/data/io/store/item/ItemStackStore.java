@@ -21,7 +21,7 @@ import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistry
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Key;
@@ -88,7 +88,7 @@ public final class ItemStackStore extends LocalMutableDataHolderStore<LanternIte
         final BannerItemTypeSerializer bannerSerializer = new BannerItemTypeSerializer();
         final ShulkerBoxItemObjectSerializer shulkerBoxSerializer = new ShulkerBoxItemObjectSerializer();
         for (ItemType itemType : ItemTypeRegistry.INSTANCE.getAll()) {
-            if (itemType.getKey().getValue().equals(CatalogKey.MINECRAFT_NAMESPACE)) {
+            if (itemType.getKey().getValue().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
                 final String value = itemType.getKey().getValue();
                 if (value.endsWith("shulker_box")) {
                     add(itemType, shulkerBoxSerializer);
@@ -110,7 +110,7 @@ public final class ItemStackStore extends LocalMutableDataHolderStore<LanternIte
     @Override
     public LanternItemStack deserialize(DataView dataView) throws InvalidDataException {
         final String identifier = dataView.getString(IDENTIFIER).get();
-        final ItemType itemType = ItemTypeRegistry.INSTANCE.get(CatalogKey.resolve(identifier)).orElseThrow(
+        final ItemType itemType = ItemTypeRegistry.INSTANCE.get(ResourceKey.resolve(identifier)).orElseThrow(
                 () -> new InvalidDataException("There is no item type with the id: " + identifier));
         final LanternItemStack itemStack = new LanternItemStack(itemType);
         deserialize(itemStack, dataView);
@@ -195,7 +195,7 @@ public final class ItemStackStore extends LocalMutableDataHolderStore<LanternIte
         dataView.getStringList(CAN_DESTROY).ifPresent(types -> {
             if (!types.isEmpty()) {
                 final Set<BlockType> blockTypes = new HashSet<>();
-                types.forEach(type -> BlockRegistryModule.get().get(CatalogKey.resolve(type)).ifPresent(blockTypes::add));
+                types.forEach(type -> BlockRegistryModule.get().get(ResourceKey.resolve(type)).ifPresent(blockTypes::add));
                 valueContainer.set(Keys.BREAKABLE_BLOCK_TYPES, blockTypes);
             }
         });

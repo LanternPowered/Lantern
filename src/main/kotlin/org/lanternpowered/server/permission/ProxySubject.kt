@@ -12,7 +12,7 @@ package org.lanternpowered.server.permission
 
 import org.lanternpowered.api.service.provide
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.server.service.LanternServiceManager
+import org.lanternpowered.server.service.LanternServiceProvider
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.permission.PermissionService
@@ -55,7 +55,7 @@ interface ProxySubject : Subject {
     @JvmDefault
     fun initializeSubject() {
         val reference = WeakReference(this)
-        LanternServiceManager.watchExpirable<PermissionService> { service ->
+        LanternServiceProvider.watchExpirable<PermissionService> { service ->
             // Don't reference to this in this block, use the weak reference
             // for this, we don't want to create a listener with a hard
             // reference to the subject
@@ -74,7 +74,7 @@ interface ProxySubject : Subject {
     fun resolveNullableSubject(): Subject? {
         var reference = this.internalSubject
         if (reference == null) {
-            val service = LanternServiceManager.provide<PermissionService>()
+            val service = LanternServiceProvider.provide<PermissionService>()
             if (service != null) {
                 // Try to update the internal subject
                 updateInternalSubject(this, service)

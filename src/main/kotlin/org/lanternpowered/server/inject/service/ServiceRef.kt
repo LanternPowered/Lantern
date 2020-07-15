@@ -21,6 +21,7 @@ import java.util.Optional
  *
  * @param T The service type
  */
+@Deprecated("")
 @FunctionalInterface
 @ProvidedBy(ServiceRefProvider::class)
 interface ServiceRef<T> {
@@ -62,7 +63,7 @@ interface ServiceRef<T> {
          */
         fun <T> of(type: Class<T>) = object : ServiceRef<T> {
             override val registration: ProviderRegistration<T>
-                get() = Lantern.serviceManager.getRegistration(type).orElseThrow { IllegalStateException("Service not found: ${type.name}") }
+                get() = Lantern.serviceProvider.getRegistration(type).orElseThrow { IllegalStateException("Service not found: ${type.name}") }
         }
     }
 }

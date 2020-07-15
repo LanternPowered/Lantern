@@ -10,22 +10,22 @@
  */
 package org.lanternpowered.server.registry.type.potion
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.ResourceKeys
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 
 val PotionEffectTypeRegistry = internalCatalogTypeRegistry<PotionEffectType> {
-    val internalIds = mutableMapOf<CatalogKey, Int>()
+    val internalIds = mutableMapOf<ResourceKey, Int>()
 
     InternalRegistries.visitElements("mob_effect") { id, element ->
-        internalIds[CatalogKeys.resolve(id)] = element.asJsonObject["internal_id"].asInt
+        internalIds[ResourceKeys.resolve(id)] = element.asJsonObject["internal_id"].asInt
     }
 
     fun register(id: String): LanternPotionEffectType {
-        val key = CatalogKey.minecraft(id)
+        val key = ResourceKey.minecraft(id)
         val internalId = internalIds[key]!!
         return register(internalId, LanternPotionEffectType(key))
     }

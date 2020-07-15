@@ -510,7 +510,7 @@ private inline class ChunkSector(val packed: Int) {
     /**
      * Whether the sector exists.
      */
-    val exists: Boolean get() = this.packed != NONE.packed
+    val exists: Boolean get() = this != NONE
 
     /**
      * The sector start index.

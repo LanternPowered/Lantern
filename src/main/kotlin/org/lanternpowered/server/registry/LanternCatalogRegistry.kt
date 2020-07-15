@@ -11,21 +11,21 @@
 package org.lanternpowered.server.registry
 
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.registry.CatalogRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.DuplicateRegistrationException
 import org.lanternpowered.api.registry.UnknownTypeException
 import org.lanternpowered.api.util.optional.optional
-import org.spongepowered.api.CatalogKey
 import java.util.Optional
 import java.util.function.Supplier
 import java.util.stream.Stream
 import kotlin.reflect.KClass
-import kotlin.streams.asSequence
 
 object LanternCatalogRegistry : CatalogRegistry {
 
     private val registriesByType = mutableMapOf<Class<*>, CatalogTypeRegistry<*>>()
+    private val registeredResourceKeys = mutableSetOf<ResourceKey>()
 
     /**
      * Makes sure that all the registries are loaded.
@@ -41,10 +41,13 @@ object LanternCatalogRegistry : CatalogRegistry {
      * @param registry The catalog type registry
      * @throws DuplicateRegistrationException If there's already a registry for the target type
      */
-    fun register(registry: CatalogTypeRegistry<*>) {
+    fun register(registry: CatalogTypeRegistry<*>, key: ResourceKey) {
         val type = registry.typeToken.rawType
         if (type in this.registriesByType)
             throw DuplicateRegistrationException("The type ${type.simpleName} is already registered.")
+        if (key in this.registeredResourceKeys)
+            throw DuplicateRegistrationException("There's already a registry bound to: $key")
+        this.registeredResourceKeys += key
         this.registriesByType[type] = registry
     }
 
@@ -72,13 +75,16 @@ object LanternCatalogRegistry : CatalogRegistry {
     override fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): E =
             requireRegistry(catalogClass).provide(suggestedId) as E
 
-    override fun <T : CatalogType> get(typeClass: KClass<T>, key: CatalogKey): T? = getNullable(typeClass.java, key)
-    override fun <T : CatalogType> get(typeClass: Class<T>, key: CatalogKey): Optional<T> = getNullable(typeClass, key).optional()
+    override fun <T : CatalogType> get(typeClass: KClass<T>, key: ResourceKey): T? = getNullable(typeClass.java, key)
+    override fun <T : CatalogType> get(typeClass: Class<T>, key: ResourceKey): Optional<T> = getNullable(typeClass, key).optional()
 
-    private fun <T : CatalogType> getNullable(typeClass: Class<T>, key: CatalogKey): T? = getRegistry(typeClass)?.get(key)
-    override fun <T : CatalogType> getAllOf(typeClass: KClass<T>): Sequence<T> = getAllOf(typeClass.java).asSequence()
-    override fun <T : CatalogType> getAllOf(typeClass: Class<T>): Stream<T> = getRegistry(typeClass)?.all?.stream() ?: emptyList<T>().stream()
+    private fun <T : CatalogType> getNullable(typeClass: Class<T>, key: ResourceKey): T? = getRegistry(typeClass)?.get(key)
 
-    override fun <T : CatalogType> getAllFor(typeClass: Class<T>, namespace: String): Stream<T> =
+    override fun <T : CatalogType> getAllOf(typeClass: KClass<T>): Collection<T> = getAllOf(typeClass.java)
+    override fun <T : CatalogType> getAllOf(typeClass: Class<T>): Collection<T> = getRegistry(typeClass)?.all ?: emptyList()
+    override fun <T : CatalogType> getAllFor(typeClass: Class<T>, namespace: String): Collection<T> =
             getAllOf(typeClass).filter { type -> type.key.namespace == namespace }
+
+    override fun <T : CatalogType> streamAllOf(typeClass: Class<T>): Stream<T> = getAllOf(typeClass).stream()
+    override fun <T : CatalogType> streamAllFor(typeClass: Class<T>, namespace: String): Stream<T> = getAllFor(typeClass, namespace).stream()
 }

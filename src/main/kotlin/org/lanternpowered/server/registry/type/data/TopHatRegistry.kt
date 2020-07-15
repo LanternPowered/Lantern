@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.ResourceKeys
 import org.lanternpowered.api.data.type.DyeColor
 import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.registry.catalogTypeRegistry
@@ -21,7 +21,7 @@ import java.util.function.Supplier
 
 val TopHatRegistry = catalogTypeRegistry<TopHat> {
     fun register(id: String, dyeColor: Supplier<out DyeColor>? = null) =
-            register(LanternTopHat(CatalogKeys.lantern(id), dyeColor?.get()))
+            register(LanternTopHat(ResourceKeys.lantern(id), dyeColor?.get()))
 
     register("black_top_hat", DyeColors.BLACK)
     register("blue_top_hat", DyeColors.BLUE)
@@ -46,4 +46,4 @@ val TopHatRegistry = catalogTypeRegistry<TopHat> {
     register("yellow_top_hat", DyeColors.YELLOW)
 }
 
-private class LanternTopHat(key: CatalogKey, override val dyeColor: DyeColor? = null) : DefaultCatalogType(key), TopHat
+private class LanternTopHat(key: ResourceKey, override val dyeColor: DyeColor? = null) : DefaultCatalogType(key), TopHat

@@ -22,8 +22,8 @@ class SpongeChunkDataStream(
 ) : ChunkDataStream {
 
     private var sequence = this.chunkStorage.sequence().iterator()
-    private var read: Int = 0
-    private var available: Int = -1
+    private var read = 0
+    private var available = UNKNOWN
 
     override fun next(): DataContainer? {
         val entry = this.sequence.next()
@@ -37,7 +37,7 @@ class SpongeChunkDataStream(
     override fun available(): Int {
         // This will be an estimate, the stream can still change
         // if chunks are being saved in the meantime
-        if (this.available == -1)
+        if (this.available == UNKNOWN)
             this.available = this.chunkStorage.sequence().count()
         return this.available - this.read
     }
@@ -47,7 +47,12 @@ class SpongeChunkDataStream(
     override fun reset() {
         // Restart the sequence
         this.sequence = this.chunkStorage.sequence().iterator()
-        this.available = -1
+        this.available = UNKNOWN
         this.read = 0
+    }
+
+    companion object {
+
+        private const val UNKNOWN = -1
     }
 }

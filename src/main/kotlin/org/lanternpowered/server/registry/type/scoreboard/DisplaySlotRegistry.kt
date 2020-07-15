@@ -11,7 +11,7 @@
 @file:JvmName("DisplaySlotRegistry")
 package org.lanternpowered.server.registry.type.scoreboard
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
@@ -22,7 +22,7 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlot
 @get:JvmName("get")
 val DisplaySlotRegistry = internalCatalogTypeRegistry<DisplaySlot> {
     fun register(internalId: Int, id: String) =
-            register(internalId, LanternDisplaySlot(CatalogKey.minecraft(id), null, null))
+            register(internalId, LanternDisplaySlot(ResourceKey.minecraft(id), null, null))
 
     register(0, "list")
     register(2, "below_name")
@@ -31,7 +31,7 @@ val DisplaySlotRegistry = internalCatalogTypeRegistry<DisplaySlot> {
     val sidebarWithTeamColor = { teamColor: TextColor? -> sidebarByTeamColor[teamColor]!! }
 
     fun registerSidebar(internalId: Int, id: String, teamColor: TextColor? = null) {
-        val sidebar = register(internalId, LanternDisplaySlot(CatalogKey.minecraft(id), teamColor, sidebarWithTeamColor))
+        val sidebar = register(internalId, LanternDisplaySlot(ResourceKey.minecraft(id), teamColor, sidebarWithTeamColor))
         sidebarByTeamColor[teamColor] = sidebar
     }
 
@@ -44,7 +44,7 @@ val DisplaySlotRegistry = internalCatalogTypeRegistry<DisplaySlot> {
 }
 
 private class LanternDisplaySlot(
-        key: CatalogKey,
+        key: ResourceKey,
         private val teamColor: TextColor?,
         private val withTeamColor: ((TextColor?) -> DisplaySlot)?
 ) : DefaultCatalogType(key), DisplaySlot {

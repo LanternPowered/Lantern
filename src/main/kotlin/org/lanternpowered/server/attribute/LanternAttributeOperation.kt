@@ -11,11 +11,11 @@
 package org.lanternpowered.server.attribute
 
 import org.lanternpowered.api.attribute.AttributeOperation
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 
 class LanternAttributeOperation(
-        key: CatalogKey,
+        key: ResourceKey,
         private val priority: Int,
         val changeValueImmediately: Boolean,
         private val function: AttributeOperationFunction

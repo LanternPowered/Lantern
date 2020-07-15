@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
@@ -20,7 +20,7 @@ import java.util.List;
 // TODO: Make the generated land finite
 public final class FlatTheEndGeneratorType extends AbstractFlatGeneratorType {
 
-    public FlatTheEndGeneratorType(CatalogKey key) {
+    public FlatTheEndGeneratorType(ResourceKey key) {
         super(key);
         setDefaultGeneratorHeight(256);
         setDefaultGeneratorHeight(4);

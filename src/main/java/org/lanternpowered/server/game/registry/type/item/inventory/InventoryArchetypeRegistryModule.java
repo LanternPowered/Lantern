@@ -20,7 +20,7 @@ import org.lanternpowered.server.inventory.sponge.SpongeInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.util.UncheckedThrowables;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
@@ -47,8 +47,8 @@ public class InventoryArchetypeRegistryModule extends DefaultCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        register(new UnknownInventoryArchetype(CatalogKey.minecraft("unknown")));
-        register(new UnknownInventoryArchetype(CatalogKey.minecraft("empty")));
+        register(new UnknownInventoryArchetype(ResourceKey.minecraft("unknown")));
+        register(new UnknownInventoryArchetype(ResourceKey.minecraft("empty")));
 
         for (Class<?> target : Arrays.asList(VanillaInventoryArchetypes.class, SpongeInventoryArchetypes.class)) {
             for (Field field : target.getFields()) {

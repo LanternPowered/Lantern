@@ -12,7 +12,7 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 
@@ -27,7 +27,7 @@ public class BuilderInventoryArchetype<T extends AbstractInventory> extends Lant
     private final AbstractArchetypeBuilder<T, ? super T, ?> builder;
     private final List<InventoryArchetype> childArchetypes;
 
-    BuilderInventoryArchetype(CatalogKey key, AbstractArchetypeBuilder<T, ? super T, ?> builder) {
+    BuilderInventoryArchetype(ResourceKey key, AbstractArchetypeBuilder<T, ? super T, ?> builder) {
         super(key);
         this.childArchetypes = Collections.unmodifiableList(builder.getArchetypes());
         this.builder = builder;

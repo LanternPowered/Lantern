@@ -15,21 +15,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 
 import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public final class LanternBlockEntityProtocolType<T extends LanternBlockEntity> extends DefaultCatalogType implements BlockEntityProtocolType<T> {
 
-    public static <T extends LanternBlockEntity> BlockEntityProtocolType<T> of(CatalogKey key,
+    public static <T extends LanternBlockEntity> BlockEntityProtocolType<T> of(ResourceKey key,
             Class<T> tileEntityType, Function<T, ? extends AbstractBlockEntityProtocol<T>> entityProtocolSupplier) {
         checkNotNull(tileEntityType, "blockEntityType");
         checkNotNull(entityProtocolSupplier, "entityProtocolSupplier");
         return new LanternBlockEntityProtocolType<>(key, tileEntityType, entityProtocolSupplier);
     }
 
-    public static <T extends LanternBlockEntity> BlockEntityProtocolType<T> of(CatalogKey key,
+    public static <T extends LanternBlockEntity> BlockEntityProtocolType<T> of(ResourceKey key,
             Function<T, ? extends AbstractBlockEntityProtocol<T>> entityProtocolSupplier) {
         return of(key, (Class<T>) LanternBlockEntity.class, entityProtocolSupplier);
     }
@@ -37,7 +37,7 @@ public final class LanternBlockEntityProtocolType<T extends LanternBlockEntity> 
     private final Class<T> blockEntityType;
     private final Function<T, AbstractBlockEntityProtocol<T>> protocolSupplier;
 
-    private LanternBlockEntityProtocolType(CatalogKey key, Class<T> blockEntityType,
+    private LanternBlockEntityProtocolType(ResourceKey key, Class<T> blockEntityType,
             Function<T, ? extends AbstractBlockEntityProtocol<T>> protocolSupplier) {
         super(key);
         this.protocolSupplier = (Function<T, AbstractBlockEntityProtocol<T>>) protocolSupplier;

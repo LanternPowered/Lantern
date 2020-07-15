@@ -15,7 +15,7 @@ import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.api.ResourceKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -26,7 +26,7 @@ import org.lanternpowered.server.world.gen.flat.FlatNetherGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatOverworldGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatTheEndGeneratorType;
 import org.lanternpowered.server.world.gen.thevoid.TheVoidGeneratorType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.plugin.PluginContainer;
@@ -57,27 +57,27 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        final FlatOverworldGeneratorType flat = new FlatOverworldGeneratorType(CatalogKeys.minecraft("flat"));
-        final FlatNetherGeneratorType flatNether = new FlatNetherGeneratorType(CatalogKeys.lantern("flat_nether"));
-        final FlatTheEndGeneratorType flatTheEnd = new FlatTheEndGeneratorType(CatalogKeys.lantern("flat_the_end"));
+        final FlatOverworldGeneratorType flat = new FlatOverworldGeneratorType(ResourceKeys.minecraft("flat"));
+        final FlatNetherGeneratorType flatNether = new FlatNetherGeneratorType(ResourceKeys.lantern("flat_nether"));
+        final FlatTheEndGeneratorType flatTheEnd = new FlatTheEndGeneratorType(ResourceKeys.lantern("flat_the_end"));
 
         // Default inbuilt generator types
         register(flat);
         register(flatNether);
         register(flatTheEnd);
-        register(new DebugGeneratorType(CatalogKeys.minecraft("minecraft")));
+        register(new DebugGeneratorType(ResourceKeys.minecraft("minecraft")));
 
         // Plugin provided generator types, these will fall back
         // to flat if missing
-        register(new DelegateGeneratorType(CatalogKeys.minecraft("default"), flat));
-        register(new DelegateGeneratorType(CatalogKeys.minecraft("overworld"), flat));
-        register(new DelegateGeneratorType(CatalogKeys.minecraft("large_biomes"), flat));
-        register(new DelegateGeneratorType(CatalogKeys.minecraft("amplified"), flat));
-        register(new DelegateGeneratorType(CatalogKeys.minecraft("nether"), flatNether));
-        register(new DelegateGeneratorType(CatalogKeys.minecraft("the_end"), flatTheEnd));
+        register(new DelegateGeneratorType(ResourceKeys.minecraft("default"), flat));
+        register(new DelegateGeneratorType(ResourceKeys.minecraft("overworld"), flat));
+        register(new DelegateGeneratorType(ResourceKeys.minecraft("large_biomes"), flat));
+        register(new DelegateGeneratorType(ResourceKeys.minecraft("amplified"), flat));
+        register(new DelegateGeneratorType(ResourceKeys.minecraft("nether"), flatNether));
+        register(new DelegateGeneratorType(ResourceKeys.minecraft("the_end"), flatTheEnd));
 
         // Sponge
-        register(new TheVoidGeneratorType(CatalogKeys.sponge("void")));
+        register(new TheVoidGeneratorType(ResourceKeys.sponge("void")));
     }
 
     /**
@@ -99,7 +99,7 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
                         final JsonObject json = gson.fromJson(reader, JsonObject.class);
                         for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
                             entries.put(entry.getKey(), new DefaultEntry(
-                                    pluginContainer, CatalogKey.resolve(entry.getValue().getAsString())));
+                                    pluginContainer, ResourceKey.resolve(entry.getValue().getAsString())));
                         }
                     }
                 } catch (IOException e) {
@@ -108,7 +108,7 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
             }
         }
         for (Map.Entry<String, Collection<DefaultEntry>> entry : entries.asMap().entrySet()) {
-            final CatalogKey key = CatalogKey.resolve(entry.getKey());
+            final ResourceKey key = ResourceKey.resolve(entry.getKey());
             if (!get(key).map(type -> type instanceof DelegateGeneratorType).orElse(false)) {
                 Lantern.getLogger().warn("The plugin(s) ({}) attempted to map an unknown id: {}",
                         Arrays.toString(entry.getValue().stream().map(e -> e.pluginContainer.getId()).toArray()), key);
@@ -141,9 +141,9 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
     private static final class DefaultEntry {
 
         private final PluginContainer pluginContainer;
-        private final CatalogKey type;
+        private final ResourceKey type;
 
-        private DefaultEntry(PluginContainer pluginContainer, CatalogKey type) {
+        private DefaultEntry(PluginContainer pluginContainer, ResourceKey type) {
             this.pluginContainer = pluginContainer;
             this.type = type;
         }

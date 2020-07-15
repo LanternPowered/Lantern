@@ -15,7 +15,7 @@ import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DataRegistration
@@ -27,7 +27,7 @@ import org.spongepowered.plugin.PluginContainer
 import java.util.Optional
 
 class LanternDataRegistration(
-        key: CatalogKey,
+        key: ResourceKey,
         private val pluginContainer: PluginContainer,
         private val keys: Set<Key<*>>,
         private val dataStores: List<DataStore>,

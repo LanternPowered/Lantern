@@ -21,7 +21,7 @@ import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStrea
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.network.item.NetworkItemHelper;
 import org.lanternpowered.server.network.item.RawItemStack;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3f;
@@ -984,26 +984,26 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public CatalogKey getCatalogKey(int index) {
-        return getAt(index, this::readCatalogKey);
+    public ResourceKey getResourceKey(int index) {
+        return getAt(index, this::readResourceKey);
     }
 
     @Override
-    public LanternByteBuffer setCatalogKey(int index, CatalogKey catalogKey) {
-        return setAt(index, catalogKey, this::writeCatalogKey);
+    public LanternByteBuffer setResourceKey(int index, ResourceKey ResourceKey) {
+        return setAt(index, ResourceKey, this::writeResourceKey);
     }
 
     @Override
-    public CatalogKey readCatalogKey() {
-        return CatalogKey.resolve(readString());
+    public ResourceKey readResourceKey() {
+        return ResourceKey.resolve(readString());
     }
 
     @Override
-    public LanternByteBuffer writeCatalogKey(CatalogKey catalogKey) {
-        if (catalogKey.getNamespace().equals(CatalogKey.MINECRAFT_NAMESPACE)) {
-            return writeString(catalogKey.getValue());
+    public LanternByteBuffer writeResourceKey(ResourceKey ResourceKey) {
+        if (ResourceKey.getNamespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
+            return writeString(ResourceKey.getValue());
         } else {
-            return writeString(catalogKey.toString());
+            return writeString(ResourceKey.toString());
         }
     }
 

@@ -10,18 +10,18 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.event.cause.entity.dismount.DismountType
 
 val DismountTypeRegistry = catalogTypeRegistry<DismountType> {
     fun register(id: String) =
-            register(LanternDismountType(CatalogKey.minecraft(id)))
+            register(LanternDismountType(ResourceKey.minecraft(id)))
 
     register("death")
     register("derail")
     register("player")
 }
 
-private class LanternDismountType(key: CatalogKey) : DefaultCatalogType(key), DismountType
+private class LanternDismountType(key: ResourceKey) : DefaultCatalogType(key), DismountType

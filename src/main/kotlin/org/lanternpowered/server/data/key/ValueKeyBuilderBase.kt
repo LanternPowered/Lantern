@@ -15,7 +15,7 @@ import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.registry.BaseBuilder
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.data.value.CopyHelper
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.ListValue
@@ -43,7 +43,7 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
         this.valueType = type
     }
 
-    override fun key(key: CatalogKey): B = apply { super.key(key) }.uncheckedCast()
+    override fun key(key: ResourceKey): B = apply { super.key(key) }.uncheckedCast()
 
     protected fun setMinValue(minValue: E) = setMinValueSupplier { CopyHelper.copy(minValue) }
     protected fun setMinValueSupplier(supplier: () -> E) { this.minValueSupplier = supplier }
@@ -56,7 +56,7 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
 
     protected fun setRequireExplicitRegistration() { this.requiresExplicitRegistration = true }
 
-    override fun build(key: CatalogKey): Key<V> {
+    override fun build(key: ResourceKey): Key<V> {
         val valueType = checkNotNull(this.valueType) { "The type must be set" }
         val elementType = valueType.resolveType(elementParameter).uncheckedCast<TypeToken<E>>()
         val comparator: Comparator<in E> = this.comparator ?: run {

@@ -18,7 +18,7 @@ import org.lanternpowered.lmbda.LambdaFactory;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.registry.type.data.GameModeRegistry;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -37,7 +37,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
     static {
         converters.put(String.class.getName(), Function.identity());
         converters.put(EntityType.class.getName(), (Function<String, EntityType>) input ->
-                EntityTypeRegistryModule.INSTANCE.get(CatalogKey.resolve(input.toLowerCase())).orElse(null));
+                EntityTypeRegistryModule.INSTANCE.get(ResourceKey.resolve(input.toLowerCase())).orElse(null));
         converters.put(GameMode.class.getName(), input -> {
             switch (input) {
                 case "s": return GameModes.SURVIVAL;
@@ -49,7 +49,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
                 final int i = Integer.parseInt(input);
                 return GameModeRegistry.get().getOptional(i).orElseGet(GameModes.NOT_SET);
             } catch (NumberFormatException e) {
-                return GameModeRegistry.get().getOptional(CatalogKey.resolve(input)).orElseGet(GameModes.NOT_SET);
+                return GameModeRegistry.get().getOptional(ResourceKey.resolve(input)).orElseGet(GameModes.NOT_SET);
             }
         });
     }
@@ -65,7 +65,7 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
                     final Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);
                     converters.put(converterKey, (Function<String, T>) input -> {
                         // assume it exists for now
-                        return (T) Lantern.getGame().getRegistry().getType(type2, CatalogKey.resolve(input)).get();
+                        return (T) Lantern.getGame().getRegistry().getType(type2, ResourceKey.resolve(input)).get();
                     });
                 } else {
                     throw new IllegalStateException("Can't convert " + type);

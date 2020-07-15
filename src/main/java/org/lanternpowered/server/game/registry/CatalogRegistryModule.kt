@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.game.registry
 
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.CatalogType
 import java.util.Optional
 
@@ -25,7 +25,7 @@ interface CatalogRegistryModule<T : CatalogType> : RegistryModule {
      * @param id The id of the catalog type requested
      * @return The catalog type, if available
      */
-    fun get(key: CatalogKey): Optional<T>
+    fun get(key: ResourceKey): Optional<T>
 
     /**
      * Gets all registered [CatalogType]s registered in this

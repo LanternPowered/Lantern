@@ -27,7 +27,7 @@ import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementD
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry;
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.advancement.DisplayInfo;
@@ -416,7 +416,7 @@ public class LanternPlayerAdvancements {
 
     @SuppressWarnings("ConstantConditions")
     private static NetworkAdvancement createAdvancement(Advancement advancement) {
-        final String parentId = advancement.getParent().map(Advancement::getKey).map(CatalogKey::toString).orElse(null);
+        final String parentId = advancement.getParent().map(Advancement::getKey).map(ResourceKey::toString).orElse(null);
         final String background = parentId == null ? advancement.getTree().get().getBackgroundPath() : null;
         final DisplayInfo displayInfo = advancement.getDisplayInfo().orElse(null);
         final TreeLayoutElement layoutElement = ((LanternAdvancement) advancement).getLayoutElement();

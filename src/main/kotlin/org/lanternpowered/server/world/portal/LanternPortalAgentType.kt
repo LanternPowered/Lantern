@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.portal
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.teleport.PortalAgent
 import org.lanternpowered.api.world.teleport.PortalAgentType
@@ -18,7 +18,7 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.world.LanternWorld
 
 class LanternPortalAgentType<T : PortalAgent>(
-        key: CatalogKey,
+        key: ResourceKey,
         private val portalAgentClass: Class<T>,
         private val supplier: (World, LanternPortalAgentType<T>) -> T
 ) : DefaultCatalogType(key), PortalAgentType {

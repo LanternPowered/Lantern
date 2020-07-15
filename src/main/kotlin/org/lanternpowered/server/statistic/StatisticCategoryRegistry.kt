@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.statistic
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.text.translation.Translation
@@ -25,7 +25,7 @@ import org.spongepowered.api.statistic.StatisticCategory
 object StatisticCategoryRegistry : AdditionalPluginCatalogRegistryModule<StatisticCategory>(StatisticCategories::class) {
 
     override fun registerDefaults() {
-        register(LanternStatisticCategory(CatalogKey.minecraft("custom"), tr("Custom")))
+        register(LanternStatisticCategory(ResourceKey.minecraft("custom"), tr("Custom")))
 
         register<BlockType>("blocks_broken", "Blocks Broken")
         register<EntityType<*>>("entities_killed", "Entities Killed")
@@ -38,10 +38,10 @@ object StatisticCategoryRegistry : AdditionalPluginCatalogRegistryModule<Statist
     }
 
     private inline fun <reified C : CatalogType> register(id: String, name: String) {
-        register<C>(CatalogKey.minecraft(id), tr(name))
+        register<C>(ResourceKey.minecraft(id), tr(name))
     }
 
-    private inline fun <reified C : CatalogType> register(key: CatalogKey, name: Translation) {
+    private inline fun <reified C : CatalogType> register(key: ResourceKey, name: Translation) {
         register(LanternStatisticCategoryForCatalogType<C>(key, name, typeTokenOf()))
     }
 }

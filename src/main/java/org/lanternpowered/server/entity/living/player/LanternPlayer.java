@@ -90,7 +90,7 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
 import org.lanternpowered.server.world.chunk.ticket.ChunkLoadingTicket;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
@@ -402,7 +402,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         c.getAsElement(LanternKeys.OPEN_ADVANCEMENT_TREE).addChangeListener((player, oldTree, newTree) -> {
             if (player.getWorld() != null) {
                 player.session.send(new MessagePlayOutSelectAdvancementTree(
-                        newTree.map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
+                        newTree.map(AdvancementTree::getKey).map(ResourceKey::toString).orElse(null)));
             }
         });
 
@@ -503,7 +503,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 this.advancementsProgress.initClient();
 
                 this.session.send(new MessagePlayOutSelectAdvancementTree(get(LanternKeys.OPEN_ADVANCEMENT_TREE).get()
-                        .map(AdvancementTree::getKey).map(CatalogKey::toString).orElse(null)));
+                        .map(AdvancementTree::getKey).map(ResourceKey::toString).orElse(null)));
                 /*
                 this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
                         Collections.singletonList(new LiteralNode(Collections.emptyList(), "test", null, "test")),

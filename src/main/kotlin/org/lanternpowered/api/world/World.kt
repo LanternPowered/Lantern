@@ -21,7 +21,7 @@ typealias BlockChangeFlag = org.spongepowered.api.world.BlockChangeFlag
 typealias BlockChangeFlags = org.spongepowered.api.world.BlockChangeFlags
 typealias Locatable = org.spongepowered.api.world.Locatable
 typealias LocatableBlock = org.spongepowered.api.world.LocatableBlock
-typealias Location = org.spongepowered.api.world.Location
+typealias Location = org.spongepowered.api.world.ServerLocation
 typealias WorldBorder = org.spongepowered.api.world.WorldBorder
 
 /**

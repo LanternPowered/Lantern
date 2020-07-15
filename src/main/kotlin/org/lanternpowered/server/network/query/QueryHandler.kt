@@ -42,6 +42,7 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.plugin.version
+import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.SimpleRemoteConnection
 import org.lanternpowered.server.util.future.thenAsync
@@ -123,7 +124,7 @@ internal class QueryHandler(
     private fun createBasicEvent(channel: Channel): QueryServerEvent.Basic {
         val game = this.queryServer.game
         val server = game.server
-        val connection = SimpleRemoteConnection(channel.remoteAddress() as InetSocketAddress, null)
+        val connection = SimpleRemoteConnection.of(channel)
         val cause = causeOf(connection)
         val address = channel.localAddress() as InetSocketAddress
 
@@ -184,7 +185,7 @@ internal class QueryHandler(
             }
         }
         val playerNames = server.onlinePlayers.map { it.name }
-        val connection = SimpleRemoteConnection(channel.remoteAddress() as InetSocketAddress, null)
+        val connection = SimpleRemoteConnection.of(channel)
         val cause = causeOf(connection)
         val address = channel.localAddress() as InetSocketAddress
 
@@ -225,10 +226,7 @@ internal class QueryHandler(
     }
 
     private val worldName: String
-        get() {
-            val worlds = this.queryServer.game.server.worlds
-            return if (worlds.isNotEmpty()) worlds.iterator().next().getProperties().directoryName else "none"
-        }
+        get() = WorldManager.worlds.firstOrNull()?.properties?.directoryName ?: "none"
 
     companion object {
 

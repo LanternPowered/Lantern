@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data.key
 
-import org.lanternpowered.api.catalog.CatalogKeys.lantern
+import org.lanternpowered.api.ResourceKeys.lantern
 import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.data.valueKeyOf
 import org.lanternpowered.api.util.ranges.rangeTo

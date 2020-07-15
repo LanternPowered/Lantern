@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.gen
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
@@ -18,7 +18,7 @@ import org.spongepowered.api.world.gen.GeneratorType
 import org.spongepowered.api.world.gen.TerrainGenerator
 import org.spongepowered.api.world.server.ServerWorld
 
-class DelegateGeneratorType(key: CatalogKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {
+class DelegateGeneratorType(key: ResourceKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {
 
     /**
      * The actual [GeneratorType].

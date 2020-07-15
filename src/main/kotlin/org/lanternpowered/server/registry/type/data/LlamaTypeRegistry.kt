@@ -12,12 +12,12 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.type.LlamaType
 
 val LlamaTypeRegistry = internalCatalogTypeRegistry<LlamaType> {
     fun register(id: String) =
-            register(LanternLlamaType(CatalogKey.minecraft(id)))
+            register(LanternLlamaType(ResourceKey.minecraft(id)))
 
     register("creamy")
     register("white")
@@ -25,4 +25,4 @@ val LlamaTypeRegistry = internalCatalogTypeRegistry<LlamaType> {
     register("gray")
 }
 
-private class LanternLlamaType(key: CatalogKey) : DefaultCatalogType(key), LlamaType
+private class LanternLlamaType(key: ResourceKey) : DefaultCatalogType(key), LlamaType

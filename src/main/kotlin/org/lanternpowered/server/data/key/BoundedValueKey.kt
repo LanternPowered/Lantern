@@ -12,7 +12,7 @@ package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.data.value.BoundedValueConstructor
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.value.BoundedValue
 import java.util.function.BiPredicate
 
@@ -20,7 +20,7 @@ import java.util.function.BiPredicate
  * Represents the [ValueKey] of a [BoundedValue].
  */
 class BoundedValueKey<V : BoundedValue<E>, E : Any>(
-        key: CatalogKey,
+        key: ResourceKey,
         valueToken: TypeToken<V>,
         elementToken: TypeToken<E>,
         elementComparator: Comparator<in E>,

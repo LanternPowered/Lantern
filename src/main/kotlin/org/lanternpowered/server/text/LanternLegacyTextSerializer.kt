@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 
 object LanternLegacyTextSerializer : LegacyTextSerializer, LanternFormattingCodeTextSerializer(
-        CatalogKey.minecraft("legacy"), LanternFormattingCodes.LEGACY_CODE)
+        ResourceKey.minecraft("legacy"), LanternFormattingCodes.LEGACY_CODE)

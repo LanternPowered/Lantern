@@ -10,13 +10,22 @@
  */
 package org.lanternpowered.server.network
 
+import io.netty.channel.Channel
 import org.spongepowered.api.network.RemoteConnection
 import java.net.InetSocketAddress
 
 data class SimpleRemoteConnection(
         private val address: InetSocketAddress,
-        private val virtualHostAddress: InetSocketAddress?
+        private val virtualHostAddress: InetSocketAddress?,
+        private val close: () -> Unit
 ) : RemoteConnection {
     override fun getAddress(): InetSocketAddress = this.address
     override fun getVirtualHost(): InetSocketAddress = this.virtualHostAddress ?: this.address
+    override fun close() = this.close.invoke()
+
+    companion object {
+
+        fun of(channel: Channel, virtualHostAddress: InetSocketAddress? = null): SimpleRemoteConnection =
+                SimpleRemoteConnection(channel.remoteAddress() as InetSocketAddress, virtualHostAddress) { channel.close() }
+    }
 }

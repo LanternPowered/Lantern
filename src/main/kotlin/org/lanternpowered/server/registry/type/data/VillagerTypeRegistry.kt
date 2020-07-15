@@ -13,13 +13,13 @@ package org.lanternpowered.server.registry.type.data
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.type.VillagerType
 
 val VillagerTypeRegistry = internalCatalogTypeRegistry<VillagerType> {
     InternalRegistries.visit("villager_type") { key, internalId ->
-        register(internalId, LanternVillagerType(CatalogKey.resolve(key)))
+        register(internalId, LanternVillagerType(ResourceKey.resolve(key)))
     }
 }
 
-private class LanternVillagerType(key: CatalogKey) : DefaultCatalogType(key), VillagerType
+private class LanternVillagerType(key: ResourceKey) : DefaultCatalogType(key), VillagerType

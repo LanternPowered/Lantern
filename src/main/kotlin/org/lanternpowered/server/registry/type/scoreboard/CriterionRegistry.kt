@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.scoreboard
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
 import org.spongepowered.api.scoreboard.criteria.Criterion
 
 val CriterionRegistry = customInternalCatalogTypeRegistry<Criterion, String> {
     fun register(internalId: String, id: String) =
-            register(internalId, LanternCriterion(CatalogKey.minecraft(id)))
+            register(internalId, LanternCriterion(ResourceKey.minecraft(id)))
 
     register("dummy", "dummy")
     register("trigger", "trigger")
@@ -27,4 +27,4 @@ val CriterionRegistry = customInternalCatalogTypeRegistry<Criterion, String> {
     register("deathCount", "deaths")
 }
 
-private class LanternCriterion(key: CatalogKey) : DefaultCatalogType(key), Criterion
+private class LanternCriterion(key: ResourceKey) : DefaultCatalogType(key), Criterion

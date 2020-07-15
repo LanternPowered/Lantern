@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.text.chat
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.network.message.Message
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.chat.ChatType
 
-class LanternChatType(key: CatalogKey, val messageProvider: (Text) -> Message) : DefaultCatalogType(key), ChatType
+class LanternChatType(key: ResourceKey, val messageProvider: (Text) -> Message) : DefaultCatalogType(key), ChatType

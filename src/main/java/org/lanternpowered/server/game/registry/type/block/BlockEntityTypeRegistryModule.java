@@ -24,7 +24,7 @@ import org.lanternpowered.server.block.entity.vanilla.LanternSign;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.BlockEntityType;
 import org.spongepowered.api.block.entity.BlockEntityTypes;
@@ -64,12 +64,12 @@ public final class BlockEntityTypeRegistryModule extends AdditionalPluginCatalog
 
     @Override
     public void registerDefaults() {
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("banner"), LanternBanner::new));
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("chest"), LanternChest::new));
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("ender_chest"), LanternEnderChest::new));
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("furnace"), LanternFurnace::new));
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("jukebox"), LanternJukebox::new));
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("shulker_box"), LanternShulkerBox::new));
-        register(LanternBlockEntityType.of(CatalogKey.minecraft("sign"), LanternSign::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("banner"), LanternBanner::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("chest"), LanternChest::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("ender_chest"), LanternEnderChest::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("furnace"), LanternFurnace::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("jukebox"), LanternJukebox::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("shulker_box"), LanternShulkerBox::new));
+        register(LanternBlockEntityType.of(ResourceKey.minecraft("sign"), LanternSign::new));
     }
 }

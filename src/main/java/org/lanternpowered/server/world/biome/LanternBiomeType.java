@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.biome;
 
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 
@@ -18,7 +18,7 @@ public class LanternBiomeType extends AbstractBiomeType {
 
     private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
 
-    public LanternBiomeType(CatalogKey key) {
+    public LanternBiomeType(ResourceKey key) {
         super(key);
     }
 

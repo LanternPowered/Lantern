@@ -15,21 +15,21 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 
 import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public final class LanternEntityProtocolType<E extends LanternEntity> extends DefaultCatalogType implements EntityProtocolType<E> {
 
-    public static <E extends LanternEntity> EntityProtocolType<E> of(CatalogKey key,
+    public static <E extends LanternEntity> EntityProtocolType<E> of(ResourceKey key,
             Class<E> entityType, Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
         checkNotNull(key, "key");
         checkNotNull(entityProtocolSupplier, "entityProtocolSupplier");
         return new LanternEntityProtocolType<>(key, entityType, entityProtocolSupplier);
     }
 
-    public static <E extends LanternEntity> EntityProtocolType<E> of(CatalogKey key,
+    public static <E extends LanternEntity> EntityProtocolType<E> of(ResourceKey key,
             Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
         return of(key, (Class<E>) LanternEntity.class, entityProtocolSupplier);
     }
@@ -37,7 +37,7 @@ public final class LanternEntityProtocolType<E extends LanternEntity> extends De
     private final Class<E> entityType;
     private final Function<E, AbstractEntityProtocol<E>> entityProtocolSupplier;
 
-    private LanternEntityProtocolType(CatalogKey key, Class<E> entityType,
+    private LanternEntityProtocolType(ResourceKey key, Class<E> entityType,
             Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
         super(key);
         this.entityProtocolSupplier = (Function<E, AbstractEntityProtocol<E>>) entityProtocolSupplier;

@@ -13,7 +13,7 @@ package org.lanternpowered.server.game;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.spongepowered.api.CatalogKey.MINECRAFT_NAMESPACE;
+import static org.spongepowered.api.ResourceKey.MINECRAFT_NAMESPACE;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -46,8 +46,8 @@ import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder;
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
-import org.lanternpowered.server.catalog.LanternCatalogKey;
-import org.lanternpowered.server.catalog.LanternCatalogKeyBuilder;
+import org.lanternpowered.server.catalog.LanternResourceKey;
+import org.lanternpowered.server.catalog.LanternResourceKeyBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageSourceBuilder;
@@ -227,7 +227,7 @@ import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.gamerule.GameRuleRegistry;
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder;
 import org.lanternpowered.server.world.update.TaskPriorityRegistry;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
@@ -479,7 +479,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
                 .registerBuilderSupplier(InventoryTransactionResult.Builder.class, LanternInventoryTransactionResult.Builder::new)
                 .registerBuilderSupplier(EnchantmentTypeBuilder.class, LanternEnchantmentTypeBuilder::new)
-                .registerBuilderSupplier(CatalogKey.Builder.class, LanternCatalogKeyBuilder::new)
+                .registerBuilderSupplier(ResourceKey.Builder.class, LanternResourceKeyBuilder::new)
                 .registerBuilderSupplier(GameRule.Builder.class, LanternGameRuleBuilder::new)
                 // Properties
                 .registerBuilderSupplier(Property.class, (Supplier) LanternPropertyBuilder::new)
@@ -688,18 +688,18 @@ public class LanternGameRegistry implements XGameRegistry {
     }
 
     @Override
-    public CatalogKey resolveKey(String value) {
+    public ResourceKey resolveKey(String value) {
         final int index = value.indexOf(':');
         if (index == -1) {
-            return new LanternCatalogKey(MINECRAFT_NAMESPACE, value);
+            return new LanternResourceKey(MINECRAFT_NAMESPACE, value);
         }
         final String namespace = value.substring(0, index);
         final String actualValue = value.substring(index + 1);
-        return new LanternCatalogKey(namespace, actualValue);
+        return new LanternResourceKey(namespace, actualValue);
     }
 
     @Override
-    public <T extends CatalogType> Optional<T> getType(Class<T> typeClass, CatalogKey key) {
+    public <T extends CatalogType> Optional<T> getType(Class<T> typeClass, ResourceKey key) {
         final CatalogRegistryModule<T> registryModule = this.getCatalogRegistryModule(typeClass).orElse(null);
         if (registryModule == null) {
             return Optional.empty();

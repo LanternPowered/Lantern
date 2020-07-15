@@ -20,7 +20,7 @@ import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
 import org.lanternpowered.server.text.translation.TextTranslation;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryProperties;
@@ -200,7 +200,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
                 if (archetype == InventoryArchetypes.UNKNOWN) {
                     throw e;
                 }
-                final CatalogKey key = archetype.getKey();
+                final ResourceKey key = archetype.getKey();
                 final String builderType = archetype.getBuilder().getClass().getName();
                 throw new RuntimeException("An error occurred while constructing " + key + " with builder type " + builderType, e);
             } catch (Exception e1) {
@@ -214,7 +214,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
             } else if (this instanceof AbstractArchetypeBuilder) {
                 final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
                 mutableInventory.setArchetype(((AbstractArchetypeBuilder) this)
-                        .buildArchetype(CatalogKey.of(pluginId, UUID.randomUUID().toString())));
+                        .buildArchetype(ResourceKey.of(pluginId, UUID.randomUUID().toString())));
             }
             if (this.shiftClickBehavior != null) {
                 mutableInventory.setShiftClickBehavior(this.shiftClickBehavior);

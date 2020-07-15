@@ -10,15 +10,15 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import java.util.Objects
 
-open class LanternCatalogKey(private val namespace: String, private val value: String) : CatalogKey {
+open class LanternResourceKey(private val namespace: String, private val value: String) : ResourceKey {
 
     override fun getNamespace(): String = this.namespace
     override fun getValue(): String = this.value
 
-    override fun compareTo(other: CatalogKey): Int {
+    override fun compareTo(other: ResourceKey): Int {
         val i = this.namespace.compareTo(other.namespace)
         return if (i != 0) i else this.value.compareTo(other.value)
     }
@@ -27,5 +27,5 @@ open class LanternCatalogKey(private val namespace: String, private val value: S
     override fun toString(): String = this.namespace + ':' + this.value
     override fun hashCode(): Int = Objects.hash(this.namespace, this.value)
     override fun equals(other: Any?): Boolean =
-            other is LanternCatalogKey && other.namespace == this.namespace && other.value == this.value
+            other is LanternResourceKey && other.namespace == this.namespace && other.value == this.value
 }

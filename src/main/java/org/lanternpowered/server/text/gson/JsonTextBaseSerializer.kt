@@ -17,7 +17,7 @@ import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import org.lanternpowered.api.registry.CatalogRegistry
 import org.lanternpowered.api.registry.get
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.action.ClickAction
 import org.spongepowered.api.text.action.HoverAction
@@ -36,7 +36,7 @@ internal abstract class JsonTextBaseSerializer<T : Text> : JsonSerializer<T>, Js
         @JvmStatic
         protected fun deserialize(json: JsonObject, builder: Text.Builder, context: JsonDeserializationContext) {
             json[TextConstants.COLOR]?.let { element ->
-                CatalogRegistry.get<TextColor>(CatalogKey.resolve(element.asString))?.let { builder.color(it) }
+                CatalogRegistry.get<TextColor>(ResourceKey.resolve(element.asString))?.let { builder.color(it) }
             }
 
             var style = builder.style

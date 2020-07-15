@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.world.update
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.world.scheduler.UpdatePriority
 import org.lanternpowered.server.catalog.DefaultCatalogType
 
-class LanternUpdatePriority(key: CatalogKey, val value: Int) : DefaultCatalogType(key), UpdatePriority
+class LanternUpdatePriority(key: ResourceKey, val value: Int) : DefaultCatalogType(key), UpdatePriority

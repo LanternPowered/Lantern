@@ -11,7 +11,7 @@
 package org.lanternpowered.api.data
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.registry.CatalogBuilder
@@ -21,15 +21,15 @@ import org.spongepowered.api.data.value.Value
 typealias Key<V> = org.spongepowered.api.data.Key<V>
 
 /**
- * Constructs a new [Key] with the given [CatalogKey] and value [TypeToken].
+ * Constructs a new [Key] with the given [ResourceKey] and value [TypeToken].
  */
-fun <V : Value<*>> valueKeyOf(key: CatalogKey, valueType: TypeToken<V>, fn: KeyBuilder<V>.() -> Unit = {}): Key<V> =
+fun <V : Value<*>> valueKeyOf(key: ResourceKey, valueType: TypeToken<V>, fn: KeyBuilder<V>.() -> Unit = {}): Key<V> =
         builderOf<KeyBuilder<V>>().key(key).type(valueType).requireExplicitRegistration().apply(fn).build()
 
 /**
- * Constructs a new [Key] with the given [CatalogKey] and value type [V].
+ * Constructs a new [Key] with the given [ResourceKey] and value type [V].
  */
-inline fun <reified V : Value<*>> valueKeyOf(key: CatalogKey, fn: KeyBuilder<V>.() -> Unit = {}): Key<V> =
+inline fun <reified V : Value<*>> valueKeyOf(key: ResourceKey, fn: KeyBuilder<V>.() -> Unit = {}): Key<V> =
         builderOf<KeyBuilder<V>>().key(key).type(typeTokenOf<V>()).requireExplicitRegistration().apply(fn).build()
 
 @Target(AnnotationTarget.TYPE, AnnotationTarget.CLASS)

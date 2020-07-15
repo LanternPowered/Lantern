@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.text.format
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.util.Color
 
-class LanternTextColor(key: CatalogKey, private val color: Color) : DefaultCatalogType(key), TextColor {
+class LanternTextColor(key: ResourceKey, private val color: Color) : DefaultCatalogType(key), TextColor {
     override fun getColor() = this.color
     override fun toStringHelper() = super.toStringHelper()
             .add("color", this.color)

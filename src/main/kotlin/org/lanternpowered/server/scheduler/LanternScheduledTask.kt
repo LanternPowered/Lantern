@@ -55,6 +55,7 @@ class LanternScheduledTask internal constructor(
     override fun getTask(): LanternTask = this.task
 
     override fun cancel(): Boolean = cancel(false)
+    override fun isCancelled(): Boolean = this.future!!.isCancelled
 
     fun cancel(mayInterruptIfRunning: Boolean): Boolean {
         val future = this.future!!

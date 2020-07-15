@@ -11,7 +11,7 @@
 package org.lanternpowered.server.data.persistence;
 
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.api.ResourceKeys;
 import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -77,7 +77,7 @@ public final class DataTranslators {
 
     static {
         UUID_DATA_SERIALIZER = new AbstractDataTranslator<UUID>(
-                CatalogKeys.sponge("uuid"), TypeToken.of(UUID.class)) {
+                ResourceKeys.sponge("uuid"), TypeToken.of(UUID.class)) {
 
             @Override
             public UUID translate(DataView view) throws InvalidDataException {
@@ -94,7 +94,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_2_D_DATA_SERIALIZER = new AbstractDataTranslator<Vector2d>(
-                CatalogKeys.sponge("vector_2_d"), TypeToken.of(Vector2d.class)) {
+                ResourceKeys.sponge("vector_2_d"), TypeToken.of(Vector2d.class)) {
 
             @Override
             public Vector2d translate(DataView view) throws InvalidDataException {
@@ -111,7 +111,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_2_F_DATA_SERIALIZER = new AbstractDataTranslator<Vector2f>(
-                CatalogKeys.sponge("vector_2_f"), TypeToken.of(Vector2f.class)) {
+                ResourceKeys.sponge("vector_2_f"), TypeToken.of(Vector2f.class)) {
 
             @Override
             public Vector2f translate(DataView view) throws InvalidDataException {
@@ -128,7 +128,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_2_I_DATA_SERIALIZER = new AbstractDataTranslator<Vector2i>(
-                CatalogKeys.sponge("vector_2_i"), TypeToken.of(Vector2i.class)) {
+                ResourceKeys.sponge("vector_2_i"), TypeToken.of(Vector2i.class)) {
 
             @Override
             public Vector2i translate(DataView view) throws InvalidDataException {
@@ -145,7 +145,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_2_L_DATA_SERIALIZER = new AbstractDataTranslator<Vector2l>(
-                CatalogKeys.sponge("vector_2_l"), TypeToken.of(Vector2l.class)) {
+                ResourceKeys.sponge("vector_2_l"), TypeToken.of(Vector2l.class)) {
 
             @Override
             public Vector2l translate(DataView view) throws InvalidDataException {
@@ -162,7 +162,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_3_D_DATA_SERIALIZER = new AbstractDataTranslator<Vector3d>(
-                CatalogKeys.sponge("vector_3_d"), TypeToken.of(Vector3d.class)) {
+                ResourceKeys.sponge("vector_3_d"), TypeToken.of(Vector3d.class)) {
 
             @Override
             public Vector3d translate(DataView view) throws InvalidDataException {
@@ -181,7 +181,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_3_F_DATA_SERIALIZER = new AbstractDataTranslator<Vector3f>(
-                CatalogKeys.sponge("vector_3_f"), TypeToken.of(Vector3f.class)) {
+                ResourceKeys.sponge("vector_3_f"), TypeToken.of(Vector3f.class)) {
 
             @Override
             public Vector3f translate(DataView view) throws InvalidDataException {
@@ -200,7 +200,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_3_I_DATA_SERIALIZER = new AbstractDataTranslator<Vector3i>(
-                CatalogKeys.sponge("vector_3_i"), TypeToken.of(Vector3i.class)) {
+                ResourceKeys.sponge("vector_3_i"), TypeToken.of(Vector3i.class)) {
 
             @Override
             public Vector3i translate(DataView view) throws InvalidDataException {
@@ -219,7 +219,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_3_L_DATA_SERIALIZER = new AbstractDataTranslator<Vector3l>(
-                CatalogKeys.sponge("vector_3_l"), TypeToken.of(Vector3l.class)) {
+                ResourceKeys.sponge("vector_3_l"), TypeToken.of(Vector3l.class)) {
 
             @Override
             public Vector3l translate(DataView view) throws InvalidDataException {
@@ -238,7 +238,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_4_F_DATA_SERIALIZER = new AbstractDataTranslator<Vector4f>(
-                CatalogKeys.sponge("vector_4_f"), TypeToken.of(Vector4f.class)) {
+                ResourceKeys.sponge("vector_4_f"), TypeToken.of(Vector4f.class)) {
 
             @Override
             public Vector4f translate(DataView view) throws InvalidDataException {
@@ -259,7 +259,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_4_I_DATA_SERIALIZER = new AbstractDataTranslator<Vector4i>(
-                CatalogKeys.sponge("vector_4_i"), TypeToken.of(Vector4i.class)) {
+                ResourceKeys.sponge("vector_4_i"), TypeToken.of(Vector4i.class)) {
 
             @Override
             public Vector4i translate(DataView view) throws InvalidDataException {
@@ -280,7 +280,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_4_L_DATA_SERIALIZER = new AbstractDataTranslator<Vector4l>(
-                CatalogKeys.sponge("vector_4_l"), TypeToken.of(Vector4l.class)) {
+                ResourceKeys.sponge("vector_4_l"), TypeToken.of(Vector4l.class)) {
 
             @Override
             public Vector4l translate(DataView view) throws InvalidDataException {
@@ -301,7 +301,7 @@ public final class DataTranslators {
             }
         };
         VECTOR_4_D_DATA_SERIALIZER = new AbstractDataTranslator<Vector4d>(
-                CatalogKeys.sponge("vector_4_d"), TypeToken.of(Vector4d.class)) {
+                ResourceKeys.sponge("vector_4_d"), TypeToken.of(Vector4d.class)) {
 
             @Override
             public Vector4d translate(DataView view) throws InvalidDataException {
@@ -322,7 +322,7 @@ public final class DataTranslators {
             }
         };
         COMPLEXD_DATA_SERIALIZER = new AbstractDataTranslator<Complexd>(
-                CatalogKeys.sponge("complex_d"), TypeToken.of(Complexd.class)) {
+                ResourceKeys.sponge("complex_d"), TypeToken.of(Complexd.class)) {
 
             @Override
             public Complexd translate(DataView view) throws InvalidDataException {
@@ -339,7 +339,7 @@ public final class DataTranslators {
             }
         };
         COMPLEXF_DATA_SERIALIZER = new AbstractDataTranslator<Complexf>(
-                CatalogKeys.sponge("complex_f"), TypeToken.of(Complexf.class)) {
+                ResourceKeys.sponge("complex_f"), TypeToken.of(Complexf.class)) {
 
             @Override
             public Complexf translate(DataView view) throws InvalidDataException {
@@ -356,7 +356,7 @@ public final class DataTranslators {
             }
         };
         QUATERNIOND_DATA_SERIALIZER = new AbstractDataTranslator<Quaterniond>(
-                CatalogKeys.sponge("quaternion_d"), TypeToken.of(Quaterniond.class)) {
+                ResourceKeys.sponge("quaternion_d"), TypeToken.of(Quaterniond.class)) {
 
             @Override
             public Quaterniond translate(DataView view) throws InvalidDataException {
@@ -377,7 +377,7 @@ public final class DataTranslators {
             }
         };
         QUATERNIONF_DATA_SERIALIZER = new AbstractDataTranslator<Quaternionf>(
-                CatalogKeys.sponge("quaternion_f"), TypeToken.of(Quaternionf.class)) {
+                ResourceKeys.sponge("quaternion_f"), TypeToken.of(Quaternionf.class)) {
 
             @Override
             public Quaternionf translate(DataView view) throws InvalidDataException {
@@ -398,7 +398,7 @@ public final class DataTranslators {
             }
         };
         LOCAL_TIME_DATA_SERIALIZER = new AbstractDataTranslator<LocalTime>(
-                CatalogKeys.sponge("local_time"), TypeToken.of(LocalTime.class)) {
+                ResourceKeys.sponge("local_time"), TypeToken.of(LocalTime.class)) {
 
             @Override
             public LocalTime translate(DataView view) throws InvalidDataException {
@@ -431,7 +431,7 @@ public final class DataTranslators {
             }
         };
         LOCAL_DATE_DATA_SERIALIZER = new AbstractDataTranslator<LocalDate>(
-                CatalogKeys.sponge("local_date"), TypeToken.of(LocalDate.class)) {
+                ResourceKeys.sponge("local_date"), TypeToken.of(LocalDate.class)) {
 
             @Override
             public LocalDate translate(DataView view) throws InvalidDataException {
@@ -459,7 +459,7 @@ public final class DataTranslators {
             }
         };
         LOCAL_DATE_TIME_DATA_SERIALIZER = new AbstractDataTranslator<LocalDateTime>(
-                CatalogKeys.sponge("local_date_time"), TypeToken.of(LocalDateTime.class)) {
+                ResourceKeys.sponge("local_date_time"), TypeToken.of(LocalDateTime.class)) {
 
             @Override
             public LocalDateTime translate(DataView view) throws InvalidDataException {
@@ -507,7 +507,7 @@ public final class DataTranslators {
             }
         };
         ZONED_DATE_TIME_DATA_SERIALIZER = new AbstractDataTranslator<ZonedDateTime>(
-                CatalogKeys.sponge("zoned_date_time"), TypeToken.of(ZonedDateTime.class)) {
+                ResourceKeys.sponge("zoned_date_time"), TypeToken.of(ZonedDateTime.class)) {
 
             @Override
             public ZonedDateTime translate(DataView view) throws InvalidDataException {
@@ -560,7 +560,7 @@ public final class DataTranslators {
             }
         };
         INSTANT_DATA_SERIALIZER = new AbstractDataTranslator<Instant>(
-                CatalogKeys.sponge("instant"), TypeToken.of(Instant.class)) {
+                ResourceKeys.sponge("instant"), TypeToken.of(Instant.class)) {
 
             @Override
             public Instant translate(DataView view) throws InvalidDataException {
@@ -609,7 +609,7 @@ public final class DataTranslators {
             }
         };
         MONTH_DATA_SERIALIZER = new AbstractDataTranslator<Month>(
-                CatalogKeys.sponge("month"), TypeToken.of(Month.class)) {
+                ResourceKeys.sponge("month"), TypeToken.of(Month.class)) {
 
             @Override
             public Month translate(DataView view) throws InvalidDataException {

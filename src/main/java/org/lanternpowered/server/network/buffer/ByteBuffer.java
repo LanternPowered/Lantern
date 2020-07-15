@@ -13,9 +13,9 @@ package org.lanternpowered.server.network.buffer;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.network.item.RawItemStack;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.network.ChannelBuf;
+import org.spongepowered.api.network.channel.ChannelBuf;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3f;
 import org.spongepowered.math.vector.Vector3i;
@@ -307,13 +307,13 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
 
     ByteBuffer writeVector3d(Vector3d vector);
 
-    CatalogKey getCatalogKey(int index);
+    ResourceKey getResourceKey(int index);
 
-    ByteBuffer setCatalogKey(int index, CatalogKey catalogKey);
+    ByteBuffer setResourceKey(int index, ResourceKey ResourceKey);
 
-    CatalogKey readCatalogKey();
+    ResourceKey readResourceKey();
 
-    ByteBuffer writeCatalogKey(CatalogKey catalogKey);
+    ByteBuffer writeResourceKey(ResourceKey ResourceKey);
 
     @Nullable
     RawItemStack getRawItemStack(int index);

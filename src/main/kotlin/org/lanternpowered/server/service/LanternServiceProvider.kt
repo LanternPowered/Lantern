@@ -18,7 +18,7 @@ import org.lanternpowered.api.cause.CauseStack.Companion.currentOrEmpty
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
-import org.lanternpowered.api.service.ServiceManager
+import org.lanternpowered.api.service.ServiceProvider
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.event.cause.EventContextKeys
@@ -29,7 +29,7 @@ import java.util.Optional
 import java.util.function.Predicate
 import kotlin.reflect.KClass
 
-object LanternServiceManager : ServiceManager {
+object LanternServiceProvider : ServiceProvider {
 
     private val serviceCallbacks: Multimap<Class<*>, Predicate<Any>> = HashMultimap.create()
     private val providers: MutableMap<Class<*>, ProviderRegistration<*>> = MapMaker()

@@ -16,20 +16,20 @@ import org.lanternpowered.api.text.format.TextColors
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.advancement.AdvancementType
 import java.util.function.Supplier
 
 @get:JvmName("get")
 val AdvancementTypeRegistry = internalCatalogTypeRegistry<AdvancementType> {
     fun register(id: String, color: Supplier<out TextColor>) =
-            register(LanternAdvancementType(CatalogKey.minecraft(id), TextFormat.of(color.get())))
+            register(LanternAdvancementType(ResourceKey.minecraft(id), TextFormat.of(color.get())))
 
     register("task", TextColors.YELLOW)
     register("challenge", TextColors.LIGHT_PURPLE)
     register("goal", TextColors.YELLOW)
 }
 
-private class LanternAdvancementType(key: CatalogKey, private val textFormat: TextFormat) : DefaultCatalogType(key), AdvancementType {
+private class LanternAdvancementType(key: ResourceKey, private val textFormat: TextFormat) : DefaultCatalogType(key), AdvancementType {
     override fun getTextFormat(): TextFormat = this.textFormat
 }

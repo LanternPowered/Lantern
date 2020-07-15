@@ -12,19 +12,19 @@ package org.lanternpowered.server.entity
 
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.text.translation.Translation
 import java.util.UUID
 
 class LanternEntityType<E : Entity> internal constructor(
-        key: CatalogKey,
+        key: ResourceKey,
         private val translation: Translation,
         private val constructor: (UUID) -> E
 ) : DefaultCatalogType(key), EntityType<E> {
 
-    internal constructor(key: CatalogKey, translation: String, entityConstructor: (UUID) -> E) :
+    internal constructor(key: ResourceKey, translation: String, entityConstructor: (UUID) -> E) :
             this(key, tr(translation), entityConstructor)
 
     fun constructEntity(uniqueId: UUID) = this.constructor(uniqueId)

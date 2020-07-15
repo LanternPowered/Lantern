@@ -14,7 +14,7 @@ import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 
@@ -22,7 +22,7 @@ public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> 
 
     @Override
     public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), CatalogKey.resolve(value.getString()))
+        return Sponge.getRegistry().getType(type.getRawType().asSubclass(CatalogType.class), ResourceKey.resolve(value.getString()))
                 .orElseThrow(() -> new ObjectMappingException("The catalog type is missing: " + value.getString()));
     }
 

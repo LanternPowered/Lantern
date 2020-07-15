@@ -17,7 +17,7 @@ import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.SpawnParticleMessage;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -64,14 +64,14 @@ public final class CommandParticle extends CommandProvider {
                                 return Sponge.getGame().getRegistry().getAllOf(ParticleType.class).stream()
                                         .filter(type -> ((LanternParticleType) type).getInternalType() != null)
                                         .map(CatalogType::getKey)
-                                        .map(CatalogKey::toString)
+                                        .map(ResourceKey::toString)
                                         .collect(Collectors.toList());
                             }
 
                             @Override
                             protected Object getValue(String choice) throws IllegalArgumentException {
                                 final Optional<ParticleType> ret = Sponge.getGame().getRegistry()
-                                        .getType(ParticleType.class, CatalogKey.resolve(choice));
+                                        .getType(ParticleType.class, ResourceKey.resolve(choice));
                                 if (!ret.isPresent() || ((LanternParticleType) ret.get()).getInternalType() == null) {
                                     throw new IllegalArgumentException("Invalid input " + choice + " was found");
                                 }

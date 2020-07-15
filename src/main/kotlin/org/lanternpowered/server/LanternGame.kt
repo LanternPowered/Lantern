@@ -15,13 +15,24 @@ import org.lanternpowered.api.GameState
 import org.lanternpowered.api.Server
 import org.lanternpowered.api.injector.Injector
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
+import org.lanternpowered.server.event.LanternEventManager
 import org.lanternpowered.server.registry.LanternGameRegistry
 import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.util.LocaleCache
 import org.lanternpowered.server.util.palette.LanternPaletteBasedArrayFactory
+import org.spongepowered.api.Platform
 import org.spongepowered.api.SystemSubject
+import org.spongepowered.api.asset.AssetManager
+import org.spongepowered.api.command.manager.CommandManager
+import org.spongepowered.api.config.ConfigManager
+import org.spongepowered.api.data.DataManager
 import org.spongepowered.api.event.EventManager
+import org.spongepowered.api.network.channel.ChannelRegistry
+import org.spongepowered.api.plugin.PluginManager
 import org.spongepowered.api.scheduler.Scheduler
+import org.spongepowered.api.service.ServiceProvider
+import org.spongepowered.api.sql.SqlManager
+import org.spongepowered.api.util.metric.MetricsConfigManager
 import java.nio.file.Path
 import java.util.Locale
 import java.util.concurrent.ScheduledExecutorService
@@ -44,19 +55,45 @@ object LanternGame : Game {
     override val injector: Injector
         get() = TODO("Not yet implemented")
 
-    override fun getState(): GameState = checkNotNull(this.state) { "The initial state isn't set yet." }
-    override fun getLocale(locale: String): Locale = LocaleCache[locale]
-    override fun getRegistry() = LanternGameRegistry
-
-    override fun getEventManager(): EventManager {
-        return super.getEventManager()
+    override fun getMetricsConfigManager(): MetricsConfigManager {
+        TODO("Not yet implemented")
     }
+
+    override fun getSqlManager(): SqlManager {
+        TODO("Not yet implemented")
+    }
+
+    override fun getEventManager(): EventManager = LanternEventManager
+
+    override fun getLocale(locale: String): Locale = LocaleCache[locale]
+
+    override fun getPluginManager(): PluginManager {
+        TODO("Not yet implemented")
+    }
+
+    override fun getPlatform(): Platform {
+        TODO("Not yet implemented")
+    }
+
+    override fun getCommandManager(): CommandManager {
+        TODO("Not yet implemented")
+    }
+
+    override fun getRegistry() = LanternGameRegistry
 
     override fun getAsyncScheduler(): Scheduler {
         TODO("Not yet implemented")
     }
 
+    override fun getAssetManager(): AssetManager {
+        TODO("Not yet implemented")
+    }
+
     override fun getSystemSubject(): SystemSubject {
+        TODO("Not yet implemented")
+    }
+
+    override fun getDataManager(): DataManager {
         TODO("Not yet implemented")
     }
 
@@ -65,6 +102,18 @@ object LanternGame : Game {
     }
 
     override fun getServer(): Server {
+        TODO("Not yet implemented")
+    }
+
+    override fun getConfigManager(): ConfigManager {
+        TODO("Not yet implemented")
+    }
+
+    override fun getChannelRegistry(): ChannelRegistry {
+        TODO("Not yet implemented")
+    }
+
+    override fun getServiceProvider(): ServiceProvider {
         TODO("Not yet implemented")
     }
 

@@ -16,7 +16,7 @@ import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 
 class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
 
@@ -40,7 +40,7 @@ class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentTy
     override fun name(name: Translation) = apply { this.name = name }
     override fun name(name: String) = apply { this.name = tr(name) }
 
-    override fun build(key: CatalogKey, name: Translation): XEnchantmentType {
+    override fun build(key: ResourceKey, name: Translation): XEnchantmentType {
         return LanternEnchantmentType(key, name, idCounter++,
                 this.levelRange, this.weight, this.treasure, this.curse, this.enchantabilityRange, this.compatibilityTester)
     }

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.text
 
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.ResourceKeys
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.lanternpowered.server.text.selector.LanternSelectorType
 import org.spongepowered.api.text.selector.SelectorType
@@ -23,10 +23,10 @@ object SelectorTypeRegistryModule : AdditionalPluginCatalogRegistryModule<Select
     private val byCode = HashMap<String, LanternSelectorType>()
 
     override fun registerDefaults() {
-        register(LanternSelectorType(CatalogKeys.minecraft("all_players"), "a"))
-        register(LanternSelectorType(CatalogKeys.minecraft("all_entities"), "e"))
-        register(LanternSelectorType(CatalogKeys.minecraft("nearest_player"), "p"))
-        register(LanternSelectorType(CatalogKeys.minecraft("random"), "r"))
+        register(LanternSelectorType(ResourceKeys.minecraft("all_players"), "a"))
+        register(LanternSelectorType(ResourceKeys.minecraft("all_entities"), "e"))
+        register(LanternSelectorType(ResourceKeys.minecraft("nearest_player"), "p"))
+        register(LanternSelectorType(ResourceKeys.minecraft("random"), "r"))
     }
 
     override fun doRegistration(selectorType: SelectorType, disallowInbuiltPluginIds: Boolean) {

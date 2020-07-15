@@ -16,7 +16,7 @@ import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.script.context.EmptyScriptContext;
 import org.lanternpowered.server.util.option.OptionValueMap;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Set;
@@ -33,7 +33,7 @@ public final class LanternWeather extends DefaultCatalogType implements Weather 
     private final double weight;
     private final IntValueProvider duration;
 
-    LanternWeather(CatalogKey key, Action action, Set<String> aliases,
+    LanternWeather(ResourceKey key, Action action, Set<String> aliases,
             OptionValueMap options, double weight, IntValueProvider duration) {
         super(key);
         this.action = action;

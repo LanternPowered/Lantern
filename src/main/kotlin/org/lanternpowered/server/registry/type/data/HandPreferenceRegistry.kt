@@ -13,17 +13,17 @@ package org.lanternpowered.server.registry.type.data
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.type.HandPreference
 import org.spongepowered.api.text.translation.Translatable
 
 val HandPreferenceRegistry = catalogTypeRegistry<HandPreference> {
     fun register(id: String, translationKey: String) =
-            register(LanternHandPreference(CatalogKey.minecraft(id), translationKey))
+            register(LanternHandPreference(ResourceKey.minecraft(id), translationKey))
 
     register("left", "options.mainHand.left")
     register("right", "options.mainHand.right")
 }
 
-private class LanternHandPreference(key: CatalogKey, translationKey: String) :
+private class LanternHandPreference(key: ResourceKey, translationKey: String) :
         DefaultCatalogType(key), HandPreference, Translatable by Translated(translationKey)

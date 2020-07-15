@@ -8,14 +8,13 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.catalog
+package org.lanternpowered.api
 
-import org.lanternpowered.api.Sponge
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.plugin.PluginContainer
 
-object CatalogKeys {
+object ResourceKeys {
 
     /**
      * The sponge namespace.
@@ -39,10 +38,10 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun activePlugin(value: String): CatalogKey {
+    fun activePlugin(value: String): ResourceKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return CatalogKey(plugin.metadata.id, value)
+        return ResourceKey(plugin.metadata.id, value)
     }
 
     /**
@@ -53,10 +52,10 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun activePlugin(value: String, name: String): CatalogKey {
+    fun activePlugin(value: String, name: String): ResourceKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return CatalogKey(plugin.metadata.id, value)
+        return ResourceKey(plugin.metadata.id, value)
     }
 
     /**
@@ -67,7 +66,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun of(namespace: String, value: String): CatalogKey = CatalogKey(namespace, value)
+    fun of(namespace: String, value: String): ResourceKey = ResourceKey(namespace, value)
 
     /**
      * Creates a catalog key with the namespace of lantern.
@@ -76,7 +75,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun lantern(value: String): CatalogKey = CatalogKey(LANTERN_NAMESPACE, value)
+    fun lantern(value: String): ResourceKey = ResourceKey(LANTERN_NAMESPACE, value)
 
     /**
      * Creates a catalog key with the namespace of sponge.
@@ -85,7 +84,7 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun sponge(value: String): CatalogKey = CatalogKey(SPONGE_NAMESPACE, value)
+    fun sponge(value: String): ResourceKey = ResourceKey(SPONGE_NAMESPACE, value)
 
     /**
      * Creates a named catalog key with the namespace of minecraft.
@@ -94,13 +93,13 @@ object CatalogKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun minecraft(value: String): CatalogKey = CatalogKey(MINECRAFT_NAMESPACE, value)
+    fun minecraft(value: String): ResourceKey = ResourceKey(MINECRAFT_NAMESPACE, value)
 
     /**
      * Resolves a catalog key from the given value.
      */
     @JvmStatic
-    fun resolve(value: String): CatalogKey {
-        return CatalogKey.resolve(value) as CatalogKey
+    fun resolve(value: String): ResourceKey {
+        return ResourceKey.resolve(value) as ResourceKey
     }
 }

@@ -12,7 +12,7 @@ package org.lanternpowered.server.advancement;
 
 import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;
 import org.spongepowered.api.text.translation.Translation;
@@ -22,7 +22,7 @@ public class LanternAdvancementTree extends DefaultCatalogType.Named implements 
     private final Advancement rootAdvancement;
     private final String background;
 
-    LanternAdvancementTree(CatalogKey key, Translation name, Advancement rootAdvancement, String background) {
+    LanternAdvancementTree(ResourceKey key, Translation name, Advancement rootAdvancement, String background) {
         super(key, name);
         this.rootAdvancement = rootAdvancement;
         this.background = background;

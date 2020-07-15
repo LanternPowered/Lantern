@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.world
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.world.World
 import org.lanternpowered.server.world.portal.EmptyPortalAgent
@@ -21,7 +21,7 @@ import kotlin.reflect.KClass
 
 val PortalAgentTypeRegistry = catalogTypeRegistry<PortalAgentType> {
     fun <T : PortalAgent> register(id: String, agentType: KClass<T>, agentProvider: (World, LanternPortalAgentType<T>) -> T) =
-            register(LanternPortalAgentType(CatalogKey.minecraft(id), agentType.java, agentProvider))
+            register(LanternPortalAgentType(ResourceKey.minecraft(id), agentType.java, agentProvider))
 
     register("empty", EmptyPortalAgent::class) { _, type -> EmptyPortalAgent(type) }
 }

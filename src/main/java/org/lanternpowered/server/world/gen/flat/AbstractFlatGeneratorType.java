@@ -13,7 +13,7 @@ package org.lanternpowered.server.world.gen.flat;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.LanternWorldGenerator;
 import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -30,7 +30,7 @@ public abstract class AbstractFlatGeneratorType extends LanternGeneratorType {
     private final static DataQuery FLAT_SEA_LEVEL_VALUE = DataQuery.of("value");
     public final static DataQuery SETTINGS = DataQuery.of("customSettings");
 
-    protected AbstractFlatGeneratorType(CatalogKey key) {
+    protected AbstractFlatGeneratorType(ResourceKey key) {
         super(key);
     }
 

@@ -10,16 +10,15 @@
  */
 package org.lanternpowered.server.world
 
+import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.teleport.TeleportHelper
 import org.lanternpowered.api.world.teleport.TeleportHelperFilter
-import org.spongepowered.api.world.Location
-import java.util.Optional
 
 object LanternTeleportHelper : TeleportHelper {
 
     override fun getSafeLocation(
             location: Location, height: Int, width: Int, floorDistance: Int, filters: Iterable<TeleportHelperFilter>
-    ): Optional<Location> {
-        return Optional.empty() // TODO
+    ): Location? {
+        return null // TODO
     }
 }

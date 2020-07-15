@@ -48,7 +48,6 @@ import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.cause.EventContext
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent
 import org.spongepowered.api.text.Text
-import java.net.InetSocketAddress
 import java.nio.charset.StandardCharsets
 
 internal class RconHandler(
@@ -77,7 +76,7 @@ internal class RconHandler(
 
     override fun channelActive(ctx: ChannelHandlerContext) {
         val channel = ctx.channel()
-        val connection = LanternRconConnection(channel.remoteAddress() as InetSocketAddress, this.server.address)
+        val connection = LanternRconConnection(channel, this.server.address)
         check(channel.attr(CONNECTION).compareAndSet(null, connection)) { "Rcon source may not be set more than once!" }
         Lantern.getSyncScheduler()
                 .submit {
@@ -101,7 +100,7 @@ internal class RconHandler(
         val cause = causeOf(connection)
         this.server.remove(connection)
         val event = LanternEventFactory.createRconConnectionEventDisconnect(cause, connection)
-        Lantern.getSyncScheduler().submit { Sponge.getEventManager().post(event) }
+        Lantern.getSyncScheduler().submit { EventManager.post(event) }
     }
 
     companion object {
@@ -119,7 +118,7 @@ internal class RconHandler(
                 val cause = Cause.of(EventContext.empty(), connection)
                 val event: RconConnectionEvent.Auth = LanternEventFactory.createRconConnectionEventAuth(cause, connection)
                 event.isCancelled = password != payload
-                Sponge.getEventManager().post(event)
+                EventManager.post(event)
                 connection.isAuthorized = !event.isCancelled
                 if (connection.isAuthorized) {
                     Lantern.getLogger().info("Rcon connection from [" + ctx.channel().remoteAddress() + "]")

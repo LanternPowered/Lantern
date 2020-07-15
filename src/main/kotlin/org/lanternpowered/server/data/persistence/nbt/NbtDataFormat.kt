@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data.persistence.nbt
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.data.persistence.AbstractDataFormat
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
@@ -20,7 +20,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 
-class NbtDataFormat(key: CatalogKey) : AbstractDataFormat(key) {
+class NbtDataFormat(key: ResourceKey) : AbstractDataFormat(key) {
 
     @Throws(InvalidDataFormatException::class, IOException::class)
     override fun readFrom(input: InputStream): DataContainer = NbtStreamUtils.read(input, false)

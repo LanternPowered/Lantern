@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.effect.sound
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.effect.sound.LanternSoundCategory
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
@@ -18,6 +18,6 @@ import org.spongepowered.api.effect.sound.SoundCategory
 
 val SoundCategoryRegistry = internalCatalogTypeRegistry<SoundCategory> {
     InternalRegistries.visit("sound_category") { key, internalId ->
-        register(internalId, LanternSoundCategory(CatalogKey.resolve(key)))
+        register(internalId, LanternSoundCategory(ResourceKey.resolve(key)))
     }
 }

@@ -38,7 +38,7 @@ import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -275,7 +275,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         } else {
             properties = PropertyProviderCollections.DEFAULT.toBuilder();
         }
-        final LanternBlockType blockType = new LanternBlockType(CatalogKey.of(pluginId, id), this.traits,
+        final LanternBlockType blockType = new LanternBlockType(ResourceKey.of(pluginId, id), this.traits,
                 translationProvider, behaviorPipeline, this.tileEntityProvider);
         // Override the default solid cube property provider if necessary
         final PropertyProvider<Boolean> solidCubeProvider = properties.build().get(BlockProperties.IS_SOLID_CUBE).orElse(null);

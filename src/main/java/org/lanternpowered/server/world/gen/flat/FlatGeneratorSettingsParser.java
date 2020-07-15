@@ -15,7 +15,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -168,7 +168,7 @@ final class FlatGeneratorSettingsParser {
                     blockType = BlockRegistryModule.get().getStateByInternalId(optId.get()).orElse(BlockTypes.STONE.getDefaultState()).getType();
                 // Not an integer, try the catalog system
                 } else {
-                    blockType = BlockRegistryModule.get().get(CatalogKey.resolve(blockStatePart)).orElse(BlockTypes.STONE);
+                    blockType = BlockRegistryModule.get().get(ResourceKey.resolve(blockStatePart)).orElse(BlockTypes.STONE);
                 }
 
                 // TODO: Convert block data value/id...

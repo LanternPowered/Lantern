@@ -13,7 +13,7 @@
 package org.lanternpowered.api.ext
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.util.option.Option
 import org.lanternpowered.api.world.weather.Weather
 import org.lanternpowered.api.world.weather.WeatherOption
@@ -49,11 +49,11 @@ val WeatherUniverse.skyDarkness: Double get() = (this as XWeatherUniverse).skyDa
 /**
  * Constructs a new [WeatherOption].
  */
-inline fun <reified V> weatherOptionOf(key: CatalogKey, defaultValue: V): WeatherOption<V> =
+inline fun <reified V> weatherOptionOf(key: ResourceKey, defaultValue: V): WeatherOption<V> =
         Option(key, object : TypeToken<V>() {}, defaultValue, WeatherOptionMapType::class)
 
 /**
  * Constructs a new [WeatherOption].
  */
-inline fun <V> weatherOptionOf(key: CatalogKey, type: TypeToken<V>, defaultValue: V): WeatherOption<V> =
+inline fun <V> weatherOptionOf(key: ResourceKey, type: TypeToken<V>, defaultValue: V): WeatherOption<V> =
         Option(key, type, defaultValue, WeatherOptionMapType::class)

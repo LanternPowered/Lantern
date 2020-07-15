@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.text
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.format.TextStyleType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.lanternpowered.server.text.format.LanternTextStyle
@@ -18,7 +18,7 @@ import org.lanternpowered.server.text.format.LanternTextStyle
 val TextStyleRegistry = internalCatalogTypeRegistry<TextStyleType> {
     fun register(id: String, bold: Boolean? = null, italic: Boolean? = null, underline: Boolean? = null,
                  strikethrough: Boolean? = null, obfuscated: Boolean? = null) =
-            register(LanternTextStyle.Type(CatalogKey.minecraft(id), bold, italic, underline, strikethrough, obfuscated))
+            register(LanternTextStyle.Type(ResourceKey.minecraft(id), bold, italic, underline, strikethrough, obfuscated))
 
     register("bold", bold = true)
     register("italic", italic = true)

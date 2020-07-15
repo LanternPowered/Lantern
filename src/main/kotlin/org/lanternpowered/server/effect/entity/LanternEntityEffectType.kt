@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.entity
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 
-class LanternEntityEffectType(key: CatalogKey) : DefaultCatalogType(key), EntityEffectType
+class LanternEntityEffectType(key: ResourceKey) : DefaultCatalogType(key), EntityEffectType

@@ -11,8 +11,8 @@
 package org.lanternpowered.server.game.registry.type.cause
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.ResourceKeys
 import org.lanternpowered.server.behavior.ContextKeys
 import org.lanternpowered.server.event.LanternEventContextKey
 import org.lanternpowered.server.event.LanternEventContextKeys
@@ -41,18 +41,18 @@ object EventContextKeysModule : AdditionalPluginCatalogRegistryModule<EventConte
                 // Get the plugin id, and make a nicely formatted name
                 val id = field.name.toLowerCase()
                 // Filter duplicates
-                if (!get(CatalogKey(pluginId, id)).map { key: EventContextKey<*> ->
+                if (!get(ResourceKey(pluginId, id)).map { key: EventContextKey<*> ->
                             (key as LanternEventContextKey<*>).allowedType != typeToken }.orElse(true)) {
                     continue
                 }
-                register(LanternEventContextKey(CatalogKey(pluginId, id), typeToken))
+                register(LanternEventContextKey(ResourceKey(pluginId, id), typeToken))
             }
         }
 
         // Sponge
-        registerKeys(CatalogKeys.SPONGE_NAMESPACE, EventContextKeys::class)
+        registerKeys(ResourceKeys.SPONGE_NAMESPACE, EventContextKeys::class)
         // Lantern
-        registerKeys(CatalogKeys.LANTERN_NAMESPACE, LanternEventContextKeys::class)
-        registerKeys(CatalogKeys.LANTERN_NAMESPACE, ContextKeys::class)
+        registerKeys(ResourceKeys.LANTERN_NAMESPACE, LanternEventContextKeys::class)
+        registerKeys(ResourceKeys.LANTERN_NAMESPACE, ContextKeys::class)
     }
 }

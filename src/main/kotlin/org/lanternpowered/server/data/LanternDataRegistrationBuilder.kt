@@ -17,7 +17,7 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DataRegistration
 import org.spongepowered.api.data.DuplicateProviderException
@@ -63,7 +63,7 @@ class LanternDataRegistrationBuilder : AbstractCatalogBuilder<DataRegistration, 
         this.stores.clear()
     }
 
-    override fun build(key: CatalogKey): DataRegistration {
+    override fun build(key: ResourceKey): DataRegistration {
         val keys = this.keys.toImmutableSet()
         check(keys.isNotEmpty()) { "At least one key must be added" }
         val pluginContainer = CauseStack.current().first<PluginContainer>()!!

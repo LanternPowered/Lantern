@@ -15,9 +15,9 @@ package org.lanternpowered.api.cause.entity.damage.source
 import org.lanternpowered.api.cause.entity.damage.DamageType
 import org.lanternpowered.api.entity.Entity
 import org.lanternpowered.api.registry.builderOf
+import org.lanternpowered.api.world.Location
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.entity.FallingBlock
-import org.spongepowered.api.world.Location
 
 typealias DamageSource = org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 typealias BlockDamageSource = org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource

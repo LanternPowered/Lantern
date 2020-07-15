@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.util.AABB
@@ -27,7 +27,7 @@ import org.spongepowered.api.block.entity.BlockEntityTypes
 import org.spongepowered.api.state.StateProperty
 import org.spongepowered.math.vector.Vector3d
 
-val testBlockType = blockTypeOf(CatalogKey("namespace", "value")) {
+val testBlockType = blockTypeOf(ResourceKey("namespace", "value")) {
     name("Test Block")
     stateProperty(BlockStateProperties.IS_WET)
     properties {
@@ -65,7 +65,7 @@ val testBlockType = blockTypeOf(CatalogKey("namespace", "value")) {
     }
 }
 
-fun blockTypeOf(key: CatalogKey, fn: BlockTypeBuilder.() -> Unit): BlockType {
+fun blockTypeOf(key: ResourceKey, fn: BlockTypeBuilder.() -> Unit): BlockType {
     TODO()
 }
 

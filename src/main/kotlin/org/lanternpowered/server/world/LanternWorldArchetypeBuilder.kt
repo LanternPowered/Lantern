@@ -14,7 +14,7 @@ import org.lanternpowered.api.text.translation.FixedTranslation
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
@@ -129,7 +129,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.buildHeight = buildHeight
     }
 
-    override fun build(key: CatalogKey): WorldArchetype {
+    override fun build(key: ResourceKey): WorldArchetype {
         val name = FixedTranslation(key.value)
         return LanternWorldArchetype(key, name,
                 allowPlayerRespawns = this.allowPlayerRespawns,

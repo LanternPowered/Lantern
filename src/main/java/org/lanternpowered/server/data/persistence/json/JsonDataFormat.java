@@ -15,7 +15,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import org.lanternpowered.server.data.persistence.AbstractStringDataFormat;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -70,7 +70,7 @@ public class JsonDataFormat extends AbstractStringDataFormat {
     private static final Pattern INTEGER =
             Pattern.compile("^[-+]?[0-9]+$");
 
-    public JsonDataFormat(CatalogKey key) {
+    public JsonDataFormat(ResourceKey key) {
         super(key);
     }
 

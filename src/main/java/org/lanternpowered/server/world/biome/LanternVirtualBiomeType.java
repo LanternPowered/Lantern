@@ -13,7 +13,7 @@ package org.lanternpowered.server.world.biome;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.util.ToStringHelper;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -26,7 +26,7 @@ public class LanternVirtualBiomeType extends AbstractBiomeType implements Virtua
     private final Function<World, BiomeGenerationSettings> settingsFunction;
     private final BiomeType persistedType;
 
-    LanternVirtualBiomeType(CatalogKey key, Function<World, BiomeGenerationSettings> settingsFunction, BiomeType persistedType) {
+    LanternVirtualBiomeType(ResourceKey key, Function<World, BiomeGenerationSettings> settingsFunction, BiomeType persistedType) {
         super(key);
         this.settingsFunction = settingsFunction;
         this.persistedType = persistedType;

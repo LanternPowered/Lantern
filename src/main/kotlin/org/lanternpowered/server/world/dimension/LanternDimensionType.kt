@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.dimension
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.world.LanternWorld
@@ -20,7 +20,7 @@ import org.spongepowered.api.world.gen.GeneratorType
 import java.util.function.BiFunction
 
 class LanternDimensionType<T : LanternDimension>(
-        key: CatalogKey,
+        key: ResourceKey,
         name: String,
         override val internalId: Int,
         private val dimensionClass: Class<T>,

@@ -14,7 +14,7 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.AbstractDataSerializable
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.meta.BannerPatternLayer
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataContainer
@@ -50,8 +50,8 @@ class LanternPatternLayer(
             if (bannerShape == null || dyeColor == null) {
                 return Optional.empty()
             }
-            val shape = BannerPatternShapeRegistry[CatalogKey.resolve(bannerShape)]
-            val color = DyeColorRegistry[CatalogKey.resolve(dyeColor)]
+            val shape = BannerPatternShapeRegistry[ResourceKey.resolve(bannerShape)]
+            val color = DyeColorRegistry[ResourceKey.resolve(dyeColor)]
             return if (shape == null || color == null) {
                 Optional.empty()
             } else Optional.of(LanternPatternLayer(shape, color))

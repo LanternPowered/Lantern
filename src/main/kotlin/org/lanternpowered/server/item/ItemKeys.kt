@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.catalog.CatalogKeys.minecraft
+import org.lanternpowered.api.ResourceKeys.minecraft
 import org.lanternpowered.api.data.valueKeyOf
 import org.lanternpowered.server.item.property.BowProjectile
 import org.spongepowered.api.data.Key

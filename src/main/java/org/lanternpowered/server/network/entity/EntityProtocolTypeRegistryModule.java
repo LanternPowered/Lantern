@@ -36,7 +36,7 @@ import org.lanternpowered.server.network.entity.vanilla.SnowmanEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.VillagerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ZombieEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ZombieVillagerEntityProtocol;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 
 public class EntityProtocolTypeRegistryModule extends DefaultCatalogRegistryModule<EntityProtocolType> {
 
@@ -51,53 +51,53 @@ public class EntityProtocolTypeRegistryModule extends DefaultCatalogRegistryModu
         // well it's not working, at least not outside the development environment, java is throwing
         // "no such constructor" exceptions...
         // Tested with: oracle jre1.8.0_101
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("armor_stand"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("armor_stand"),
                 entity -> new ArmorStandEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("bat"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("bat"),
                 entity -> new BatEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("chicken"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("chicken"),
                 entity -> new ChickenEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("ender_dragon"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("ender_dragon"),
                 entity -> new EnderDragonEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("endermite"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("endermite"),
                 entity -> new EndermiteEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("experience_orb"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("experience_orb"),
                 entity -> new ExperienceOrbEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("giant"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("giant"),
                 entity -> new GiantEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("human"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("human"),
                 entity -> new HumanEntityProtocol(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("husk"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("husk"),
                 entity -> new HuskEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("iron_golem"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("iron_golem"),
                 entity -> new IronGolemEntityProcotol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("item"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("item"),
                 entity -> new ItemEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("lightning"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("lightning"),
                 entity -> new LightningEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("magma_cube"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("magma_cube"),
                 entity -> new MagmaCubeEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("painting"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("painting"),
                 entity -> new PaintingEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("pig"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("pig"),
                 entity -> new PigEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("player"), LanternPlayer.class,
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("player"), LanternPlayer.class,
                 entity -> new PlayerEntityProtocol(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("rabbit"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("rabbit"),
                 entity -> new RabbitEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("sheep"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("sheep"),
                 entity -> new SheepEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("silverfish"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("silverfish"),
                 entity -> new SilverfishEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("slime"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("slime"),
                 entity -> new SlimeEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("snowman"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("snowman"),
                 entity -> new SnowmanEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("villager"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("villager"),
                 entity -> new VillagerEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("zombie"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("zombie"),
                 entity -> new ZombieEntityProtocol<>(entity)));
-        register(LanternEntityProtocolType.of(CatalogKey.minecraft("zombie_villager"),
+        register(LanternEntityProtocolType.of(ResourceKey.minecraft("zombie_villager"),
                 entity -> new ZombieVillagerEntityProtocol<>(entity)));
     }
 }

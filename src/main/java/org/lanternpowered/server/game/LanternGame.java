@@ -51,7 +51,7 @@ import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
-import org.lanternpowered.server.service.LanternServiceManager;
+import org.lanternpowered.server.service.LanternServiceProvider;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
@@ -135,7 +135,7 @@ public class LanternGame implements Game {
     @Inject private LanternEventManager eventManager;
 
     // The service manager
-    @Inject private LanternServiceManager serviceManager;
+    @Inject private LanternServiceProvider serviceManager;
 
     // The game registry
     @Inject private LanternGameRegistry gameRegistry;
@@ -283,7 +283,7 @@ public class LanternGame implements Game {
         // Call pre init phase for registry
         this.gameRegistry.preInit();
 
-        LanternServiceManager.INSTANCE.watch(PermissionService.class, service -> {
+        LanternServiceProvider.INSTANCE.watch(PermissionService.class, service -> {
             this.server.getConsole().getContainingCollection();
             service.registerContextCalculator(new LanternContextCalculator());
             return Unit.INSTANCE;
@@ -457,7 +457,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public LanternServiceManager getServiceManager() {
+    public LanternServiceProvider getServiceManager() {
         return this.serviceManager;
     }
 

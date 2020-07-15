@@ -17,7 +17,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
 import org.lanternpowered.server.util.roman.RomanNumber;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataSerializable;
@@ -57,18 +57,18 @@ public final class DataTypeSerializers {
         registry.registerTypeSerializer(TypeToken.of(Boolean.class), new BooleanSerializer());
         registry.registerTypeSerializer(TypeToken.of(DataSerializable.class), new DataSerializableSerializer());
         registry.registerTypeSerializer(TypeToken.of(DataView.class), new DataViewSerializer());
-        registry.registerTypeSerializer(TypeToken.of(CatalogKey.class), new CatalogKeySerializer());
+        registry.registerTypeSerializer(TypeToken.of(ResourceKey.class), new ResourceKeySerializer());
     }
 
-    private static class CatalogKeySerializer implements DataTypeSerializer<CatalogKey, String> {
+    private static class ResourceKeySerializer implements DataTypeSerializer<ResourceKey, String> {
 
         @Override
-        public CatalogKey deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
-            return CatalogKey.resolve(data);
+        public ResourceKey deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
+            return ResourceKey.resolve(data);
         }
 
         @Override
-        public String serialize(TypeToken<?> type, DataTypeSerializerContext ctx, CatalogKey obj) throws InvalidDataException {
+        public String serialize(TypeToken<?> type, DataTypeSerializerContext ctx, ResourceKey obj) throws InvalidDataException {
             return obj.toString();
         }
     }
@@ -109,7 +109,7 @@ public final class DataTypeSerializers {
         @Override
         public CatalogType deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
             final Optional<CatalogType> catalogType = Sponge.getRegistry().getType(
-                    (Class<CatalogType>) type.getRawType(), CatalogKey.resolve(data));
+                    (Class<CatalogType>) type.getRawType(), ResourceKey.resolve(data));
             if (!catalogType.isPresent()) {
                 throw new InvalidDataException("The catalog type " + data + " of type " + type.toString() + " is missing.");
             }

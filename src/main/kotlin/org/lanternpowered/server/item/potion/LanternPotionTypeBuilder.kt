@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.item.potion
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeys
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.ResourceKeys
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
@@ -28,7 +28,7 @@ class LanternPotionTypeBuilder : AbstractCatalogBuilder<PotionType, PotionTypeBu
     override fun addEffect(potionEffect: PotionEffect) = apply { this.effects.add(potionEffect) }
     override fun translationKey(key: String) = apply { this.translationKey = key }
 
-    override fun build(key: CatalogKey): PotionType {
+    override fun build(key: ResourceKey): PotionType {
         val translationKey = this.translationKey ?: key.value
         val effects = this.effects.toImmutableList()
         val internalId = internalPotionTypes[key] ?: 0
@@ -37,6 +37,6 @@ class LanternPotionTypeBuilder : AbstractCatalogBuilder<PotionType, PotionTypeBu
 
     companion object {
 
-        private val internalPotionTypes = InternalRegistries.load("potion", CatalogKeys::resolve)
+        private val internalPotionTypes = InternalRegistries.load("potion", ResourceKeys::resolve)
     }
 }

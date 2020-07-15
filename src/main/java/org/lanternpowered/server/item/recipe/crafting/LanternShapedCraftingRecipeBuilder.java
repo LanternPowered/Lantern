@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkState;
 import it.unimi.dsi.fastutil.chars.Char2ObjectArrayMap;
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -147,7 +147,7 @@ public final class LanternShapedCraftingRecipeBuilder extends AbstractCatalogBui
     }
 
     @Override
-    public EndStep key(CatalogKey key) {
+    public EndStep key(ResourceKey key) {
         super.key(key);
         return this;
     }
@@ -158,7 +158,7 @@ public final class LanternShapedCraftingRecipeBuilder extends AbstractCatalogBui
     }
 
     @Override
-    protected ShapedCraftingRecipe build(CatalogKey key, Translation name) {
+    protected ShapedCraftingRecipe build(ResourceKey key, Translation name) {
         checkState(!this.aisle.isEmpty(), "aisle has not been set");
         checkState(!this.ingredientMap.isEmpty(), "no ingredients set");
         checkState(this.resultProvider != null, "no result provider");

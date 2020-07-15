@@ -10,11 +10,11 @@
  */
 package org.lanternpowered.server.effect.sound
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.effect.sound.SoundCategory
 import org.spongepowered.api.text.translation.Translatable
 
-class LanternSoundCategory(key: CatalogKey) : DefaultCatalogType(key), SoundCategory,
+class LanternSoundCategory(key: ResourceKey) : DefaultCatalogType(key), SoundCategory,
         Translatable by Translated("soundCategory.${key.value}")

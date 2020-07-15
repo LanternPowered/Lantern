@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.text.selector
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.text.selector.SelectorType
 
-class LanternSelectorType(key: CatalogKey, val code: String) : DefaultCatalogType(key), SelectorType
+class LanternSelectorType(key: ResourceKey, val code: String) : DefaultCatalogType(key), SelectorType

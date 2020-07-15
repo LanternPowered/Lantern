@@ -10,11 +10,12 @@
  */
 package org.lanternpowered.server.command
 
+import org.lanternpowered.api.cause.CauseStack
 import org.spongepowered.api.command.CommandCause
 import org.spongepowered.api.event.cause.Cause
 
 object LanternCommandCauseFactory : CommandCause.Factory {
-    override fun create(cause: Cause): CommandCause = LanternCommandCause(cause)
+    override fun create(): CommandCause = LanternCommandCause(CauseStack.current().currentCause)
 }
 
 private class LanternCommandCause(private val cause: Cause) : CommandCause {

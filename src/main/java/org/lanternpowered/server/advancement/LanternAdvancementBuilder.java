@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder;
 import org.lanternpowered.server.text.translation.TextTranslation;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.DisplayInfo;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
@@ -72,7 +72,7 @@ public class LanternAdvancementBuilder extends AbstractNamedCatalogBuilder<Advan
     }
 
     @Override
-    protected Advancement build(CatalogKey key, Translation name) {
+    protected Advancement build(ResourceKey key, Translation name) {
         return new LanternAdvancement(key, name, this.parent, this.displayInfo, this.criterion);
     }
 }

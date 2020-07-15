@@ -18,7 +18,7 @@ import com.google.gson.JsonSyntaxException;
 import org.lanternpowered.api.text.serializer.TextSerializer;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.text.translation.TranslationManager;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
@@ -33,7 +33,7 @@ public final class LanternJsonTextSerializer extends DefaultCatalogType implemen
 
     private final Gson gson;
 
-    public LanternJsonTextSerializer(CatalogKey key, TranslationManager translationManager) {
+    public LanternJsonTextSerializer(ResourceKey key, TranslationManager translationManager) {
         super(key);
         this.gson = new GsonBuilder()
                 .registerTypeHierarchyAdapter(Text.class, new JsonTextSerializer())

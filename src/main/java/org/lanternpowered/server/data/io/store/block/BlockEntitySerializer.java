@@ -15,7 +15,7 @@ import org.lanternpowered.server.block.entity.LanternBlockEntityType;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.entity.BlockEntityType;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -33,7 +33,7 @@ public class BlockEntitySerializer implements ObjectSerializer<LanternBlockEntit
         dataView.remove(ID);
 
         final LanternBlockEntityType tileEntityType = (LanternBlockEntityType) Sponge.getRegistry()
-                .getType(BlockEntityType.class, CatalogKey.resolve(id))
+                .getType(BlockEntityType.class, ResourceKey.resolve(id))
                 .orElseThrow(() -> new InvalidDataException("Unknown block entity id: " + id));
         //noinspection unchecked
         final ObjectStore<LanternBlockEntity> store = (ObjectStore)

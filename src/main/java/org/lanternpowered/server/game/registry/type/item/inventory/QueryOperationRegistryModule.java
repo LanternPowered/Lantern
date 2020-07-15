@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory;
 
-import org.lanternpowered.api.catalog.CatalogKeys;
+import org.lanternpowered.api.ResourceKeys;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.query.LanternQueryOperationType;
@@ -35,25 +35,25 @@ public class QueryOperationRegistryModule extends DefaultCatalogRegistryModule<Q
 
     @Override
     public void registerDefaults() {
-        register(new LanternQueryOperationType<ItemStack>(CatalogKeys.sponge("item_stack_exact"),
+        register(new LanternQueryOperationType<ItemStack>(ResourceKeys.sponge("item_stack_exact"),
                 (arg, inventory) -> inventory instanceof Slot && inventory.contains(arg)));
-        register(new LanternQueryOperationType<ItemStack>(CatalogKeys.sponge("item_stack_ignore_quantity"),
+        register(new LanternQueryOperationType<ItemStack>(ResourceKeys.sponge("item_stack_ignore_quantity"),
                 (arg, inventory) -> inventory instanceof Slot && inventory.containsAny(arg)));
-        register(new LanternQueryOperationType<ItemType>(CatalogKeys.sponge("item_type"),
+        register(new LanternQueryOperationType<ItemType>(ResourceKeys.sponge("item_type"),
                 (arg, inventory) -> inventory instanceof Slot && inventory.contains(arg)));
-        register(new LanternQueryOperationType<Predicate<ItemStack>>(CatalogKeys.sponge("item_stack_custom"),
+        register(new LanternQueryOperationType<Predicate<ItemStack>>(ResourceKeys.sponge("item_stack_custom"),
                 (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek())));
-        register(new LanternQueryOperationType<Predicate<ItemStack>>(CatalogKeys.lantern("item_stack_predicate"),
+        register(new LanternQueryOperationType<Predicate<ItemStack>>(ResourceKeys.lantern("item_stack_predicate"),
                 (arg, inventory) -> inventory instanceof Slot && arg.test(inventory.peek())));
-        register(new LanternQueryOperationType<Predicate<ItemStack>>(CatalogKeys.lantern("unsafe_item_stack_predicate"),
+        register(new LanternQueryOperationType<Predicate<ItemStack>>(ResourceKeys.lantern("unsafe_item_stack_predicate"),
                 (arg, inventory) -> inventory instanceof Slot && arg.test(((AbstractSlot) inventory).getRawItemStack())));
-        register(new LanternQueryOperationType<Class<? extends Inventory>>(CatalogKeys.sponge("inventory_type"),
+        register(new LanternQueryOperationType<Class<? extends Inventory>>(ResourceKeys.sponge("inventory_type"),
                 (arg, inventory) -> arg.isInstance(inventory)));
-        register(new LanternQueryOperationType<Class<?>>(CatalogKeys.sponge("type"),
+        register(new LanternQueryOperationType<Class<?>>(ResourceKeys.sponge("type"),
                 (arg, inventory) -> arg.isInstance(inventory)));
-        register(new LanternQueryOperationType<Translation>(CatalogKeys.sponge("inventory_translation"),
+        register(new LanternQueryOperationType<Translation>(ResourceKeys.sponge("inventory_translation"),
                 (arg, inventory) -> inventory.getName().equals(arg)));
-        register(new LanternQueryOperationType<PropertyMatcher<?>>(CatalogKeys.sponge("property"),
+        register(new LanternQueryOperationType<PropertyMatcher<?>>(ResourceKeys.sponge("property"),
                 (arg, inventory) -> arg.matchesHolder(inventory)));
     }
 }

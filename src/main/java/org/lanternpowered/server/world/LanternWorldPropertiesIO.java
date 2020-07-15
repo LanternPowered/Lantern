@@ -25,7 +25,7 @@ import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;
 import org.lanternpowered.server.world.weather.LanternWeather;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -251,7 +251,7 @@ final class LanternWorldPropertiesIO {
                 properties.setDimensionType(DimensionTypes.THE_END);
             } else {
                 final DimensionType dimensionType = Sponge.getRegistry().getType(
-                        DimensionType.class, CatalogKey.resolve(dimensionTypeId)).orElse(null);
+                        DimensionType.class, ResourceKey.resolve(dimensionTypeId)).orElse(null);
                 if (dimensionType == null) {
                     Lantern.getLogger().warn("Could not find a dimension type with id {} for the world {}, falling back to overworld...",
                             dimensionTypeId, levelData.worldName);
@@ -263,7 +263,7 @@ final class LanternWorldPropertiesIO {
             if (spongeDataView.contains(PORTAL_AGENT_TYPE)) {
                 final String portalAgentTypeId = spongeDataView.getString(PORTAL_AGENT_TYPE).get();
                 portalAgentType = Sponge.getRegistry().getType(
-                        PortalAgentType.class, CatalogKey.resolve(portalAgentTypeId)).orElse(null);
+                        PortalAgentType.class, ResourceKey.resolve(portalAgentTypeId)).orElse(null);
                 if (portalAgentType == null) {
                     Lantern.getLogger().warn("Could not find a portal agent type with id {} for the world {}, falling back to default...",
                             portalAgentTypeId, levelData.worldName);
@@ -302,7 +302,7 @@ final class LanternWorldPropertiesIO {
 
             final String weatherTypeId = weatherView.getString(WEATHER_TYPE).get();
             final Optional<Weather> weatherType = Sponge.getRegistry().getType(
-                    Weather.class, CatalogKey.resolve(weatherTypeId));
+                    Weather.class, ResourceKey.resolve(weatherTypeId));
             if (weatherType.isPresent()) {
                 weatherData.setWeather((LanternWeather) weatherType.get());
             } else {
@@ -374,7 +374,7 @@ final class LanternWorldPropertiesIO {
             if (dataView.contains(GENERATOR_NAME)) {
                 final String genName0 = dataView.getString(GENERATOR_NAME).get();
                 final String genName = genName0.indexOf(':') == -1 ? "minecraft:" + genName0 : genName0;
-                final GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, CatalogKey.resolve(genName))
+                final GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, ResourceKey.resolve(genName))
                         .orElse(properties.getDimensionType().getDefaultGeneratorType());
                 DataContainer generatorSettings = null;
                 if (dataView.contains(GENERATOR_OPTIONS)) {

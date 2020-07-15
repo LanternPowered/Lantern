@@ -21,7 +21,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMaps
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStackManager
@@ -33,7 +33,9 @@ import org.lanternpowered.api.registry.MutableCatalogTypeRegistryBase
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.type.TypeToken
-import org.spongepowered.api.event.registry.RegistryEvent
+import org.lanternpowered.server.LanternGame
+import org.spongepowered.api.Game
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent
 import java.util.function.Supplier
 
 object LanternCatalogTypeRegistryFactory : CatalogTypeRegistry.Factory {
@@ -225,7 +227,7 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
     override val all: org.lanternpowered.api.registry.Collection<T>
         get() = ensureLoaded().values
 
-    override fun get(key: CatalogKey): T? = ensureLoaded().byKey[key]
+    override fun get(key: ResourceKey): T? = ensureLoaded().byKey[key]
 
     override fun provideSupplier(suggestedId: String): Supplier<T> =
             this.suppliers.computeIfAbsent(suggestedId) { CatalogTypeSupplier(suggestedId, this) }
@@ -261,7 +263,7 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
 }
 
 private class GenericInternalRegistryData<T : CatalogType, I>(
-        byKey: Map<CatalogKey, T> = emptyMap(),
+        byKey: Map<ResourceKey, T> = emptyMap(),
         private val byId: BiMap<I, T> = HashBiMap.create(),
         suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
 ) : RegistryData<T>(byKey, suggestedIdMatchers) {
@@ -271,7 +273,7 @@ private class GenericInternalRegistryData<T : CatalogType, I>(
 }
 
 private class InternalRegistryData<T : CatalogType>(
-        byKey: Map<CatalogKey, T> = emptyMap(),
+        byKey: Map<ResourceKey, T> = emptyMap(),
         private val byId: Int2ObjectMap<T> = Int2ObjectMaps.emptyMap(),
         private val toId: Object2IntMap<T> = Object2IntOpenHashMap<T>().apply { defaultReturnValue(Integer.MIN_VALUE) },
         suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
@@ -288,8 +290,8 @@ private class InternalRegistryData<T : CatalogType>(
 }
 
 private open class RegistryData<T>(
-    val byKey: Map<CatalogKey, T>,
-    val suggestedIdMatchers: List<(String, T) -> Boolean>
+        val byKey: Map<ResourceKey, T>,
+        val suggestedIdMatchers: List<(String, T) -> Boolean>
 ) {
     val values = CustomCollection(this.byKey.values)
 }
@@ -383,7 +385,7 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
 
     private val typeName: String get() = this.typeToken.rawType.simpleName
     protected val suggestedIdMatchers: MutableList<(String, T) -> Boolean> = mutableListOf()
-    protected val byKey: MutableMap<CatalogKey, T> = mutableMapOf()
+    protected val byKey: MutableMap<ResourceKey, T> = mutableMapOf()
     protected val byId: BiMap<I, T> = HashBiMap.create()
     private var allowPluginRegistrations = false
 
@@ -405,10 +407,11 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
         if (!this.allowPluginRegistrations)
             return
         val cause = CauseStackManager.currentCause
-        val event = object : RegistryEvent.Catalog<T> {
+        val event = object : RegisterCatalogEvent<T> {
             override fun getCause(): Cause = cause
+            override fun getGame(): Game = LanternGame
             override fun getGenericType(): TypeToken<T> = typeToken
-            override fun register(catalogType: T) { this@AbstractCatalogTypeRegistryBuilder.register(catalogType) }
+            override fun register(catalogType: T): T = this@AbstractCatalogTypeRegistryBuilder.register(catalogType)
         }
         EventManager.post(event)
     }

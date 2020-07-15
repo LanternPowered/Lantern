@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.cause
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.ext.*
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.event.cause.entity.health.HealingType
@@ -19,7 +19,7 @@ import org.spongepowered.api.event.cause.entity.health.HealingTypes
 class HealingTypeRegistryModule : AdditionalPluginCatalogRegistryModule<HealingType>(HealingTypes::class) {
 
     override fun registerDefaults() {
-        val register = { id: String -> register(HealingType(CatalogKey.minecraft(id))) }
+        val register = { id: String -> register(HealingType(ResourceKey.minecraft(id))) }
         register("boss")
         register("food")
         register("plugin")
@@ -32,9 +32,9 @@ class HealingTypeRegistryModule : AdditionalPluginCatalogRegistryModule<HealingT
     companion object {
 
         @JvmField
-        val GENERIC = HealingType(CatalogKey.minecraft("generic"))
+        val GENERIC = HealingType(ResourceKey.minecraft("generic"))
 
         @JvmField
-        val MAGIC = HealingType(CatalogKey.minecraft("magic"))
+        val MAGIC = HealingType(ResourceKey.minecraft("magic"))
     }
 }

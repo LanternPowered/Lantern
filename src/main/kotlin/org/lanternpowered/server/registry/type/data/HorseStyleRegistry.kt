@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.HorseStyle
 
 val HorseStyleRegistry = internalCatalogTypeRegistry<HorseStyle> {
     fun register(id: String) =
-            register(LanternHorseStyle(CatalogKey.minecraft(id)))
+            register(LanternHorseStyle(ResourceKey.minecraft(id)))
 
     register("none")
     register("white")
@@ -26,4 +26,4 @@ val HorseStyleRegistry = internalCatalogTypeRegistry<HorseStyle> {
     register("black_dots")
 }
 
-private class LanternHorseStyle(key: CatalogKey) : DefaultCatalogType(key), HorseStyle
+private class LanternHorseStyle(key: ResourceKey) : DefaultCatalogType(key), HorseStyle

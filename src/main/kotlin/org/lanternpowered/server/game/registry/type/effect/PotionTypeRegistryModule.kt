@@ -10,10 +10,9 @@
  */
 package org.lanternpowered.server.game.registry.type.effect
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeys.minecraft
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.ResourceKeys.minecraft
 import org.lanternpowered.api.effect.potion.PotionEffectTypes
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
 import org.lanternpowered.api.item.potion.PotionTypes
@@ -21,7 +20,7 @@ import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModu
 
 object PotionTypeRegistryModule : InternalPluginCatalogRegistryModule<PotionType>(PotionTypes::class) {
 
-    fun register(key: CatalogKey, fn: PotionTypeBuilder.() -> Unit = {}) {
+    fun register(key: ResourceKey, fn: PotionTypeBuilder.() -> Unit = {}) {
         register(potionTypeOf(key, fn))
     }
 

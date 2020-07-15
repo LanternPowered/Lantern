@@ -15,7 +15,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.HeaderMode;
 import org.lanternpowered.server.data.translator.ConfigurateTranslator;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -36,7 +36,7 @@ import java.util.concurrent.Callable;
 
 public final class HoconDataFormat extends AbstractStringDataFormat {
 
-    public HoconDataFormat(CatalogKey key) {
+    public HoconDataFormat(ResourceKey key) {
         super(key);
     }
 

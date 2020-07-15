@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -115,7 +115,7 @@ public class LanternShapelessCraftingRecipeBuilder extends AbstractCatalogBuilde
     }
 
     @Override
-    public IShapelessCraftingRecipe.Builder.EndStep key(CatalogKey key) {
+    public IShapelessCraftingRecipe.Builder.EndStep key(ResourceKey key) {
         super.key(key);
         return this;
     }
@@ -126,7 +126,7 @@ public class LanternShapelessCraftingRecipeBuilder extends AbstractCatalogBuilde
     }
 
     @Override
-    protected ShapelessCraftingRecipe build(CatalogKey key, Translation name) {
+    protected ShapelessCraftingRecipe build(ResourceKey key, Translation name) {
         checkState(this.resultProvider != null, "The result provider is not set.");
         checkState(!this.ingredients.isEmpty(), "The ingredients are not set.");
 

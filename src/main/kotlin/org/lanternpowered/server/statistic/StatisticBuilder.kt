@@ -11,7 +11,7 @@
 package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.catalog.CatalogType
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.scoreboard.criteria.Criterion
 import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.statistic.StatisticCategory
@@ -57,7 +57,7 @@ interface StatisticBuilder : NamedCatalogBuilder<XStatistic, StatisticBuilder> {
         override fun category(category: StatisticCategory): ForCatalogType<C>
         override fun criterion(criterion: Criterion?): ForCatalogType<C>
         override fun translation(translation: Translation): ForCatalogType<C>
-        override fun key(key: CatalogKey): ForCatalogType<C>
+        override fun key(key: ResourceKey): ForCatalogType<C>
         override fun name(name: String): ForCatalogType<C>
         override fun name(translation: Translation): ForCatalogType<C>
         override fun reset(): ForCatalogType<C>

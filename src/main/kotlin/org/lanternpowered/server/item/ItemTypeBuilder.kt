@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.data.Key
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
@@ -22,7 +22,7 @@ import org.lanternpowered.server.data.LocalKeyRegistry
 /**
  * Constructs a new [ItemType].
  */
-fun itemTypeOf(key: CatalogKey, fn: ItemTypeBuilder.() -> Unit): ItemType {
+fun itemTypeOf(key: ResourceKey, fn: ItemTypeBuilder.() -> Unit): ItemType {
     return LanternItemTypeBuilder().apply(fn).build(key)
 }
 

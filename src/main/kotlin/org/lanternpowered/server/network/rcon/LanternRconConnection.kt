@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.network.rcon
 
+import io.netty.channel.Channel
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.permission.AbstractProxySubject
 import org.spongepowered.api.network.RconConnection
@@ -20,7 +21,7 @@ import org.spongepowered.api.util.Tristate
 import java.net.InetSocketAddress
 
 class LanternRconConnection internal constructor(
-        private val address: InetSocketAddress,
+        private val channel: Channel,
         private val virtualHost: InetSocketAddress
 ) : AbstractProxySubject(), RconConnection {
 
@@ -32,11 +33,17 @@ class LanternRconConnection internal constructor(
         initializeSubject()
     }
 
-    override fun getAddress(): InetSocketAddress = this.address
+    override fun getAddress(): InetSocketAddress = this.channel.remoteAddress() as InetSocketAddress
     override fun getVirtualHost(): InetSocketAddress = this.virtualHost
     override fun getIdentifier(): String = this.identifier
     override fun isAuthorized(): Boolean = this.authorized
     override fun setAuthorized(authorized: Boolean) { this.authorized = authorized }
+
+    override fun close() {
+        // Flush remaining content first
+        this.flush()
+        this.channel.close()
+    }
 
     override fun sendMessage(message: Text) {
         this.buffer.append(message.toPlain()).append('\n')

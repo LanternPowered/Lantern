@@ -11,8 +11,8 @@
 package org.lanternpowered.server.world.portal
 
 import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.teleport.PortalAgentType
-import org.spongepowered.api.world.Location
 
 import java.util.Optional
 

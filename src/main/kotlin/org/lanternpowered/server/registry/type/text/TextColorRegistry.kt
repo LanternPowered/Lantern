@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.text
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.lanternpowered.server.text.format.LanternTextColor
@@ -18,7 +18,7 @@ import org.spongepowered.api.util.Color
 
 val TextColorRegistry = internalCatalogTypeRegistry<TextColor> {
     fun register(id: String, color: Color) {
-        val textColor = LanternTextColor(CatalogKey.minecraft(id), color)
+        val textColor = LanternTextColor(ResourceKey.minecraft(id), color)
         register(textColor)
     }
 

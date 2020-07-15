@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.data
 
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistry
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
@@ -21,7 +21,7 @@ import org.spongepowered.api.text.translation.Translatable
 
 object SkinPartRegistry : InternalCatalogTypeRegistry<SkinPart> by internalCatalogTypeRegistry({
     fun register(id: String) =
-            register(LanternSkinPart(CatalogKey.minecraft(id)))
+            register(LanternSkinPart(ResourceKey.minecraft(id)))
 
     register("cape")
     register("jacket")
@@ -65,5 +65,5 @@ object SkinPartRegistry : InternalCatalogTypeRegistry<SkinPart> by internalCatal
     }
 }
 
-private class LanternSkinPart(key: CatalogKey) : DefaultCatalogType(key), SkinPart,
+private class LanternSkinPart(key: ResourceKey) : DefaultCatalogType(key), SkinPart,
         Translatable by Translated("options.modelPart.${key.value}")

@@ -15,7 +15,7 @@ import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.world.SerializationBehavior
@@ -24,7 +24,7 @@ import org.spongepowered.api.world.difficulty.Difficulty
 import org.spongepowered.api.world.gen.GeneratorType
 
 internal data class LanternWorldArchetype(
-        private val key: CatalogKey,
+        private val key: ResourceKey,
         private val name: Translation,
         private val gameMode: GameMode,
         private val dimensionType: LanternDimensionType<*>,

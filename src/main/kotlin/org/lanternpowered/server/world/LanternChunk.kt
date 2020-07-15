@@ -27,12 +27,6 @@ import org.spongepowered.api.world.HeightType
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.biome.BiomeType
 import org.spongepowered.api.world.chunk.ChunkState
-import org.spongepowered.api.world.volume.biome.ImmutableBiomeVolume
-import org.spongepowered.api.world.volume.biome.UnmodifiableBiomeVolume
-import org.spongepowered.api.world.volume.block.ImmutableBlockVolume
-import org.spongepowered.api.world.volume.block.UnmodifiableBlockVolume
-import org.spongepowered.api.world.volume.entity.ImmutableEntityVolume
-import org.spongepowered.api.world.volume.entity.UnmodifiableEntityVolume
 import org.spongepowered.math.vector.Vector3i
 import java.util.Optional
 import java.util.UUID
@@ -53,18 +47,6 @@ class LanternChunk(val position: ChunkPosition) : Chunk {
     }
 
     override fun getScheduledBlockUpdates(): ScheduledUpdateList<BlockType> {
-        TODO("Not yet implemented")
-    }
-
-    override fun asUnmodifiableBlockVolume(): UnmodifiableBlockVolume<*> {
-        TODO("Not yet implemented")
-    }
-
-    override fun asImmutableBiomeVolume(): ImmutableBiomeVolume {
-        TODO("Not yet implemented")
-    }
-
-    override fun getView(newMin: Vector3i, newMax: Vector3i): org.spongepowered.api.world.chunk.Chunk {
         TODO("Not yet implemented")
     }
 
@@ -124,27 +106,11 @@ class LanternChunk(val position: ChunkPosition) : Chunk {
         TODO("Not yet implemented")
     }
 
-    override fun asImmutableEntityVolume(): ImmutableEntityVolume {
-        TODO("Not yet implemented")
-    }
-
     override fun addEntity(entity: Entity?) {
         TODO("Not yet implemented")
     }
 
     override fun getBlockSize(): Vector3i {
-        TODO("Not yet implemented")
-    }
-
-    override fun asUnmodifiableBiomeVolume(): UnmodifiableBiomeVolume<*> {
-        TODO("Not yet implemented")
-    }
-
-    override fun asImmutableBlockVolume(): ImmutableBlockVolume {
-        TODO("Not yet implemented")
-    }
-
-    override fun asUnmodifiableEntityVolume(): UnmodifiableEntityVolume<*> {
         TODO("Not yet implemented")
     }
 

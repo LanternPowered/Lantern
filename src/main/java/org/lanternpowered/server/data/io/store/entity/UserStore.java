@@ -32,7 +32,7 @@ import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.registry.type.data.GameModeRegistry;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldPropertiesOld;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -246,7 +246,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             valueContainer.set(LanternKeys.SMELTING_RECIPE_BOOK_STATE, new RecipeBookState(currentlyOpen, filterActive));
         });
         dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> valueContainer
-                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().get(CatalogKey.resolve(id))));
+                .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().get(ResourceKey.resolve(id))));
 
         super.deserializeValues(player, valueContainer, dataView);
     }

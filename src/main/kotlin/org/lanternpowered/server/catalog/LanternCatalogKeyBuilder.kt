@@ -10,27 +10,27 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.catalog.CatalogKey
-import org.lanternpowered.api.catalog.CatalogKeyBuilder
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.ResourceKeyBuilder
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.id
 
-class LanternCatalogKeyBuilder : CatalogKeyBuilder {
+class LanternResourceKeyBuilder : ResourceKeyBuilder {
 
     private var namespace: String? = null
     private var value: String? = null
 
-    override fun namespace(namespace: String): CatalogKeyBuilder = apply { this.namespace = namespace }
-    override fun namespace(container: PluginContainer): CatalogKeyBuilder = namespace(container.id)
-    override fun value(value: String): CatalogKeyBuilder = apply { this.value = value }
+    override fun namespace(namespace: String): ResourceKeyBuilder = apply { this.namespace = namespace }
+    override fun namespace(container: PluginContainer): ResourceKeyBuilder = namespace(container.id)
+    override fun value(value: String): ResourceKeyBuilder = apply { this.value = value }
 
-    override fun build(): CatalogKey {
+    override fun build(): ResourceKey {
         val namespace = checkNotNull(this.namespace) { "The namespace must be set" }
         val value = checkNotNull(this.value) { "The value must be set" }
-        return LanternCatalogKey(namespace, value)
+        return LanternResourceKey(namespace, value)
     }
 
-    override fun reset(): CatalogKeyBuilder = apply {
+    override fun reset(): ResourceKeyBuilder = apply {
         this.namespace = null
         this.value = null
     }

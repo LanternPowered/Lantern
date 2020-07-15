@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.potion
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectType
@@ -73,7 +73,7 @@ class LanternPotionEffectBuilder : AbstractDataBuilder<PotionEffect>(PotionEffec
                 || !container.contains(DataQueries.POTION_SHOWS_PARTICLES)) {
             return Optional.empty()
         }
-        val typeId = CatalogKey.resolve(container.getString(DataQueries.POTION_TYPE).get())
+        val typeId = ResourceKey.resolve(container.getString(DataQueries.POTION_TYPE).get())
         val type = CatalogRegistry.require<PotionEffectType>(typeId)
         val duration = container.getInt(DataQueries.POTION_DURATION).get()
         val amplifier = container.getInt(DataQueries.POTION_AMPLIFIER).get()

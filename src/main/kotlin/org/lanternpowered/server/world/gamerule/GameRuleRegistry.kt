@@ -14,7 +14,7 @@ import com.google.common.base.CaseFormat
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.text.translation.FixedTranslation
 import org.spongepowered.api.world.gamerule.GameRule
 import org.spongepowered.api.world.gamerule.GameRules
@@ -53,7 +53,7 @@ object GameRuleRegistry : DefaultCatalogRegistryModule<GameRule<*>>(GameRules::c
 
     private fun <T : Any> register(name: String, valueType: TypeToken<T>, defaultValue: T) {
         val id = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, name)
-        val gameRule = LanternGameRule(CatalogKey.minecraft(id), FixedTranslation(name), valueType, defaultValue)
+        val gameRule = LanternGameRule(ResourceKey.minecraft(id), FixedTranslation(name), valueType, defaultValue)
         register(gameRule)
     }
 }

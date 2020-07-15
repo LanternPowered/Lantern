@@ -18,7 +18,7 @@ import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
 import org.lanternpowered.server.inventory.LanternItemStack
 import org.lanternpowered.server.item.ItemTypeRegistry
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.type.NotePitches
 import org.spongepowered.api.effect.particle.ParticleOption
@@ -49,10 +49,10 @@ class ParticleTypeRegistryModule : DefaultCatalogRegistryModule<ParticleType>(Pa
     }
 
     private fun registerEffect(id: String, internalType: OptionalInt, options: Map<ParticleOption<*>, Any>) {
-        registerEffect(CatalogKey.minecraft(id), internalType, options)
+        registerEffect(ResourceKey.minecraft(id), internalType, options)
     }
 
-    private fun registerEffect(key: CatalogKey, internalType: OptionalInt, options: Map<ParticleOption<*>, Any>) {
+    private fun registerEffect(key: ResourceKey, internalType: OptionalInt, options: Map<ParticleOption<*>, Any>) {
         register(LanternParticleType(key, if (internalType.isPresent) internalType.asInt else null, options))
     }
 
@@ -60,7 +60,7 @@ class ParticleTypeRegistryModule : DefaultCatalogRegistryModule<ParticleType>(Pa
         val particleIds = InternalRegistries.load("particle_type")
 
         fun registerParticle(id: String, velocity: Boolean, extraOptions: Map<ParticleOption<*>, Any> = emptyMap()) {
-            val key = CatalogKey.minecraft(id)
+            val key = ResourceKey.minecraft(id)
             val options = ImmutableMap.builder<ParticleOption<*>, Any>()
             options.put(ParticleOptions.OFFSET, Vector3d.ZERO)
             options.put(ParticleOptions.QUANTITY, 1)

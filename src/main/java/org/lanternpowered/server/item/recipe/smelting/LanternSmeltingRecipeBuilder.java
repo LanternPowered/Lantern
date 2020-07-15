@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -185,7 +185,7 @@ public class LanternSmeltingRecipeBuilder extends AbstractCatalogBuilder<Smeltin
     }
 
     @Override
-    public ISmeltingRecipe.Builder.EndStep key(CatalogKey key) {
+    public ISmeltingRecipe.Builder.EndStep key(ResourceKey key) {
         super.key(key);
         return this;
     }
@@ -196,7 +196,7 @@ public class LanternSmeltingRecipeBuilder extends AbstractCatalogBuilder<Smeltin
     }
 
     @Override
-    protected SmeltingRecipe build(CatalogKey key, Translation name) {
+    protected SmeltingRecipe build(ResourceKey key, Translation name) {
         checkState(this.resultProvider != null || this.result != null, "The result provider is not set.");
         checkState(this.ingredient != null, "The ingredient is not set.");
         ISmeltingResultProvider resultProvider = this.resultProvider;

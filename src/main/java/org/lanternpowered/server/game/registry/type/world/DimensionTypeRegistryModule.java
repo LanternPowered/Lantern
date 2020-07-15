@@ -15,7 +15,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
 import org.lanternpowered.server.world.dimension.LanternDimensionNether;
 import org.lanternpowered.server.world.dimension.LanternDimensionOverworld;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
@@ -30,11 +30,11 @@ public class DimensionTypeRegistryModule extends AdditionalPluginCatalogRegistry
 
     @Override
     public void registerDefaults() {
-        register(new LanternDimensionType<>(CatalogKey.minecraft("nether"), "Nether", -1, LanternDimensionNether.class,
+        register(new LanternDimensionType<>(ResourceKey.minecraft("nether"), "Nether", -1, LanternDimensionNether.class,
                 GeneratorTypes.NETHER, true, true, false, false, LanternDimensionNether::new));
-        register(new LanternDimensionType<>(CatalogKey.minecraft("overworld"), "Overworld", 0, LanternDimensionOverworld.class,
+        register(new LanternDimensionType<>(ResourceKey.minecraft("overworld"), "Overworld", 0, LanternDimensionOverworld.class,
                 GeneratorTypes.OVERWORLD, true, false, true, true, LanternDimensionOverworld::new));
-        register(new LanternDimensionType<>(CatalogKey.minecraft("the_end"), "The End", 1, LanternDimensionEnd.class,
+        register(new LanternDimensionType<>(ResourceKey.minecraft("the_end"), "The End", 1, LanternDimensionEnd.class,
                 GeneratorTypes.THE_END, true, false, false, false, LanternDimensionEnd::new));
     }
 }

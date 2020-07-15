@@ -13,10 +13,10 @@ package org.lanternpowered.server.world
 import com.google.common.base.Objects
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.optional.orNull
+import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.fix
-import org.spongepowered.api.world.Location
 import org.spongepowered.api.world.World as SpongeWorld
 import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3i

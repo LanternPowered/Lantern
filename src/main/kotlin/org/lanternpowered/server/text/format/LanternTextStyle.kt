@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.text.format
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.text.TextBuilder
 import org.lanternpowered.api.text.format.TextStyle
@@ -168,7 +168,7 @@ open class LanternTextStyle(
                 .add("obfuscated", this.obfuscated)
                 .toString()
 
-    class Type(key: CatalogKey,
+    class Type(key: ResourceKey,
                bold: Boolean? = null,
                italic: Boolean? = null,
                underline: Boolean? = null,

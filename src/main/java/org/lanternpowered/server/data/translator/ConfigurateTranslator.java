@@ -16,7 +16,7 @@ import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.SimpleConfigurationNode;
 import org.lanternpowered.server.data.persistence.AbstractDataTranslator;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -41,7 +41,7 @@ public class ConfigurateTranslator extends AbstractDataTranslator<ConfigurationN
     }
 
     private ConfigurateTranslator() {
-        super(CatalogKey.of("sponge", "configuration_node"), TypeToken.of(ConfigurationNode.class));
+        super(ResourceKey.of("sponge", "configuration_node"), TypeToken.of(ConfigurationNode.class));
     }
 
     @Override

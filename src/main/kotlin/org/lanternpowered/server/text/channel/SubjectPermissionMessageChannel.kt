@@ -24,8 +24,7 @@ import org.spongepowered.api.text.channel.MessageReceiver
 class SubjectPermissionMessageChannel(private val permission: String) : MessageChannel {
 
     override fun getMembers(): Collection<MessageReceiver> {
-        val service = serviceOf<PermissionService>()
-
+        val service = serviceOf<PermissionService>() ?: return emptyList()
         return service.loadedCollections.values.stream()
                 .flatMap { input ->
                     input.getLoadedWithPermission(this.permission).entries.stream()

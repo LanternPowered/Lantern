@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.effect.sound
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.effect.sound.LanternSoundType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
@@ -21,6 +21,6 @@ val SoundTypeRegistry = internalCatalogTypeRegistry<SoundType> {
         type.key.value.replace('.', '_') == suggestedId
     }
     InternalRegistries.visit("sound_event") { key, internalId ->
-        register(LanternSoundType(CatalogKey.resolve(key), internalId))
+        register(LanternSoundType(ResourceKey.resolve(key), internalId))
     }
 }

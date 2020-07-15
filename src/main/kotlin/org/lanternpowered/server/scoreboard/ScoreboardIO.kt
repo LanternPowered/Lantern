@@ -23,7 +23,7 @@ import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.text.LanternTexts.fromLegacy
 import org.lanternpowered.server.text.LanternTexts.toLegacy
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
@@ -79,7 +79,7 @@ object ScoreboardIO {
                         .displayName(displayName)
 
                 val criterionName = entry.getString(CRITERION_NAME).get()
-                val criterion = CriterionRegistry[CatalogKey.resolve(criterionName)]
+                val criterion = CriterionRegistry[ResourceKey.resolve(criterionName)]
                 if (criterion == null) {
                     Lantern.getLogger().warn("Unable to find a criterion with id: $criterionName, default to dummy.")
                     builder.criterion(Criteria.DUMMY)
@@ -88,7 +88,7 @@ object ScoreboardIO {
                 }
 
                 val displayModeName = entry.getString(DISPLAY_MODE).get()
-                val displayMode = ObjectiveDisplayModeRegistry[CatalogKey.resolve(displayModeName)]
+                val displayMode = ObjectiveDisplayModeRegistry[ResourceKey.resolve(displayModeName)]
                 if (displayMode == null) {
                     Lantern.getLogger().warn("Unable to find a display mode with id: $displayModeName, default to integer.")
                     builder.objectiveDisplayMode(ObjectiveDisplayModes.INTEGER)
@@ -143,7 +143,7 @@ object ScoreboardIO {
                 entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent { value -> builder.deathTextVisibility(VisibilityRegistry.require(value)) }
                 entry.getString(COLLISION_RULE).ifPresent { value -> builder.collisionRule(CollisionRuleRegistry.require(value)) }
                 entry.getString(TEAM_COLOR).ifPresent { colorName ->
-                    val color = TextColorRegistry[CatalogKey.resolve(colorName)] ?: run {
+                    val color = TextColorRegistry[ResourceKey.resolve(colorName)] ?: run {
                         Lantern.getLogger().warn("Unable to find a team color with id: $colorName, default to none.")
                         TextColors.NONE.get()
                     }

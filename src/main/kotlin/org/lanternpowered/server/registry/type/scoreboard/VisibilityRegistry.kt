@@ -11,7 +11,7 @@
 @file:JvmName("VisibilityRegistry")
 package org.lanternpowered.server.registry.type.scoreboard
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
 import org.spongepowered.api.scoreboard.Visibility
@@ -20,7 +20,7 @@ import org.spongepowered.api.text.translation.FixedTranslation
 @get:JvmName("get")
 val VisibilityRegistry = customInternalCatalogTypeRegistry<Visibility, String> {
     fun register(internalId: String, id: String) =
-            register(internalId, LanternVisibility(CatalogKey.minecraft(id)))
+            register(internalId, LanternVisibility(ResourceKey.minecraft(id)))
 
     register("always", "always")
     register("hideForOwnTeam", "hide_for_own_team")
@@ -28,6 +28,6 @@ val VisibilityRegistry = customInternalCatalogTypeRegistry<Visibility, String> {
     register("never", "never")
 }
 
-private class LanternVisibility(key: CatalogKey) : DefaultCatalogType(key), Visibility {
+private class LanternVisibility(key: ResourceKey) : DefaultCatalogType(key), Visibility {
     override fun getTranslation() = FixedTranslation(this.key.value) // TODO
 }

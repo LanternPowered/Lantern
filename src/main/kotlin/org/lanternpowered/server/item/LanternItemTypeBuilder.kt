@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.text.translation.FixedTranslation
@@ -64,7 +64,7 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
         this.behaviorsBuilderFunctions += fn
     }
 
-    fun build(key: CatalogKey): ItemType {
+    fun build(key: ResourceKey): ItemType {
         var nameFunction = this.nameFunction
         if (nameFunction == null) {
             val def = tr("item.${key.namespace}.${key.value}")

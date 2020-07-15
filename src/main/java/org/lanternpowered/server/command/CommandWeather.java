@@ -15,7 +15,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.lanternpowered.server.world.weather.LanternWeather;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -58,7 +58,7 @@ public final class CommandWeather extends CommandProvider {
 
                             @Override
                             protected Object getValue(String choice) throws IllegalArgumentException {
-                                final Optional<Weather> optWeather = Sponge.getRegistry().getType(Weather.class, CatalogKey.resolve(choice));
+                                final Optional<Weather> optWeather = Sponge.getRegistry().getType(Weather.class, ResourceKey.resolve(choice));
                                 if (!optWeather.isPresent()) {
                                     return Sponge.getRegistry().getAllOf(Weather.class).stream()
                                             .filter(weather -> {

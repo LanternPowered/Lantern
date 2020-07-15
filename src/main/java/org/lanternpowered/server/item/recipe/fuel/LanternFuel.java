@@ -12,7 +12,7 @@ package org.lanternpowered.server.item.recipe.fuel;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -23,7 +23,7 @@ final class LanternFuel extends DefaultCatalogType implements IFuel {
     final IFuelBurnTimeProvider burnTimeProvider;
     private final IIngredient ingredient;
 
-    LanternFuel(CatalogKey key,
+    LanternFuel(ResourceKey key,
             IFuelBurnTimeProvider burnTimeProvider,
             IIngredient ingredient) {
         super(key);

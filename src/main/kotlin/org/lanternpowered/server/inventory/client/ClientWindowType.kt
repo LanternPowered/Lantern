@@ -10,6 +10,6 @@
  */
 package org.lanternpowered.server.inventory.client
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 
-data class ClientWindowType(val id: CatalogKey, val internalId: Int)
+data class ClientWindowType(val id: ResourceKey, val internalId: Int)

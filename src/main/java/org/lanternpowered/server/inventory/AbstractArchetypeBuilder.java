@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.Archetype;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -75,7 +75,7 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
      */
     public LanternInventoryArchetype<R> buildArchetype() {
         final String pluginId = (this.pluginContainer == null ? Lantern.getImplementationPlugin() : this.pluginContainer).getId();
-        return buildArchetype(CatalogKey.of(pluginId, UUID.randomUUID().toString()));
+        return buildArchetype(ResourceKey.of(pluginId, UUID.randomUUID().toString()));
     }
 
     /**
@@ -84,7 +84,7 @@ public abstract class AbstractArchetypeBuilder<R extends T, T extends AbstractIn
      * @param key The key
      * @return The inventory archetype
      */
-    public LanternInventoryArchetype<R> buildArchetype(CatalogKey key) {
+    public LanternInventoryArchetype<R> buildArchetype(ResourceKey key) {
         checkState(this.constructor != null);
         if (this.cachedArchetype != null && this.cachedArchetype.getKey().equals(key)) {
             return this.cachedArchetype;

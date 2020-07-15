@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
@@ -31,7 +31,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class EnumValueRegistryModule<V extends CatalogType>
         implements CatalogRegistryModule<V>, CatalogMappingDataHolder {
 
-    private final Map<CatalogKey, V> values = new HashMap<>();
+    private final Map<ResourceKey, V> values = new HashMap<>();
     @Nullable private Set<V> unmodifiableValues;
     final Class<? extends Enum<?>> enumType;
     @Nullable private final Class<?> catalogClass;
@@ -52,7 +52,7 @@ public class EnumValueRegistryModule<V extends CatalogType>
     }
 
     @Override
-    public Optional<V> get(CatalogKey key) {
+    public Optional<V> get(ResourceKey key) {
         return Optional.ofNullable(this.values.get(key));
     }
 

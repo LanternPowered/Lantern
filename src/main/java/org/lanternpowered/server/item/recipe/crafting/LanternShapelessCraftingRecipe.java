@@ -16,7 +16,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.item.recipe.IIngredient;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
@@ -35,7 +35,7 @@ final class LanternShapelessCraftingRecipe extends LanternCraftingRecipe impleme
     final ICraftingResultProvider resultProvider;
     private final List<Ingredient> ingredients;
 
-    LanternShapelessCraftingRecipe(CatalogKey key, ItemStackSnapshot exemplaryResult, @Nullable String group,
+    LanternShapelessCraftingRecipe(ResourceKey key, ItemStackSnapshot exemplaryResult, @Nullable String group,
             ICraftingResultProvider resultProvider, List<Ingredient> ingredients) {
         super(key, exemplaryResult, group);
         this.resultProvider = resultProvider;

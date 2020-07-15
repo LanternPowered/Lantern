@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import com.google.common.collect.Lists
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.util.collections.immutableMapBuilderOf
@@ -34,7 +34,7 @@ import java.util.LinkedHashMap
 import java.util.Optional
 
 abstract class AbstractStateContainer<S : State<S>>(
-        baseKey: CatalogKey, stateProperties: Iterable<StateProperty<*>>, constructor: (StateBuilder<S>) -> S
+        baseKey: ResourceKey, stateProperties: Iterable<StateProperty<*>>, constructor: (StateBuilder<S>) -> S
 ) : StateContainer<S> {
 
     // The lookup to convert between key <--> state property
@@ -129,7 +129,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         fun <T, S : State<S>> deserializeState(dataView: DataView, registry: CatalogTypeRegistry<T>):
                 S where T : CatalogType, T : StateContainer<S> {
             val id = dataView.getString(NAME).get()
-            val catalogType = registry.require(CatalogKey.resolve(id))
+            val catalogType = registry.require(ResourceKey.resolve(id))
 
             var state = catalogType.defaultState
             val properties = dataView.getView(PROPERTIES).orElse(null)
@@ -154,7 +154,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         }
     }
 
-    private fun buildDataContainer(baseKey: CatalogKey, values: Map<StateProperty<*>, Comparable<*>>): DataContainer {
+    private fun buildDataContainer(baseKey: ResourceKey, values: Map<StateProperty<*>, Comparable<*>>): DataContainer {
         val dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
         dataContainer[NAME] = baseKey.toString()
 
@@ -169,7 +169,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         return dataContainer
     }
 
-    private fun buildKey(baseKey: CatalogKey, values: Map<StateProperty<*>, Comparable<*>>): CatalogKey {
+    private fun buildKey(baseKey: ResourceKey, values: Map<StateProperty<*>, Comparable<*>>): ResourceKey {
         if (values.isEmpty())
             return baseKey
 
@@ -185,7 +185,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         builder.append(propertyValues.joinToString(separator = ","))
         builder.append(']')
 
-        return CatalogKey(baseKey.namespace, builder.toString())
+        return ResourceKey(baseKey.namespace, builder.toString())
     }
 
     override fun getValidStates(): ImmutableList<S> = this.validStates

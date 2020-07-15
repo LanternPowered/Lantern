@@ -12,40 +12,40 @@ package org.lanternpowered.server.registry.type.inventory
 
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import org.spongepowered.api.item.inventory.equipment.HeldEquipmentType
 import org.spongepowered.api.item.inventory.equipment.WornEquipmentType
 
 val EquipmentTypeRegistry = catalogTypeRegistry<EquipmentType> {
-    register(LanternEquipmentType(CatalogKey.minecraft("all")) { true })
-    register(LanternEquipmentType(CatalogKey.minecraft("equipped")) {
+    register(LanternEquipmentType(ResourceKey.minecraft("all")) { true })
+    register(LanternEquipmentType(ResourceKey.minecraft("equipped")) {
         type -> type is LanternHeldEquipmentType || type is LanternWornEquipmentType
     })
-    register(LanternHeldEquipmentType(CatalogKey.minecraft("held")) {
+    register(LanternHeldEquipmentType(ResourceKey.minecraft("held")) {
         type -> type is LanternHeldEquipmentType
     })
-    register(LanternHeldEquipmentType(CatalogKey.minecraft("main_hand")))
-    register(LanternHeldEquipmentType(CatalogKey.minecraft("off_hand")))
-    register(LanternWornEquipmentType(CatalogKey.minecraft("worn")) {
+    register(LanternHeldEquipmentType(ResourceKey.minecraft("main_hand")))
+    register(LanternHeldEquipmentType(ResourceKey.minecraft("off_hand")))
+    register(LanternWornEquipmentType(ResourceKey.minecraft("worn")) {
         type -> type is LanternWornEquipmentType
     })
-    register(LanternWornEquipmentType(CatalogKey.minecraft("boots")))
-    register(LanternWornEquipmentType(CatalogKey.minecraft("chestplate")))
-    register(LanternWornEquipmentType(CatalogKey.minecraft("headwear")))
-    register(LanternWornEquipmentType(CatalogKey.minecraft("leggings")))
+    register(LanternWornEquipmentType(ResourceKey.minecraft("boots")))
+    register(LanternWornEquipmentType(ResourceKey.minecraft("chestplate")))
+    register(LanternWornEquipmentType(ResourceKey.minecraft("headwear")))
+    register(LanternWornEquipmentType(ResourceKey.minecraft("leggings")))
 }
 
 private open class LanternEquipmentType(
-        key: CatalogKey, private val childChecker: (EquipmentType) -> Boolean
+        key: ResourceKey, private val childChecker: (EquipmentType) -> Boolean
 ) : DefaultCatalogType(key), EquipmentType {
 
     override fun includes(other: EquipmentType): Boolean =
             other == this || this.childChecker(other)
 }
 
-private class LanternHeldEquipmentType(key: CatalogKey, childChecker: (EquipmentType) -> Boolean = { false }) :
+private class LanternHeldEquipmentType(key: ResourceKey, childChecker: (EquipmentType) -> Boolean = { false }) :
         LanternEquipmentType(key, childChecker), HeldEquipmentType
 
-private class LanternWornEquipmentType(key: CatalogKey, childChecker: (EquipmentType) -> Boolean = { _ -> false }) :
+private class LanternWornEquipmentType(key: ResourceKey, childChecker: (EquipmentType) -> Boolean = { _ -> false }) :
         LanternEquipmentType(key, childChecker), WornEquipmentType

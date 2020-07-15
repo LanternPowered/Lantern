@@ -12,7 +12,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternToolType;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.ToolTypes;
 
@@ -24,10 +24,10 @@ public final class ToolTypeRegistryModule extends DefaultCatalogRegistryModule<T
 
     @Override
     public void registerDefaults() {
-        register(new LanternToolType(CatalogKey.minecraft("diamond")));
-        register(new LanternToolType(CatalogKey.minecraft("gold")));
-        register(new LanternToolType(CatalogKey.minecraft("iron")));
-        register(new LanternToolType(CatalogKey.minecraft("stone")));
-        register(new LanternToolType(CatalogKey.minecraft("wood")));
+        register(new LanternToolType(ResourceKey.minecraft("diamond")));
+        register(new LanternToolType(ResourceKey.minecraft("gold")));
+        register(new LanternToolType(ResourceKey.minecraft("iron")));
+        register(new LanternToolType(ResourceKey.minecraft("stone")));
+        register(new LanternToolType(ResourceKey.minecraft("wood")));
     }
 }

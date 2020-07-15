@@ -11,7 +11,7 @@
 package org.lanternpowered.server.inventory;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 
@@ -19,7 +19,7 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 public abstract class LanternInventoryArchetype<T extends AbstractInventory> extends DefaultCatalogType
         implements InventoryArchetype, PropertyHolder {
 
-    LanternInventoryArchetype(CatalogKey key) {
+    LanternInventoryArchetype(ResourceKey key) {
         super(key);
     }
 

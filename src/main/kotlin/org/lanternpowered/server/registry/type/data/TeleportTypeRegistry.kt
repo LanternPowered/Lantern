@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType
 
 val TeleportTypeRegistry = catalogTypeRegistry<TeleportType> {
     fun register(id: String) =
-            register(LanternTeleportType(CatalogKey.minecraft(id)))
+            register(LanternTeleportType(ResourceKey.minecraft(id)))
 
     register("command")
     register("entity_teleport")
@@ -26,4 +26,4 @@ val TeleportTypeRegistry = catalogTypeRegistry<TeleportType> {
     register("unknown")
 }
 
-private class LanternTeleportType(key: CatalogKey) : DefaultCatalogType(key), TeleportType
+private class LanternTeleportType(key: ResourceKey) : DefaultCatalogType(key), TeleportType

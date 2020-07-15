@@ -11,13 +11,13 @@
 package org.lanternpowered.server.attribute
 
 import org.lanternpowered.api.attribute.AttributeType
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.text.Text
 
 class LanternAttributeType(
-        key: CatalogKey,
+        key: ResourceKey,
         override val name: Text,
         override val valueRange: ClosedFloatingPointRange<Double>,
         override val defaultValue: Double,

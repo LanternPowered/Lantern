@@ -18,7 +18,7 @@ import org.lanternpowered.server.block.provider.property.PropertyProviderCollect
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
 import org.lanternpowered.server.data.property.PropertyHolderBase;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -80,7 +80,7 @@ public class LanternBlockType extends DefaultCatalogType implements BlockType, P
     // TODO: A better way to handle this?
     private final boolean isAir;
 
-    LanternBlockType(CatalogKey key, Iterable<BlockTrait<?>> blockTraits,
+    LanternBlockType(ResourceKey key, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
             @Nullable BlockEntityProvider tileEntityProvider) {
         super(key);

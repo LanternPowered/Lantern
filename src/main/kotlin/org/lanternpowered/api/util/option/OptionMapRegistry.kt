@@ -12,7 +12,7 @@
 
 package org.lanternpowered.api.util.option
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.util.collections.toImmutableList
 import java.util.concurrent.ConcurrentHashMap
 
@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
 class OptionMapRegistry<T : OptionMapType> internal constructor(val mapType: Class<T>) {
 
     // All the options mapped by their key
-    internal val byKey = HashMap<CatalogKey, Option<T, *>>()
+    internal val byKey = HashMap<ResourceKey, Option<T, *>>()
 
     /**
      * Gets all the options for the target map type.
@@ -32,9 +32,9 @@ class OptionMapRegistry<T : OptionMapType> internal constructor(val mapType: Cla
     fun all(): Collection<Option<T, *>> = this.byKey.values.toImmutableList()
 
     /**
-     * Gets whether the given [CatalogKey] is present within this registry.
+     * Gets whether the given [ResourceKey] is present within this registry.
      */
-    operator fun contains(key: CatalogKey): Boolean = this.byKey.containsKey(key)
+    operator fun contains(key: ResourceKey): Boolean = this.byKey.containsKey(key)
 
     /**
      * Gets whether the given [Option] is present within this registry.
@@ -42,9 +42,9 @@ class OptionMapRegistry<T : OptionMapType> internal constructor(val mapType: Cla
     operator fun contains(option: Option<T, *>): Boolean = this.byKey.containsValue(option)
 
     /**
-     * Gets the [Option] that is registered for the given [CatalogKey].
+     * Gets the [Option] that is registered for the given [ResourceKey].
      */
-    operator fun get(key: CatalogKey): Option<T, *>? = this.byKey[key]
+    operator fun get(key: ResourceKey): Option<T, *>? = this.byKey[key]
 
     companion object {
 

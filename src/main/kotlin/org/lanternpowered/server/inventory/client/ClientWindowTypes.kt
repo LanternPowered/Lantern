@@ -10,22 +10,22 @@
  */
 package org.lanternpowered.server.inventory.client
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.game.registry.InternalRegistries
 
 object ClientWindowTypes {
 
-    private val keyToIdMap = HashMap<CatalogKey, ClientWindowType>()
+    private val keyToIdMap = HashMap<ResourceKey, ClientWindowType>()
 
     init {
         InternalRegistries.visit("menu") { name, internalId ->
-            val key = CatalogKey.resolve(name)
+            val key = ResourceKey.resolve(name)
             this.keyToIdMap[key] = ClientWindowType(key, internalId)
         }
     }
 
-    fun get(key: String) = get(CatalogKey.resolve(key))
-    fun get(key: CatalogKey) = requireNotNull(this.keyToIdMap[key]) { "Cannot find mapping for $key" }
+    fun get(key: String) = get(ResourceKey.resolve(key))
+    fun get(key: ResourceKey) = requireNotNull(this.keyToIdMap[key]) { "Cannot find mapping for $key" }
 
     @JvmField val ANVIL = get("anvil")
     @JvmField val BEACON = get("beacon")

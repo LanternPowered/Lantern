@@ -10,17 +10,17 @@
  */
 package org.lanternpowered.server.registry.type.scoreboard
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode
 
 val ObjectiveDisplayModeRegistry = internalCatalogTypeRegistry<ObjectiveDisplayMode> {
     fun register(id: String) =
-            register(LanternObjectiveDisplayMode(CatalogKey.minecraft(id)))
+            register(LanternObjectiveDisplayMode(ResourceKey.minecraft(id)))
 
     register("integer")
     register("hearts")
 }
 
-private class LanternObjectiveDisplayMode(key: CatalogKey) : DefaultCatalogType(key), ObjectiveDisplayMode
+private class LanternObjectiveDisplayMode(key: ResourceKey) : DefaultCatalogType(key), ObjectiveDisplayMode

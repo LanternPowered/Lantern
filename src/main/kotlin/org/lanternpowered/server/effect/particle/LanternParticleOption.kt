@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.effect.particle
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.effect.particle.ParticleOption
 
 class LanternParticleOption<V> @JvmOverloads constructor(
-        key: CatalogKey, private val valueType: Class<V>,
+        key: ResourceKey, private val valueType: Class<V>,
         internal val valueValidator: (V) -> Unit = {}
 ) : DefaultCatalogType(key), ParticleOption<V> {
 

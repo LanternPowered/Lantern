@@ -11,7 +11,7 @@
 package org.lanternpowered.server.item.recipe;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.Recipe;
 
@@ -19,7 +19,7 @@ public abstract class LanternRecipe extends DefaultCatalogType implements Recipe
 
     private final ItemStackSnapshot exemplaryResult;
 
-    public LanternRecipe(CatalogKey key, ItemStackSnapshot exemplaryResult) {
+    public LanternRecipe(ResourceKey key, ItemStackSnapshot exemplaryResult) {
         super(key);
         this.exemplaryResult = exemplaryResult;
     }

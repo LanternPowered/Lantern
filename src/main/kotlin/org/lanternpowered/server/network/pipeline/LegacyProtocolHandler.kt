@@ -140,7 +140,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 val players = LanternStatusHelper.createPlayers(server)
                 val response = LanternStatusResponse(
                         serverVersion, description, players, server.favicon.orElse(null))
-                val connection = SimpleRemoteConnection(address, virtualAddress1)
+                val connection = SimpleRemoteConnection.of(ctx.channel(), virtualAddress1)
                 val cause = causeOf(connection)
                 val event = LanternEventFactory.createClientPingServerEvent(cause, client, response)
                 EventManager.post(event)

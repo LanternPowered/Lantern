@@ -15,7 +15,7 @@ import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.effect.particle.LanternParticleOption
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.data.type.NotePitch
 import org.spongepowered.api.effect.particle.ParticleOption
@@ -42,4 +42,4 @@ val ParticleOptionRegistry: CatalogTypeRegistry<ParticleOption<*>> = catalogType
 
 private inline fun <reified V> CatalogTypeRegistryBuilder<ParticleOption<*>>.register(
         id: String, noinline valueValidator: (V) -> Unit = {}
-): ParticleOption<*> = register(LanternParticleOption(CatalogKey.minecraft(id), V::class.java, valueValidator))
+): ParticleOption<*> = register(LanternParticleOption(ResourceKey.minecraft(id), V::class.java, valueValidator))

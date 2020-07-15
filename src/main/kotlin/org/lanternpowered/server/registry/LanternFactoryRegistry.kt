@@ -31,9 +31,10 @@ object LanternFactoryRegistry : FactoryRegistry {
             this.factories.putIfAbsent(factoryType, factory)
     }
 
-    fun <T : Any> register(factoryClass: Class<T>, factory: T) {
+    fun <T : Any> register(factoryClass: Class<T>, factory: T): T {
         val old = this.factories.putIfAbsent(factoryClass, factory)
         if (old != null)
             throw DuplicateRegistrationException("There's already a factory registered fot the type: $factoryClass")
+        return factory
     }
 }

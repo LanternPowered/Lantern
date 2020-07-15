@@ -23,7 +23,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
-import org.lanternpowered.server.config.serializer.CatalogKeyTypeSerializer;
+import org.lanternpowered.server.config.serializer.ResourceKeyTypeSerializer;
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.DataViewTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
@@ -37,7 +37,7 @@ import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.text.serializer.TextTemplateArgConfigSerializer;
 import org.lanternpowered.server.text.serializer.TextTemplateConfigSerializer;
 import org.lanternpowered.server.util.IpSet;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
@@ -65,7 +65,7 @@ public abstract class ConfigBase {
                 .registerType(TypeToken.of(TextTemplate.class), new TextTemplateConfigSerializer())
                 .registerType(TypeToken.of(TextTemplate.Arg.class), new TextTemplateArgConfigSerializer())
                 .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
-                .registerType(TypeToken.of(CatalogKey.class), new CatalogKeyTypeSerializer())
+                .registerType(TypeToken.of(ResourceKey.class), new ResourceKeyTypeSerializer())
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
                 .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(
                         TypeToken.of(LanternGameProfile.class)))

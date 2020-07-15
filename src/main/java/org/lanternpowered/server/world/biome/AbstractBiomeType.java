@@ -11,7 +11,7 @@
 package org.lanternpowered.server.world.biome;
 
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.world.biome.BiomeType;
 
 public abstract class AbstractBiomeType extends DefaultCatalogType implements BiomeType {
@@ -19,7 +19,7 @@ public abstract class AbstractBiomeType extends DefaultCatalogType implements Bi
     private double temperature;
     private double humidity;
 
-    public AbstractBiomeType(CatalogKey key) {
+    public AbstractBiomeType(ResourceKey key) {
         super(key);
     }
 

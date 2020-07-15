@@ -59,7 +59,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.registry.LanternGameRegistry;
 import org.lanternpowered.server.scheduler.LanternScheduler;
-import org.lanternpowered.server.service.LanternServiceManager;
+import org.lanternpowered.server.service.LanternServiceProvider;
 import org.lanternpowered.server.util.PathUtils;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.metric.LanternMetricsConfigManager;
@@ -174,7 +174,7 @@ public class LanternModule extends PrivateModule {
         bindAndExpose(MinecraftVersion.class)
                 .toInstance(LanternMinecraftVersion.CURRENT);
         bindAndExpose(ServiceManager.class)
-                .to(LanternServiceManager.class);
+                .to(LanternServiceProvider.class);
         bindAndExpose(AssetManager.class)
                 .to(LanternAssetManager.class);
         bindAndExpose(GameRegistry.class)

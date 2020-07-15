@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.block.entity.BlockEntityType;
@@ -26,12 +26,12 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @SuppressWarnings("unchecked")
 public final class LanternBlockEntityType extends DefaultCatalogType implements BlockEntityType {
 
-    public static <T extends BlockEntity> LanternBlockEntityType of(CatalogKey key,
+    public static <T extends BlockEntity> LanternBlockEntityType of(ResourceKey key,
             Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
         return new LanternBlockEntityType(key, tileEntityClass, (Supplier) tileEntitySupplier);
     }
 
-    public static <T extends BlockEntity> LanternBlockEntityType of(CatalogKey key,
+    public static <T extends BlockEntity> LanternBlockEntityType of(ResourceKey key,
             Supplier<T> tileEntitySupplier) {
         return new LanternBlockEntityType(key, tileEntitySupplier.get().getClass(), (Supplier) tileEntitySupplier);
     }
@@ -41,7 +41,7 @@ public final class LanternBlockEntityType extends DefaultCatalogType implements 
 
     @Nullable BlockState defaultBlock;
 
-    private LanternBlockEntityType(CatalogKey key, Class<? extends BlockEntity> tileEntityClass,
+    private LanternBlockEntityType(ResourceKey key, Class<? extends BlockEntity> tileEntityClass,
             Supplier<BlockEntity> tileEntityConstructor) {
         super(key);
         this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");

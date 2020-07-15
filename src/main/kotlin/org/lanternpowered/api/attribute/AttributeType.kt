@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.attribute
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.catalog.CatalogedBy
 import org.lanternpowered.api.registry.CatalogBuilder
@@ -21,7 +21,7 @@ import org.spongepowered.api.data.DataHolder
 /**
  * Constructs a new [AttributeType].
  */
-fun attributeTypeOf(key: CatalogKey, fn: AttributeTypeBuilder.() -> Unit): AttributeType =
+fun attributeTypeOf(key: ResourceKey, fn: AttributeTypeBuilder.() -> Unit): AttributeType =
         builderOf<AttributeTypeBuilder>().key(key).apply(fn).build()
 
 /**

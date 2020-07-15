@@ -12,7 +12,7 @@
 
 package org.lanternpowered.server.catalog
 
-import org.spongepowered.api.CatalogKey
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.NamedCatalogType
 import org.spongepowered.api.text.translation.FixedTranslation
 import org.spongepowered.api.text.translation.Translation
@@ -42,7 +42,7 @@ abstract class AbstractNamedCatalogBuilder<C : NamedCatalogType, B : ResettableB
         return build(key, name)
     }
 
-    protected abstract fun build(key: CatalogKey, name: Translation): C
+    protected abstract fun build(key: ResourceKey, name: Translation): C
 
     override fun reset() = super.reset().apply {
         name = null

@@ -10,4 +10,4 @@
  */
 package org.lanternpowered.api.event.catalog
 
-typealias CatalogRegisterEvent<T> = org.spongepowered.api.event.registry.RegistryEvent.Catalog<T>
+typealias RegisterCatalogEvent<T> = org.spongepowered.api.event.lifecycle.RegisterCatalogEvent<T>

@@ -11,7 +11,7 @@
 @file:JvmName("RabbitTypeRegistry")
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.catalog.CatalogKey
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.RabbitType
@@ -19,7 +19,7 @@ import org.spongepowered.api.data.type.RabbitType
 @get:JvmName("get")
 val RabbitTypeRegistry = internalCatalogTypeRegistry<RabbitType> {
     fun register(id: String, internalId: Int = -1) {
-        val type = LanternRabbitType(CatalogKey.minecraft(id))
+        val type = LanternRabbitType(ResourceKey.minecraft(id))
         if (internalId == -1) {
             register(type)
         } else {
@@ -36,4 +36,4 @@ val RabbitTypeRegistry = internalCatalogTypeRegistry<RabbitType> {
     register("killer", 99)
 }
 
-private class LanternRabbitType(key: CatalogKey) : DefaultCatalogType(key), RabbitType
+private class LanternRabbitType(key: ResourceKey) : DefaultCatalogType(key), RabbitType

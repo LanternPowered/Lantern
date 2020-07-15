@@ -18,7 +18,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
-import org.spongepowered.api.CatalogKey;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -91,12 +91,12 @@ public final class CommandSetData extends CommandProvider {
                             @Override
                             protected Iterable<String> getChoices(CommandSource source) {
                                 return Sponge.getGame().getRegistry().getAllOf(Key.class).stream()
-                                        .map(Key::getKey).map(CatalogKey::toString).collect(Collectors.toList());
+                                        .map(Key::getKey).map(ResourceKey::toString).collect(Collectors.toList());
                             }
 
                             @Override
                             protected Object getValue(String choice) throws IllegalArgumentException {
-                                final Optional<Key> ret = Sponge.getGame().getRegistry().getType(Key.class, CatalogKey.resolve(choice));
+                                final Optional<Key> ret = Sponge.getGame().getRegistry().getType(Key.class, ResourceKey.resolve(choice));
                                 if (!ret.isPresent()) {
                                     throw new IllegalArgumentException("Invalid input " + choice + " was found");
                                 }

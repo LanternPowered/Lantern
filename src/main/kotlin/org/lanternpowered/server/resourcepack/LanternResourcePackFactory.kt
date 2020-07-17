@@ -12,6 +12,7 @@ package org.lanternpowered.server.resourcepack
 
 import com.google.common.hash.Hashing
 import com.google.common.io.ByteStreams
+import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.util.PathUtils
 import org.spongepowered.api.resourcepack.ResourcePack
@@ -20,12 +21,11 @@ import java.net.URI
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.concurrent.ConcurrentHashMap
 
 object LanternResourcePackFactory : ResourcePack.Factory {
 
-    private val resourcePacks = ConcurrentHashMap<String, ResourcePack>()
-    private val resourcePacksByKey = ConcurrentHashMap<CacheKey, ResourcePack>()
+    private val resourcePacks = concurrentHashMapOf<String, ResourcePack>()
+    private val resourcePacksByKey = concurrentHashMapOf<CacheKey, ResourcePack>()
 
     // The folder the level resource packs should be stored if
     // they should be hashed, not sure how sponge will handle it

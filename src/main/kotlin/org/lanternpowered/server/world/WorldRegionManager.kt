@@ -14,6 +14,8 @@ import org.lanternpowered.api.util.math.toBlockPosition
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.world.chunk.ChunkPositionSet
+import org.lanternpowered.server.world.chunk.MergedChunkPositionCollection
 
 // TODO: Move to the player
 /**

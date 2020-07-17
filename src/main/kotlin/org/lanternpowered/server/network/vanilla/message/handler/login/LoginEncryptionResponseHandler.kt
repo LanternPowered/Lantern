@@ -31,7 +31,7 @@ import org.lanternpowered.server.util.InetAddressHelper
 import org.lanternpowered.server.util.UUIDHelper
 import org.lanternpowered.server.util.future.thenAsync
 import org.spongepowered.api.event.message.MessageEvent
-import org.spongepowered.api.event.network.ClientConnectionEvent
+import org.spongepowered.api.event.network.ServerSideConnectionEvent
 import java.io.InputStreamReader
 import java.io.UnsupportedEncodingException
 import java.net.URL
@@ -63,14 +63,14 @@ class LoginEncryptionResponseHandler : Handler<LoginEncryptionResponseMessage> {
                 .thenAsync(LanternGame.syncExecutor) { profile ->
                     val cause = causeOf(session, profile)
                     val messageFormatter = MessageEvent.MessageFormatter(TranslationHelper.t("multiplayer.disconnect.not_allowed_to_join"))
-                    val event: ClientConnectionEvent.Auth = LanternEventFactory.createClientConnectionEventAuth(
-                            cause, session, messageFormatter, profile, false)
+                    val event: ServerSideConnectionEvent.Auth = LanternEventFactory.createClientConnectionEventAuth(
+                            cause, session, messageFormatter, false)
                     EventManager.post(event)
                     if (event.isCancelled) {
                         val disconnectMessage = if (event.isMessageCancelled) {
                             TranslationHelper.t("multiplayer.disconnect.generic")
                         } else event.message
-                        session.disconnect(disconnectMessage)
+                        session.close(disconnectMessage)
                         null
                     } else profile
                 }

@@ -19,7 +19,6 @@ import org.lanternpowered.server.inventory.type.LanternInventoryColumn;
 import org.lanternpowered.server.inventory.type.LanternInventoryRow;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 
 public final class SpongeInventoryArchetypes {
 

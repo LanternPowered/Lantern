@@ -13,7 +13,6 @@ package org.lanternpowered.server.asset;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.spongepowered.api.util.Coerce;
 
 import java.io.BufferedReader;

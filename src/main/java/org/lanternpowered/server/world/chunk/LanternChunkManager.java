@@ -37,7 +37,6 @@ import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.util.gen.biome.IntArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;

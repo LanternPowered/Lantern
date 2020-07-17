@@ -10,8 +10,12 @@
  */
 package org.lanternpowered.server.world
 
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldProperties
+import org.lanternpowered.server.config.WorldConfigObject
+import org.lanternpowered.server.world.dimension.LanternDimensionType
+import org.lanternpowered.server.world.portal.LanternPortalAgentType
 import org.spongepowered.api.boss.BossBar
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
@@ -20,31 +24,144 @@ import org.spongepowered.api.world.SerializationBehavior
 import org.spongepowered.api.world.SerializationBehaviors
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.difficulty.Difficulty
-import org.spongepowered.api.world.dimension.DimensionType
+import org.spongepowered.api.world.dimension.DimensionTypes
 import org.spongepowered.api.world.gamerule.GameRule
 import org.spongepowered.api.world.gen.GeneratorType
-import org.spongepowered.api.world.teleport.PortalAgentType
+import org.spongepowered.api.world.gen.GeneratorTypes
+import org.spongepowered.api.world.teleport.PortalAgentTypes
 import org.spongepowered.api.world.weather.Weather
 import org.spongepowered.math.vector.Vector3i
 import java.time.Duration
 import java.util.Optional
 import java.util.UUID
+import kotlin.random.Random
 
-class LanternWorldProperties(private val directoryName: String) : WorldProperties {
+class LanternWorldProperties(
+        private val directoryName: String,
+        private val uniqueId: UUID
+) : WorldProperties {
+
+    // TODO: Link some settings to config
+
+    private val config: WorldConfigObject = TODO()
 
     private var serializationBehavior = SerializationBehaviors.AUTOMATIC.get()
+    private var generateBonusChest = false
+    private var generateSpawnOnLoad = true
+    private var loadOnStartup = false
+    private var keepSpawnLoaded = false
+    private var structuresEnabled = true
+    private var commandsEnabled = true
+    private var viewDistance = 10 // TODO: Proper default
+    private var seed = Random.nextLong()
+    private var spawnPosition = Vector3i.ZERO // TODO: Calculate based on generated terrain
+    private var portalAgentType: LanternPortalAgentType<*> = PortalAgentTypes.DEFAULT.get() as LanternPortalAgentType<*>
+    private var generatorType = GeneratorTypes.DEFAULT.get()
+    private var dimensionType: LanternDimensionType<*> = DimensionTypes.OVERWORLD.get() as LanternDimensionType<*>
+
+    /**
+     * The maximum build height in this world.
+     */
+    var maxBuildHeight: Int
+        get() = this.config.maxBuildHeight
+        set(value) { this.config.maxBuildHeight = value }
+
+    /**
+     * Whether water evaporates when being placed in this world.
+     */
+    var doesWaterEvaporate: Boolean = false
 
     override fun getDirectoryName(): String = this.directoryName
+    override fun getUniqueId(): UUID = this.uniqueId
 
-    fun load(archetype: WorldArchetype) {
-
+    fun loadFrom(archetype: WorldArchetype) {
+        archetype as LanternWorldArchetype
+        this.serializationBehavior = archetype.serializationBehavior
+        this.config.hardcore = archetype.isHardcore
+        this.generateBonusChest = archetype.doesGenerateBonusChest()
+        this.generateSpawnOnLoad = archetype.doesGenerateSpawnOnLoad()
+        this.loadOnStartup = archetype.doesLoadOnStartup()
+        this.keepSpawnLoaded = archetype.doesKeepSpawnLoaded()
+        this.structuresEnabled = archetype.areStructuresEnabled()
+        this.commandsEnabled = archetype.areCommandsEnabled()
+        this.config.pvp = archetype.isPVPEnabled
+        this.config.enabled = archetype.isEnabled
+        this.seed = if (archetype.isSeedRandomized) Random.nextLong() else archetype.seed
+        this.config.difficulty = archetype.difficulty
+        this.config.gameMode.mode = archetype.gameMode
+        this.config.maxBuildHeight = archetype.buildHeight
+        this.generatorType = archetype.generatorType
+        this.dimensionType = archetype.dimensionType
     }
 
-    override fun isHardcore(): Boolean {
-        TODO("Not yet implemented")
+    override fun isInitialized(): Boolean = true // TODO: When are properties "not" initialized?
+
+    override fun getSerializationBehavior(): SerializationBehavior = this.serializationBehavior
+    override fun setSerializationBehavior(behavior: SerializationBehavior) { this.serializationBehavior = behavior }
+
+    override fun isHardcore(): Boolean = this.config.hardcore
+    override fun setHardcore(state: Boolean) { this.config.hardcore = state }
+
+    override fun doesGenerateBonusChest(): Boolean = this.generateBonusChest
+    override fun setGenerateBonusChest(state: Boolean) { this.generateBonusChest = state }
+
+    override fun isPVPEnabled(): Boolean = this.config.pvp
+    override fun setPVPEnabled(enabled: Boolean) { this.config.pvp = enabled }
+
+    override fun isEnabled(): Boolean = this.config.enabled
+    override fun setEnabled(state: Boolean) { this.config.enabled = state }
+
+    override fun areStructuresEnabled(): Boolean = this.structuresEnabled
+    override fun setStructuresEnabled(state: Boolean) { this.structuresEnabled = state }
+
+    override fun doesGenerateSpawnOnLoad(): Boolean = this.generateSpawnOnLoad
+    override fun setGenerateSpawnOnLoad(state: Boolean) { this.generateSpawnOnLoad = state }
+
+    override fun doesLoadOnStartup(): Boolean = this.loadOnStartup
+    override fun setLoadOnStartup(state: Boolean) { this.loadOnStartup }
+
+    override fun getSeed(): Long = this.seed
+    override fun setSeed(seed: Long) { this.seed = seed }
+
+    override fun areCommandsEnabled(): Boolean = this.commandsEnabled
+    override fun setCommandsEnabled(state: Boolean) { this.commandsEnabled = state }
+
+    override fun doesKeepSpawnLoaded(): Boolean = this.keepSpawnLoaded
+    override fun setKeepSpawnLoaded(state: Boolean) { this.keepSpawnLoaded = state }
+
+    override fun getSpawnPosition(): Vector3i = this.spawnPosition
+    override fun setSpawnPosition(position: Vector3i) { this.spawnPosition = position }
+
+    override fun getGameMode(): GameMode = this.config.gameMode.mode
+    override fun setGameMode(gameMode: GameMode) { this.config.gameMode.mode = gameMode }
+
+    override fun getPortalAgentType(): LanternPortalAgentType<*> = this.portalAgentType
+
+    override fun getViewDistance(): Int = this.viewDistance
+
+    override fun setViewDistance(viewDistance: Int) {
+        check(viewDistance > 0) { "The view distance must be greater than zero." }
+        this.viewDistance = viewDistance
     }
 
-    override fun setStructuresEnabled(state: Boolean) {
+    override fun getDifficulty(): Difficulty = this.config.difficulty
+
+    override fun setDifficulty(difficulty: Difficulty) {
+        this.config.difficulty = difficulty
+
+        // TODO: Send update to players
+    }
+
+    override fun getDimensionType(): LanternDimensionType<*> = this.dimensionType
+
+    override fun getGeneratorType(): GeneratorType = this.generatorType
+
+    override fun setGeneratorType(type: GeneratorType) {
+        this.generatorType = type
+        // TODO: Apply new terrain generator
+    }
+
+    override fun getWorldBorder(): WorldBorder {
         TODO("Not yet implemented")
     }
 
@@ -52,43 +169,7 @@ class LanternWorldProperties(private val directoryName: String) : WorldPropertie
         TODO("Not yet implemented")
     }
 
-    override fun setViewDistance(viewDistance: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun doesGenerateBonusChest(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun getCustomBossBars(): MutableList<BossBar> {
-        TODO("Not yet implemented")
-    }
-
-    override fun isEnabled(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun setGenerateBonusChest(state: Boolean) {
-        TODO("Not yet implemented")
-    }
-
     override fun getGameTime(): Duration {
-        TODO("Not yet implemented")
-    }
-
-    override fun doesGenerateSpawnOnLoad(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun areStructuresEnabled(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun doesKeepSpawnLoaded(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun setWanderingTrader(trader: WanderingTrader?) {
         TODO("Not yet implemented")
     }
 
@@ -96,23 +177,7 @@ class LanternWorldProperties(private val directoryName: String) : WorldPropertie
         TODO("Not yet implemented")
     }
 
-    override fun getWanderingTraderSpawnDelay(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun setKeepSpawnLoaded(state: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setSeed(seed: Long) {
-        TODO("Not yet implemented")
-    }
-
     override fun getRemainingWeatherDuration(): Duration {
-        TODO("Not yet implemented")
-    }
-
-    override fun setGameMode(gamemode: GameMode) {
         TODO("Not yet implemented")
     }
 
@@ -120,43 +185,11 @@ class LanternWorldProperties(private val directoryName: String) : WorldPropertie
         TODO("Not yet implemented")
     }
 
-    override fun setHardcore(state: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setDifficulty(difficulty: Difficulty) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setEnabled(state: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setWanderingTraderSpawnChance(chance: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getGeneratorType(): GeneratorType {
-        TODO("Not yet implemented")
-    }
-
-    override fun setSerializationBehavior(behavior: SerializationBehavior) {
-        this.serializationBehavior = behavior
-    }
-
     override fun getGameRules(): MutableMap<GameRule<*>, *> {
         TODO("Not yet implemented")
     }
 
     override fun <V : Any> getGameRule(gameRule: GameRule<V>): V {
-        TODO("Not yet implemented")
-    }
-
-    override fun setGeneratorType(type: GeneratorType) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getViewDistance(): Int {
         TODO("Not yet implemented")
     }
 
@@ -172,67 +205,7 @@ class LanternWorldProperties(private val directoryName: String) : WorldPropertie
         TODO("Not yet implemented")
     }
 
-    override fun getDifficulty(): Difficulty {
-        TODO("Not yet implemented")
-    }
-
-    override fun getUniqueId(): UUID {
-        TODO("Not yet implemented")
-    }
-
-    override fun isPVPEnabled(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun setLoadOnStartup(state: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getSeed(): Long {
-        TODO("Not yet implemented")
-    }
-
     override fun getDayTime(): Duration {
-        TODO("Not yet implemented")
-    }
-
-    override fun setCustomBossBars(bars: MutableList<BossBar>?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setSpawnPosition(position: Vector3i?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getSpawnPosition(): Vector3i {
-        TODO("Not yet implemented")
-    }
-
-    override fun setWanderingTraderSpawnDelay(delay: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getDimensionType(): DimensionType {
-        TODO("Not yet implemented")
-    }
-
-    override fun getSerializationBehavior(): SerializationBehavior {
-        TODO("Not yet implemented")
-    }
-
-    override fun setPVPEnabled(enabled: Boolean) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getPortalAgentType(): PortalAgentType {
-        TODO("Not yet implemented")
-    }
-
-    override fun doesLoadOnStartup(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun setGenerateSpawnOnLoad(state: Boolean) {
         TODO("Not yet implemented")
     }
 
@@ -240,35 +213,23 @@ class LanternWorldProperties(private val directoryName: String) : WorldPropertie
         TODO("Not yet implemented")
     }
 
-    override fun getWanderTraderUniqueId(): Optional<UUID> {
-        TODO("Not yet implemented")
-    }
-
     override fun getGeneratorSettings(): DataContainer {
         TODO("Not yet implemented")
     }
 
-    override fun areCommandsEnabled(): Boolean {
-        TODO("Not yet implemented")
-    }
+    // TODO: What are these "custom" boss bars? Are these just boss
+    //  bars that should persist? Or something else?
 
-    override fun getWorldBorder(): WorldBorder {
-        TODO("Not yet implemented")
-    }
+    override fun getCustomBossBars(): List<BossBar> = emptyList()
+    override fun setCustomBossBars(bars: List<BossBar>?) {}
 
-    override fun getGameMode(): GameMode {
-        TODO("Not yet implemented")
-    }
+    // TODO: Introduce wandering entities? Maybe a different system
+    //  compared on vanilla? More than one trader?
 
-    override fun getWanderingTraderSpawnChance(): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun isInitialized(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun setCommandsEnabled(state: Boolean) {
-        TODO("Not yet implemented")
-    }
+    override fun setWanderingTrader(trader: WanderingTrader?) {}
+    override fun getWanderingTraderSpawnDelay(): Int = Int.MAX_VALUE
+    override fun setWanderingTraderSpawnDelay(delay: Int) {}
+    override fun getWanderTraderUniqueId(): Optional<UUID> = emptyOptional()
+    override fun getWanderingTraderSpawnChance(): Int = 1
+    override fun setWanderingTraderSpawnChance(chance: Int) {}
 }

@@ -11,9 +11,9 @@
 package org.lanternpowered.server.catalog
 
 import org.lanternpowered.api.ResourceKey
-import org.lanternpowered.api.ResourceKeyBuilder
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.id
+import org.spongepowered.api.ResourceKey.Builder as ResourceKeyBuilder
 
 class LanternResourceKeyBuilder : ResourceKeyBuilder {
 

@@ -25,6 +25,9 @@ import java.util.UUID
  */
 interface WorldStorage : Identifiable {
 
+    // TODO: Detach scoreboard data from the world, scoreboard data is
+    //  per server, but is stored in the world in vanilla
+
     /**
      * The name of the directory.
      */

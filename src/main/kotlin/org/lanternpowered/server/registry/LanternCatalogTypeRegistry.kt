@@ -189,7 +189,7 @@ private abstract class AbstractImmutableCatalogTypeRegistry<T, D, B>(
         if (this in cycleStack) {
             val cycles = cycleStack + listOf(this)
             val message = StringBuilder()
-            message.append("Dependencies are cyclic! [\n  ")
+            message.append("Catalog dependencies are cyclic! [\n  ")
             cycles.joinTo(message, separator = " ->\n  ") { it.typeToken.rawType.simpleName }
             message.append("\n]")
             throw CyclicDependencyException(message.toString())

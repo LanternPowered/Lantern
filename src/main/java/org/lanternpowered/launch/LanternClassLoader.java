@@ -345,7 +345,7 @@ public final class LanternClassLoader extends URLClassLoader {
 
         // The server class loader will load lantern, the api and all the plugins
         final LanternClassLoader serverClassLoader = new LanternClassLoader(
-                urls.toArray(new URL[urls.size()]), libraryUrls.toArray(new URL[libraryUrls.size()]), classLoader);
+                urls.toArray(new URL[0]), libraryUrls.toArray(new URL[0]), classLoader);
         Thread.currentThread().setContextClassLoader(serverClassLoader);
         return serverClassLoader;
     }
@@ -712,7 +712,7 @@ public final class LanternClassLoader extends URLClassLoader {
         return new CodeSource(url, (CodeSigner[]) null);
     }
 
-    private Class<?> defineClass(String name, byte[] b, int off, int len, URL url) throws ClassNotFoundException {
+    private Class<?> defineClass(String name, byte[] b, int off, int len, URL url) {
         final CodeSource source = getCodeSource(name, url);
 
         final int lastDot = name.lastIndexOf('.');
@@ -801,7 +801,7 @@ public final class LanternClassLoader extends URLClassLoader {
         final Set<URL> urls = new HashSet<>();
         urls.addAll(Arrays.asList(super.getURLs()));
         urls.addAll(Arrays.asList(this.libraryClassLoader.getURLs()));
-        return urls.toArray(new URL[urls.size()]);
+        return urls.toArray(new URL[0]);
     }
 
     @SuppressWarnings("unchecked")

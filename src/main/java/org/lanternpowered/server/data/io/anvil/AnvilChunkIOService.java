@@ -53,6 +53,7 @@ import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStre
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
@@ -65,7 +66,9 @@ import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3i;
@@ -110,7 +113,7 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery INHABITED_TIME = DataQuery.of("InhabitedTime");
     private static final DataQuery ENTITIES = DataQuery.of("Entities");
 
-    private final World world;
+    private final ServerWorld world;
     private final Logger logger;
     private final LanternGame game;
     private final RegionFileCache cache;
@@ -119,7 +122,7 @@ public class AnvilChunkIOService implements ChunkIOService {
     // TODO: Consider the session.lock file
 
     @Inject
-    public AnvilChunkIOService(@Named(DirectoryKeys.WORLD) Path baseDir, World world, Logger logger, LanternGame game) {
+    public AnvilChunkIOService(@Named(DirectoryKeys.WORLD) Path baseDir, ServerWorld world, Logger logger, LanternGame game) {
         this.cache = new RegionFileCache(baseDir);
         this.baseDir = baseDir;
         this.logger = logger;
@@ -193,14 +196,14 @@ public class AnvilChunkIOService implements ChunkIOService {
                 final int tileX = blockEntityView.getInt(BLOCK_ENTITY_X).get();
                 try {
                     final LanternBlockEntity blockEntity = blockEntitySerializer.deserialize(blockEntityView);
-                    blockEntity.setLocation(new LanternLocation(this.world, tileX, tileY, tileZ));
+                    blockEntity.setLocation(ServerLocation.of(this.world, new Vector3i(tileX, tileY, tileZ)));
                     final short index = (short) ChunkSection.index(tileX & 0xf, tileY & 0xf, tileZ & 0xf);
                     blockEntity.setBlock(blockStateArray[section].get(index));
                     blockEntity.setValid(true);
                     tileEntitySections[section].put(index, blockEntity);
                 } catch (InvalidDataException e) {
                     this.logger.warn("Error loading block entity at ({};{};{}) in the chunk ({},{}) in the world {}",
-                            tileX & 0xf, tileY & 0xf, tileZ & 0xf, x, z, getWorldProperties().getWorldName(), e);
+                            tileX & 0xf, tileY & 0xf, tileZ & 0xf, x, z, getWorldProperties().getDirectoryName(), e);
                 }
             }
         });
@@ -257,7 +260,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                     chunk.addEntity(entity, ySection);
                 } catch (InvalidDataException e) {
                     this.logger.warn("Error loading entity in the chunk ({},{}) in the world {}",
-                            x, z, getWorldProperties().getWorldName(), e);
+                            x, z, getWorldProperties().getDirectoryName(), e);
                 }
             }
         });
@@ -507,7 +510,13 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public CompletableFuture<Boolean> doesChunkExist(Vector3i chunkCoords) {
-        return this.game.getAsyncScheduler().submit(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
+        return this.game.getAsyncScheduler().submit(() -> {
+            try {
+                return exists(chunkCoords.getX(), chunkCoords.getZ());
+            } catch (IOException e) {
+                UncheckedThrowables.throwUnchecked(e);
+            }
+        });
     }
 
     @Override

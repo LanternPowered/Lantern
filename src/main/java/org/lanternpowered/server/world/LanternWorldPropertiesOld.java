@@ -130,7 +130,7 @@ public final class LanternWorldPropertiesOld implements WorldProperties {
         this.worldConfig.setAllowPlayerRespawns(worldArchetype.allowPlayerRespawns());
         this.worldConfig.setDifficulty(worldArchetype.getDifficulty());
         this.worldConfig.setKeepSpawnLoaded(worldArchetype.doesKeepSpawnLoaded());
-        this.worldConfig.setDoesWaterEvaporate(worldArchetype.waterEvaporates());
+        this.worldConfig.setDoesWaterEvaporate(worldArchetype.doesWaterEvaporate());
         setEnabled(worldArchetype.isEnabled());
         this.worldConfig.setPVPEnabled(worldArchetype.isPVPEnabled());
         setBuildHeight(worldArchetype.getBuildHeight());

@@ -11,7 +11,6 @@
 package org.lanternpowered.api.injector
 
 import org.lanternpowered.api.Game
-import org.lanternpowered.api.util.Named
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import kotlin.reflect.KClass

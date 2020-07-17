@@ -12,11 +12,11 @@ package org.lanternpowered.server.registry
 
 import com.google.common.base.CaseFormat
 import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.Game
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.boss.BossBarBuilder
-import org.lanternpowered.api.ResourceKey
-import org.lanternpowered.api.ResourceKeyBuilder
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
@@ -30,7 +30,6 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.scoreboard.ScoreboardBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
-import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder
 import org.lanternpowered.server.attribute.LanternAttributeTypeBuilder
 import org.lanternpowered.server.block.BlockSnapshotBuilder
@@ -112,8 +111,10 @@ import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistr
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
+import org.lanternpowered.server.registry.type.item.EnchantmentTypeRegistry
 import org.lanternpowered.server.registry.type.persistence.DataFormatRegistry
 import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
+import org.lanternpowered.server.registry.type.potion.PotionTypeRegistry
 import org.lanternpowered.server.registry.type.recipe.LanternRecipeRegistry
 import org.lanternpowered.server.registry.type.recipe.RecipeTypeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
@@ -149,7 +150,6 @@ import org.lanternpowered.server.world.LanternWorldBorderBuilder
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder
 import org.spongepowered.api.CatalogType
-import org.spongepowered.api.Game
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.entity.BlockEntityArchetype
 import org.spongepowered.api.data.Key
@@ -176,9 +176,12 @@ import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.biome.VirtualBiomeType
 import org.spongepowered.api.world.gamerule.GameRule
+import org.spongepowered.api.ResourceKey.Builder as ResourceKeyBuilder
 import java.util.function.Supplier
 
-object LanternGameRegistry : GameRegistry {
+class LanternGameRegistry(
+        private val game: Game
+) : GameRegistry {
 
     fun init() {
         factoryRegistry.apply {
@@ -313,9 +316,13 @@ object LanternGameRegistry : GameRegistry {
             register(FluidTypeRegistry)
 
             register(EquipmentTypeRegistry)
+
+            register(EnchantmentTypeRegistry)
+
             register(DataFormatRegistry)
 
             register(PotionEffectTypeRegistry)
+            register(PotionTypeRegistry)
 
             register(RecipeTypeRegistry)
             register(LanternRecipeRegistry)
@@ -355,7 +362,7 @@ object LanternGameRegistry : GameRegistry {
         val cause = CauseStackManager.currentCause
         val factoryRegistryEvent = object : RegisterFactoryEvent {
             override fun getCause(): Cause = cause
-            override fun getGame(): Game = LanternGame
+            override fun getGame(): Game = this@LanternGameRegistry.game
             override fun <T : Any> register(factoryClass: Class<T>, factory: T): T =
                     factoryRegistry.register(factoryClass, factory)
         }
@@ -366,7 +373,7 @@ object LanternGameRegistry : GameRegistry {
         val cause = CauseStackManager.currentCause
         val builderRegistryEvent = object : RegisterBuilderEvent {
             override fun getCause(): Cause = cause
-            override fun getGame(): Game = LanternGame
+            override fun getGame(): Game = this@LanternGameRegistry.game
             override fun <T : ResettableBuilder<*, in T>> register(builderClass: Class<T>, supplier: Supplier<in T>) =
                     builderRegistry.register(builderClass, supplier)
         }
@@ -377,14 +384,16 @@ object LanternGameRegistry : GameRegistry {
         val cause = CauseStackManager.currentCause
         val catalogRegistryEvent = object : RegisterCatalogRegistryEvent {
             override fun getCause(): Cause = cause
-            override fun getGame(): Game = LanternGame
-            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey): Unit = register(catalogClass, key) { emptySet() }
-            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey, defaultsSupplier: Supplier<Set<T>>) {
+            override fun getGame(): Game = this@LanternGameRegistry.game
+            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey): Unit = register(catalogClass, key, null)
+            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey, defaultsSupplier: Supplier<Set<T>>?) {
                 val registry = catalogTypeRegistry<T>(TypeToken.of(catalogClass)) {
                     allowPluginRegistrations()
-                    val defaults = defaultsSupplier.get()
-                    for (def in defaults)
-                        register(def)
+                    if (defaultsSupplier != null) {
+                        val defaults = defaultsSupplier.get()
+                        for (def in defaults)
+                            register(def)
+                    }
                 }
                 catalogRegistry.register(registry, key)
             }

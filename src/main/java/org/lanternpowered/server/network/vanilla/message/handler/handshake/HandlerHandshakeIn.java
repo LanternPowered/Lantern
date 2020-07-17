@@ -47,14 +47,14 @@ public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
         final Optional<ProtocolState> optNextState = ProtocolState.getFromId(message.getNextState());
         final NetworkSession session = context.getSession();
         if (!optNextState.isPresent()) {
-            session.disconnect(t("Unknown protocol state! (%s)", message.getNextState()));
+            session.close(t("Unknown protocol state! (%s)", message.getNextState()));
             return;
         }
 
         final ProtocolState nextState = optNextState.get();
         session.setProtocolState(nextState);
         if (!nextState.equals(ProtocolState.LOGIN) && !nextState.equals(ProtocolState.STATUS)) {
-            session.disconnect(t("Received a unexpected handshake message! (%s)", nextState));
+            session.close(t("Received a unexpected handshake message! (%s)", nextState));
             return;
         }
 
@@ -81,7 +81,7 @@ public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
                         try {
                             properties = LanternProfileProperty.createPropertiesMapFromJson(GSON.fromJson(split[3], JsonArray.class));
                         } catch (Exception e) {
-                            session.disconnect(t("Invalid %s proxy data format.", proxyType.getDisplayName()));
+                            session.close(t("Invalid %s proxy data format.", proxyType.getDisplayName()));
                             throw new CodecException(e);
                         }
                     } else {
@@ -90,7 +90,7 @@ public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
 
                     session.getChannel().attr(LoginStartHandler.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, null, properties));
                 } else {
-                    session.disconnect(t("Please enable client detail forwarding (also known as \"ip forwarding\") on "
+                    session.close(t("Please enable client detail forwarding (also known as \"ip forwarding\") on "
                             + "your proxy if you wish to use it on this server, and also make sure that you joined through the proxy."));
                     return;
                 }
@@ -102,7 +102,7 @@ public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
                     final String securityKey = Lantern.getGame().getGlobalConfig().getProxySecurityKey();
                     // Validate the security key
                     if (!securityKey.isEmpty() && !jsonObject.get("s").getAsString().equals(securityKey)) {
-                        session.disconnect(t("Proxy security key mismatch"));
+                        session.close(t("Proxy security key mismatch"));
                         Lantern.getLogger().warn("Proxy security key mismatch for the player {}", jsonObject.get("n").getAsString());
                         return;
                     }
@@ -133,7 +133,7 @@ public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
 
                     virtualAddress = new InetSocketAddress(host, port);
                 } catch (Exception e) {
-                    session.disconnect(t("Invalid %s proxy data format.", proxyType.getDisplayName()));
+                    session.close(t("Invalid %s proxy data format.", proxyType.getDisplayName()));
                     throw new CodecException(e);
                 }
                 break;
@@ -156,9 +156,9 @@ public final class HandlerHandshakeIn implements Handler<HandshakeMessage> {
             final int protocol = Lantern.getGame().getPlatform().getMinecraftVersion().getProtocol();
 
             if (message.getProtocolVersion() < protocol) {
-                session.disconnect(t("multiplayer.disconnect.outdated_client", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
+                session.close(t("multiplayer.disconnect.outdated_client", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
             } else if (message.getProtocolVersion() > protocol) {
-                session.disconnect(t("multiplayer.disconnect.outdated_server", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
+                session.close(t("multiplayer.disconnect.outdated_server", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
             }
         }
     }

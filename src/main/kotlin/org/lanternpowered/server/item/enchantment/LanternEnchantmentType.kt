@@ -37,6 +37,7 @@ class LanternEnchantmentType internal constructor(
         min..max
     }
 
+    override fun getName(): String = this.translation.get()
     override fun getWeight(): Int = this.weight
     override fun isTreasure(): Boolean = this.treasure
     override fun isCurse(): Boolean = this.curse

@@ -94,7 +94,7 @@ public final class HandlerPlayInChatMessage implements Handler<ClientSendChatMes
 
         String message1 = StringUtils.normalizeSpace(message0);
         if (!isAllowedString(message0)) {
-            session.disconnect(t("multiplayer.disconnect.illegal_characters"));
+            session.close(t("multiplayer.disconnect.illegal_characters"));
             return;
         }
         if (message1.startsWith("/")) {
@@ -139,7 +139,7 @@ public final class HandlerPlayInChatMessage implements Handler<ClientSendChatMes
             chatData.lastChatTime = currentTime;
             chatData.chatThrottle += 20;
             if (chatData.chatThrottle > Lantern.getGame().getGlobalConfig().getChatSpamThreshold()) {
-                session.disconnect(t("disconnect.spam"));
+                session.close(t("disconnect.spam"));
             }
         }
     }

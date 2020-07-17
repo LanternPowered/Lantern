@@ -31,7 +31,6 @@ import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.RconServer;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.text.LanternTexts;
@@ -576,7 +575,7 @@ public final class LanternServer implements Server {
         this.logger.info("Stopping the server... ({})", LanternTexts.toLegacy(kickMessage));
 
         // Kick all the online players
-        getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().disconnect(kickMessage));
+        getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().close(kickMessage));
 
         // Stop the network servers - starts the shutdown process
         // It may take a second or two for Netty to totally clean up

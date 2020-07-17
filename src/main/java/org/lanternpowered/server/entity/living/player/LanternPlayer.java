@@ -804,7 +804,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         // Check whether the player is still active
         int timeout = Lantern.getGame().getGlobalConfig().getPlayerIdleTimeout();
         if (timeout > 0 && System.currentTimeMillis() - this.lastActiveTime >= timeout * 60000) {
-            this.session.disconnect(t("multiplayer.disconnect.idling"));
+            this.session.close(t("multiplayer.disconnect.idling"));
             return;
         }
 
@@ -1196,12 +1196,12 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
     @Override
     public void kick() {
-        this.session.disconnect();
+        this.session.close();
     }
 
     @Override
     public void kick(Text reason) {
-        this.session.disconnect(reason);
+        this.session.close(reason);
     }
 
     @Override

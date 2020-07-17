@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
@@ -31,15 +32,14 @@ import org.lanternpowered.server.item.ItemKeys;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.ClientBlockPlacementMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
-import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -53,7 +53,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -62,8 +62,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
 public final class PlayerInteractionHandler {
@@ -124,8 +122,8 @@ public final class PlayerInteractionHandler {
                 this.lastBreakState = breakState;
             }
         }
-        final HandType activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(Optional.empty()).orElse(null);
-        final AbstractSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND ?
+        final HandType activeHand = this.player.get(LanternKeys.ACTIVE_HAND).orElse(null);
+        final AbstractSlot slot = activeHand == null ? null : activeHand == HandTypes.MAIN_HAND.get() ?
                 this.player.getInventory().getHotbar().getSelectedSlot() : this.player.getInventory().getOffhand();
         // The interaction just started
         if (!Objects.equals(activeHand, this.lastActiveHand)) {
@@ -140,7 +138,7 @@ public final class PlayerInteractionHandler {
                 // Stop the interaction
                 resetItemUseTime();
             } else {
-                final OptionalInt property = itemStack.getIntProperty(ItemKeys.MAXIMUM_USE_DURATION);
+                final OptionalInt property = itemStack.getInt(ItemKeys.MAXIMUM_USE_DURATION);
                 if (property.isPresent()) {
                     // Check if the interaction reached it's max time
                     final long time = LanternGame.currentTimeTicks();
@@ -240,7 +238,7 @@ public final class PlayerInteractionHandler {
     }
 
     private void handleBrokenBlock() {
-        final Location location = new LanternLocation(this.player.getWorld(), this.diggingBlock);
+        final ServerLocation location = ServerLocation.of(this.player.getWorld(), this.diggingBlock);
 
         final CauseStack causeStack = CauseStack.current();
         try (CauseStack.Frame frame = causeStack.pushCauseFrame()) {
@@ -315,7 +313,7 @@ public final class PlayerInteractionHandler {
         final double dy = Math.min(pos2.getY(), 0.999);
         final double dz = Math.min(pos2.getZ(), 0.999);
 
-        final Location clickedLocation = new LanternLocation(this.player.getWorld(),
+        final ServerLocation clickedLocation = ServerLocation.of(this.player.getWorld(),
                 message.getPosition().toDouble().add(dx, dy, dz));
         final Direction face = message.getFace();
 
@@ -326,7 +324,7 @@ public final class PlayerInteractionHandler {
             // Add context
             frame.addContext(ContextKeys.INTERACTION_FACE, face);
             frame.addContext(ContextKeys.INTERACTION_LOCATION, clickedLocation);
-            frame.addContext(ContextKeys.BLOCK_LOCATION, new LanternLocation(clickedLocation.getWorld(), message.getPosition()));
+            frame.addContext(ContextKeys.BLOCK_LOCATION, ServerLocation.of(clickedLocation.getWorld(), message.getPosition()));
             frame.addContext(ContextKeys.PLAYER, this.player);
 
             final BehaviorContextImpl context = new BehaviorContextImpl(causeStack);

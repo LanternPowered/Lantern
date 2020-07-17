@@ -65,8 +65,8 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.network.PlayerConnection;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.network.ServerPlayerConnection;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -76,6 +76,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.dimension.DimensionTypes;
 import org.spongepowered.math.vector.Vector3d;
@@ -98,7 +99,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public final class NetworkSession extends SimpleChannelInboundHandler<Message> implements PlayerConnection {
+public final class NetworkSession extends SimpleChannelInboundHandler<Message> implements ServerPlayerConnection {
 
     /**
      * The read timeout in seconds.
@@ -219,6 +220,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.server = server;
     }
 
+    @Override
+    public GameProfile getProfile() {
+        return checkNotNull(this.gameProfile);
+    }
+
     private static long currentTime() {
         return System.nanoTime() / 1000000L;
     }
@@ -334,7 +340,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // If the connection isn't established after 30 seconds,
         // kick the player. 30 seconds is the value used in vanilla
         this.connectionTask = this.channel.eventLoop().schedule(
-                () -> disconnect(t("multiplayer.disconnect.slow_login")), 30, TimeUnit.SECONDS);
+                () -> close(t("multiplayer.disconnect.slow_login")), 30, TimeUnit.SECONDS);
     }
 
     @NettyThreadOnly
@@ -350,7 +356,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                     this.keepAliveTime = time;
                     send(new KeepAliveMessage(time));
                 } else {
-                    disconnect(t("disconnect.timeout"));
+                    close(t("disconnect.timeout"));
                 }
             }
         }, 0, 15, TimeUnit.SECONDS);
@@ -807,19 +813,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
     }
 
-    /**
-     * Disconnects the session with a unknown reason.
-     */
-    public void disconnect() {
-        disconnect(Text.of("Unknown reason."));
+    @Override
+    public void close() {
+        close(Text.of("Unknown reason."));
     }
 
-    /**
-     * Disconnects the session with a specific reason.
-     *
-     * @param reason The reason
-     */
-    public void disconnect(Text reason) {
+    @Override
+    public void close(Text reason) {
         checkNotNull(reason, "reason");
         if (this.disconnectReason != null) {
             return;
@@ -850,8 +850,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             final MessageChannel messageChannel = this.player.getMessageChannel();
             final Text quitMessage = t("multiplayer.player.left", this.player.getName());
 
-            final ClientConnectionEvent.Disconnect event = SpongeEventFactory.createClientConnectionEventDisconnect(
-                    causeStack.getCurrentCause(), messageChannel, Optional.of(messageChannel),
+            final ServerSideConnectionEvent.Disconnect event = SpongeEventFactory.createServerSideConnectionEventDisconnect(
+                    causeStack.getCurrentCause(), messageChannel, Optional.of(messageChannel), this,
                     new MessageEvent.MessageFormatter(quitMessage), this.player, false);
 
             Sponge.getEventManager().post(event);
@@ -932,7 +932,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // The kick reason
         Text kickReason = null;
 
-        final BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService banService = Sponge.getServiceProvider().provide(BanService.class).get();
         // Check whether the player is banned and kick if necessary
         Ban ban = banService.getBanFor(this.gameProfile).orElse(null);
         if (ban == null) {
@@ -974,9 +974,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 kickReason != null ? kickReason : t("multiplayer.disconnect.not_allowed_to_join"));
 
         final Cause cause = Cause.builder().append(this).build(EventContext.builder().add(EventContextKeys.PLAYER, this.player).build());
-        final Transform fromTransform = this.player.getTransform();
-        final ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
-                fromTransform, fromTransform, world, world, this, messageFormatter, this.gameProfile, this.player, false);
+        final Location fromLocation = this.player.getLocation();
+        final ServerSideConnectionEvent.Login loginEvent = SpongeEventFactory.createServerSideConnectionEventLogin(cause,
+                fromLocation, fromLocation, world, world, this, messageFormatter, this.player, false);
 
         if (kickReason != null) {
             loginEvent.setCancelled(true);
@@ -984,7 +984,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         Sponge.getEventManager().post(loginEvent);
         if (loginEvent.isCancelled()) {
-            disconnect(loginEvent.isMessageCancelled() ? t("multiplayer.disconnect.generic") : loginEvent.getMessage());
+            close(loginEvent.isMessageCancelled() ? t("multiplayer.disconnect.generic") : loginEvent.getMessage());
             return;
         }
 

@@ -25,7 +25,6 @@ import org.lanternpowered.server.asset.DirectoryAssetRepository;
 import org.lanternpowered.server.asset.MultiAssetRepository;
 import org.lanternpowered.server.asset.PacksAssetRepository;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.util.PathUtils;
 
 import java.io.IOException;

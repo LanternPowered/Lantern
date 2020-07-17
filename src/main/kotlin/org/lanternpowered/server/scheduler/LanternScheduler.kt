@@ -12,17 +12,15 @@ package org.lanternpowered.server.scheduler
 
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
+import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.optional
-import org.spongepowered.plugin.PluginContainer
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.scheduler.TaskExecutorService
-import org.spongepowered.api.util.Functional
 import java.util.Optional
 import java.util.UUID
-import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Future
@@ -106,8 +104,17 @@ class LanternScheduler(val service: ScheduledExecutorService) : Scheduler {
         return scheduledTask
     }
 
-    fun <T> submit(callable: Callable<T>): CompletableFuture<T> = Functional.asyncFailableFuture(callable, this.service)
-    fun <R> submit(callable: () -> R): CompletableFuture<R> = submit(Callable<R> { callable() })
+    fun <R> submit(callable: () -> R): CompletableFuture<R> {
+        val future = CompletableFuture<R>()
+        this.service.execute {
+            try {
+                future.complete(callable())
+            } catch (e: Throwable) {
+                future.completeExceptionally(e)
+            }
+        }
+        return future
+    }
 
-    fun submit(runnable: Runnable): CompletableFuture<Unit> = submit(Callable<Unit> { runnable.run() })
+    fun submit(runnable: Runnable): CompletableFuture<Unit> = submit { runnable.run() }
 }

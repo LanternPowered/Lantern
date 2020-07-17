@@ -12,9 +12,11 @@ package org.lanternpowered.api
 
 import org.lanternpowered.api.injector.Injector
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
+import org.spongepowered.api.Client
 
 typealias MinecraftVersion = org.spongepowered.api.MinecraftVersion
 typealias Platform = org.spongepowered.api.Platform
+typealias PlatformComponent = org.spongepowered.api.Platform.Component
 typealias Sponge = org.spongepowered.api.Sponge
 
 /**
@@ -31,6 +33,14 @@ interface Game : org.spongepowered.api.Game {
      * The injector.
      */
     val injector: Injector
+
+    @Deprecated(message = "The client isn't supported.", replaceWith = ReplaceWith(""), level = DeprecationLevel.HIDDEN)
+    @JvmDefault
+    override fun getClient(): Client = throw UnsupportedOperationException("The client isn't supported.")
+
+    @Deprecated(message = "The client isn't supported.", replaceWith = ReplaceWith(""), level = DeprecationLevel.HIDDEN)
+    @JvmDefault
+    override fun isClientAvailable(): Boolean = false
 
     /**
      * The game singleton.

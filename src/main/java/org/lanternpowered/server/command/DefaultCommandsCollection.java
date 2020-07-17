@@ -18,7 +18,6 @@ import com.google.inject.name.Named;
 import org.lanternpowered.server.inject.service.ServiceRef;
 import org.lanternpowered.server.command.test.CommandOpenTestContainer;
 import org.lanternpowered.server.command.test.CommandSpawnEntity;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.plugin.PluginContainer;

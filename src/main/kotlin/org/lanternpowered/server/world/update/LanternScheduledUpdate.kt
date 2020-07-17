@@ -12,8 +12,11 @@ package org.lanternpowered.server.world.update
 
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.world.BlockPosition
+import org.lanternpowered.api.world.Location
+import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.scheduler.ScheduledUpdate
 import org.lanternpowered.api.world.scheduler.ScheduledUpdateState
+import org.lanternpowered.api.world.scheduler.UpdatePriority
 import org.lanternpowered.server.world.LanternLocation
 import java.time.Duration
 import java.util.Objects
@@ -32,11 +35,11 @@ class LanternScheduledUpdate<T : Any>(
     // The state of the scheduled task
     private var state = ScheduledUpdateState.WAITING
 
-    override fun getWorld() = this.list.world
-    override fun getLocation() = this.theLocation
-    override fun getTarget() = this.target
-    override fun getPriority() = this.priority
-    override fun getState() = this.state
+    override fun getWorld(): World = this.list.world
+    override fun getLocation(): Location = this.theLocation
+    override fun getTarget(): T = this.target
+    override fun getPriority(): UpdatePriority = this.priority
+    override fun getState(): ScheduledUpdateState = this.state
 
     override fun getDelay(): Duration {
         var diff = System.currentTimeMillis() - this.scheduledTime

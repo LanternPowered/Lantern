@@ -51,7 +51,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     private var enabled = false
     private var loadOnStartup = false
     private var generateStructures = true
-    private var commandEnabled = false // No builder method available
+    private var commandEnabled = false
     private var pvpEnabled = false
     private var generateSpawnOnLoad = false
     private var generateBonusChest = false
@@ -95,8 +95,8 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.generatorType = properties.generatorType
         this.generatorSettings = properties.generatorSettings.copy()
         this.generateStructures = properties.areStructuresEnabled()
-        this.waterEvaporates = properties.doesWaterEvaporate()
-        this.buildHeight = properties.buildHeight
+        this.waterEvaporates = properties.doesWaterEvaporate
+        this.buildHeight = properties.maxBuildHeight
         this.pvpEnabled = properties.isPVPEnabled
         this.generateSpawnOnLoad = properties.doesGenerateSpawnOnLoad()
         this.generateBonusChest = properties.doesGenerateBonusChest()
@@ -159,7 +159,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     override fun reset() = apply {
         this.gameMode = GameModes.SURVIVAL.get()
         this.difficulty = Difficulties.NORMAL.get()
-        this.portalAgentType = PortalAgentTypes.DEFAULT as LanternPortalAgentType<*>
+        this.portalAgentType = PortalAgentTypes.DEFAULT.get() as LanternPortalAgentType<*>
         this.hardcore = false
         this.keepSpawnLoaded = null
         this.loadOnStartup = false
@@ -167,7 +167,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.enabled = true
         this.generateStructures = true
         this.commandEnabled = true
-        this.dimensionType = DimensionTypes.OVERWORLD as LanternDimensionType<*>
+        this.dimensionType = DimensionTypes.OVERWORLD.get() as LanternDimensionType<*>
         this.seed = null
         this.generatorType = null
         this.generatorSettings = null

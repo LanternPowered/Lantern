@@ -10,93 +10,78 @@
  */
 package org.lanternpowered.server.service
 
-import com.google.common.collect.HashMultimap
-import com.google.common.collect.ImmutableList
-import com.google.common.collect.MapMaker
-import com.google.common.collect.Multimap
-import org.lanternpowered.api.cause.CauseStack.Companion.currentOrEmpty
-import org.lanternpowered.api.cause.withFrame
+import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.Game
+import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.cause.emptyCause
+import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.service.ServiceProvider
 import org.lanternpowered.api.util.optional.optional
-import org.lanternpowered.api.util.uncheckedCast
-import org.spongepowered.api.event.cause.EventContextKeys
-import org.spongepowered.plugin.PluginContainer
-import org.spongepowered.api.service.ProviderRegistration
-import org.spongepowered.api.service.ProvisioningException
+import org.lanternpowered.server.LanternGame
+import org.spongepowered.api.event.lifecycle.ProvideServiceEvent
+import org.spongepowered.api.service.ServiceRegistration
 import java.util.Optional
-import java.util.function.Predicate
+import java.util.function.Supplier
 import kotlin.reflect.KClass
 
-object LanternServiceProvider : ServiceProvider {
+class LanternServiceProvider : ServiceProvider {
 
-    private val serviceCallbacks: Multimap<Class<*>, Predicate<Any>> = HashMultimap.create()
-    private val providers: MutableMap<Class<*>, ProviderRegistration<*>> = MapMaker()
-            .concurrencyLevel(3).makeMap<Class<*>, ProviderRegistration<*>>()
+    private val registrations = mutableMapOf<Class<*>, ServiceRegistration<*>>()
 
-    val providerRegistrations: Collection<ProviderRegistration<*>>
-        get() = ImmutableList.copyOf(this.providers.values)
+    inline fun <reified T : Any> register(): T? = register(T::class)
+    inline fun <reified T : Any> register(noinline default: () -> Pair<PluginContainer, T>): T = register(T::class, default)
 
-    inline fun <reified T : Any> watchExpirable(noinline callback: (T) -> Boolean) = watchExpirable(T::class.java, callback)
+    fun <T : Any> register(serviceClass: KClass<T>): T? = register(serviceClass.java, null)
+    fun <T : Any> register(serviceClass: KClass<T>, default: () -> Pair<PluginContainer, T>): T = register(serviceClass.java, default)!!
 
-    fun <T> watchExpirable(serviceType: Class<T>, callback: (T) -> Boolean) {
-        val registration = getNullableRegistration(serviceType)
-        if (registration != null && !callback(registration.provider)) {
-            return
+    private fun <T : Any> register(serviceClass: Class<T>, default: (() -> Pair<PluginContainer, T>)? = null): T? {
+        val cause = emptyCause()
+        var supplier: (() -> Pair<PluginContainer, T>)? = null
+        val event = object : ProvideServiceEvent<T> {
+            override fun getCause(): Cause = cause
+            override fun getGame(): Game = LanternGame
+            override fun getGenericType(): TypeToken<T> = TypeToken.of(serviceClass)
+            override fun suggest(serviceFactory: Supplier<T>) {
+                val plugin: PluginContainer = CauseStack.current().first()
+                        ?: error("No plugin found in the cause stack.")
+                // The first one wins, I guess
+                if (supplier == null)
+                    supplier = { plugin to serviceFactory.get() }
+            }
         }
-        synchronized(this.serviceCallbacks) {
-            this.serviceCallbacks.put(serviceType, callback.uncheckedCast())
-        }
+        EventManager.post(event)
+        if (supplier == null)
+            supplier = default
+        if (supplier == null)
+            return null
+        val (plugin, service) = supplier!!()
+        this.registrations[serviceClass] = LanternServiceRegistration(serviceClass, service, plugin)
+        return service
     }
 
-    fun <T> watch(serviceType: Class<T>, callback: (T) -> Unit) {
-        watchExpirable(serviceType) { service ->
-            callback(service)
-            true
-        }
-    }
+    override fun <T : Any> provide(serviceClass: KClass<T>): T? = provideNullable(serviceClass.java)
+    override fun <T : Any> provide(serviceClass: Class<T>): Optional<T> = provideNullable(serviceClass).optional()
+
+    override fun <T : Any> getRegistration(serviceClass: Class<T>): Optional<ServiceRegistration<T>> =
+            getNullableRegistration(serviceClass).optional()
+
+    private fun <T : Any> provideNullable(serviceClass: Class<T>): T? =
+            getNullableRegistration(serviceClass)?.service()
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T> setProvider(plugin: PluginContainer, service: Class<T>, provider: T) {
-        val newRegistration: ProviderRegistration<T> = Provider(plugin, service, provider)
-        val oldRegistration: ProviderRegistration<T>? = this.providers.put(service, newRegistration) as ProviderRegistration<T>?
-        currentOrEmpty().withFrame { frame ->
-            frame.pushCause(plugin)
-            frame.addContext(EventContextKeys.SERVICE_MANAGER, this)
-            EventManager.post(LanternEventFactory.createChangeServiceProviderEvent<T>(
-                    frame.currentCause, newRegistration, oldRegistration))
-        }
-        synchronized(this.serviceCallbacks) {
-            this.serviceCallbacks[service].removeIf { callback -> !callback.uncheckedCast<(T) -> Boolean>()(provider) }
-        }
-    }
+    private fun <T> getNullableRegistration(serviceClass: Class<T>): ServiceRegistration<T>? =
+            this.registrations[serviceClass] as? ServiceRegistration<T>
+}
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T> getNullableRegistration(service: Class<T>): ProviderRegistration<T>? =
-            (this.providers[service] as ProviderRegistration<T>?)
-
-    override fun <T> getRegistration(service: Class<T>): Optional<ProviderRegistration<T>> = getNullableRegistration(service).optional()
-
-    private fun <T> provideNullable(service: Class<T>): T? = getNullableRegistration(service)?.provider
-
-    override fun <T : Any> provide(service: KClass<T>): T? = provideNullable(service.java)
-    override fun <T : Any> provide(service: Class<T>): Optional<T> = provideNullable(service).optional()
-
-    override fun <T : Any> provideUnchecked(service: KClass<T>): T = provideUnchecked(service.java)
-
-    override fun <T> provideUnchecked(service: Class<T>): T =
-            provideNullable(service) ?: throw ProvisioningException(
-                    "No provider is registered for the service '" + service.name + "'", service)
-
-    private class Provider<T> internal constructor(
-            private val container: PluginContainer,
-            private val service: Class<T>,
-            private val provider: T
-    ) : ProviderRegistration<T> {
-
-        override fun getService(): Class<T> = this.service
-        override fun getProvider(): T = this.provider
-        override fun getPlugin(): PluginContainer = this.container
-    }
+private data class LanternServiceRegistration<T>(
+        private val serviceClass: Class<T>,
+        private val service: T,
+        private val plugin: PluginContainer
+) : ServiceRegistration<T> {
+    override fun serviceClass(): Class<T> = this.serviceClass
+    override fun service(): T = this.service
+    override fun pluginContainer(): PluginContainer = this.plugin
 }

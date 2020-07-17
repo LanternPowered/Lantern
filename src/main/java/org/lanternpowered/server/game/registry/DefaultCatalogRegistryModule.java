@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import kotlin.jvm.JvmClassMappingKt;
 import kotlin.reflect.KClass;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.util.Tuple;

@@ -19,7 +19,7 @@ import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.WorldProperties
-import org.lanternpowered.server.util.ThreadHelper
+import org.lanternpowered.server.util.SyncLanternThread
 import java.nio.file.Path
 import java.util.Optional
 import java.util.UUID
@@ -28,14 +28,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.ThreadFactory
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import java.util.function.Supplier
 import kotlin.concurrent.withLock
 import kotlin.math.max
-
-val World.regionManager: WorldRegionManager get() = TODO()
 
 class LanternWorldManager(
         val ioExecutor: ExecutorService,
@@ -44,7 +43,7 @@ class LanternWorldManager(
 
     // The executor that will be used for world related tasks
     private val worldExecutor: ThreadPoolExecutor = ThreadPoolExecutor(
-            1, 1, 60L, TimeUnit.MINUTES, SynchronousQueue<Runnable>(), ThreadHelper.newThreadFactory())
+            1, 1, 60L, TimeUnit.MINUTES, SynchronousQueue<Runnable>(), ThreadFactory { SyncLanternThread(it) })
 
     private class WorldEntry(
             val storage: WorldStorage,
@@ -52,7 +51,14 @@ class LanternWorldManager(
     ) {
         val modifyLock = ReentrantLock()
 
-        // The current instance of the world, if the world is loaded
+        /**
+         * A lock which makes sure a world storage can't be modified.
+         */
+        var storageLock: WorldStorage.Lock? = null
+
+        /**
+         * The current instance of the world, if the world is loaded
+         */
         @Volatile var world: World? = null
     }
 
@@ -171,19 +177,48 @@ class LanternWorldManager(
         }
     }
 
-    override fun loadWorld(directoryName: String): CompletableFuture<Optional<World>> {
-        TODO("Not yet implemented")
+    override fun loadWorld(directoryName: String): CompletableFuture<Optional<World>> =
+            CompletableFuture.supplyAsync(Supplier { loadWorld0(directoryName).optional() }, this.ioExecutor)
+
+    private fun loadWorld0(directoryName: String): World? {
+        val entry = this.entryByDirectory[directoryName]
+                ?: return null
+        return loadWorld(entry)
     }
 
-    override fun loadWorld(properties: WorldProperties): CompletableFuture<Optional<World>> {
-        TODO("Not yet implemented")
+    override fun loadWorld(properties: WorldProperties): CompletableFuture<Optional<World>> =
+            CompletableFuture.supplyAsync(Supplier { loadWorld0(properties).optional() }, this.ioExecutor)
+
+    private fun loadWorld0(properties: WorldProperties): World? {
+        val entry = this.entryByUniqueId[properties.uniqueId]
+                ?: return null
+        return loadWorld(entry)
+    }
+
+    private fun loadWorld(entry: WorldEntry): World? {
+        entry.modifyLock.withLock {
+            // The world is already loaded
+            if (entry.world != null)
+                return entry.world
+            val storageLock = entry.storage.acquireLock()
+                    ?: return null
+            entry.storageLock = storageLock
+            val world = LanternWorldNew(entry.properties, entry.storage, this.ioExecutor)
+            entry.world = world
+            return world
+        }
+    }
+
+    override fun unloadWorld(world: World): CompletableFuture<Boolean> =
+            CompletableFuture.supplyAsync(Supplier { unloadWorld0(world) }, this.ioExecutor)
+
+    private fun unloadWorld0(world: World): Boolean {
+        val entry = this.entryByUniqueId[world.uniqueId]
+                ?: return false
+        return unloadWorld(entry)
     }
 
     private fun unloadWorld(entry: WorldEntry): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun unloadWorld(world: World): CompletableFuture<Boolean> {
         TODO("Not yet implemented")
     }
 
@@ -195,27 +230,34 @@ class LanternWorldManager(
             return emptyOptional()
         val storage = this.worldStorageService.create(directoryName)
                 ?: return emptyOptional() // The construction failed
-        val properties = LanternWorldProperties(directoryName)
+        val properties = LanternWorldProperties(directoryName, UUID.randomUUID())
         val entry = WorldEntry(storage, properties)
         entry.modifyLock.withLock {
             val previous = this.entryByDirectory.putIfAbsent(storage.directoryName, entry)
             // Someone beat us to it
             if (previous != null)
                 return emptyOptional()
-            this.entryByUniqueId.put(storage.uniqueId, entry)
-        }
-        entry.modifyLock.withLock {
+            this.entryByUniqueId[storage.uniqueId] = entry
             // TODO: Write config file
             // Copy all the information from the archetype to the properties
-            properties.load(archetype)
+            properties.loadFrom(archetype)
             // Write the world data
             storage.save(WorldPropertiesSerializer.serialize(properties))
         }
         return properties.optional()
     }
 
-    override fun saveProperties(properties: WorldProperties): CompletableFuture<Boolean> {
-        TODO("Not yet implemented")
+    override fun saveProperties(properties: WorldProperties): CompletableFuture<Boolean> =
+            CompletableFuture.supplyAsync(Supplier { saveProperties0(properties) }, this.ioExecutor)
+
+    private fun saveProperties0(properties: WorldProperties): Boolean {
+        val entry = this.entryByUniqueId[properties.uniqueId]
+                ?: return false
+        entry.modifyLock.withLock {
+            check(properties === entry.properties)
+            // TODO
+            return true
+        }
     }
 
     override fun getAllProperties(): Collection<WorldProperties> =
@@ -278,7 +320,8 @@ class LanternWorldManager(
             // Start collecting tasks
             val tasks = mutableListOf<() -> Unit>()
             for (entry in locked) {
-                val regionManager = entry.world!!.regionManager
+                val world = entry.world as LanternWorldNew
+                val regionManager = world.regionManager
                 regionManager.update { tasks.add(it) }
             }
 

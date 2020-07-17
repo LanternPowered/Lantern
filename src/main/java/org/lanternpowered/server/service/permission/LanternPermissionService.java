@@ -55,8 +55,7 @@ public final class LanternPermissionService implements PermissionService {
     private final LanternSubjectCollection defaultCollection;
     private final LanternSubject defaultData;
 
-    @Inject
-    private LanternPermissionService() {
+    public LanternPermissionService() {
         this.defaultData = new OpLevelCollection.OpLevelSubject(this, 0);
         this.subjects.put(SUBJECTS_DEFAULT, this.defaultCollection = newCollection(SUBJECTS_DEFAULT));
         this.subjects.put(SUBJECTS_USER, new UserCollection(this));

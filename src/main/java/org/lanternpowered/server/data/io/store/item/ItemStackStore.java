@@ -12,15 +12,16 @@ package org.lanternpowered.server.data.io.store.item;
 
 import static org.lanternpowered.server.data.DataHelper.getOrCreateView;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.LocalMutableDataHolderStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.ItemTypeRegistry;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
+import org.lanternpowered.server.registry.type.item.EnchantmentTypeRegistry;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockType;
@@ -30,7 +31,6 @@ import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.property.Properties;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -226,11 +226,10 @@ public final class ItemStackStore extends LocalMutableDataHolderStore<LanternIte
             if (!views.isEmpty()) {
                 final List<Enchantment> enchantments = new ArrayList<>();
                 views.forEach(view -> {
-                    final Optional<EnchantmentType> enchantmentType = EnchantmentTypeRegistryModule.INSTANCE
-                            .getByInternalId(view.getInt(ENCHANTMENT_ID).get());
-                    if (enchantmentType.isPresent()) {
+                    final @Nullable EnchantmentType enchantmentType = EnchantmentTypeRegistry.get().get(view.getInt(ENCHANTMENT_ID).get());
+                    if (enchantmentType != null) {
                         final int level = view.getInt(ENCHANTMENT_LEVEL).get();
-                        enchantments.add(Enchantment.of(enchantmentType.get(), level));
+                        enchantments.add(Enchantment.of(enchantmentType, level));
                     } else {
                         Lantern.getLogger().warn("Attempted to deserialize a enchantment with unknown id: {}", view.getInt(ENCHANTMENT_ID).get());
                     }

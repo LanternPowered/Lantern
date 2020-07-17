@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.api.asset.Asset;
-import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.util.PathUtils;
 
 import java.io.IOException;

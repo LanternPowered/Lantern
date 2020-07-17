@@ -11,10 +11,10 @@
 package org.lanternpowered.server.text.action
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.spongepowered.api.command.CommandCause
 import org.spongepowered.api.text.action.TextActions
 import java.util.UUID
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
@@ -30,7 +30,7 @@ object LanternClickActionCallbacks {
      */
     val commandPattern = "^$commandBase([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$".toRegex()
 
-    private val reverseMap = ConcurrentHashMap<UUID, Consumer<CommandCause>>()
+    private val reverseMap = concurrentHashMapOf<UUID, Consumer<CommandCause>>()
     private val callbackCache = Caffeine.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .removalListener<Consumer<CommandCause>, UUID> { key, value, _ ->

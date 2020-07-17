@@ -17,10 +17,13 @@ import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.entity.attribute.AttributeModifier
+import org.spongepowered.api.entity.attribute.type.AttributeType
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import java.util.Optional
 
 class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.java, 1), ItemStack.Builder {
@@ -68,6 +71,10 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
 
     override fun <V : Any> add(key: Key<out Value<V>>, value: V) = apply {
         itemStack(null).offerFastNoEvents(key, value)
+    }
+
+    override fun attributeModifier(attributeType: AttributeType, modifier: AttributeModifier, equipmentType: EquipmentType): ItemStack.Builder {
+        TODO("Not yet implemented")
     }
 
     override fun from(value: ItemStack) = apply {

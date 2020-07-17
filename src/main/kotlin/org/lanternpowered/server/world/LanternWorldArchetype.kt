@@ -49,25 +49,25 @@ internal data class LanternWorldArchetype(
         val buildHeight: Int
 ) : CatalogType by DefaultCatalogType.Named(key, name), WorldArchetype {
 
-    override fun getDifficulty() = this.difficulty
-    override fun isEnabled() = this.enabled
-    override fun doesLoadOnStartup() = this.loadsOnStartup
-    override fun doesKeepSpawnLoaded() = this.keepSpawnLoaded ?: this.dimensionType.keepSpawnLoaded
-    override fun doesGenerateSpawnOnLoad() = this.generateSpawnOnLoad
-    override fun getSeed() = this.seed
-    override fun isSeedRandomized() = this.isSeedRandomized
-    override fun getGameMode() = this.gameMode
-    override fun getGeneratorType() = this.generatorType ?: this.dimensionType.defaultGeneratorType
-    override fun isHardcore() = this.hardcore
-    override fun areCommandsEnabled() = this.commandsEnabled
-    override fun doesGenerateBonusChest() = this.generateBonusChest
-    override fun getDimensionType() = this.dimensionType
-    override fun getPortalAgentType() = this.portalAgentType
-    override fun getSerializationBehavior() = this.serializationBehavior
-    override fun isPVPEnabled() = this.pvpEnabled
-    override fun areStructuresEnabled() = this.generateStructures
+    override fun getDifficulty(): Difficulty = this.difficulty
+    override fun isEnabled(): Boolean = this.enabled
+    override fun doesLoadOnStartup(): Boolean = this.loadsOnStartup
+    override fun doesKeepSpawnLoaded(): Boolean = this.keepSpawnLoaded ?: this.dimensionType.keepSpawnLoaded
+    override fun doesGenerateSpawnOnLoad(): Boolean = this.generateSpawnOnLoad
+    override fun getSeed(): Long = this.seed
+    override fun isSeedRandomized(): Boolean = this.isSeedRandomized
+    override fun getGameMode(): GameMode = this.gameMode
+    override fun getGeneratorType(): GeneratorType = this.generatorType ?: this.dimensionType.defaultGeneratorType
+    override fun isHardcore(): Boolean = this.hardcore
+    override fun areCommandsEnabled(): Boolean = this.commandsEnabled
+    override fun doesGenerateBonusChest(): Boolean = this.generateBonusChest
+    override fun getDimensionType(): LanternDimensionType<*> = this.dimensionType
+    override fun getPortalAgentType(): LanternPortalAgentType<*> = this.portalAgentType
+    override fun getSerializationBehavior(): SerializationBehavior = this.serializationBehavior
+    override fun isPVPEnabled(): Boolean = this.pvpEnabled
+    override fun areStructuresEnabled(): Boolean = this.generateStructures
     override fun getGeneratorSettings(): DataContainer = this.generatorSettings?.copy() ?: getGeneratorType().defaultGeneratorSettings
 
     fun allowPlayerRespawns() = this.allowPlayerRespawns ?: this.dimensionType.allowsPlayerRespawns
-    fun waterEvaporates() = this.waterEvaporates ?: this.dimensionType.doesWaterEvaporate
+    fun doesWaterEvaporate() = this.waterEvaporates ?: this.dimensionType.doesWaterEvaporate
 }

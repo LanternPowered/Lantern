@@ -11,7 +11,6 @@
 package org.lanternpowered.server.asset;
 
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.spongepowered.api.Sponge;
 
 import java.io.File;

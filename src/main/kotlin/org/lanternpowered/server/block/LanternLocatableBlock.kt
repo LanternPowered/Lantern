@@ -10,11 +10,10 @@
  */
 package org.lanternpowered.server.block
 
-import com.google.common.base.Objects
-import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.block.BlockState
+import org.lanternpowered.api.world.Location
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.SerializableForwardingDataHolder
-import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.SerializableDataHolder
 import org.spongepowered.api.data.persistence.DataContainer
@@ -23,7 +22,6 @@ import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.world.LocatableBlock
-import org.spongepowered.api.world.Location
 import java.util.Optional
 import java.util.function.Function
 
@@ -32,8 +30,8 @@ data class LanternLocatableBlock internal constructor(
         private val blockState: BlockState
 ) : LocatableBlock, SerializableForwardingDataHolder {
 
-    override fun getBlockState() = this.blockState
-    override fun getLocation() = this.location
+    override fun getBlockState(): BlockState = this.blockState
+    override fun getLocation(): Location = this.location
 
     override val delegateDataHolder: SerializableDataHolder get() = this.blockState
 

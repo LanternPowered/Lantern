@@ -20,10 +20,13 @@ import org.lanternpowered.server.item.LanternItemType
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
+import org.spongepowered.api.entity.attribute.AttributeModifier
+import org.spongepowered.api.entity.attribute.type.AttributeType
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import org.spongepowered.api.text.translation.Translation
 import java.util.function.Consumer
 
@@ -109,6 +112,14 @@ class LanternItemStack private constructor(
         return isSimilarTo(that) && getQuantity() == that.quantity
     }
 
+    override fun getAttributeModifiers(attributeType: AttributeType, equipmentType: EquipmentType): MutableCollection<AttributeModifier> {
+        TODO("Not yet implemented")
+    }
+
+    override fun addAttributeModifier(attributeType: AttributeType, modifier: AttributeModifier, equipmentType: EquipmentType) {
+        TODO("Not yet implemented")
+    }
+    
     /**
      * Similar to [.equalTo], but matches this
      * [ItemStack] with a [ItemStackSnapshot].

@@ -23,7 +23,6 @@ import org.lanternpowered.launch.Environment;
 import org.lanternpowered.launch.LanternClassLoader;
 import org.lanternpowered.launch.transformer.Exclusion;
 import org.lanternpowered.server.inject.LanternModule;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
 import org.lanternpowered.server.util.SyncLanternThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

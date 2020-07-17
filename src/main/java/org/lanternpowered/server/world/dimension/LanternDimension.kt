@@ -14,7 +14,6 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.world.LanternWorld
 import org.spongepowered.api.world.dimension.Dimension
 import org.spongepowered.api.world.dimension.DimensionType
-import org.spongepowered.api.world.gen.TerrainGenerator
 
 open class LanternDimension protected constructor(private val world: LanternWorld, private val dimensionType: LanternDimensionType<*>) : Dimension {
 
@@ -28,7 +27,7 @@ open class LanternDimension protected constructor(private val world: LanternWorl
         return false // TODO
     }
 
-    override fun createGenerator(): TerrainGenerator<*> = this.world.properties.generatorType.createGenerator(world)
+    // override fun createGenerator(): TerrainGenerator<*> = this.world.properties.generatorType.createGenerator(world)
 
     override fun toString(): String = ToStringHelper(this)
             .add("worldUUID", this.world.uniqueId)

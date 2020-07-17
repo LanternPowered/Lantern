@@ -12,6 +12,7 @@ package org.lanternpowered.server.config
 
 import org.lanternpowered.api.util.Tristate
 import org.lanternpowered.api.world.difficulty.Difficulties
+import org.spongepowered.api.entity.living.player.gamemode.GameModes
 
 class ChunksObject : ConfigObject() {
 
@@ -21,10 +22,20 @@ class ChunksObject : ConfigObject() {
     companion object : Factory<ChunksObject> by { ChunksObject() }
 }
 
+class WorldGameModeObject : ConfigObject() {
+
+    var mode by setting(default = GameModes.SURVIVAL.get(), name = "mode",
+            description = "The default game mode of this world.")
+
+    var forced by setting(default = true, name = "forced",
+            description = "Whether players are forced to the default game mode on join.")
+
+    companion object : Factory<WorldGameModeObject> by { WorldGameModeObject() }
+}
+
 class WorldConfigObject : ConfigObject() {
 
-    val chunks by ChunksObject
-    val chunks1 by ChunksObject.with(name = "chunks-1")
+    val chunks by ChunksObject.with(name = "chunks")
 
     var pvp by setting(default = true, name = "pvp",
             description = "Enable if this world allows PVP combat.")
@@ -55,6 +66,8 @@ class WorldConfigObject : ConfigObject() {
 
     var difficulty by setting(default = Difficulties.NORMAL.get(), name = "difficulty",
             description = "The difficulty of this world.")
+
+    val gameMode by WorldGameModeObject.with(name = "game-mode")
 
     companion object : Factory<WorldConfigObject> by { WorldConfigObject() }
 }

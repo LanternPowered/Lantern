@@ -40,7 +40,7 @@ inline fun <reified T : Any> serviceOf(): T? = ServiceProvider.provide()
 inline fun <reified T : Any> ServiceProvider.provide(): T? = provide(T::class)
 
 /**
- * The service manager.
+ * The service provider.
  */
 interface ServiceProvider : org.spongepowered.api.service.ServiceProvider {
 

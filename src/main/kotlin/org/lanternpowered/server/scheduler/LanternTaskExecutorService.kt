@@ -12,7 +12,6 @@
 
 package org.lanternpowered.server.scheduler
 
-import com.google.common.collect.ImmutableList
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.ScheduledTaskFuture
 import org.spongepowered.api.scheduler.Task
@@ -42,7 +41,7 @@ internal class LanternTaskExecutorService(
         // ensure those tasks were created through this interface.
     }
 
-    override fun shutdownNow(): List<Runnable> = ImmutableList.of()
+    override fun shutdownNow(): List<Runnable> = emptyList()
     override fun isShutdown(): Boolean = false
     override fun isTerminated(): Boolean = false
     override fun awaitTermination(timeout: Long, unit: TimeUnit): Boolean = false
@@ -70,9 +69,9 @@ internal class LanternTaskExecutorService(
             val delay = scheduledTask.task.delayNanos
             val interval = scheduledTask.task.intervalNanos
             if (interval != 0L) {
-                return@submit executor.scheduleAtFixedRate(runnable, delay, interval, TimeUnit.NANOSECONDS)
+                executor.scheduleAtFixedRate(runnable, delay, interval, TimeUnit.NANOSECONDS)
             } else {
-                return@submit executor.schedule(runnable, delay, TimeUnit.NANOSECONDS)
+                executor.schedule(runnable, delay, TimeUnit.NANOSECONDS)
             }
         }
     }

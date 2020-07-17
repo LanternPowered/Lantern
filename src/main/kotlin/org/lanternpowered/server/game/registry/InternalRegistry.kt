@@ -58,6 +58,6 @@ class InternalRegistry<T : Any>(keyToId: Object2IntMap<String>, objectConstructo
         fun identityKey(keyToId: Object2IntMap<String>) = InternalRegistry(keyToId) { key -> key }
 
         @JvmStatic
-        fun ResourceKey(keyToId: Object2IntMap<String>) = InternalRegistry(keyToId) { key -> ResourceKey.resolve(key) }
+        fun resourceKey(keyToId: Object2IntMap<String>) = InternalRegistry(keyToId) { key -> ResourceKey.resolve(key) }
     }
 }

@@ -11,12 +11,12 @@
 @file:JvmName("AdvancementTypeRegistry")
 package org.lanternpowered.server.registry.type.advancement
 
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextColors
 import org.lanternpowered.api.text.format.TextFormat
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.advancement.AdvancementType
 import java.util.function.Supplier
 

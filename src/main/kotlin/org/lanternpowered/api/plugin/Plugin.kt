@@ -12,9 +12,10 @@
 
 package org.lanternpowered.api.plugin
 
+import org.lanternpowered.api.Lantern
+
 typealias Plugin = org.spongepowered.plugin.jvm.Plugin
 typealias PluginContainer = org.spongepowered.plugin.PluginContainer
-typealias PluginManager = org.spongepowered.api.plugin.PluginManager
 
 val PluginContainer.id: String
     get() = metadata.id
@@ -24,3 +25,8 @@ val PluginContainer.name: String
 
 val PluginContainer.version: String
     get() = metadata.version
+
+interface PluginManager : org.spongepowered.api.plugin.PluginManager {
+
+    companion object : PluginManager by Lantern.pluginManager
+}

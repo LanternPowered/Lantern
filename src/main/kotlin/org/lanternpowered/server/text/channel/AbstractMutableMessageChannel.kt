@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.text.channel
 
-import org.lanternpowered.api.util.collections.weakSetOf
+import org.lanternpowered.api.util.collections.weakHashSetOf
 import org.spongepowered.api.text.channel.MessageReceiver
 import org.spongepowered.api.text.channel.MutableMessageChannel
 
@@ -28,7 +28,7 @@ import org.spongepowered.api.text.channel.MutableMessageChannel
  * @param receivers The collection of members
  */
 abstract class AbstractMutableMessageChannel protected constructor(
-        private val receivers: MutableCollection<MessageReceiver> = weakSetOf()
+        private val receivers: MutableCollection<MessageReceiver> = weakHashSetOf()
 ) : MutableMessageChannel {
 
     override fun addMember(member: MessageReceiver) = this.receivers.add(member)

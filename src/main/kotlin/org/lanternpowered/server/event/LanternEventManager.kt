@@ -278,8 +278,21 @@ object LanternEventManager : EventManager {
         unregister { handler -> plugin == handler.plugin }
     }
 
+    private fun <E : Event> E.eventType(): EventType<E> =
+            EventType(this.javaClass, (this as? GenericEvent<*>)?.genericType)
+
+    /**
+     * Posts the [Event], but only handlers from the given
+     * [PluginContainer] will be called.
+     */
+    fun postFor(event: Event, plugin: PluginContainer): Boolean {
+        val listeners = this.listenersCache.get(event.eventType())!!
+                .filter { it.plugin == plugin }
+        return post(event, listeners)
+    }
+
     override fun post(event: Event): Boolean {
-        val eventType = EventType(event.javaClass, (event as? GenericEvent<*>)?.genericType)
+        val eventType = event.eventType()
         val listeners = this.listenersCache.get(eventType)!!
         /* TODO
         // Special case

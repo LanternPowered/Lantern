@@ -77,6 +77,7 @@ import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
 import org.spongepowered.math.imaginary.Quaterniond;
 import org.spongepowered.math.vector.Vector3d;
@@ -456,13 +457,13 @@ public class LanternEntity implements SerializableLocalMutableDataHolder, Entity
     }
 
     @Override
-    public Location getLocation() {
+    public ServerLocation getLocation() {
         checkState(this.world != null, "This entity doesn't have a world.");
         return new LanternLocation(this.world, this.position);
     }
 
     @Override
-    public boolean setLocation(Location location) {
+    public boolean setLocation(ServerLocation location) {
         checkNotNull(location, "location");
         return setPositionAndWorld(location.getWorld(), location.getPosition());
     }

@@ -19,7 +19,6 @@ import ninja.leaping.configurate.objectmapping.DefaultObjectMapperFactory;
 import ninja.leaping.configurate.objectmapping.GuiceObjectMapperFactory;
 import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
 import org.lanternpowered.server.game.DirectoryKeys;
-import org.lanternpowered.server.plugin.LanternPluginContainer;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.ConfigRoot;
 import org.spongepowered.plugin.PluginContainer;

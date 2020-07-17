@@ -13,7 +13,7 @@ package org.lanternpowered.server.data.io.store.item;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
-import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
+import org.lanternpowered.server.registry.type.potion.PotionTypeRegistry;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataQuery;
@@ -56,7 +56,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
                     .filter(Objects::nonNull)
                     .collect(ImmutableList.toImmutableList()));
         });
-        dataView.getString(POTION).ifPresent(id -> PotionTypeRegistryModule.INSTANCE.get(ResourceKey.resolve(id)).ifPresent(
-                potionType -> valueContainer.set(Keys.POTION_TYPE, potionType)));
+        dataView.getString(POTION).flatMap(id -> PotionTypeRegistry.get().getOptional(ResourceKey.resolve(id)))
+                .ifPresent(potionType -> valueContainer.set(Keys.POTION_TYPE, potionType));
     }
 }

@@ -11,14 +11,16 @@
 package org.lanternpowered.api.event;
 
 import com.google.common.reflect.TypeParameter;
-import com.google.common.reflect.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
@@ -27,36 +29,25 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.player.CooldownEvent;
 import org.spongepowered.api.event.entity.living.player.PlayerChangeClientSettingsEvent;
 import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-import org.spongepowered.api.event.game.state.GameConstructionEvent;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppedEvent;
-import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.message.MessageEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.event.server.query.QueryServerEvent;
-import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.network.RconConnection;
-import org.spongepowered.api.network.RemoteConnection;
+import org.spongepowered.api.network.ServerSideConnection;
 import org.spongepowered.api.network.status.StatusClient;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.service.ProviderRegistration;
 import org.spongepowered.api.text.chat.ChatVisibility;
-import org.spongepowered.api.util.Transform;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -65,8 +56,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class LanternEventFactory {
@@ -98,10 +87,10 @@ public class LanternEventFactory {
 
     public static ConstructEntityEvent.@NonNull Pre createConstructEntityEventPre(
             @NonNull Cause cause,
-            @NonNull EntityType<?> targetType,
-            @NonNull Transform transform,
-            @NonNull World<?> world) {
-        return SpongeEventFactory.createConstructEntityEventPre(cause, targetType, transform, world);
+            @NonNull ServerLocation location,
+            @NonNull Vector3d rotation,
+            @NonNull EntityType<?> targetType) {
+        return SpongeEventFactory.createConstructEntityEventPre(cause, location, rotation, targetType);
     }
 
     public static ChangeDataHolderEvent.@NonNull ValueChange createChangeDataHolderEventValueChange(
@@ -111,21 +100,10 @@ public class LanternEventFactory {
         return SpongeEventFactory.createChangeDataHolderEventValueChange(cause, originalChanges, targetHolder);
     }
 
-    public static <T> ChangeServiceProviderEvent<T> createChangeServiceProviderEvent(
-            @NonNull Cause cause,
-            @NonNull ProviderRegistration<T> newProviderRegistration,
-            @Nullable ProviderRegistration<T> previousProviderRegistration) {
-        final TypeToken<ChangeServiceProviderEvent<T>> typeToken = new TypeToken<ChangeServiceProviderEvent<T>>() {}.where(
-                new TypeParameter<T>() {}, newProviderRegistration.getService());
-        //noinspection unchecked
-        return SpongeEventFactory.createChangeServiceProviderEvent(cause, typeToken,
-                newProviderRegistration, Optional.ofNullable(previousProviderRegistration));
-    }
-
     public static CooldownEvent.@NonNull End createCooldownEventEnd(
             @NonNull Cause cause,
             @NonNull ItemType itemType,
-            @NonNull Player player) {
+            @NonNull ServerPlayer player) {
         return SpongeEventFactory.createCooldownEventEnd(cause, itemType, player);
     }
 
@@ -134,7 +112,7 @@ public class LanternEventFactory {
             int originalNewCooldown,
             int newCooldown,
             @NonNull ItemType itemType,
-            @NonNull Player player,
+            @NonNull ServerPlayer player,
             @NonNull OptionalInt startingCooldown) {
         return SpongeEventFactory.createCooldownEventSet(
                 cause, originalNewCooldown, newCooldown, itemType, player, startingCooldown);
@@ -154,14 +132,12 @@ public class LanternEventFactory {
         return SpongeEventFactory.createClientPingServerEvent(cause, client, response);
     }
 
-    public static ClientConnectionEvent.@NonNull Auth createClientConnectionEventAuth(
+    public static ServerSideConnectionEvent.@NonNull Auth createClientConnectionEventAuth(
             @NonNull Cause cause,
-            @NonNull RemoteConnection connection,
+            @NonNull ServerSideConnection connection,
             MessageEvent.@NonNull MessageFormatter formatter,
-            @NonNull GameProfile profile,
             boolean messageCancelled) {
-        return SpongeEventFactory.createClientConnectionEventAuth(
-                cause, connection, formatter, profile, messageCancelled);
+        return SpongeEventFactory.createServerSideConnectionEventAuth(cause, connection, formatter, messageCancelled);
     }
 
     public static @NonNull PlayerChangeClientSettingsEvent createPlayerChangeClientSettingsEvent(
@@ -169,65 +145,24 @@ public class LanternEventFactory {
             @NonNull ChatVisibility chatVisibility,
             @NonNull Set<SkinPart> displayedSkinParts,
             @NonNull Locale locale,
-            @NonNull Player player,
+            @NonNull ServerPlayer player,
             boolean chatColorsEnabled,
             int viewDistance) {
         return SpongeEventFactory.createPlayerChangeClientSettingsEvent(
                 cause, chatVisibility, displayedSkinParts, locale, player, chatColorsEnabled, viewDistance);
     }
 
-    public static @NonNull GameConstructionEvent createGameConstructionEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameConstructionEvent(cause);
-    }
-
-    public static @NonNull GameInitializationEvent createGameInitializationEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameInitializationEvent(cause);
-    }
-
-    public static @NonNull GamePreInitializationEvent createGamePreInitializationEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGamePreInitializationEvent(cause);
-    }
-
-    public static @NonNull GamePostInitializationEvent createGamePostInitializationEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGamePostInitializationEvent(cause);
-    }
-
-    public static @NonNull GameLoadCompleteEvent createGameLoadCompleteEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameLoadCompleteEvent(cause);
-    }
-
-    public static @NonNull GameAboutToStartServerEvent createGameAboutToStartServerEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameAboutToStartServerEvent(cause);
-    }
-
-    public static @NonNull GameStartingServerEvent createGameStartingServerEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameStartingServerEvent(cause);
-    }
-
-    public static @NonNull GameStartedServerEvent createGameStartedServerEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameStartedServerEvent(cause);
-    }
-
-    public static @NonNull GameStoppingServerEvent createGameStoppingServerEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameStoppingServerEvent(cause);
-    }
-
-    public static @NonNull GameStoppedServerEvent createGameStoppedServerEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameStoppedServerEvent(cause);
-    }
-
-    public static @NonNull GameStoppingEvent createGameStoppingEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameStoppingEvent(cause);
-    }
-
-    public static @NonNull GameStoppedEvent createGameStoppedEvent(@NonNull Cause cause) {
-        return SpongeEventFactory.createGameStoppedEvent(cause);
+    public static @NonNull ConstructPluginEvent createConstructPluginEvent(
+            @NonNull Cause cause,
+            @NonNull Game game,
+            @NonNull PluginContainer plugin) {
+        return SpongeEventFactory.createConstructPluginEvent(cause, game, plugin);
     }
 
     public static @NonNull ResourcePackStatusEvent createResourcePackStatusEvent(
             @NonNull Cause cause,
             @NonNull ResourcePack pack,
-            @NonNull Player player,
+            @NonNull ServerPlayer player,
             ResourcePackStatusEvent.@NonNull ResourcePackStatus status) {
         return SpongeEventFactory.createResourcePackStatusEvent(cause, pack, player, status);
     }

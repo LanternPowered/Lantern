@@ -12,7 +12,6 @@ package org.lanternpowered.server.game.version
 
 import org.lanternpowered.api.MinecraftVersion
 import org.lanternpowered.server.network.protocol.Protocol
-import org.lanternpowered.server.plugin.InternalPluginsInfo
 
 data class LanternMinecraftVersion(
         private val name: String,

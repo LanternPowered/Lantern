@@ -1,14 +1,25 @@
+/*
+ * Lantern
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * This work is licensed under the terms of the MIT License (MIT). For
+ * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
+ */
 package org.lanternpowered.server.world.chunk
 
+import org.lanternpowered.api.util.collections.concurrentHashMapOf
+import org.lanternpowered.api.util.collections.concurrentHashSetOf
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.chunk.ChunkLoadingTicket
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.world.LanternChunk
-import java.util.Collections
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 /**
@@ -26,18 +37,22 @@ class ChunkManager(
      * All the chunk loading tickets that are currently
      * allocated and hold references.
      */
-    private val tickets: MutableSet<LanternChunkLoadingTicket> = Collections.newSetFromMap(ConcurrentHashMap())
+    private val tickets = concurrentHashSetOf<LanternChunkLoadingTicket>()
 
     /**
      * All the chunk entries.
      */
-    private val entries = ConcurrentHashMap<Long, ChunkEntry>()
+    private val entries = concurrentHashMapOf<Long, ChunkEntry>()
 
     /**
      * References to either a loaded or unloaded chunk,
      * and all the states in between.
      */
     class ChunkEntry(val position: ChunkPosition) {
+
+        /**
+         * A lock for modifications to the chunk entry.
+         */
         val lock = ReentrantReadWriteLock()
 
         /**
@@ -121,6 +136,15 @@ class ChunkManager(
     }
 
     /**
+     * Gets whether there are references for the chunk
+     * at the given [ChunkPosition].
+     */
+    fun hasReference(position: ChunkPosition): Boolean {
+        val entry = this.entries[position.packed] ?: return false
+        return entry.lock.read { entry.references > 0 }
+    }
+
+    /**
      * Acquires a reference to the given chunk at
      * the [ChunkPosition].
      */
@@ -128,9 +152,8 @@ class ChunkManager(
         val entry = this.entries.computeIfAbsent(position.packed) { ChunkEntry(position) }
         entry.lock.write {
             entry.references++
-            if (entry.references == 1) {
+            if (entry.references == 1)
                 queueLoad(entry)
-            }
         }
     }
 
@@ -143,9 +166,8 @@ class ChunkManager(
                 ?: throw IllegalStateException("The entry for $position doesn't exist.")
         entry.lock.write {
             entry.references--
-            if (entry.references == 0) {
+            if (entry.references == 0)
                 queueUnload(entry)
-            }
         }
     }
 

@@ -47,15 +47,13 @@ import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
 import org.lanternpowered.server.permission.Permissions;
-import org.lanternpowered.server.plugin.InternalPluginsInfo;
-import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceProvider;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
-import org.lanternpowered.server.service.sql.LanternSqlService;
+import org.lanternpowered.server.sql.LanternSqlManager;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Console;
@@ -218,7 +216,7 @@ public class LanternGame implements Game {
         initService(BanService.class, BanConfig.class);
         initService(UserStorageService.class, LanternUserStorageService.class);
         initService(PaginationService.class, LanternPaginationService.class);
-        initService(SqlService.class, LanternSqlService.class);
+        initService(SqlService.class, LanternSqlManager.class);
         initService(PermissionService.class, LanternPermissionService.class);
 
         final LanternMinecraftVersion versionCacheEntry = this.minecraftVersionCache.getVersionOrUnknown(

@@ -15,8 +15,6 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.world.gen.GeneratorType
-import org.spongepowered.api.world.gen.TerrainGenerator
-import org.spongepowered.api.world.server.ServerWorld
 
 class DelegateGeneratorType(key: ResourceKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {
 
@@ -58,7 +56,7 @@ class DelegateGeneratorType(key: ResourceKey, generatorType: GeneratorType) : De
     }
 
     override fun getDefaultGeneratorSettings(): DataContainer = this.generatorType.defaultGeneratorSettings
-    override fun createGenerator(world: ServerWorld): TerrainGenerator<*> = this.generatorType.createGenerator(world)
+    // override fun createGenerator(world: ServerWorld): TerrainGenerator<*> = this.generatorType.createGenerator(world)
 
     override fun toStringHelper() = super.toStringHelper()
                 .add("backing", this.generatorType.key)

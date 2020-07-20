@@ -11,9 +11,7 @@
 package org.lanternpowered.server.data.value
 
 import org.lanternpowered.api.util.uncheckedCast
-import org.lanternpowered.server.data.key.BoundedValueKey
 import org.lanternpowered.server.data.key.ValueKey
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.data.value.MapValue
 import org.spongepowered.api.data.value.SetValue
@@ -25,9 +23,6 @@ import org.spongepowered.api.util.weighted.WeightedTable
 object ValueConstructorFactory {
 
     fun <V : Value<E>, E : Any> getConstructor(key: ValueKey<V, E>): ValueConstructor<V, E> {
-        if (key is BoundedValueKey<*,*>) {
-            return BoundedValueConstructor(key as BoundedValueKey<BoundedValue<E>, E>) as ValueConstructor<V, E>
-        }
         val valueType = key.valueToken.rawType
         var valueConstructor: ValueConstructor<V, E>
         if (ListValue::class.java.isAssignableFrom(valueType)) {

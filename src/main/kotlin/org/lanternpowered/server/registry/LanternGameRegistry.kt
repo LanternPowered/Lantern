@@ -44,7 +44,6 @@ import org.lanternpowered.server.data.key.SpongeValueKeyBuilder
 import org.lanternpowered.server.data.key.ValueKeyBuilder
 import org.lanternpowered.server.data.manipulator.ImmutableDataManipulatorFactory
 import org.lanternpowered.server.data.manipulator.MutableDataManipulatorFactory
-import org.lanternpowered.server.data.value.BoundedValueFactory
 import org.lanternpowered.server.data.value.ValueFactory
 import org.lanternpowered.server.effect.entity.EntityEffectCollection
 import org.lanternpowered.server.effect.entity.LanternEntityEffectCollectionBuilder

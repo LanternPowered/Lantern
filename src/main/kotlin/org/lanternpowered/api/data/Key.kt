@@ -15,7 +15,6 @@ import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.registry.CatalogBuilder
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 
 typealias Key<V> = org.spongepowered.api.data.Key<V>
@@ -52,31 +51,6 @@ interface KeyBuilder<V : Value<*>> : CatalogBuilder<Key<V>, KeyBuilder<V>> {
      * @return This builder, generified
      */
     fun <N : Value<*>> type(token: TypeToken<N>): KeyBuilder<N>
-
-    /**
-     * Sets the value range of the bounded value [Key].
-     */
-    fun <V : BoundedValue<E>, E : Comparable<E>> KeyBuilder<V>.range(range: ClosedRange<E>): KeyBuilder<V>
-
-    /**
-     * Sets the minimum value of the bounded value [Key].
-     */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(value: E): KeyBuilder<V>
-
-    /**
-     * Sets the minimum value supplier of the bounded value [Key].
-     */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.minimum(supplier: @KeyBuilderDsl () -> E): KeyBuilder<V>
-
-    /**
-     * Sets the maximum value of the bounded value [Key].
-     */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.maximum(value: E): KeyBuilder<V>
-
-    /**
-     * Sets the maximum value supplier of the bounded value [Key].
-     */
-    fun <V : BoundedValue<E>, E : Any> KeyBuilder<V>.maximum(supplier: @KeyBuilderDsl () -> E): KeyBuilder<V>
 
     /**
      * Sets the comparator of the bounded value [Key].

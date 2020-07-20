@@ -87,15 +87,16 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     public void registerKeys() {
         super.registerKeys();
         final LocalKeyRegistry<AbstractUser> c = getKeyRegistry().forHolder(AbstractUser.class);
-        c.register(LanternKeys.ACCESSORIES, new ArrayList<>());
-        c.register(LanternKeys.MAX_EXHAUSTION).minimum(0.0).maximum(Double.MAX_VALUE);
-        c.register(Keys.EXHAUSTION, DEFAULT_EXHAUSTION).minimum(0.0).maximum(LanternKeys.MAX_EXHAUSTION);
-        c.register(LanternKeys.MAX_FOOD_LEVEL, 20).minimum(0).maximum(Integer.MAX_VALUE);
-        c.register(Keys.FOOD_LEVEL, 20).minimum(0).maximum(LanternKeys.MAX_FOOD_LEVEL);
-        c.register(Keys.SATURATION, DEFAULT_SATURATION).minimum(0.0)
+        c.register(LanternKeys.TOP_HAT);
+        c.registerBounded(LanternKeys.MAX_EXHAUSTION).minimum(0.0).maximum(Double.MAX_VALUE);
+        c.registerBounded(Keys.EXHAUSTION, DEFAULT_EXHAUSTION).minimum(0.0).maximum(LanternKeys.MAX_EXHAUSTION);
+        c.registerBounded(LanternKeys.MAX_FOOD_LEVEL, 20).minimum(0).maximum(Integer.MAX_VALUE);
+        c.registerBounded(Keys.FOOD_LEVEL, 20).minimum(0).maximum(LanternKeys.MAX_FOOD_LEVEL);
+        c.registerBounded(Keys.SATURATION, DEFAULT_SATURATION).minimum(0.0)
                 .maximum(user -> user.get(Keys.FOOD_LEVEL).orElse(20).doubleValue());
         c.register(Keys.LAST_DATE_PLAYED);
-        c.register(Keys.FIRST_DATE_PLAYED);
+        c.register(Keys.LAST_DATE_JOINED);
+        c.register(Keys.FIRST_DATE_JOINED);
         c.register(Keys.WALKING_SPEED, 0.1);
         c.register(LanternKeys.FIELD_OF_VIEW_MODIFIER, 1.0);
         c.register(Keys.IS_FLYING, false);

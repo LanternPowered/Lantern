@@ -13,14 +13,13 @@ package org.lanternpowered.server.data
 import org.lanternpowered.server.util.function.TriConsumer
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.function.Supplier
 
 /**
  * Represents the [ElementKeyRegistration] of a bounded value.
  */
-interface BoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHolder> : ElementKeyRegistration<V, E, H> {
+interface BoundedElementKeyRegistration<V : Value<E>, E : Any, H : DataHolder> : ElementKeyRegistration<V, E, H> {
 
     operator fun invoke(fn: BoundedElementKeyRegistration<V, E, H>.() -> Unit) = apply(fn)
 
@@ -30,7 +29,7 @@ interface BoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHo
      * @param range The value range
      * @return This registration, for chaining
      */
-    fun <V : BoundedValue<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
+    fun <V : Value<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
             .range(range: ClosedRange<E>): BoundedElementKeyRegistration<V, E, H>
 
     /**

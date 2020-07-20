@@ -13,7 +13,6 @@
 package org.lanternpowered.api.value
 
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.data.value.MapValue
 import org.spongepowered.api.data.value.SetValue
@@ -27,12 +26,6 @@ inline fun <E> immutableValueOf(key: Key<out Value<E>>, element: E): Value.Immut
 
 inline fun <E> immutableValueOf(key: Supplier<out Key<out Value<E>>>, element: E): Value.Immutable<E>
         = Value.immutableOf(key, element)
-
-inline fun <E> immutableValueOf(key: Key<out BoundedValue<E>>, element: E): BoundedValue.Immutable<E>
-        = BoundedValue.immutableOf(key, element)
-
-inline fun <E> immutableValueOf(key: Supplier<out Key<out BoundedValue<E>>>, element: E): BoundedValue.Immutable<E>
-        = BoundedValue.immutableOf(key, element)
 
 inline fun <E> immutableValueOf(key: Key<out ListValue<E>>, element: List<E>): ListValue.Immutable<E>
         = Value.immutableOf(key, element)
@@ -63,12 +56,6 @@ inline fun <E> mutableValueOf(key: Key<out Value<E>>, element: E): Value.Mutable
 
 inline fun <E> mutableValueOf(key: Supplier<out Key<out Value<E>>>, element: E): Value.Mutable<E>
         = Value.mutableOf(key, element)
-
-inline fun <E> mutableValueOf(key: Key<out BoundedValue<E>>, element: E): BoundedValue.Mutable<E>
-        = BoundedValue.mutableOf(key, element)
-
-inline fun <E> mutableValueOf(key: Supplier<out Key<out BoundedValue<E>>>, element: E): BoundedValue.Mutable<E>
-        = BoundedValue.mutableOf(key, element)
 
 inline fun <E> mutableValueOf(key: Key<out ListValue<E>>, element: List<E>): ListValue.Mutable<E>
         = Value.mutableOf(key, element)

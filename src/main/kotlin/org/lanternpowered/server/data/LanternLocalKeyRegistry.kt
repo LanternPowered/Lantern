@@ -12,12 +12,10 @@ package org.lanternpowered.server.data
 
 import org.lanternpowered.api.util.collections.asUnmodifiableCollection
 import org.lanternpowered.api.util.uncheckedCast
-import org.lanternpowered.server.data.key.BoundedValueKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DirectionRelativeDataProvider
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.concurrent.ConcurrentHashMap
 import java.util.function.BiConsumer
@@ -58,34 +56,24 @@ class LanternLocalKeyRegistry<H : DataHolder> : LocalKeyRegistry<H>() {
         return registration
     }
 
-    private fun <V : BoundedValue<E>, E : Any> registerBoundedElement(key: Key<V>): BoundedElementKeyRegistration<V, E, H> {
+    private fun <V : Value<E>, E : Any> registerBoundedElement(key: Key<V>): BoundedElementKeyRegistration<V, E, H> {
         checkRegistration(key)
         val registration = LanternBoundedElementKeyRegistration<V, E, H>(key)
         this.internalRegistrations[key] = registration
         return registration
     }
 
-    override fun <V : Value<E>, E : Any> register(key: Key<V>): ElementKeyRegistration<V, E, H> {
-        return if (key is BoundedValueKey<*,*>) {
-            registerBoundedElement(key.uncheckedCast<Key<BoundedValue<Any>>>()).uncheckedCast()
-        } else {
-            registerElement(key)
-        }.removable()
-    }
+    override fun <V : Value<E>, E : Any> register(key: Key<V>): ElementKeyRegistration<V, E, H> =
+            registerElement(key).removable()
 
-    override fun <V : Value<E>, E : Any> register(key: Key<V>, initialElement: E): ElementKeyRegistration<V, E, H> {
-        return if (key is BoundedValueKey<*,*>) {
-            registerBoundedElement(key.uncheckedCast<Key<BoundedValue<Any>>>()).uncheckedCast()
-        } else {
-            registerElement(key)
-        }.nonRemovable().set(initialElement)
-    }
+    override fun <V : Value<E>, E : Any> register(key: Key<V>, initialElement: E): ElementKeyRegistration<V, E, H> =
+            registerElement(key).nonRemovable().set(initialElement)
 
-    override fun <V : BoundedValue<E>, E : Any> register(key: Key<V>, initialElement: E): BoundedElementKeyRegistration<V, E, H> {
+    override fun <V : Value<E>, E : Any> registerBounded(key: Key<V>, initialElement: E): BoundedElementKeyRegistration<V, E, H> {
         return registerBoundedElement(key).nonRemovable().set(initialElement)
     }
 
-    override fun <V : BoundedValue<E>, E : Any> register(key: Key<V>): BoundedElementKeyRegistration<V, E, H> {
+    override fun <V : Value<E>, E : Any> registerBounded(key: Key<V>): BoundedElementKeyRegistration<V, E, H> {
         return registerBoundedElement(key).removable()
     }
 

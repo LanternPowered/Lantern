@@ -17,7 +17,6 @@ import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.data.value.CopyHelper
 import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
@@ -72,25 +71,6 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
 
         var defaultElementSupplier: () -> E? = { null }
         when {
-            BoundedValue::class.java.isAssignableFrom(valueType.rawType) -> {
-                var minValueSupplier = this.minValueSupplier
-                var maxValueSupplier = this.maxValueSupplier
-                @Suppress("UNCHECKED_CAST")
-                val bounds = defaultBounds[elementType.rawType] as? Pair<E, E>
-                if (minValueSupplier == null && bounds != null) {
-                    val minimum: E = bounds.first
-                    minValueSupplier = { minimum }
-                }
-                if (maxValueSupplier == null && bounds != null) {
-                    val maximum: E = bounds.second
-                    maxValueSupplier = { maximum }
-                }
-                checkNotNull(minValueSupplier) { "The minimum value supplier must be set" }
-                checkNotNull(maxValueSupplier) { "The maximum value supplier must be set" }
-                return BoundedValueKey(key.uncheckedCast(), valueType.uncheckedCast(), elementType.uncheckedCast(),
-                        comparator, includesTester, defaultElementSupplier, this.requiresExplicitRegistration,
-                        minValueSupplier, maxValueSupplier).uncheckedCast()
-            }
             ListValue::class.java.isAssignableFrom(valueType.rawType) -> {
                 defaultElementSupplier = { ArrayList<Any?>().uncheckedCast() }
             }

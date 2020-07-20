@@ -13,7 +13,6 @@ package org.lanternpowered.server.data.key
 import org.lanternpowered.api.ResourceKeys.lantern
 import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.data.valueKeyOf
-import org.lanternpowered.api.util.ranges.rangeTo
 import org.lanternpowered.server.data.type.LanternBedPart
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.LanternWireAttachmentType
@@ -26,7 +25,6 @@ import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.InstrumentType
 import org.spongepowered.api.data.type.SkinPart
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
@@ -66,7 +64,7 @@ object LanternKeys {
     /**
      * How many arrows are stuck a entity's body.
      */
-    @JvmField val ARROWS_IN_ENTITY: Key<BoundedValue<Int>> = valueKeyOf(lantern("arrows_in_entity")) { range(0..Int.MAX_VALUE) }
+    @JvmField val ARROWS_IN_ENTITY: Key<Value<Int>> = valueKeyOf(lantern("arrows_in_entity"))
 
     /**
      * Whether something is converting, usually a zombie villager converting to a villager.
@@ -168,12 +166,12 @@ object LanternKeys {
     /**
      * The maximum exhaustion of a entity.
      */
-    @JvmField val MAX_EXHAUSTION = valueKeyOf<BoundedValue<Double>>(lantern("max_exhaustion")) { range(0..Double.MAX_VALUE) }
+    @JvmField val MAX_EXHAUSTION = valueKeyOf<Value<Double>>(lantern("max_exhaustion"))
 
     /**
      * The maximum food level of a entity.
      */
-    @JvmField val MAX_FOOD_LEVEL = valueKeyOf<BoundedValue<Int>>(lantern("max_food_level")) { range(0..Int.MAX_VALUE) }
+    @JvmField val MAX_FOOD_LEVEL = valueKeyOf<Value<Int>>(lantern("max_food_level"))
 
     /**
      * The crafting recipe book state.
@@ -197,7 +195,7 @@ object LanternKeys {
 
     @JvmField val HAS_CHEST: Key<Value<Boolean>> = valueKeyOf(lantern("has_chest"))
 
-    @JvmField val FINE_ROTATION: Key<BoundedValue<Int>> = valueKeyOf(lantern("fine_rotation")) { range(0..Integer.MAX_VALUE) }
+    @JvmField val FINE_ROTATION: Key<Value<Int>> = valueKeyOf(lantern("fine_rotation"))
 
     @JvmField val WATERLOGGED: Key<Value<Boolean>> = valueKeyOf(lantern("waterlogged"))
 

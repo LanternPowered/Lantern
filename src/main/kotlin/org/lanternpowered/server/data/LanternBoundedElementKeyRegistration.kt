@@ -11,22 +11,22 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.util.optional.orNull
-import org.lanternpowered.server.data.key.BoundedValueKey
+import org.lanternpowered.api.value.immutableValueOf
+import org.lanternpowered.server.data.key.ValueKey
 import org.lanternpowered.server.data.value.CopyHelper
 import org.lanternpowered.server.util.function.TriConsumer
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 
 @Suppress("UNCHECKED_CAST")
-internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any, H : DataHolder>(key: Key<V>) :
+internal class LanternBoundedElementKeyRegistration<V : Value<E>, E : Any, H : DataHolder>(key: Key<V>) :
         LanternElementKeyRegistration<V, E, H>(key), BoundedElementKeyRegistration<V, E, H> {
 
     private var minimum: (H.() -> E?)? = null
     private var maximum: (H.() -> E?)? = null
 
-    override fun <V : BoundedValue<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
+    override fun <V : Value<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
             .range(range: ClosedRange<E>) = apply {
         this as LanternBoundedElementKeyRegistration<V, E, H>
         minimum(range.start)
@@ -70,26 +70,21 @@ internal class LanternBoundedElementKeyRegistration<V : BoundedValue<E>, E : Any
     }
 
     override fun validate(holder: H, element: E): Boolean {
-        val key = this.key as BoundedValueKey<V, E>
+        val key = this.key as ValueKey<V, E>
         val comparator = key.elementComparator
 
-        val minimum = this.minimum?.invoke(holder) ?: key.minimum()
-        val maximum = this.maximum?.invoke(holder) ?: key.maximum()
-        if (comparator.compare(element, minimum) < 0 || comparator.compare(element, maximum) > 0) {
+        val minimum = this.minimum?.invoke(holder)
+        if (minimum != null && comparator.compare(element, minimum) < 0)
             return false
-        }
+
+        val maximum = this.maximum?.invoke(holder)
+        if (maximum != null && comparator.compare(element, maximum) > 0)
+            return false
 
         return super.validate(holder, element)
     }
 
-    override fun immutableValueOf(holder: H, element: E): Value.Immutable<E> {
-        val key = this.key as BoundedValueKey<V, E>
-
-        val minimum = this.minimum?.invoke(holder) ?: key.minimum()
-        val maximum = this.maximum?.invoke(holder) ?: key.maximum()
-
-        return BoundedValue.immutableOf(key, element, minimum, maximum).asImmutable()
-    }
+    override fun immutableValueOf(holder: H, element: E): Value.Immutable<E> = immutableValueOf(this.key, element)
 
     override fun validator(validator: H.(element: E) -> Boolean) = apply { super.validator(validator) }
     override fun set(element: E) = apply { super.set(element) }

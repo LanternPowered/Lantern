@@ -16,7 +16,6 @@ import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.value.BoundedValue
 import org.spongepowered.api.data.value.Value
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -207,7 +206,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @param key The key to register
      * @return The bounded element key registration
      */
-    abstract fun <V : BoundedValue<E>, E : Any> register(key: Key<V>): BoundedElementKeyRegistration<V, E, H>
+    abstract fun <V : Value<E>, E : Any> registerBounded(key: Key<V>): BoundedElementKeyRegistration<V, E, H>
 
     /**
      * Registers the given [Key] with bounded value to this local key registry.
@@ -215,16 +214,7 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @param key The key to register
      * @return The bounded element key registration
      */
-    fun <V : BoundedValue<E>, E : Any> register(key: Supplier<out Key<V>>): BoundedElementKeyRegistration<V, E, H> = register(key.get())
-
-    /**
-     * Registers the given [Key] with bounded value to this local key registry.
-     *
-     * @param key The key to register
-     * @param initialElement The initial element
-     * @return The bounded element key registration
-     */
-    abstract fun <V : BoundedValue<E>, E : Any> register(key: Key<V>, initialElement: E): BoundedElementKeyRegistration<V, E, H>
+    fun <V : Value<E>, E : Any> registerBounded(key: Supplier<out Key<V>>): BoundedElementKeyRegistration<V, E, H> = registerBounded(key.get())
 
     /**
      * Registers the given [Key] with bounded value to this local key registry.
@@ -233,8 +223,17 @@ abstract class LocalKeyRegistry<H : DataHolder> : KeyRegistry<LocalKeyRegistrati
      * @param initialElement The initial element
      * @return The bounded element key registration
      */
-    fun <V : BoundedValue<E>, E : Any> register(key: Supplier<out Key<V>>, initialElement: E): BoundedElementKeyRegistration<V, E, H> =
-            register(key.get(), initialElement)
+    abstract fun <V : Value<E>, E : Any> registerBounded(key: Key<V>, initialElement: E): BoundedElementKeyRegistration<V, E, H>
+
+    /**
+     * Registers the given [Key] with bounded value to this local key registry.
+     *
+     * @param key The key to register
+     * @param initialElement The initial element
+     * @return The bounded element key registration
+     */
+    fun <V : Value<E>, E : Any> registerBounded(key: Supplier<out Key<V>>, initialElement: E): BoundedElementKeyRegistration<V, E, H> =
+            registerBounded(key.get(), initialElement)
 
     /**
      * Registers the given [Key] with the data provider to this local key registry.

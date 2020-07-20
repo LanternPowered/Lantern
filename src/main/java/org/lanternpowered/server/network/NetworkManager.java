@@ -11,8 +11,6 @@
 package org.lanternpowered.server.network;
 
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -23,6 +21,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.LanternServerNew;
 import org.lanternpowered.server.network.buffer.LanternByteBufferAllocator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.SimpleCodecContext;
@@ -31,8 +30,10 @@ import org.lanternpowered.server.network.pipeline.MessageCodecHandler;
 import org.lanternpowered.server.network.pipeline.MessageFramingHandler;
 import org.lanternpowered.server.network.pipeline.MessageProcessorHandler;
 import org.lanternpowered.server.network.pipeline.NoopHandler;
+import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.util.ThreadHelper;
 
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Optional;
 import java.util.Set;
@@ -41,7 +42,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@Singleton
 public final class NetworkManager extends AbstractServer {
 
     private final static AtomicInteger threadCounter = new AtomicInteger(0);
@@ -52,22 +52,22 @@ public final class NetworkManager extends AbstractServer {
     private EventLoopGroup workerGroup;
 
     private final Set<NetworkSession> sessions = Sets.newConcurrentHashSet();
-    private final LanternServer server;
+    private final LanternServerNew server;
 
-    @Nullable private SocketAddress socketAddress;
+    @Nullable private InetSocketAddress address;
 
-    @Inject
-    public NetworkManager(LanternServer server) {
+    public NetworkManager(LanternServerNew server) {
         this.server = server;
+        ProtocolState.init();
     }
 
     /**
-     * Gets the {@link SocketAddress} if present.
+     * Gets the {@link InetSocketAddress} if present.
      * 
      * @return The socket address
      */
-    public Optional<SocketAddress> getAddress() {
-        return Optional.ofNullable(this.socketAddress);
+    public @Nullable InetSocketAddress getAddress() {
+        return this.address;
     }
 
     /**
@@ -75,7 +75,7 @@ public final class NetworkManager extends AbstractServer {
      * 
      * @return The server
      */
-    public LanternServer getServer() {
+    public LanternServerNew getServer() {
         return this.server;
     }
 
@@ -112,7 +112,7 @@ public final class NetworkManager extends AbstractServer {
         final ThreadFactory threadFactory = ThreadHelper.newThreadFactory(() -> "netty-" + threadCounter.getAndIncrement());
         this.bossGroup = createEventLoopGroup(transportType, threadFactory);
         this.workerGroup = createEventLoopGroup(transportType, threadFactory);
-        this.socketAddress = address;
+        this.address = (InetSocketAddress) address;
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
                 .channel(getServerSocketChannelClass(transportType))

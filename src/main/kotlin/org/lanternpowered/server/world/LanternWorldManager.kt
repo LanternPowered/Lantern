@@ -19,6 +19,7 @@ import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.WorldProperties
+import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.util.SyncLanternThread
 import java.nio.file.Path
 import java.util.Optional
@@ -37,6 +38,7 @@ import kotlin.concurrent.withLock
 import kotlin.math.max
 
 class LanternWorldManager(
+        val server: LanternServerNew,
         val ioExecutor: ExecutorService,
         val worldStorageService: WorldStorageService
 ) : WorldManager {
@@ -59,7 +61,7 @@ class LanternWorldManager(
         /**
          * The current instance of the world, if the world is loaded
          */
-        @Volatile var world: World? = null
+        @Volatile var world: LanternWorldNew? = null
     }
 
     private val registrations = linkedMapOf<String, WorldArchetype>()
@@ -203,8 +205,9 @@ class LanternWorldManager(
             val storageLock = entry.storage.acquireLock()
                     ?: return null
             entry.storageLock = storageLock
-            val world = LanternWorldNew(entry.properties, entry.storage, this.ioExecutor)
+            val world = LanternWorldNew(this.server, entry.properties, entry.storage, this.ioExecutor)
             entry.world = world
+            entry.properties.setWorld(world)
             return world
         }
     }
@@ -219,7 +222,17 @@ class LanternWorldManager(
     }
 
     private fun unloadWorld(entry: WorldEntry): Boolean {
-        TODO("Not yet implemented")
+        entry.modifyLock.withLock {
+            val world = entry.world
+                    ?: return false // The world isn't loaded
+            world.unload()
+            entry.storage.save(WorldPropertiesSerializer.serialize(entry.properties))
+            entry.properties.setWorld(null)
+            entry.storageLock?.close()
+            entry.storageLock = null
+            entry.world = null
+            return true
+        }
     }
 
     override fun createProperties(directoryName: String, archetype: WorldArchetype): CompletableFuture<Optional<WorldProperties>> =
@@ -255,7 +268,7 @@ class LanternWorldManager(
                 ?: return false
         entry.modifyLock.withLock {
             check(properties === entry.properties)
-            // TODO
+            entry.storage.save(WorldPropertiesSerializer.serialize(properties as LanternWorldProperties))
             return true
         }
     }

@@ -28,7 +28,7 @@ class GameRuleContainer : GameRuleHolder {
     override fun <V> setGameRule(gameRule: GameRule<V>, value: V) {
         val holder = this.values.computeIfAbsent(gameRule) { ValueHolder(gameRule.defaultValue, arrayListOf()) } as ValueHolder<V>
         if (holder.value != value) {
-            holder.listeners.forEach { it.invoke(value) }
+            holder.listeners.forEach { it(value) }
         }
         holder.value = value
     }

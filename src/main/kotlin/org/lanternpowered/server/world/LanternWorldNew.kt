@@ -14,6 +14,7 @@ import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
+import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.world.chunk.ChunkManager
 import org.lanternpowered.server.world.storage.SpongeWorldStorage
 import org.spongepowered.api.Server
@@ -28,7 +29,6 @@ import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
-import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.sound.SoundCategory
 import org.spongepowered.api.effect.sound.SoundType
@@ -55,7 +55,6 @@ import org.spongepowered.api.world.biome.BiomeType
 import org.spongepowered.api.world.chunk.Chunk
 import org.spongepowered.api.world.dimension.Dimension
 import org.spongepowered.api.world.explosion.Explosion
-import org.spongepowered.api.world.storage.WorldProperties
 import org.spongepowered.api.world.volume.archetype.ArchetypeVolume
 import org.spongepowered.api.world.weather.Weather
 import org.spongepowered.math.vector.Vector3d
@@ -71,6 +70,7 @@ import java.util.function.Supplier
 
 // TODO: Rename world
 class LanternWorldNew(
+        private val server: LanternServerNew,
         private val properties: LanternWorldProperties,
         private val storage: WorldStorage,
         private val ioExecutor: ExecutorService
@@ -83,17 +83,25 @@ class LanternWorldNew(
      */
     val regionManager = WorldRegionManager(this)
 
+    /**
+     * Whether this world is currently loaded.
+     */
+    private var loaded: Boolean = true
+
+    fun unload() {
+
+    }
+
     private val random = Random()
     private val spongeWorldStorage = SpongeWorldStorage(this.ioExecutor, this.properties, this.storage)
 
-    override fun getEngine(): Server {
-        TODO("Not yet implemented")
-    }
-
+    override fun isLoaded(): Boolean = this.loaded
+    override fun getDirectory(): Path = this.storage.directory
+    override fun getEngine(): Server = this.server
     override fun getWorldStorage(): SpongeWorldStorage = this.spongeWorldStorage
     override fun getRandom(): Random = this.random
     override fun getSeed(): Long = this.properties.seed
-    override fun getProperties(): WorldProperties = this.properties
+    override fun getProperties(): LanternWorldProperties = this.properties
 
     override fun getLocation(position: Vector3i): Location = LanternLocation(this, position)
     override fun getLocation(position: Vector3d): Location = LanternLocation(this, position)
@@ -309,14 +317,6 @@ class LanternWorldNew(
     }
 
     override fun getScheduledBlockUpdates(): ScheduledUpdateList<BlockType> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getDirectory(): Path {
-        TODO("Not yet implemented")
-    }
-
-    override fun isLoaded(): Boolean {
         TODO("Not yet implemented")
     }
 

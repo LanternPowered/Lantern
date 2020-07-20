@@ -26,7 +26,7 @@ class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
 
     init {
         protocolType = BlockEntityProtocolTypes.SIGN
-        initializeSubject()
+        resolveSubject()
         keyRegistry {
             register(Keys.SIGN_LINES, mutableListOf(Text.of(), Text.of(), Text.of(), Text.of()))
         }

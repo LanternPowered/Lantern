@@ -23,7 +23,7 @@ import kotlin.reflect.typeOf
 class NamedConfigObjectFactory<T : ConfigObject>(val factory: Factory<T>, val name: String, val description: String)
 
 /**
- * @property name The name of the config spec, by default it will be inferred from the class name
+ * @property specName The name of the config spec, by default it will be inferred from the class name
  * @property caseFormat The case format, this is the format that will be used for
  *                      property names that are inferred from the property field name
  * @property description The description of the config spec
@@ -45,7 +45,7 @@ abstract class ConfigObject(
     /**
      * The name of the config spec.
      */
-    val name = name ?: resolveName()
+    val specName = name ?: resolveName()
 
     fun <T : ConfigObject> Factory<T>.with(name: String? = null, description: String? = null): NamedConfigObjectFactory<T> {
         TODO()

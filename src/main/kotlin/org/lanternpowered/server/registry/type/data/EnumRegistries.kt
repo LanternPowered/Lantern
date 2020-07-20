@@ -15,24 +15,24 @@ import org.lanternpowered.server.data.type.LanternChestAttachment
 import org.lanternpowered.server.data.type.LanternComparatorMode
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.LanternDyeColor
-import org.lanternpowered.server.data.type.LanternHinge
+import org.lanternpowered.server.data.type.LanternDoorHinge
 import org.lanternpowered.server.data.type.LanternInstrumentType
 import org.lanternpowered.server.data.type.LanternPortionType
 import org.lanternpowered.server.data.type.LanternRailDirection
 import org.lanternpowered.server.data.type.LanternSlabPortion
-import org.lanternpowered.server.data.type.LanternSurface
+import org.lanternpowered.server.data.type.LanternAttachmentSurface
 import org.lanternpowered.server.data.type.LanternWireAttachmentType
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistry
 import org.lanternpowered.server.registry.internalCatalogTypeRegistryOfArray
+import org.spongepowered.api.data.type.AttachmentSurface
 import org.spongepowered.api.data.type.ChestAttachmentType
 import org.spongepowered.api.data.type.ComparatorMode
+import org.spongepowered.api.data.type.DoorHinge
 import org.spongepowered.api.data.type.DyeColor
-import org.spongepowered.api.data.type.Hinge
 import org.spongepowered.api.data.type.InstrumentType
 import org.spongepowered.api.data.type.PortionType
 import org.spongepowered.api.data.type.RailDirection
 import org.spongepowered.api.data.type.SlabPortion
-import org.spongepowered.api.data.type.Surface
 import org.spongepowered.api.data.type.WireAttachmentType
 
 val BedPartRegistry: InternalCatalogTypeRegistry<LanternBedPart> =
@@ -50,8 +50,8 @@ val DoorHalfRegistry: InternalCatalogTypeRegistry<LanternDoorHalf> =
 val DyeColorRegistry: InternalCatalogTypeRegistry<DyeColor> =
         internalCatalogTypeRegistryOfArray { LanternDyeColor.values() }
 
-val HingeRegistry: InternalCatalogTypeRegistry<Hinge> =
-        internalCatalogTypeRegistryOfArray { LanternHinge.values() }
+val DoorHingeRegistry: InternalCatalogTypeRegistry<DoorHinge> =
+        internalCatalogTypeRegistryOfArray { LanternDoorHinge.values() }
 
 val InstrumentTypeRegistry: InternalCatalogTypeRegistry<InstrumentType> =
         internalCatalogTypeRegistryOfArray { LanternInstrumentType.values() }
@@ -65,8 +65,8 @@ val RailDirectionRegistry: InternalCatalogTypeRegistry<RailDirection> =
 val SlabPortionRegistry: InternalCatalogTypeRegistry<SlabPortion> =
         internalCatalogTypeRegistryOfArray { LanternSlabPortion.values() }
 
-val SurfaceRegistry: InternalCatalogTypeRegistry<Surface> =
-        internalCatalogTypeRegistryOfArray { LanternSurface.values() }
+val AttachmentSurfaceRegistry: InternalCatalogTypeRegistry<AttachmentSurface> =
+        internalCatalogTypeRegistryOfArray { LanternAttachmentSurface.values() }
 
 val WireAttachmentTypeRegistry: InternalCatalogTypeRegistry<WireAttachmentType> =
         internalCatalogTypeRegistryOfArray { LanternWireAttachmentType.values() }

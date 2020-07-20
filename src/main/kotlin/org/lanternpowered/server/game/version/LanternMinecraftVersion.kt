@@ -34,8 +34,5 @@ data class LanternMinecraftVersion(
 
         @JvmField
         val UNKNOWN_LEGACY = LanternMinecraftVersion(UNKNOWN_NAME, -1, true)
-
-        @JvmField
-        val CURRENT = LanternMinecraftVersion(InternalPluginsInfo.Minecraft.VERSION, Protocol.CURRENT_VERSION, false)
     }
 }

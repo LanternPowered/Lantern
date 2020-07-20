@@ -12,7 +12,6 @@ package org.lanternpowered.server.permission
 
 import org.lanternpowered.api.service.serviceOf
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.server.service.LanternServiceProvider
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.permission.PermissionService
@@ -21,7 +20,6 @@ import org.spongepowered.api.service.permission.SubjectCollection
 import org.spongepowered.api.service.permission.SubjectData
 import org.spongepowered.api.service.permission.SubjectReference
 import org.spongepowered.api.util.Tristate
-import java.lang.ref.WeakReference
 import java.util.Optional
 
 interface ProxySubject : Subject {
@@ -49,27 +47,6 @@ interface ProxySubject : Subject {
      */
     fun getPermissionDefault(permission: String): Tristate
 
-    /**
-     * Initializes the [ProxySubject].
-     */
-    @JvmDefault
-    fun initializeSubject() {
-        val reference = WeakReference(this)
-        LanternServiceProvider.watchExpirable<PermissionService> { service ->
-            // Don't reference to this in this block, use the weak reference
-            // for this, we don't want to create a listener with a hard
-            // reference to the subject
-
-            // Returning false from this predicate means this setting callback will be removed
-            // as a listener, and will not be tested again.
-            val subject = reference.get() ?: return@watchExpirable false
-
-            // Update the internal subject
-            updateInternalSubject(subject, service)
-            true
-        }
-    }
-
     @JvmDefault
     fun resolveNullableSubject(): Subject? {
         var reference = this.internalSubject
@@ -77,9 +54,16 @@ interface ProxySubject : Subject {
             val service = serviceOf<PermissionService>()
             if (service != null) {
                 // Try to update the internal subject
-                updateInternalSubject(this, service)
-                // Get the new subject reference, can be null if failed
-                reference = this.internalSubject
+                // check if we're using the native Lantern impl
+                // we can skip some unnecessary instance creation this way.
+                reference = if (service is LanternPermissionService) {
+                    service.get(this.subjectCollectionIdentifier).get(this.identifier).asSubjectReference()
+                } else {
+                    // build a new subject reference using the permission service
+                    // this doesn't actually load the subject, so it will be lazily init'd when needed.
+                    service.newSubjectReference(this.subjectCollectionIdentifier, this.identifier)
+                }
+                this.internalSubject = reference
             }
         }
         return reference?.resolve()?.join()
@@ -135,17 +119,4 @@ interface ProxySubject : Subject {
     @JvmDefault
     override fun getOption(contexts: Set<Context>, key: String): Optional<String> =
             resolveNullableSubject()?.getOption(contexts, key) ?: emptyOptional()
-}
-
-fun updateInternalSubject(ref: ProxySubject, service: PermissionService) {
-    // check if we're using the native Lantern impl
-    // we can skip some unnecessary instance creation this way.
-    val subject = if (service is LanternPermissionService) {
-        service.get(ref.subjectCollectionIdentifier).get(ref.identifier).asSubjectReference()
-    } else {
-        // build a new subject reference using the permission service
-        // this doesn't actually load the subject, so it will be lazily init'd when needed.
-        service.newSubjectReference(ref.subjectCollectionIdentifier, ref.identifier)
-    }
-    ref.internalSubject = subject
 }

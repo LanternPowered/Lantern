@@ -18,9 +18,9 @@ import org.spongepowered.plugin.jvm.JVMPluginContainer
 import org.spongepowered.plugin.jvm.JVMPluginLanguageService
 import java.util.Optional
 
-class LanternPluginLanguageService : JVMPluginLanguageService<JVMPluginContainer>() {
+class LanternPluginLanguageService : JVMPluginLanguageService<LanternPluginContainer>() {
 
-    override fun getName(): String = this::class.java.simpleName
+    override fun getName(): String = "lantern"
 
     override fun createPluginInstance(environment: PluginEnvironment, container: JVMPluginContainer, targetClassLoader: ClassLoader): Any {
         val pluginClass = Class.forName(container.metadata.mainClass, true, targetClassLoader)
@@ -32,6 +32,6 @@ class LanternPluginLanguageService : JVMPluginLanguageService<JVMPluginContainer
         TODO()
     }
 
-    override fun createPluginContainer(candidate: PluginCandidate, environment: PluginEnvironment): Optional<JVMPluginContainer> =
-            JVMPluginContainer(candidate).optional()
+    override fun createPluginContainer(candidate: PluginCandidate, environment: PluginEnvironment): Optional<LanternPluginContainer> =
+            LanternPluginContainer(candidate).optional()
 }

@@ -39,9 +39,8 @@ class FullLocationPatternConverter private constructor(private val format: Strin
         private val ignoredPackages = arrayOf("java.", "kotlin.io.")
 
         @JvmStatic
-        fun newInstance(options: Array<String>): FullLocationPatternConverter {
-            return FullLocationPatternConverter(if (options.isNotEmpty()) options[0] else "%path")
-        }
+        fun newInstance(options: Array<String>): FullLocationPatternConverter =
+                FullLocationPatternConverter(if (options.isNotEmpty()) options[0] else "%path")
 
         private fun calculateLocation(fqcn: String): StackTraceElement? {
             val stackTrace = Throwable().stackTrace
@@ -50,28 +49,17 @@ class FullLocationPatternConverter private constructor(private val format: Strin
             for (i in stackTrace.size - 1 downTo 1) {
                 val className = stackTrace[i].className
                 // Check if the target logger source should be redirected
-                if (LanternConsole.redirectFqcns.contains(className) || className == fqcn) {
+                if (LanternConsole.redirectFqcns.contains(className) || className == fqcn)
                     return last
-                }
                 // Check if the target logger source should be ignored
-                if (LanternConsole.ignoreFqcns.contains(className)) {
+                if (LanternConsole.ignoreFqcns.contains(className))
                     return null
-                }
                 // Reaching the printStackTrace method is also the end of the road
-                if (className == "java.lang.Throwable" && stackTrace[i].methodName == "printStackTrace") {
+                if (className == "java.lang.Throwable" && stackTrace[i].methodName == "printStackTrace")
                     return null
-                }
                 // Ignore Kotlin and Java packages
-                var isIgnored = false
-                for (ignored in ignoredPackages) {
-                    if (className.startsWith(ignored)) {
-                        isIgnored = true
-                        break
-                    }
-                }
-                if (!isIgnored) {
+                if (ignoredPackages.none { ignored -> className.startsWith(ignored) })
                     last = stackTrace[i]
-                }
             }
 
             return null

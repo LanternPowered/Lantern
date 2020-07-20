@@ -11,9 +11,12 @@
 package org.lanternpowered.server.world
 
 import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.config.WorldConfigObject
+import org.lanternpowered.server.world.archetype.LanternWorldArchetype
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
 import org.spongepowered.api.boss.BossBar
@@ -43,6 +46,8 @@ class LanternWorldProperties(
 
     // TODO: Link some settings to config
 
+    private var world: World? = null
+
     private val config: WorldConfigObject = TODO()
 
     private var serializationBehavior = SerializationBehaviors.AUTOMATIC.get()
@@ -59,12 +64,29 @@ class LanternWorldProperties(
     private var generatorType = GeneratorTypes.DEFAULT.get()
     private var dimensionType: LanternDimensionType<*> = DimensionTypes.OVERWORLD.get() as LanternDimensionType<*>
 
+    // TODO: Move some things to game rules?
+
+    override fun getWorld(): Optional<World> = this.world.optional()
+
+    /**
+     * Sets the world instance attached to these
+     * properties, internal use only.
+     */
+    fun setWorld(world: World?) { this.world = world }
+
     /**
      * The maximum build height in this world.
      */
     var maxBuildHeight: Int
         get() = this.config.maxBuildHeight
         set(value) { this.config.maxBuildHeight = value }
+
+    /**
+     * Whether player are able to respawn in this world when they die.
+     */
+    var allowsPlayerRespawns: Boolean
+        get() = this.config.allowPlayerRespawns
+        set(value) { this.config.allowPlayerRespawns = value }
 
     /**
      * Whether water evaporates when being placed in this world.
@@ -84,9 +106,10 @@ class LanternWorldProperties(
         this.keepSpawnLoaded = archetype.doesKeepSpawnLoaded()
         this.structuresEnabled = archetype.areStructuresEnabled()
         this.commandsEnabled = archetype.areCommandsEnabled()
+        this.allowsPlayerRespawns = archetype.allowPlayerRespawns()
         this.config.pvp = archetype.isPVPEnabled
         this.config.enabled = archetype.isEnabled
-        this.seed = if (archetype.isSeedRandomized) Random.nextLong() else archetype.seed
+        this.seed = archetype.seed
         this.config.difficulty = archetype.difficulty
         this.config.gameMode.mode = archetype.gameMode
         this.config.maxBuildHeight = archetype.buildHeight

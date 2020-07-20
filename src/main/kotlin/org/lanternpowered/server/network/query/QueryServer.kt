@@ -35,7 +35,7 @@ package org.lanternpowered.server.network.query
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.ChannelFuture
 import io.netty.channel.EventLoopGroup
-import org.lanternpowered.server.game.LanternGame
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.TransportType
 import org.lanternpowered.server.util.ThreadHelper
 import java.net.InetSocketAddress

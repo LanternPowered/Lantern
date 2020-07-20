@@ -11,6 +11,7 @@
 package org.lanternpowered.server.entity.living.player
 
 import com.google.common.base.Objects
+import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.data.MutableForwardingDataHolder
 import org.lanternpowered.server.data.io.UserIO
@@ -18,12 +19,10 @@ import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.permission.AbstractProxySubject
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.type.HandType
-import org.spongepowered.api.entity.living.player.Player
-import org.spongepowered.api.item.inventory.Carrier
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
+import org.spongepowered.api.item.inventory.entity.UserInventory
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
-import org.spongepowered.api.item.inventory.type.CarriedInventory
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.util.Tristate
@@ -38,7 +37,7 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
     private var user: AbstractUser? = null
 
     init {
-        initializeSubject()
+        resolveSubject()
     }
 
     /**
@@ -62,7 +61,7 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
             check(this.uniqueId == this.gameProfile.uniqueId)
             // Reinitialize the subject
             if (!Objects.equal(oldProfile.name.orElse(null), this.gameProfile.name.orElse(null))) {
-                initializeSubject()
+                resolveSubject()
             }
             try {
                 UserIO.load(Lantern.getGame().savesDirectory, this.user)
@@ -94,7 +93,7 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
     override fun getUniqueId(): UUID = this.uniqueId
     override fun getProfile(): GameProfile = this.gameProfile
     override fun getPermissionDefault(permission: String): Tristate = Tristate.FALSE
-    override fun getInventory(): CarriedInventory<out Carrier> = resolveUser().inventory
+    override fun getInventory(): UserInventory = resolveUser().inventory
     override fun canEquip(type: EquipmentType): Boolean = resolveUser().canEquip(type)
     override fun canEquip(type: EquipmentType, equipment: ItemStack): Boolean = resolveUser().canEquip(type, equipment)
     override fun getEquipped(type: EquipmentType): Optional<ItemStack> = resolveUser().getEquipped(type)

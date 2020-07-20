@@ -29,6 +29,11 @@ interface WorldStorage : Identifiable {
     //  per server, but is stored in the world in vanilla
 
     /**
+     * The path of the directory.
+     */
+    val directory: Path
+
+    /**
      * The name of the directory.
      */
     val directoryName: String

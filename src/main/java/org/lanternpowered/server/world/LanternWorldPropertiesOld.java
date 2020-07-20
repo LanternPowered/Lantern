@@ -16,6 +16,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.network.vanilla.message.type.play.SetDifficultyMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.SetReducedDebugMessage;
+import org.lanternpowered.server.world.archetype.LanternWorldArchetype;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gamerule.GameRuleContainer;
 import org.lanternpowered.server.world.gen.flat.AbstractFlatGeneratorType;

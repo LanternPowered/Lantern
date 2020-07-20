@@ -12,6 +12,8 @@ package org.lanternpowered.server.plugin
 
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.Game
+import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.cause.withCause
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.PluginManager
 import org.lanternpowered.api.util.collections.getAndRemoveAll
@@ -28,12 +30,15 @@ import org.spongepowered.plugin.PluginLanguageService
 import org.spongepowered.plugin.metadata.PluginMetadata
 import java.nio.file.Path
 import java.util.Optional
+import java.util.ServiceConfigurationError
+import java.util.ServiceLoader
 
 class LanternPluginManager(
         private val game: Game,
         private val logger: Logger,
         private val eventManager: LanternEventManager,
-        private val baseDirectory: Path
+        private val baseDirectory: Path,
+        private val pluginsDirectory: Path
 ) : PluginManager {
 
     companion object {
@@ -60,17 +65,33 @@ class LanternPluginManager(
         private set
 
     fun instantiate() {
-        val languageService = LanternPluginLanguageService()
-        instantiate(listOf(languageService))
+        val languageServices = findLanguageServices()
+        instantiate(languageServices)
     }
 
-    fun instantiate(languageServices: List<PluginLanguageService<out PluginContainer>>) {
+    private fun findLanguageServices(): List<PluginLanguageService<out PluginContainer>> {
+        val services = mutableListOf<PluginLanguageService<out PluginContainer>>()
+
+        val it = ServiceLoader.load(PluginLanguageService::class.java).iterator()
+        while (it.hasNext()) {
+            try {
+                services += it.next()
+            } catch (ex: ServiceConfigurationError) {
+                this.logger.error("Error encountered initializing plugin loader!", ex)
+                continue
+            }
+        }
+
+        return services
+    }
+
+    private fun instantiate(languageServices: List<PluginLanguageService<out PluginContainer>>) {
         val classLoader = LanternClassLoader.get()
 
         val environment = PluginEnvironment()
         environment.blackboard.getOrCreate(PluginKeys.BASE_DIRECTORY) { this.baseDirectory }
-        // TODO: Make this configurable again using launch options?
-        environment.blackboard.getOrCreate(PluginKeys.PLUGIN_DIRECTORIES) { listOf(this.baseDirectory.resolve("plugins")) }
+        environment.blackboard.getOrCreate(PluginKeys.PLUGIN_DIRECTORIES) { listOf(this.pluginsDirectory) }
+        // TODO: Add parent injector
 
         val resources = mutableSetOf<Path>()
         val candidatesByService = mutableListOf<Pair<PluginLanguageService<out PluginContainer>, PluginCandidate>>()
@@ -92,7 +113,7 @@ class LanternPluginManager(
                     .getAndRemoveAll { (_, candidate) -> candidate.metadata.id == id }
                     .firstOrNull()?.second
             val metadata = candidate?.metadata ?: PluginMetadata.builder().setId(id).build()
-            val file = candidate?.file ?: this.baseDirectory.resolve("magic/$id.jar")
+            val file = candidate?.file ?: this.baseDirectory.resolve("magic/$id.jar") // Use something as path.
 
             val pluginContainer = InternalPluginContainer(file, metadata, this.logger, this.game)
             this.byId[id] = pluginContainer
@@ -108,15 +129,21 @@ class LanternPluginManager(
 
         // Load other plugin instances
 
+        val causeStack = CauseStack.current()
+
         for ((service, candidate) in candidatesByService) {
             val pluginContainer = service.createPluginContainer(candidate, environment).orNull() ?: continue
             // Already store it so it can be looked up through injections.
             this.byId[pluginContainer.metadata.id] = pluginContainer
 
-            // Instantiate the plugin instance.
-            @Suppress("UNCHECKED_CAST")
-            (service as PluginLanguageService<PluginContainer>).loadPlugin(environment, pluginContainer, classLoader)
-            this.byInstance[pluginContainer.instance] = pluginContainer
+            // Already put the plugin container in the cause stack so
+            // it's available during injections, etc.
+            causeStack.withCause(pluginContainer) {
+                // Instantiate the plugin instance.
+                @Suppress("UNCHECKED_CAST")
+                (service as PluginLanguageService<PluginContainer>).loadPlugin(environment, pluginContainer, classLoader)
+                this.byInstance[pluginContainer.instance] = pluginContainer
+            }
         }
     }
 

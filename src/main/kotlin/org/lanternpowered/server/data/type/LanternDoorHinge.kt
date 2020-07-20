@@ -13,13 +13,13 @@ package org.lanternpowered.server.data.type
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.asString
-import org.spongepowered.api.data.type.Hinge
+import org.spongepowered.api.data.type.DoorHinge
 
-enum class LanternHinge(id: String) : Hinge, CatalogType by DefaultCatalogType.minecraft(id) {
+enum class LanternDoorHinge(id: String) : DoorHinge, CatalogType by DefaultCatalogType.minecraft(id) {
 
     LEFT    ("left"),
     RIGHT   ("right");
 
-    override fun cycleNext(): Hinge = if (this == LEFT) RIGHT else LEFT
+    override fun cycleNext(): DoorHinge = if (this == LEFT) RIGHT else LEFT
     override fun toString(): String = asString()
 }

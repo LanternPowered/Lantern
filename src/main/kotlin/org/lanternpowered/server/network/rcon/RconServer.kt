@@ -33,24 +33,21 @@
 package org.lanternpowered.server.network.rcon
 
 import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.Channel
 import io.netty.channel.ChannelFuture
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.socket.SocketChannel
-import org.lanternpowered.server.network.AbstractServer
+import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.server.network.TransportType
 import org.lanternpowered.server.util.ThreadHelper
 import org.spongepowered.api.service.rcon.RconService
+import java.io.Closeable
 import java.net.InetSocketAddress
 import java.net.SocketAddress
-import java.util.Optional
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ThreadFactory
 
-class RconServer(private val password: String) : RconService {
+class RconServer(private val password: String) : RconService, Closeable {
 
-    private val connectionByHostname: MutableMap<String, LanternRconConnection> = ConcurrentHashMap()
+    private val connectionByHostname = concurrentHashMapOf<String, LanternRconConnection>()
 
     private lateinit var bootstrap: ServerBootstrap
     private lateinit var bossGroup: EventLoopGroup
@@ -83,7 +80,7 @@ class RconServer(private val password: String) : RconService {
         return this.bootstrap.bind(address)
     }
 
-    fun shutdown() {
+    override fun close() {
         check(this::bootstrap.isInitialized) { "The rcon server wasn't initialized." }
         this.workerGroup.shutdownGracefully()
         this.bossGroup.shutdownGracefully()
@@ -97,9 +94,7 @@ class RconServer(private val password: String) : RconService {
         this.connectionByHostname.remove(connection.address.hostName)
     }
 
-    fun getByHostName(hostname: String): Optional<LanternRconConnection> {
-        return Optional.ofNullable(this.connectionByHostname[hostname])
-    }
+    fun getByHostName(hostname: String): LanternRconConnection? = this.connectionByHostname[hostname]
 
     override fun isRconEnabled(): Boolean = true
     override fun getRconPassword(): String = this.password

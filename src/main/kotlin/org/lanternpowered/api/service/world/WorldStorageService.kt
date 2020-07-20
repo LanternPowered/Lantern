@@ -14,7 +14,7 @@ import java.nio.file.Path
 import java.util.UUID
 
 /**
- * A service that will handle all the loading and saving data related to worlds.
+ * A service that will handle all the loading and saving of data related to worlds.
  */
 interface WorldStorageService {
 

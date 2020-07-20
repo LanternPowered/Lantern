@@ -39,7 +39,7 @@ import kotlin.concurrent.write
 
 class LanternWorldStorage(
         @Volatile private var uniqueId: UUID,
-        private val directory: Path
+        override val directory: Path
 ) : WorldStorage {
 
     private var sessionLock: Lock? = null
@@ -50,7 +50,7 @@ class LanternWorldStorage(
     override val directoryName: String
         get() = this.directory.fileName.toString()
 
-    private val dataDirectory: Path = this.directory.resolve(WORLD_DATA_DIRECTORY_NAME)
+    private val dataDirectory: Path = this.directory.resolve(DATA_DIRECTORY_NAME)
 
     override val chunks: AnvilChunkStorage = AnvilChunkStorage(this.dataDirectory.resolve(REGION_DIRECTORY_NAME))
 
@@ -292,7 +292,8 @@ class LanternWorldStorage(
             return null
         }
 
-        private const val WORLD_DATA_DIRECTORY_NAME = "data"
+        const val DATA_DIRECTORY_NAME = "data"
+
         private const val SCOREBOARD_DATA_FILE = "scoreboard.dat"
         private const val LEVEL_DATA_FILE = "level.dat"
         private const val SPONGE_LEVEL_DATA_FILE = "level_sponge.dat"

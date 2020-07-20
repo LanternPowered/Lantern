@@ -11,16 +11,15 @@
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.cause.first
+import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.asUnmodifiableList
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.data.value.ValueConstructorFactory
 import org.lanternpowered.server.event.LanternEventManager
 import org.lanternpowered.server.event.RegisteredListener
-import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.CatalogType
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
@@ -28,7 +27,6 @@ import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.Order
 import org.spongepowered.api.event.data.ChangeDataHolderEvent
-import org.spongepowered.plugin.PluginContainer
 import java.util.Objects
 import java.util.function.BiPredicate
 
@@ -71,9 +69,9 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
     override fun getValueToken() = this.valueToken
     override fun getElementToken() = this.elementToken
 
-    override fun <E : DataHolder> registerEvent(holderFilter: Class<E>, listener: EventListener<ChangeDataHolderEvent.ValueChange>) {
+    override fun <E : DataHolder> registerEvent(
+            plugin: PluginContainer, holderFilter: Class<E>, listener: EventListener<ChangeDataHolderEvent.ValueChange>) {
         val keyEventListener = ValueKeyEventListener(listener, holderFilter::isInstance, this)
-        val plugin = CauseStack.current().first<PluginContainer>() ?: error("There no plugin in the cause stack.")
         val registeredListener = LanternEventManager.register(
                 plugin, valueChangeEventTypeToken, Order.DEFAULT, keyEventListener)
         this.mutableListeners.add(registeredListener)

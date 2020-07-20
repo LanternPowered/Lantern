@@ -16,6 +16,7 @@ import io.netty.util.concurrent.FastThreadLocal
 import org.lanternpowered.api.injector.ChildInjector
 import org.lanternpowered.api.injector.Injector
 import org.lanternpowered.api.injector.InjectorBuilder
+import org.lanternpowered.api.injector.get
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.uncheckedCast
 import javax.inject.Qualifier
@@ -25,6 +26,7 @@ import kotlin.reflect.jvm.javaType
 import com.google.inject.Injector as GuiceInjector
 
 class DefaultInjector : Injector {
+
     override fun createChild(fn: InjectorBuilder.() -> Unit): Injector {
         TODO("Not yet implemented")
     }
@@ -88,6 +90,29 @@ object LanternGlobalInjector : Injector {
     }
 }
 
+private val currentInjector = FastThreadLocal<Pair<Injector, ChildInjector.Context>>()
+
+private class InjectorContext(injector: Injector) : ChildInjector.Context {
+
+    var closed = false
+    val previous: Pair<Injector, ChildInjector.Context> = currentInjector.get()
+
+    init {
+        currentInjector.set(injector to this)
+    }
+
+    override fun close() {
+        if (this.closed)
+            return
+        val pair = currentInjector.get() ?: return
+        if (pair.second !== this)
+            throw IllegalStateException("Injector close order problem. An context that was opened " +
+                    "after this one must be closed before closing this one.")
+        currentInjector.set(this.previous)
+        this.closed = true
+    }
+}
+
 class LanternInjector(
         private val guiceInjector: GuiceInjector
 ) : ChildInjector {
@@ -96,9 +121,7 @@ class LanternInjector(
         TODO("Not yet implemented")
     }
 
-    override fun openContext(): ChildInjector.Context {
-        TODO("Not yet implemented")
-    }
+    override fun openContext(): ChildInjector.Context = InjectorContext(this)
 
     override fun <T : Any> get(type: KType): T {
         val bindingAnnotation = type.annotations
@@ -113,15 +136,7 @@ class LanternInjector(
     override fun <T : Any> get(type: TypeToken<T>): T =
             this.guiceInjector.getInstance(Key.get(type.type)).uncheckedCast()
 
-    override fun <T : Any> getLazy(type: KType): Lazy<T> {
-        TODO("Not yet implemented")
-    }
-
-    override fun <T : Any> getLazy(type: KClass<T>): Lazy<T> {
-        TODO("Not yet implemented")
-    }
-
-    override fun <T : Any> getLazy(type: TypeToken<T>): Lazy<T> {
-        TODO("Not yet implemented")
-    }
+    override fun <T : Any> getLazy(type: KType): Lazy<T> = lazy { get<T>(type) }
+    override fun <T : Any> getLazy(type: KClass<T>): Lazy<T> = lazy { get(type) }
+    override fun <T : Any> getLazy(type: TypeToken<T>): Lazy<T> = lazy { get(type) }
 }

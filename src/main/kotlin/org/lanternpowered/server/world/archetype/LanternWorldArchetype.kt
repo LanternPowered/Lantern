@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.world
+package org.lanternpowered.server.world.archetype
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.text.translation.Translation
@@ -40,9 +40,8 @@ internal data class LanternWorldArchetype(
         private val generateStructures: Boolean,
         private val commandsEnabled: Boolean,
         private val generateSpawnOnLoad: Boolean,
-        private val isSeedRandomized: Boolean,
         private val generateBonusChest: Boolean,
-        private val seed: Long,
+        val seedProvider: SeedProvider,
         internal val keepSpawnLoaded: Boolean?,
         internal val waterEvaporates: Boolean?,
         internal val allowPlayerRespawns: Boolean?,
@@ -54,8 +53,8 @@ internal data class LanternWorldArchetype(
     override fun doesLoadOnStartup(): Boolean = this.loadsOnStartup
     override fun doesKeepSpawnLoaded(): Boolean = this.keepSpawnLoaded ?: this.dimensionType.keepSpawnLoaded
     override fun doesGenerateSpawnOnLoad(): Boolean = this.generateSpawnOnLoad
-    override fun getSeed(): Long = this.seed
-    override fun isSeedRandomized(): Boolean = this.isSeedRandomized
+    override fun getSeed(): Long = this.seedProvider.get()
+    override fun isSeedRandomized(): Boolean = this.seedProvider == SeedProvider.Random
     override fun getGameMode(): GameMode = this.gameMode
     override fun getGeneratorType(): GeneratorType = this.generatorType ?: this.dimensionType.defaultGeneratorType
     override fun isHardcore(): Boolean = this.hardcore

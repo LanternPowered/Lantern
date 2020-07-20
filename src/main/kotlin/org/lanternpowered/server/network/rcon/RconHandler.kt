@@ -36,16 +36,14 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.util.AttributeKey
+import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.CauseStack.Companion.current
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
-import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.util.future.thenAsync
-import org.spongepowered.api.Sponge
 import org.spongepowered.api.command.exception.CommandException
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.cause.EventContext
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent
 import org.spongepowered.api.text.Text
 import java.nio.charset.StandardCharsets
@@ -78,7 +76,7 @@ internal class RconHandler(
         val channel = ctx.channel()
         val connection = LanternRconConnection(channel, this.server.address)
         check(channel.attr(CONNECTION).compareAndSet(null, connection)) { "Rcon source may not be set more than once!" }
-        Lantern.getSyncScheduler()
+        LanternGame.syncScheduler
                 .submit {
                     val cause = causeOf(connection)
                     val event = LanternEventFactory.createRconConnectionEventConnect(cause, connection)
@@ -100,7 +98,7 @@ internal class RconHandler(
         val cause = causeOf(connection)
         this.server.remove(connection)
         val event = LanternEventFactory.createRconConnectionEventDisconnect(cause, connection)
-        Lantern.getSyncScheduler().submit { EventManager.post(event) }
+        LanternGame.syncScheduler.submit { EventManager.post(event) }
     }
 
     companion object {
@@ -114,19 +112,19 @@ internal class RconHandler(
 
         private fun handleAuth(ctx: ChannelHandlerContext, payload: String, password: String, requestId: Int) {
             val connection = ctx.channel().attr(CONNECTION).get()
-            Lantern.getSyncScheduler().submit(Runnable {
-                val cause = Cause.of(EventContext.empty(), connection)
+            LanternGame.syncScheduler.submit {
+                val cause = causeOf(connection)
                 val event: RconConnectionEvent.Auth = LanternEventFactory.createRconConnectionEventAuth(cause, connection)
                 event.isCancelled = password != payload
                 EventManager.post(event)
                 connection.isAuthorized = !event.isCancelled
                 if (connection.isAuthorized) {
-                    Lantern.getLogger().info("Rcon connection from [" + ctx.channel().remoteAddress() + "]")
+                    LanternGame.logger.info("Rcon connection from [" + ctx.channel().remoteAddress() + "]")
                     ctx.channel().eventLoop().submit { sendResponse(ctx, requestId, TYPE_COMMAND, "") }
                 } else {
                     ctx.channel().eventLoop().submit { sendResponse(ctx, FAILURE, TYPE_COMMAND, "") }
                 }
-            })
+            }
         }
 
         private fun handleCommand(ctx: ChannelHandlerContext, payload: String, requestId: Int) {
@@ -137,11 +135,11 @@ internal class RconHandler(
             }
             // Process the command on the main thread and send
             // the response on the netty thread.
-            Lantern.getSyncScheduler().submit {
+            LanternGame.syncScheduler.submit {
                 val causeStack = current()
                 causeStack.pushCause(connection)
                 try {
-                    Sponge.getCommandManager().process(connection, payload)
+                    Lantern.commandManager.process(connection, payload)
                 } catch (e: CommandException) {
                     connection.sendMessage(Text.of("An error occurred while executing the command: $payload; $e"))
                 }

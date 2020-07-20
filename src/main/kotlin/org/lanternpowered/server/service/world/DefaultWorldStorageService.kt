@@ -39,7 +39,7 @@ import java.util.concurrent.ConcurrentHashMap
  *     /the_end
  *     /the_nether
  *
- * @property directory The directory where all the saves
+ * @property directory The directory where all the worlds will be stored
  */
 class DefaultWorldStorageService(
         override val directory: Path
@@ -59,9 +59,8 @@ class DefaultWorldStorageService(
     fun import(directory: Path) {
         // First check all the sub directories
         for (subDirectory in Files.walk(directory, 1)) {
-            if (LanternWorldStorage.isWorld(subDirectory)) {
+            if (LanternWorldStorage.isWorld(subDirectory))
                 importWorld(subDirectory)
-            }
         }
         // Import the root world
         if (LanternWorldStorage.isWorld(this.directory))
@@ -84,7 +83,7 @@ class DefaultWorldStorageService(
             Lantern.getLogger().info("The directory $newName was already in use, so the imported world " +
                     "from $oldName will be moved to $destination.")
         }
-        com.google.common.io.Files.move(path.toFile(), destination.resolve("data").toFile())
+        com.google.common.io.Files.move(path.toFile(), destination.resolve(LanternWorldStorage.DATA_DIRECTORY_NAME).toFile())
         // Remove unneeded data
         LanternWorldStorage.cleanupWorld(destination)
         return destination
@@ -103,7 +102,23 @@ class DefaultWorldStorageService(
             this.knownStoragesByDirectory[directoryName]
 
     override fun create(directoryName: String, uniqueId: UUID): WorldStorage? {
-        TODO("Not yet implemented")
+        synchronized(this.modifyLock) {
+            if (this.knownStoragesByDirectory.containsKey(directoryName) ||
+                    this.knownStoragesByUniqueId.containsKey(uniqueId))
+                return null
+
+            val worldDirectory = this.directory.resolve(directoryName)
+            if (Files.exists(worldDirectory) && Files.list(worldDirectory).count() > 0)
+                return null
+
+            Files.createDirectories(worldDirectory)
+            val worldStorage = LanternWorldStorage(uniqueId, worldDirectory)
+
+            this.knownStoragesByDirectory[directoryName] = worldStorage
+            this.knownStoragesByUniqueId[uniqueId] = worldStorage
+
+            return worldStorage
+        }
     }
 
     override fun copy(sourceName: String, copyName: String, uniqueId: UUID): WorldStorage? {

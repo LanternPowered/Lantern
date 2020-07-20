@@ -30,6 +30,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.SyncLanternThread;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
+import org.lanternpowered.server.world.archetype.LanternWorldArchetype;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;

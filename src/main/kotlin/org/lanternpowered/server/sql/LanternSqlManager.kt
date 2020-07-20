@@ -15,9 +15,10 @@ import com.github.benmanes.caffeine.cache.RemovalCause
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.h2.engine.ConnectionInfo
-import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.collections.immutableMapOf
+import org.lanternpowered.api.util.optional.emptyOptional
+import org.spongepowered.api.config.ConfigManager
 import org.spongepowered.api.sql.SqlManager
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -41,7 +42,7 @@ import javax.sql.DataSource
  *    -- if some plugin makes database connections to a ton of different databases
  *    we may want to implement this, but it is kinda unimportant.
  */
-class LanternSqlManager : SqlManager {
+class LanternSqlManager(private val configManager: ConfigManager) : SqlManager {
 
     private val protocolSpecificProperties: Map<String, Properties>
     private val pathCanonicalizers: Map<String, (PluginContainer, String) -> String>
@@ -68,7 +69,7 @@ class LanternSqlManager : SqlManager {
             if (origPath.isAbsolute) {
                 origPath.toString()
             } else {
-                Lantern.game.configManager.getPluginConfig(plugin).directory.resolve(orig).toAbsolutePath().toString()
+                this.configManager.getPluginConfig(plugin).directory.resolve(orig).toAbsolutePath().toString()
             }
         })
     }
@@ -91,7 +92,7 @@ class LanternSqlManager : SqlManager {
 
     private fun getDataSource0(plugin: PluginContainer?, jdbcConnection: String): DataSource {
         val url = getConnectionUrlFromAlias(jdbcConnection).orElse(jdbcConnection)
-        val info = ConnectionInfo.fromUrl(plugin, url)
+        val info = connectionInfoFromUrl(plugin, url)
         return this.connectionCache[info]!!
     }
 
@@ -102,6 +103,37 @@ class LanternSqlManager : SqlManager {
         this.connectionCache.invalidateAll()
     }
 
+    private val connectionUrlRegex = Pattern.compile("(?:jdbc:)?([^:]+):(//)?(?:([^:]+)(?::([^@]+))?@)?(.*)")
+
+    /**
+     * Extracts the connection info from a JDBC url with additional authentication information as specified in [SqlService].
+     *
+     * @param container The plugin to put a path relative to
+     * @param fullUrl The full JDBC URL as specified in SqlService
+     * @return A constructed ConnectionInfo object using the info from the provided URL
+     * @throws SQLException If the driver for the given URL is not present
+     */
+    private fun connectionInfoFromUrl(container: PluginContainer?, fullUrl: String): ConnectionInfo {
+        val match = connectionUrlRegex.matcher(fullUrl)
+        require(match.matches()) { "URL $fullUrl is not a valid JDBC URL" }
+        val protocol = match.group(1)
+        val hasSlashes = match.group(2) != null
+        val user = urlDecode(match.group(3))
+        val pass = urlDecode(match.group(4))
+        var serverDatabaseSpecifier = match.group(5)
+        val derelativizer = pathCanonicalizers[protocol]
+        if (container != null && derelativizer != null)
+            serverDatabaseSpecifier = derelativizer(container, serverDatabaseSpecifier)
+        val unauthedUrl = "jdbc:" + protocol + (if (hasSlashes) "://" else ":") + serverDatabaseSpecifier
+        val driverClass = DriverManager.getDriver(unauthedUrl).javaClass.canonicalName
+        return ConnectionInfo(user, pass, driverClass, unauthedUrl, fullUrl)
+    }
+
+    private fun urlDecode(str: String?): String? =
+            if (str == null) null else URLDecoder.decode(str, StandardCharsets.UTF_8)
+
+    override fun getConnectionUrlFromAlias(alias: String): Optional<String> = emptyOptional() // TODO
+
     /**
      * Create a new ConnectionInfo with the given parameters.
      *
@@ -111,48 +143,11 @@ class LanternSqlManager : SqlManager {
      * @property authlessUrl A JDBC url for this driver not containing authentication information
      * @property fullUrl The full jdbc url containing user, password, and database info
      */
-    data class ConnectionInfo(
+    private data class ConnectionInfo(
             val user: String?,
             val password: String?,
             val driverClassName: String,
             val authlessUrl: String,
             val fullUrl: String
-    ) {
-
-        companion object {
-
-            private val URL_REGEX = Pattern.compile("(?:jdbc:)?([^:]+):(//)?(?:([^:]+)(?::([^@]+))?@)?(.*)")
-
-            /**
-             * Extracts the connection info from a JDBC url with additional authentication information as specified in [SqlService].
-             *
-             * @param container The plugin to put a path relative to
-             * @param fullUrl The full JDBC URL as specified in SqlService
-             * @return A constructed ConnectionInfo object using the info from the provided URL
-             * @throws SQLException If the driver for the given URL is not present
-             */
-            fun fromUrl(container: PluginContainer?, fullUrl: String): ConnectionInfo {
-                val match = URL_REGEX.matcher(fullUrl)
-                require(match.matches()) { "URL $fullUrl is not a valid JDBC URL" }
-                val protocol = match.group(1)
-                val hasSlashes = match.group(2) != null
-                val user = urlDecode(match.group(3))
-                val pass = urlDecode(match.group(4))
-                var serverDatabaseSpecifier = match.group(5)
-                val derelativizer = pathCanonicalizers[protocol]
-                if (container != null && derelativizer != null)
-                    serverDatabaseSpecifier = derelativizer(container, serverDatabaseSpecifier)
-                val unauthedUrl = "jdbc:" + protocol + (if (hasSlashes) "://" else ":") + serverDatabaseSpecifier
-                val driverClass = DriverManager.getDriver(unauthedUrl).javaClass.canonicalName
-                return ConnectionInfo(user, pass, driverClass, unauthedUrl, fullUrl)
-            }
-
-            private fun urlDecode(str: String?): String? =
-                    if (str == null) null else URLDecoder.decode(str, StandardCharsets.UTF_8)
-        }
-    }
-
-    override fun getConnectionUrlFromAlias(alias: String): Optional<String> {
-        return Optional.empty() // TODO
-    }
+    )
 }

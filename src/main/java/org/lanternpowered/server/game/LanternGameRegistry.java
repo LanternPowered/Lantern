@@ -63,10 +63,10 @@ import org.lanternpowered.server.data.key.ValueKeyRegistryModule;
 import org.lanternpowered.server.data.property.LanternPropertyBuilder;
 import org.lanternpowered.server.data.LanternKeyValueMatcherBuilder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
-import org.lanternpowered.server.data.type.LanternHinge;
+import org.lanternpowered.server.data.type.LanternDoorHinge;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternSlabPortion;
-import org.lanternpowered.server.data.type.LanternSurface;
+import org.lanternpowered.server.data.type.LanternAttachmentSurface;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectType;
 import org.lanternpowered.server.effect.entity.LanternEntityEffectCollectionBuilder;
@@ -91,7 +91,6 @@ import org.lanternpowered.server.game.registry.type.advancement.AdvancementTypeR
 import org.lanternpowered.server.game.registry.type.advancement.TriggerRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.game.registry.type.block.BlockSoundGroupRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
@@ -104,7 +103,6 @@ import org.lanternpowered.server.game.registry.type.cause.EventContextKeysModule
 import org.lanternpowered.server.game.registry.type.cause.HealingTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DataTranslatorRegistryModule;
@@ -151,7 +149,6 @@ import org.lanternpowered.server.game.registry.type.text.TextStyleRegistryModule
 import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.BanTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.RotationRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.DefaultGameRulesRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
@@ -219,7 +216,7 @@ import org.lanternpowered.server.util.LocaleCache;
 import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
-import org.lanternpowered.server.world.LanternWorldArchetypeBuilder;
+import org.lanternpowered.server.world.archetype.LanternWorldArchetypeBuilder;
 import org.lanternpowered.server.world.LanternWorldBorderBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettingsBuilder;
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
@@ -542,9 +539,9 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
                 .registerModule(Surface.class,
-                        new EnumValueRegistryModule<Surface>(LanternSurface.class, Surfaces.class) {})
+                        new EnumValueRegistryModule<Surface>(LanternAttachmentSurface.class, Surfaces.class) {})
                 .registerModule(Hinge.class,
-                        new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
+                        new EnumValueRegistryModule<Hinge>(LanternDoorHinge.class, Hinges.class) {})
                 .registerModule(Key.class, ValueKeyRegistryModule.INSTANCE)
                 .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
                 .registerModule(SlabPortion.class, new EnumValueRegistryModule<SlabPortion>(LanternSlabPortion.class, SlabPortions.class) {})

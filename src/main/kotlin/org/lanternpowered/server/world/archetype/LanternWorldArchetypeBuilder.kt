@@ -8,10 +8,11 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.world
+package org.lanternpowered.server.world.archetype
 
 import org.lanternpowered.api.text.translation.FixedTranslation
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
+import org.lanternpowered.server.world.LanternWorldProperties
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
 import org.spongepowered.api.ResourceKey
@@ -29,7 +30,6 @@ import org.spongepowered.api.world.gen.GeneratorType
 import org.spongepowered.api.world.storage.WorldProperties
 import org.spongepowered.api.world.teleport.PortalAgentType
 import org.spongepowered.api.world.teleport.PortalAgentTypes
-import java.util.concurrent.ThreadLocalRandom
 
 class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, WorldArchetype.Builder>(), WorldArchetype.Builder {
 
@@ -55,7 +55,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     private var pvpEnabled = false
     private var generateSpawnOnLoad = false
     private var generateBonusChest = false
-    private var seed: Long? = null
+    private var seedProvider: SeedProvider = SeedProvider.Random
 
     init {
         reset()
@@ -80,7 +80,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.generateSpawnOnLoad = archetype.doesGenerateSpawnOnLoad()
         this.generateBonusChest = archetype.doesGenerateBonusChest()
         this.portalAgentType = archetype.portalAgentType
-        this.seed = if (archetype.isSeedRandomized) null else archetype.seed
+        this.seedProvider = archetype.seedProvider
     }
 
     override fun from(properties: WorldProperties) = apply {
@@ -90,7 +90,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.enabled = properties.isEnabled
         this.gameMode = properties.gameMode
         this.keepSpawnLoaded = properties.doesKeepSpawnLoaded()
-        this.seed = properties.seed
+        this.seedProvider = SeedProvider.Constant(properties.seed)
         this.dimensionType = properties.dimensionType
         this.generatorType = properties.generatorType
         this.generatorSettings = properties.generatorSettings.copy()
@@ -107,8 +107,8 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     override fun loadOnStartup(state: Boolean) = apply { this.loadOnStartup = state }
     override fun keepSpawnLoaded(state: Boolean) = apply { this.keepSpawnLoaded = state }
     override fun generateSpawnOnLoad(state: Boolean) = apply { this.generateSpawnOnLoad = state }
-    override fun seed(seed: Long) = apply { this.seed = seed }
-    override fun randomSeed() = apply { this.seed = null }
+    override fun seed(seed: Long) = apply { this.seedProvider = SeedProvider.Constant(seed) }
+    override fun randomSeed() = apply { this.seedProvider = SeedProvider.Random }
     override fun gameMode(gameMode: GameMode) = apply { this.gameMode = gameMode }
     override fun generatorType(type: GeneratorType) = apply { this.generatorType = type }
     override fun dimensionType(type: DimensionType) = apply { this.dimensionType = type as LanternDimensionType<*> }
@@ -123,6 +123,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     override fun generateBonusChest(enabled: Boolean) = apply { this.generateBonusChest = enabled }
 
     fun waterEvaporates(evaporates: Boolean) = apply { this.waterEvaporates = evaporates }
+    fun allowPlayerRespawns(allow: Boolean) = apply { this.allowPlayerRespawns = allow }
 
     fun buildHeight(buildHeight: Int) = apply {
         check(buildHeight <= 256) { "the build height cannot be greater then 256" }
@@ -145,10 +146,9 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
                 generatorSettings = this.generatorSettings,
                 generatorType = this.generatorType,
                 hardcore = this.hardcore,
-                isSeedRandomized = this.seed == null,
                 keepSpawnLoaded = this.keepSpawnLoaded,
                 loadsOnStartup = this.loadOnStartup,
-                seed = this.seed ?: ThreadLocalRandom.current().nextLong(),
+                seedProvider = this.seedProvider,
                 serializationBehavior = this.serializationBehavior,
                 portalAgentType = this.portalAgentType,
                 pvpEnabled = this.pvpEnabled,
@@ -168,7 +168,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.generateStructures = true
         this.commandEnabled = true
         this.dimensionType = DimensionTypes.OVERWORLD.get() as LanternDimensionType<*>
-        this.seed = null
+        this.seedProvider = SeedProvider.Random
         this.generatorType = null
         this.generatorSettings = null
         this.waterEvaporates = null

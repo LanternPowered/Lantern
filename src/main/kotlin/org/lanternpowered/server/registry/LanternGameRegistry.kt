@@ -71,6 +71,7 @@ import org.lanternpowered.server.registry.type.boss.BossBarColorRegistry
 import org.lanternpowered.server.registry.type.boss.BossBarOverlayRegistry
 import org.lanternpowered.server.registry.type.cause.DamageModifierTypeRegistry
 import org.lanternpowered.server.registry.type.cause.DamageTypeRegistry
+import org.lanternpowered.server.registry.type.data.ArmorMaterialRegistry
 import org.lanternpowered.server.registry.type.data.ArtTypeRegistry
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.BedPartRegistry
@@ -84,7 +85,7 @@ import org.lanternpowered.server.registry.type.data.FireworkShapeRegistry
 import org.lanternpowered.server.registry.type.data.GameModeRegistry
 import org.lanternpowered.server.registry.type.data.HandPreferenceRegistry
 import org.lanternpowered.server.registry.type.data.HandTypeRegistry
-import org.lanternpowered.server.registry.type.data.HingeRegistry
+import org.lanternpowered.server.registry.type.data.DoorHingeRegistry
 import org.lanternpowered.server.registry.type.data.HorseColorRegistry
 import org.lanternpowered.server.registry.type.data.HorseStyleRegistry
 import org.lanternpowered.server.registry.type.data.InstrumentTypeRegistry
@@ -99,8 +100,9 @@ import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
 import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
-import org.lanternpowered.server.registry.type.data.SurfaceRegistry
+import org.lanternpowered.server.registry.type.data.AttachmentSurfaceRegistry
 import org.lanternpowered.server.registry.type.data.TeleportTypeRegistry
+import org.lanternpowered.server.registry.type.data.ToolTypeRegistry
 import org.lanternpowered.server.registry.type.data.TopHatRegistry
 import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
 import org.lanternpowered.server.registry.type.data.WireAttachmentTypeRegistry
@@ -130,6 +132,7 @@ import org.lanternpowered.server.registry.type.text.TextStyleRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
 import org.lanternpowered.server.registry.type.util.RotationRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
+import org.lanternpowered.server.registry.type.world.GameRuleRegistry
 import org.lanternpowered.server.registry.type.world.PortalAgentTypeRegistry
 import org.lanternpowered.server.registry.type.world.SerializationBehaviorRegistry
 import org.lanternpowered.server.registry.type.world.UpdatePriorityRegistry
@@ -145,7 +148,7 @@ import org.lanternpowered.server.text.LanternTextTemplateFactory
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder
 import org.lanternpowered.server.timings.DummyTimingsFactory
 import org.lanternpowered.server.world.LanternBlockChangeFlag
-import org.lanternpowered.server.world.LanternWorldArchetypeBuilder
+import org.lanternpowered.server.world.archetype.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.LanternWorldBorderBuilder
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder
@@ -270,6 +273,7 @@ class LanternGameRegistry(
             register(DamageModifierTypeRegistry)
             register(DamageTypeRegistry)
 
+            register(ArmorMaterialRegistry)
             register(ArtTypeRegistry)
             register(BannerPatternShapeRegistry)
             register(CatTypeRegistry)
@@ -289,6 +293,7 @@ class LanternGameRegistry(
             register(SkinPartRegistry)
             register(SpawnTypeRegistry)
             register(TeleportTypeRegistry)
+            register(ToolTypeRegistry)
             register(TopHatRegistry)
             register(VillagerTypeRegistry)
             register(WoodTypeRegistry)
@@ -298,12 +303,12 @@ class LanternGameRegistry(
             register(ComparatorTypeRegistry)
             register(DoorHalfRegistry)
             register(DyeColorRegistry)
-            register(HingeRegistry)
+            register(DoorHingeRegistry)
             register(InstrumentTypeRegistry)
             register(PortionTypeRegistry)
             register(RailDirectionRegistry)
             register(SlabPortionRegistry)
-            register(SurfaceRegistry)
+            register(AttachmentSurfaceRegistry)
             register(WireAttachmentTypeRegistry)
 
             register(TransactionTypeRegistry)
@@ -343,6 +348,7 @@ class LanternGameRegistry(
             register(RotationRegistry)
 
             register(DifficultyRegistry)
+            register(GameRuleRegistry)
             register(PortalAgentTypeRegistry)
             register(SerializationBehaviorRegistry)
             register(UpdatePriorityRegistry)

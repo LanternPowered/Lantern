@@ -32,6 +32,7 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.ScheduledFuture;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.LanternServerNew;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -125,7 +126,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     public static final AttributeKey<Boolean> FML_MARKER = AttributeKey.valueOf("fml-marker");
 
     private final NetworkManager networkManager;
-    private final LanternServer server;
+    private final LanternServerNew server;
     private final Channel channel;
 
     /**
@@ -214,7 +215,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     private boolean firstClientSettingsMessage;
 
-    public NetworkSession(Channel channel, LanternServer server, NetworkManager networkManager) {
+    public NetworkSession(Channel channel, LanternServerNew server, NetworkManager networkManager) {
         this.networkManager = networkManager;
         this.channel = channel;
         this.server = server;
@@ -537,7 +538,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      *
      * @return The server
      */
-    public LanternServer getServer() {
+    public LanternServerNew getServer() {
         return this.server;
     }
 

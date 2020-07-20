@@ -19,12 +19,12 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.util.Optional
 
-object MinecraftVersionCache {
+class MinecraftVersionCache {
 
     private val versionsByProtocol = Int2ObjectOpenHashMap<LanternMinecraftVersion>()
     private val legacyVersionsByProtocol = Int2ObjectOpenHashMap<LanternMinecraftVersion>()
 
-    init {
+    fun init() {
         load(MinecraftVersionCache::class.java.getResourceAsStream("/internal/mc_versions.json"), false)
         load(MinecraftVersionCache::class.java.getResourceAsStream("/internal/mc_legacy_versions.json"), true)
     }
@@ -46,9 +46,9 @@ object MinecraftVersionCache {
         }
     }
 
-    fun getVersion(protocol: Int, legacy: Boolean): Optional<LanternMinecraftVersion> =
-            (if (legacy) this.legacyVersionsByProtocol else this.versionsByProtocol)[protocol].optional()
+    fun getVersion(protocol: Int, legacy: Boolean): LanternMinecraftVersion? =
+            (if (legacy) this.legacyVersionsByProtocol else this.versionsByProtocol)[protocol]
 
     fun getVersionOrUnknown(protocol: Int, legacy: Boolean): LanternMinecraftVersion =
-            getVersion(protocol, legacy).orElseGet { if (legacy) LanternMinecraftVersion.UNKNOWN_LEGACY else LanternMinecraftVersion.UNKNOWN }
+            getVersion(protocol, legacy) ?: if (legacy) LanternMinecraftVersion.UNKNOWN_LEGACY else LanternMinecraftVersion.UNKNOWN
 }

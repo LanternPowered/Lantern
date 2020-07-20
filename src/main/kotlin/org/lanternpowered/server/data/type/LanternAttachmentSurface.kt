@@ -13,9 +13,9 @@ package org.lanternpowered.server.data.type
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.asString
-import org.spongepowered.api.data.type.Surface
+import org.spongepowered.api.data.type.AttachmentSurface
 
-enum class LanternSurface(id: String) : Surface, CatalogType by DefaultCatalogType.minecraft(id) {
+enum class LanternAttachmentSurface(id: String) : AttachmentSurface, CatalogType by DefaultCatalogType.minecraft(id) {
 
     CEILING     ("ceiling"),
     WALL        ("wall"),

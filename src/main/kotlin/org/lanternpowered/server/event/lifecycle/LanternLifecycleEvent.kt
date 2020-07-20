@@ -23,33 +23,36 @@ import org.lanternpowered.api.event.lifecycle.StartingServerEvent
 import org.lanternpowered.api.event.lifecycle.StoppingServerEvent
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.type.typeTokenOf
+import org.spongepowered.api.event.lifecycle.LoadedGameEvent
 
 abstract class LanternLifecycleEvent(
-        private val cause: Cause,
-        private val game: Game
+        private val game: Game,
+        private val cause: Cause
 ) : LifecycleEvent {
     override fun getCause(): Cause = this.cause
     override fun getGame(): Game = this.game
 }
 
 abstract class LanternServerLifecycleEvent(
-        cause: Cause, game: Game, private val server: Server
-) : LanternLifecycleEvent(cause, game), ServerLifecycleEvent {
+        game: Game, private val server: Server, cause: Cause
+) : LanternLifecycleEvent(game, cause), ServerLifecycleEvent {
     override fun getGenericType(): TypeToken<Server> = typeTokenOf()
     override fun getEngine(): Server = this.server
 }
 
 class LanternConstructPluginEvent(
         game: Game, private val plugin: PluginContainer, cause: Cause = emptyCause()
-) : LanternLifecycleEvent(cause, game), ConstructPluginEvent {
+) : LanternLifecycleEvent(game, cause), ConstructPluginEvent {
     override fun getPlugin(): PluginContainer = this.plugin
 }
 
 class LanternStartingServerEvent(game: Game, server: Server, cause: Cause = emptyCause()) :
-        LanternServerLifecycleEvent(cause, game, server), StartingServerEvent
+        LanternServerLifecycleEvent(game, server, cause), StartingServerEvent
 
 class LanternStartedServerEvent(game: Game, server: Server, cause: Cause = emptyCause()) :
-        LanternServerLifecycleEvent(cause, game, server), StartedServerEvent
+        LanternServerLifecycleEvent(game, server, cause), StartedServerEvent
 
 class LanternStoppingServerEvent(game: Game, server: Server, cause: Cause = emptyCause()) :
-        LanternServerLifecycleEvent(cause, game, server), StoppingServerEvent
+        LanternServerLifecycleEvent(game, server, cause), StoppingServerEvent
+
+class LanternLoadedGameEvent(game: Game, cause: Cause = emptyCause()) : LanternLifecycleEvent(game, cause), LoadedGameEvent

@@ -11,15 +11,18 @@
 package org.lanternpowered.server.world.dimension
 
 import org.lanternpowered.api.util.ToStringHelper
-import org.lanternpowered.server.world.LanternWorld
+import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.world.dimension.Dimension
 import org.spongepowered.api.world.dimension.DimensionType
 
-open class LanternDimension protected constructor(private val world: LanternWorld, private val dimensionType: LanternDimensionType<*>) : Dimension {
+open class LanternDimension protected constructor(
+        private val world: LanternWorldNew,
+        private val dimensionType: LanternDimensionType<*>
+) : Dimension {
 
     override fun getType(): DimensionType = this.dimensionType
-    override fun allowsPlayerRespawns(): Boolean = this.world.properties.allowsPlayerRespawns()
-    override fun doesWaterEvaporate(): Boolean = this.world.properties.doesWaterEvaporate()
+    override fun allowsPlayerRespawns(): Boolean = this.world.properties.allowsPlayerRespawns
+    override fun doesWaterEvaporate(): Boolean = this.world.properties.doesWaterEvaporate
     override fun hasSky(): Boolean = this.dimensionType.hasSkylight()
     override fun hasSkylight(): Boolean = this.dimensionType.hasSkylight()
 

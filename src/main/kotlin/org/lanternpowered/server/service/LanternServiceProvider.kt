@@ -19,6 +19,7 @@ import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.service.ServiceProvider
+import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.LanternGame
 import org.spongepowered.api.event.lifecycle.ProvideServiceEvent
@@ -27,9 +28,9 @@ import java.util.Optional
 import java.util.function.Supplier
 import kotlin.reflect.KClass
 
-class LanternServiceProvider : ServiceProvider {
+class LanternServiceProvider(private val eventManager: EventManager) : ServiceProvider {
 
-    private val registrations = mutableMapOf<Class<*>, ServiceRegistration<*>>()
+    private val registrationMap = mutableMapOf<Class<*>, ServiceRegistration<*>>()
 
     inline fun <reified T : Any> register(): T? = register(T::class)
     inline fun <reified T : Any> register(noinline default: () -> Pair<PluginContainer, T>): T = register(T::class, default)
@@ -52,15 +53,18 @@ class LanternServiceProvider : ServiceProvider {
                     supplier = { plugin to serviceFactory.get() }
             }
         }
-        EventManager.post(event)
+        this.eventManager.post(event)
         if (supplier == null)
             supplier = default
         if (supplier == null)
             return null
         val (plugin, service) = supplier!!()
-        this.registrations[serviceClass] = LanternServiceRegistration(serviceClass, service, plugin)
+        this.registrationMap[serviceClass] = LanternServiceRegistration(serviceClass, service, plugin)
         return service
     }
+
+    val registrations: Collection<ServiceRegistration<*>>
+        get() = this.registrationMap.values.toImmutableList()
 
     override fun <T : Any> provide(serviceClass: KClass<T>): T? = provideNullable(serviceClass.java)
     override fun <T : Any> provide(serviceClass: Class<T>): Optional<T> = provideNullable(serviceClass).optional()
@@ -73,7 +77,7 @@ class LanternServiceProvider : ServiceProvider {
 
     @Suppress("UNCHECKED_CAST")
     private fun <T> getNullableRegistration(serviceClass: Class<T>): ServiceRegistration<T>? =
-            this.registrations[serviceClass] as? ServiceRegistration<T>
+            this.registrationMap[serviceClass] as? ServiceRegistration<T>
 }
 
 private data class LanternServiceRegistration<T>(

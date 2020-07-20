@@ -16,10 +16,10 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.ArmorMaterial
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 
-class LanternArmorMaterial @JvmOverloads constructor(key: ResourceKey, repairIngredient: () -> Ingredient? = { null }) :
+class LanternArmorMaterial @JvmOverloads constructor(key: ResourceKey, repairIngredient: (() -> Ingredient)? = null) :
         DefaultCatalogType(key), ArmorMaterial {
 
-    private val ingredient by lazy(repairIngredient)
+    private val ingredient by lazy { repairIngredient?.invoke() }
 
     override fun getRepairIngredient() = this.ingredient.optional()
 }

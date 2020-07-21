@@ -130,7 +130,9 @@ class LanternServerNew : Server {
         }
 
         this.ioExecutor = Executors.newCachedThreadPool() // TODO: Use a specific amount of threads
+
         this.worldManager = LanternWorldManager(this, this.ioExecutor, worldStorageService)
+        this.worldManager.init()
 
         this.game.eventManager.post(LanternStartingServerEvent(game, this))
 

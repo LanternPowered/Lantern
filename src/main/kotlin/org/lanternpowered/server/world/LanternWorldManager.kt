@@ -11,6 +11,7 @@
 package org.lanternpowered.server.world
 
 import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.resourceKeyOf
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
@@ -23,6 +24,9 @@ import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.util.SyncLanternThread
+import org.spongepowered.api.Game
+import org.spongepowered.api.event.cause.Cause
+import org.spongepowered.api.event.lifecycle.RegisterWorldEvent
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -65,19 +69,24 @@ class LanternWorldManager(
         @Volatile var world: LanternWorldNew? = null
     }
 
-    private val registrations = linkedMapOf<ResourceKey, WorldArchetype>()
-
     private val entryByKey = ConcurrentHashMap<ResourceKey, WorldEntry>()
     private val entryByUniqueId = ConcurrentHashMap<UUID, WorldEntry>()
     private val modifyLock = Any()
 
-    init {
+    fun init() {
+        for (storage in this.worldStorageService.all)
+            loadEntry(storage)
+
         this.worldStorageService.onDiscover += this::onDiscover
         this.worldStorageService.onRemove += this::onRemove
+
+        val registrations = registerWorlds()
+        for ((key, archetype) in registrations)
+            createPropertiesNow(key, archetype)
     }
 
     override fun getDefaultPropertiesKey(): ResourceKey =
-            this.registrations.entries.firstOrNull()?.key ?: resourceKeyOf("lantern", "unknown")
+            this.entryByKey.entries.firstOrNull()?.key ?: resourceKeyOf("lantern", "unknown")
 
     override fun getDefaultProperties(): Optional<WorldProperties> =
             this.entryByKey[this.defaultPropertiesKey]?.properties.optional()
@@ -100,17 +109,19 @@ class LanternWorldManager(
         }
     }
 
-    /*
-    override fun submitRegistration(directoryName: String, archetype: WorldArchetype): Boolean {
-        // TODO: Move to event
-        @Suppress("NAME_SHADOWING")
-        val directoryName = directoryName.toLowerCase()
-        if (this.registrations.containsKey(directoryName))
-            return false
-        this.registrations[directoryName] = archetype
-        return true
+    private fun registerWorlds(): Map<ResourceKey, WorldArchetype> {
+        val registrations = mutableMapOf<ResourceKey, WorldArchetype>()
+        val cause = CauseStackManager.currentCause
+        val event = object : RegisterWorldEvent {
+            override fun getCause(): Cause = cause
+            override fun getGame(): Game = server.game
+            override fun register(key: ResourceKey, archetype: WorldArchetype) {
+                registrations.putIfAbsent(key, archetype)
+            }
+        }
+        this.server.game.eventManager.post(event)
+        return registrations
     }
-    */
 
     override fun copyWorld(sourceKey: ResourceKey, copyValue: String): CompletableFuture<Optional<WorldProperties>> =
             CompletableFuture.supplyAsync(Supplier { copyWorld0(sourceKey, copyValue) }, this.ioExecutor)
@@ -243,9 +254,9 @@ class LanternWorldManager(
     }
 
     override fun createProperties(key: ResourceKey, archetype: WorldArchetype): CompletableFuture<Optional<WorldProperties>> =
-            CompletableFuture.supplyAsync(Supplier { createProperties0(key, archetype) }, this.ioExecutor)
+            CompletableFuture.supplyAsync(Supplier { createPropertiesNow(key, archetype) }, this.ioExecutor)
 
-    private fun createProperties0(key: ResourceKey, archetype: WorldArchetype): Optional<WorldProperties> {
+    private fun createPropertiesNow(key: ResourceKey, archetype: WorldArchetype): Optional<WorldProperties> {
         if (this.entryByKey.containsKey(key))
             return emptyOptional()
         val storage = this.worldStorageService.create(key)

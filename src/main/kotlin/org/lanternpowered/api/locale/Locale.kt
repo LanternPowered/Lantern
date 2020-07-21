@@ -11,5 +11,5 @@
 package org.lanternpowered.api.locale
 
 typealias Locale = java.util.Locale
-typealias Locales = org.spongepowered.api.text.translation.locale.Locales
-typealias NamedLocales = org.spongepowered.api.text.translation.locale.NamedLocales
+typealias Locales = org.spongepowered.api.util.locale.Locales
+typealias NamedLocales = org.spongepowered.api.util.locale.NamedLocales

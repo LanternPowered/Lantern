@@ -21,7 +21,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.EntityEventType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.math.vector.Vector3d;
@@ -96,42 +96,42 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
 
         @Override
-        public void sendToSelf(Message message) {
+        public void sendToSelf(Packet packet) {
             if (entity instanceof Player) {
-                ((LanternPlayer) entity).getConnection().send(message);
+                ((LanternPlayer) entity).getConnection().send(packet);
             }
         }
 
         @Override
-        public void sendToSelf(Supplier<Message> messageSupplier) {
+        public void sendToSelf(Supplier<Packet> messageSupplier) {
             if (entity instanceof Player) {
                 sendToSelf(messageSupplier.get());
             }
         }
 
         @Override
-        public void sendToAll(Message message) {
-            this.trackers.forEach(tracker -> tracker.getConnection().send(message));
+        public void sendToAll(Packet packet) {
+            this.trackers.forEach(tracker -> tracker.getConnection().send(packet));
         }
 
         @Override
-        public void sendToAll(Supplier<Message> message) {
+        public void sendToAll(Supplier<Packet> message) {
             if (!this.trackers.isEmpty()) {
                 sendToAll(message.get());
             }
         }
 
         @Override
-        public void sendToAllExceptSelf(Message message) {
+        public void sendToAllExceptSelf(Packet packet) {
             this.trackers.forEach(tracker -> {
                 if (tracker != entity) {
-                    tracker.getConnection().send(message);
+                    tracker.getConnection().send(packet);
                 }
             });
         }
 
         @Override
-        public void sendToAllExceptSelf(Supplier<Message> messageSupplier) {
+        public void sendToAllExceptSelf(Supplier<Packet> messageSupplier) {
             if (!this.trackers.isEmpty()) {
                 sendToAllExceptSelf(messageSupplier.get());
             }

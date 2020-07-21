@@ -13,8 +13,8 @@ package org.lanternpowered.server.inventory.client;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.inventory.behavior.event.SelectTradingOfferEvent;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.text.Text;
 
 public class TradingClientContainer extends ClientContainer {
@@ -35,8 +35,8 @@ public class TradingClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.MERCHANT, getTitle());
+    protected Packet createInitMessage() {
+        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.MERCHANT, getTitle());
     }
 
     @Override

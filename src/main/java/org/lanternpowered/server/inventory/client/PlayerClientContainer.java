@@ -16,8 +16,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class PlayerClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
+    protected Packet createInitMessage() {
         return null;
     }
 
@@ -88,39 +88,39 @@ public class PlayerClientContainer extends ClientContainer {
     }
 
     @Override
-    protected void collectInitMessages(List<Message> messages) {
-        super.collectInitMessages(messages);
+    protected void collectInitMessages(List<Packet> packets) {
+        super.collectInitMessages(packets);
         this.previousSelectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
-        messages.add(new MessagePlayInOutHeldItemChange(this.previousSelectedHotbarSlot));
+        packets.add(new PacketPlayInOutHeldItemChange(this.previousSelectedHotbarSlot));
     }
 
     @Override
-    protected void collectChangeMessages(List<Message> messages) {
-        super.collectChangeMessages(messages);
-        collectHotbarSlotChange(messages);
+    protected void collectChangeMessages(List<Packet> packets) {
+        super.collectChangeMessages(packets);
+        collectHotbarSlotChange(packets);
     }
 
     /**
      * Update for changes while a other {@link ClientContainer} is opened.
      */
     public void closedUpdate() {
-        final List<Message> messages = new ArrayList<>();
-        collectHotbarSlotChange(messages);
+        final List<Packet> packets = new ArrayList<>();
+        collectHotbarSlotChange(packets);
         for (int i = EQUIPMENT_START_INDEX; i <= OFFHAND_SLOT_INDEX; i++) {
-            collectSlotChangeMessages(messages, i, true);
+            collectSlotChangeMessages(packets, i, true);
         }
-        if (!messages.isEmpty()) {
+        if (!packets.isEmpty()) {
             // Stream the messages to the player
-            getPlayer().getConnection().send(messages);
+            getPlayer().getConnection().send(packets);
         }
     }
 
-    private void collectHotbarSlotChange(List<Message> messages) {
+    private void collectHotbarSlotChange(List<Packet> packets) {
         final int selectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
         // Update the selected hotbar slot
         if (selectedHotbarSlot != this.previousSelectedHotbarSlot) {
             this.previousSelectedHotbarSlot = selectedHotbarSlot;
-            messages.add(new MessagePlayInOutHeldItemChange(selectedHotbarSlot));
+            packets.add(new PacketPlayInOutHeldItemChange(selectedHotbarSlot));
         }
     }
 

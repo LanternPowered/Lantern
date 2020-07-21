@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.block.entity.vanilla
 
+import org.lanternpowered.api.text.emptyText
 import org.lanternpowered.server.block.entity.LanternBlockEntity
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.lanternpowered.server.permission.ProxySubject
 import org.spongepowered.api.block.entity.Sign
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.service.permission.SubjectReference
-import org.spongepowered.api.text.Text
 import org.spongepowered.api.util.Tristate
 
 class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
@@ -28,7 +28,7 @@ class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
         protocolType = BlockEntityProtocolTypes.SIGN
         resolveSubject()
         keyRegistry {
-            register(Keys.SIGN_LINES, mutableListOf(Text.of(), Text.of(), Text.of(), Text.of()))
+            register(Keys.SIGN_LINES, listOf(emptyText(), emptyText(), emptyText(), emptyText()))
         }
     }
 

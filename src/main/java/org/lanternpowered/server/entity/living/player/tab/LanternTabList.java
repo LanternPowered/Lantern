@@ -15,8 +15,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
@@ -55,22 +55,22 @@ public class LanternTabList implements TabList {
         if (entries.isEmpty()) {
             return;
         }
-        List<MessagePlayOutTabListEntries.Entry> messageEntries = new ArrayList<>();
+        List<PacketPlayOutTabListEntries.Entry> messageEntries = new ArrayList<>();
         entries.forEach(e -> {
             checkArgument(e.getList() == this, "Tab list entry targets the wrong tab list!");
             this.tabListEntries.put(e.getProfile().getUniqueId(), e);
             e.getGlobalEntry().addEntry(e);
-            messageEntries.add(new MessagePlayOutTabListEntries.Entry.Add(e.getProfile(), e.getGameMode(),
+            messageEntries.add(new PacketPlayOutTabListEntries.Entry.Add(e.getProfile(), e.getGameMode(),
                     e.getDisplayName().orElse(null), e.getLatency()));
         });
-        this.player.getConnection().send(new MessagePlayOutTabListEntries(messageEntries));
+        this.player.getConnection().send(new PacketPlayOutTabListEntries(messageEntries));
         if (this.footer.isPresent() || this.header.isPresent()) {
             sendHeaderAndFooterUpdate();
         }
     }
 
     private void sendHeaderAndFooterUpdate() {
-        this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header.orElse(null), this.footer.orElse(null)));
+        this.player.getConnection().send(new PacketPlayOutTabListHeaderAndFooter(this.header.orElse(null), this.footer.orElse(null)));
     }
 
     public void refresh() {
@@ -141,7 +141,7 @@ public class LanternTabList implements TabList {
         checkArgument(!this.tabListEntries.containsKey(uniqueId),
                 "There is already a tab list entry assigned with the unique id: " + uniqueId.toString());
         this.tabListEntries.put(uniqueId, (LanternTabListEntry) entry);
-        this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(new MessagePlayOutTabListEntries.Entry.Add(
+        this.player.getConnection().send(new PacketPlayOutTabListEntries(Collections.singletonList(new PacketPlayOutTabListEntries.Entry.Add(
                 entry.getProfile(), entry.getGameMode(), entry.getDisplayName().orElse(null), entry.getLatency()))));
         final LanternTabListEntry entry0 = (LanternTabListEntry) entry;
         entry0.attached = true;
@@ -162,8 +162,8 @@ public class LanternTabList implements TabList {
     public Optional<TabListEntry> removeEntry(UUID uniqueId) {
         final Optional<TabListEntry> entry = this.removeRawEntry(uniqueId);
         entry.ifPresent(entry0 -> {
-            this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.Remove(entry0.getProfile()))));
+            this.player.getConnection().send(new PacketPlayOutTabListEntries(Collections.singletonList(
+                    new PacketPlayOutTabListEntries.Entry.Remove(entry0.getProfile()))));
             ((LanternTabListEntry) entry0).getGlobalEntry().removeEntry((LanternTabListEntry) entry0);
         });
         return entry;

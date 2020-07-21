@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.entity.living.player
 
-import org.lanternpowered.server.network.vanilla.message.type.play.SetResourcePackMessage
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetResourcePackPacket
 import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent.ResourcePackStatus
 import org.spongepowered.api.resourcepack.ResourcePack
 
@@ -66,7 +66,7 @@ class ResourcePackSendQueue internal constructor(private val player: LanternPlay
         this.waitingForResponse = resourcePack
         val hash = resourcePack.hash.orElse(resourcePack.id)
         val location = resourcePack.uri.toString()
-        this.player.connection.send(SetResourcePackMessage(location, hash))
+        this.player.connection.send(SetResourcePackPacket(location, hash))
     }
 
     companion object {

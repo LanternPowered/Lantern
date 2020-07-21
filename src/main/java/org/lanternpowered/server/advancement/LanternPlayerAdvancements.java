@@ -24,7 +24,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementDisplay;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAdvancements;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutAdvancements;
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry;
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry;
 import org.spongepowered.api.ResourceKey;
@@ -149,7 +149,7 @@ public class LanternPlayerAdvancements {
     }
 
     public void pulse() {
-        @Nullable final MessagePlayOutAdvancements advancementsMessage = createUpdateMessage(false);
+        @Nullable final PacketPlayOutAdvancements advancementsMessage = createUpdateMessage(false);
         if (advancementsMessage != null) {
             this.player.getConnection().send(advancementsMessage);
         }
@@ -264,7 +264,7 @@ public class LanternPlayerAdvancements {
     }
 
     @Nullable
-    private MessagePlayOutAdvancements createUpdateMessage(boolean init) {
+    private PacketPlayOutAdvancements createUpdateMessage(boolean init) {
         if (!init && this.dirtyProgress.isEmpty()) {
             return null;
         }
@@ -296,7 +296,7 @@ public class LanternPlayerAdvancements {
         }
         // Clear the dirty progress
         this.dirtyProgress.clear();
-        return new MessagePlayOutAdvancements(init, added, removed, progressMap);
+        return new PacketPlayOutAdvancements(init, added, removed, progressMap);
     }
 
     private void update(LanternAdvancementProgress progress,

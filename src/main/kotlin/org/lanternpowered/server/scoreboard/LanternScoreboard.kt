@@ -17,11 +17,11 @@ import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.entity.living.player.LanternPlayer
-import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardDisplayObjective
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams
+import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardDisplayObjective
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardObjective
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
@@ -40,10 +40,10 @@ class LanternScoreboard : Scoreboard {
     private val objectivesInSlot = mutableMapOf<DisplaySlot, Objective>()
     private val teams = mutableMapOf<String, Team>()
 
-    fun sendToPlayers(messageSupplier: () -> List<Message>) {
+    fun sendToPlayers(packetSupplier: () -> List<Packet>) {
         if (this.players.isEmpty())
             return
-        val messages = messageSupplier()
+        val messages = packetSupplier()
         this.players.forEach { player -> player.connection.send(messages) }
     }
 
@@ -57,24 +57,24 @@ class LanternScoreboard : Scoreboard {
             player.connection.send(collectAddMessages(mutableListOf()))
     }
 
-    private fun collectRemoveMessages(messages: MutableList<Message>): List<Message> {
+    private fun collectRemoveMessages(packets: MutableList<Packet>): List<Packet> {
         for (objective in objectives.values)
-            messages.add(MessagePlayOutScoreboardObjective.Remove(objective.name))
+            packets.add(PacketPlayOutScoreboardObjective.Remove(objective.name))
         for (team in teams.values)
-            messages.add(MessagePlayOutTeams.Remove(team.name))
-        return messages
+            packets.add(PacketPlayOutTeams.Remove(team.name))
+        return packets
     }
 
-    private fun collectAddMessages(messages: MutableList<Message>): List<Message> {
+    private fun collectAddMessages(packets: MutableList<Packet>): List<Packet> {
         for (objective in objectives.values)
-            messages.addAll(createObjectiveInitMessages(objective))
+            packets.addAll(createObjectiveInitMessages(objective))
         for ((key, value) in objectivesInSlot) {
-            messages.add(MessagePlayOutScoreboardDisplayObjective(value.name, key))
+            packets.add(PacketPlayOutScoreboardDisplayObjective(value.name, key))
         }
         for (team in teams.values) {
-            messages.add((team as LanternTeam).toCreateMessage())
+            packets.add((team as LanternTeam).toCreateMessage())
         }
-        return messages
+        return packets
     }
 
     fun refreshPlayer(player: Player) {
@@ -82,7 +82,7 @@ class LanternScoreboard : Scoreboard {
     }
 
     private fun refreshPlayers(players: Iterable<Player>) {
-        val messages = mutableListOf<Message>()
+        val messages = mutableListOf<Packet>()
         collectRemoveMessages(messages)
         collectAddMessages(messages)
         players.forEach { player -> (player as LanternPlayer).connection.send(messages) }
@@ -102,12 +102,12 @@ class LanternScoreboard : Scoreboard {
         sendToPlayers { createObjectiveInitMessages(objective) }
     }
 
-    private fun createObjectiveInitMessages(objective: Objective): List<Message> {
-        val messages = mutableListOf<Message>()
-        messages.add(MessagePlayOutScoreboardObjective.Create(
+    private fun createObjectiveInitMessages(objective: Objective): List<Packet> {
+        val messages = mutableListOf<Packet>()
+        messages.add(PacketPlayOutScoreboardObjective.Create(
                 objective.name, objective.displayName, objective.displayMode))
         for (score in (objective as LanternObjective).scores.values) {
-            messages.add(MessagePlayOutScoreboardScore.CreateOrUpdate(
+            messages.add(PacketPlayOutScoreboardScore.CreateOrUpdate(
                     objective.name, score.name, score.score))
         }
         return messages
@@ -118,13 +118,13 @@ class LanternScoreboard : Scoreboard {
             val oldObjective = this.objectivesInSlot.remove(displaySlot)
             if (oldObjective != null) {
                 // Clear the display slot on the client
-                sendToPlayers { listOf(MessagePlayOutScoreboardDisplayObjective(null, displaySlot)) }
+                sendToPlayers { listOf(PacketPlayOutScoreboardDisplayObjective(null, displaySlot)) }
             }
         } else {
             check(this.objectives.containsValue(objective)) { "The specified objective does not exist in this scoreboard." }
             if (this.objectivesInSlot.put(displaySlot, objective) !== objective) {
                 // Update the displayed objective on the client
-                sendToPlayers { listOf(MessagePlayOutScoreboardDisplayObjective(objective.name, displaySlot)) }
+                sendToPlayers { listOf(PacketPlayOutScoreboardDisplayObjective(objective.name, displaySlot)) }
             }
         }
     }
@@ -137,7 +137,7 @@ class LanternScoreboard : Scoreboard {
             (objective as LanternObjective).scoreboards.remove(this)
             this.objectivesByCriterion.remove(objective.criterion, objective)
             this.objectivesInSlot.entries.removeIf { (_, value) -> value == objective }
-            sendToPlayers { listOf(MessagePlayOutScoreboardObjective.Remove(objective.name)) }
+            sendToPlayers { listOf(PacketPlayOutScoreboardObjective.Remove(objective.name)) }
         }
     }
 

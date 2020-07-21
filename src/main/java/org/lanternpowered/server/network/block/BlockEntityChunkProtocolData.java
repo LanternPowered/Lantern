@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.block;
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.spongepowered.api.data.persistence.DataView;
 
 import java.util.List;
@@ -23,5 +23,5 @@ public interface BlockEntityChunkProtocolData {
 
     Short2ObjectMap<DataView> getInitData();
 
-    List<Message> getMessages();
+    List<Packet> getPackets();
 }

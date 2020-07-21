@@ -10,14 +10,13 @@
  */
 package org.lanternpowered.server.util.metric
 
-import com.google.inject.Singleton
 import org.lanternpowered.api.plugin.PluginContainer
-import org.lanternpowered.server.game.Lantern
-import org.spongepowered.api.util.Tristate
+import org.lanternpowered.api.plugin.id
+import org.lanternpowered.api.util.Tristate
+import org.lanternpowered.server.config.GlobalConfigObject
 import org.spongepowered.api.util.metric.MetricsConfigManager
 
-@Singleton
-class LanternMetricsConfigManager : MetricsConfigManager {
+class LanternMetricsConfigManager(private val config: GlobalConfigObject) : MetricsConfigManager {
 
     fun areMetricsEnabled(container: PluginContainer): Boolean {
         val pluginState = getCollectionState(container)
@@ -26,9 +25,9 @@ class LanternMetricsConfigManager : MetricsConfigManager {
         return this.globalCollectionState == Tristate.TRUE && pluginState == Tristate.UNDEFINED
     }
 
-    override fun getGlobalCollectionState(): Tristate
-            = Lantern.getGame().globalConfig.metricsCategory.globalState
+    override fun getGlobalCollectionState(): Tristate =
+            this.config.metrics.globalState
 
-    override fun getCollectionState(container: PluginContainer): Tristate
-            = Lantern.getGame().globalConfig.metricsCategory.getCollectionState(container)
+    override fun getCollectionState(container: PluginContainer): Tristate =
+            this.config.metrics.pluginStates[container.id] ?: Tristate.UNDEFINED
 }

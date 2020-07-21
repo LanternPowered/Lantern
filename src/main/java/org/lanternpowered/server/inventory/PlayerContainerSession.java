@@ -21,19 +21,19 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInAcceptBeaconEffects;
-import org.lanternpowered.server.network.vanilla.message.type.play.ClientItemRenameMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.ChangeTradeOfferMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickRecipe;
-import org.lanternpowered.server.network.vanilla.message.type.play.ClickWindowMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDisplayedRecipe;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEnchantItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.CloseWindowMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDisplayRecipe;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientAcceptBeaconEffectsPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientItemRenamePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeTradeOfferPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInClickRecipe;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClickWindowPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInCreativeWindowAction;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInDisplayedRecipe;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInDropHeldItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInEnchantItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.CloseWindowPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutHeldItemChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPickItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDisplayRecipe;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -116,7 +116,7 @@ public class PlayerContainerSession {
         return setRawOpenContainer(causeStack, container, false, false);
     }
 
-    public void handleWindowClose(CloseWindowMessage message) {
+    public void handleWindowClose(CloseWindowPacket message) {
         if (this.openContainer == null || message.getWindow() != getContainerId()) {
             return;
         }
@@ -194,7 +194,7 @@ public class PlayerContainerSession {
                     container.open();
                 }
                 if (sendClose && getContainerId() != 0) {
-                    this.player.getConnection().send(new CloseWindowMessage(getContainerId()));
+                    this.player.getConnection().send(new CloseWindowPacket(getContainerId()));
                 }
                 if (this.openContainer != null) {
                     this.openContainer.close();
@@ -205,7 +205,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleHeldItemChange(MessagePlayInOutHeldItemChange message) {
+    public void handleHeldItemChange(PacketPlayInOutHeldItemChange message) {
         final PlayerClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer();
         clientContainer.handleHeldItemChange(message.getSlot());
     }
@@ -223,15 +223,15 @@ public class PlayerContainerSession {
         runnable.run();
     }
 
-    public void handleRecipeClick(MessagePlayInClickRecipe message) {
+    public void handleRecipeClick(PacketPlayInClickRecipe message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             // Just display the recipe for now, all the other behavior will be implemented later,
             // this requires recipes to be added first
-            this.player.getConnection().send(new MessagePlayOutDisplayRecipe(message.getWindowId(), message.getRecipeId()));
+            this.player.getConnection().send(new PacketPlayOutDisplayRecipe(message.getWindowId(), message.getRecipeId()));
         });
     }
 
-    public void handleWindowCreativeClick(MessagePlayInCreativeWindowAction message) {
+    public void handleWindowCreativeClick(PacketPlayInCreativeWindowAction message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
@@ -240,7 +240,7 @@ public class PlayerContainerSession {
                 message.getItemStack() == null ? LanternItemStack.empty() : message.getItemStack());
     }
 
-    public void handleItemDrop(MessagePlayInDropHeldItem message) {
+    public void handleItemDrop(PacketPlayInDropHeldItem message) {
         final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
         final ItemStack itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
 
@@ -271,47 +271,47 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleDisplayedRecipe(MessagePlayInDisplayedRecipe message) {
+    public void handleDisplayedRecipe(PacketPlayInDisplayedRecipe message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
     }
 
-    public void handleWindowClick(ClickWindowMessage message) {
+    public void handleWindowClick(ClickWindowPacket message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             final ClientContainer clientContainer = getClientContainer();
             clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
         });
     }
 
-    public void handlePickItem(MessagePlayInPickItem message) {
+    public void handlePickItem(PacketPlayInPickItem message) {
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handlePick(message.getSlot());
     }
 
-    public void handleAcceptBeaconEffects(MessagePlayInAcceptBeaconEffects message) {
+    public void handleAcceptBeaconEffects(ClientAcceptBeaconEffectsPacket message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof BeaconClientContainer) {
             ((BeaconClientContainer) clientContainer).handleEffects(
-                    message.getPrimaryEffect().orElse(null), message.getSecondaryEffect().orElse(null));
+                    message.getPrimaryEffect(), message.getSecondaryEffect());
         }
     }
 
-    public void handleItemRename(ClientItemRenameMessage message) {
+    public void handleItemRename(ClientItemRenamePacket message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof AnvilClientContainer) {
             ((AnvilClientContainer) clientContainer).handleRename(message.getName());
         }
     }
 
-    public void handleOfferChange(ChangeTradeOfferMessage message) {
+    public void handleOfferChange(ChangeTradeOfferPacket message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof TradingClientContainer) {
             ((TradingClientContainer) clientContainer).handleSelectOffer(message.getIndex());
         }
     }
 
-    public void handleEnchantItem(MessagePlayInEnchantItem message) {
+    public void handleEnchantItem(PacketPlayInEnchantItem message) {
         if (message.getWindowId() != getContainerId()) {
             return;
         }

@@ -10,16 +10,15 @@
  */
 package org.lanternpowered.server.text.chat
 
+import net.kyori.adventure.audience.MessageType
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.text.chat.ChatType
-import org.spongepowered.api.text.chat.ChatVisibility
-import org.spongepowered.api.text.translation.Translatable
+import org.spongepowered.api.entity.living.player.chat.ChatVisibility
 
 class LanternChatVisibility(
-        key: ResourceKey, private val chatTypePredicate: (ChatType) -> Boolean
+        key: ResourceKey, private val chatTypePredicate: (MessageType) -> Boolean
 ) : DefaultCatalogType(key), ChatVisibility, Translatable by Translated("options.chat.visibility.${key.value}") {
 
-    override fun isVisible(chatType: ChatType): Boolean = this.chatTypePredicate(chatType)
+    override fun isVisible(type: MessageType): Boolean = this.chatTypePredicate(type)
 }

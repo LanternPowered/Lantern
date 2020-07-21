@@ -12,8 +12,8 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.text.Text;
 
 import java.util.function.Supplier;
@@ -51,8 +51,8 @@ public class BrewingStandClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.BREWING_STAND, getTitle());
+    protected Packet createInitMessage() {
+        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.BREWING_STAND, getTitle());
     }
 
     @Override

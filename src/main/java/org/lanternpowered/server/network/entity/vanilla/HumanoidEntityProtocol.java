@@ -10,16 +10,16 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
+import static org.lanternpowered.server.network.vanilla.packet.codec.play.CodecUtils.wrapAngle;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
-import org.lanternpowered.server.network.vanilla.message.type.play.SpawnPlayerMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityHeadLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnPlayerPacket;
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreference;
@@ -53,13 +53,13 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final double yaw = rot.getY();
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
 
-        context.sendToAllExceptSelf(() -> new SpawnPlayerMessage(entityId, this.entity.getUniqueId(),
+        context.sendToAllExceptSelf(() -> new SpawnPlayerPacket(entityId, this.entity.getUniqueId(),
                 pos, wrapAngle(yaw), wrapAngle(pitch)));
         if (headRot != null) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
+            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
         }
         if (!vel.equals(Vector3d.ZERO)) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
+            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
         }
         spawnWithMetadata(context);
         spawnWithEquipment(context);

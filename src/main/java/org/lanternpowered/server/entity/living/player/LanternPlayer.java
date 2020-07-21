@@ -62,24 +62,24 @@ import org.lanternpowered.server.network.vanilla.command.SuggestionTypes;
 import org.lanternpowered.server.network.vanilla.command.argument.ArgumentAndType;
 import org.lanternpowered.server.network.vanilla.command.argument.ArgumentTypes;
 import org.lanternpowered.server.network.vanilla.command.argument.StringArgument;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDefineCommands;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenBookMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.PlayerRespawnMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetMusicDiscMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSelectAdvancementTree;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetDifficultyMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetReducedDebugMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTags;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnlockRecipes;
-import org.lanternpowered.server.network.vanilla.message.type.play.UpdateViewDistanceMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.UpdateViewPositionMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDefineCommands;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenBookPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutOpenSign;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutPlayerPositionAndLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerRespawnPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSelectAdvancementTree;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetDifficultyPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTags;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnlockRecipes;
+import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewDistancePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewPositionPacket;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
@@ -341,7 +341,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
     public boolean openSignAt(Vector3i position) {
         return getWorld().getBlockEntity(position).map(blockEntity -> {
             if (blockEntity instanceof Sign) {
-                this.session.send(new MessagePlayOutOpenSign(position));
+                this.session.send(new PacketPlayOutOpenSign(position));
                 this.openedSignPosition = position;
                 return true;
             }
@@ -401,7 +401,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
         c.getAsElement(LanternKeys.OPEN_ADVANCEMENT_TREE).addChangeListener((player, oldTree, newTree) -> {
             if (player.getWorld() != null) {
-                player.session.send(new MessagePlayOutSelectAdvancementTree(
+                player.session.send(new PacketPlayOutSelectAdvancementTree(
                         newTree.map(AdvancementTree::getKey).map(ResourceKey::toString).orElse(null)));
             }
         });
@@ -479,16 +479,16 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // The player has joined the server
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
-                this.session.send(new PlayerRespawnMessage(gameMode, dimensionType, lowHorizon, 0L));
-                this.session.send(new SetReducedDebugMessage(reducedDebug));
+                this.session.send(new PlayerRespawnPacket(gameMode, dimensionType, lowHorizon, 0L));
+                this.session.send(new SetReducedDebugPacket(reducedDebug));
                 // Send the server brand
-                this.session.send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+                this.session.send(new PacketPlayInOutBrand(Lantern.getImplementationPlugin().getName()));
                 // We just have to send this to prevent the client from crashing in some
                 // occasions, for example when clicking a furnace fuel slot.
                 // It's not used for anything else, so there aren't any arguments.
                 // Two messages, because only one does not work, it crashes the client...
-                this.session.send(new MessagePlayOutTags());
-                this.session.send(new MessagePlayOutTags());
+                this.session.send(new PacketPlayOutTags());
+                this.session.send(new PacketPlayOutTags());
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);
@@ -502,7 +502,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 this.tabList.init(tabListEntries);
                 this.advancementsProgress.initClient();
 
-                this.session.send(new MessagePlayOutSelectAdvancementTree(get(LanternKeys.OPEN_ADVANCEMENT_TREE).get()
+                this.session.send(new PacketPlayOutSelectAdvancementTree(get(LanternKeys.OPEN_ADVANCEMENT_TREE).get()
                         .map(AdvancementTree::getKey).map(ResourceKey::toString).orElse(null)));
                 /*
                 this.session.send(new MessagePlayOutRegisterCommands(new RootNode(
@@ -511,7 +511,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 final ArgumentNode argumentNode = new ArgumentNode(Collections.emptyList(), "my-argument",
                         ArgumentAndType.of(ArgumentTypes.STRING, new StringArgument(StringArgument.Type.GREEDY_PHRASE)),
                         null, null, SuggestionTypes.ASK_SERVER);
-                this.session.send(new MessagePlayOutDefineCommands(new RootNode(
+                this.session.send(new PacketPlayOutDefineCommands(new RootNode(
                         Collections.singletonList(
                                 new LiteralNode(Collections.singletonList(argumentNode), "test", null, "test")),
                         null, null)));
@@ -523,7 +523,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 for (int i = 0; i < recipes.length; i++) {
                     recipes[i] = i;
                 }*/
-                this.session.send(new MessagePlayOutUnlockRecipes.Add(
+                this.session.send(new PacketPlayOutUnlockRecipes.Add(
                         get(LanternKeys.CRAFTING_RECIPE_BOOK_STATE).get(),
                         get(LanternKeys.SMELTING_RECIPE_BOOK_STATE).get(),
                         new ArrayList<>()));
@@ -537,12 +537,12 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ?
                                 DimensionTypes.THE_NETHER : DimensionTypes.OVERWORLD);
-                        this.session.send(new PlayerRespawnMessage(gameMode, oldDimensionType, lowHorizon, 0L));
+                        this.session.send(new PlayerRespawnPacket(gameMode, oldDimensionType, lowHorizon, 0L));
                     }
                 }
                 // Send a respawn message
-                this.session.send(new PlayerRespawnMessage(gameMode, dimensionType, lowHorizon, 0L));
-                this.session.send(new SetReducedDebugMessage(reducedDebug));
+                this.session.send(new PlayerRespawnPacket(gameMode, dimensionType, lowHorizon, 0L));
+                this.session.send(new SetReducedDebugPacket(reducedDebug));
             }
             // Send the first chunks
             pulseChunkChanges();
@@ -551,8 +551,8 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             // Update the difficulty
-            this.session.send(new SetDifficultyMessage(world.getDifficulty(), true));
-            this.session.send(new UpdateViewDistanceMessage(getServerViewDistance()));
+            this.session.send(new SetDifficultyPacket(world.getDifficulty(), true));
+            this.session.send(new UpdateViewDistancePacket(getServerViewDistance()));
             // Update the player inventory
             this.inventoryContainer.initClientContainer();
             if (oldWorld != world) {
@@ -716,7 +716,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         final LanternWorld oldWorld = this.getWorld();
         final boolean success = super.setPositionAndWorld(world, position);
         if (success && world == oldWorld) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(position, 0, 0, RELATIVE_ROTATION, 0));
+            this.session.send(new PacketPlayOutPlayerPositionAndLook(position, 0, 0, RELATIVE_ROTATION, 0));
         }
         return success;
     }
@@ -726,7 +726,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         super.setPosition(position);
         final LanternWorld world = getWorld();
         if (world != null) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(position, 0, 0, RELATIVE_ROTATION, 0));
+            this.session.send(new PacketPlayOutPlayerPositionAndLook(position, 0, 0, RELATIVE_ROTATION, 0));
         }
     }
 
@@ -735,7 +735,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         super.setRotation(rotation);
         final LanternWorld world = getWorld();
         if (world != null) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(
+            this.session.send(new PacketPlayOutPlayerPositionAndLook(
                     Vector3d.ZERO, (float) rotation.getX(), (float) rotation.getY(), RELATIVE_POSITION, 0));
         }
     }
@@ -769,7 +769,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
                 final Vector3d pos = location.getPosition();
-                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(
+                final PacketPlayOutPlayerPositionAndLook message = new PacketPlayOutPlayerPositionAndLook(
                         pos, (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
                 this.session.send(message);
             }
@@ -786,7 +786,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
                 final Vector3d pos = location.getPosition();
-                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(
+                final PacketPlayOutPlayerPositionAndLook message = new PacketPlayOutPlayerPositionAndLook(
                         pos, (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
                 this.session.send(message);
             }
@@ -883,7 +883,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         }
 
         this.lastChunkPos = new Vector2i(centralX, centralZ);
-        this.session.send(new UpdateViewPositionMessage(centralX, centralZ));
+        this.session.send(new UpdateViewPositionPacket(centralX, centralZ));
 
         final Set<Vector2i> previousChunks = new HashSet<>(this.knownChunks);
         final List<Vector2i> newChunks = new ArrayList<>();
@@ -968,7 +968,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
     @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
-        this.session.send(new MessagePlayOutParticleEffect(checkNotNull(position, "position"),
+        this.session.send(new PacketPlayOutParticleEffect(checkNotNull(position, "position"),
                 checkNotNull(particleEffect, "particleEffect")));
     }
 
@@ -1011,7 +1011,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
     }
 
     private void stopSounds0(@Nullable SoundType sound, @Nullable SoundCategory category) {
-        this.session.send(new MessagePlayOutStopSounds(sound == null ? null : sound.getKey().getValue(), category));
+        this.session.send(new StopSoundsPacket(sound == null ? null : sound.getKey().getValue(), category));
     }
 
     @Override
@@ -1026,7 +1026,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
     private void playOrStopMusicDisc(Vector3i position, @Nullable MusicDisc musicDisc) {
         checkNotNull(position, "position");
-        getConnection().send(new SetMusicDiscMessage(position, musicDisc));
+        getConnection().send(new SetMusicDiscPacket(position, musicDisc));
     }
 
     @Override
@@ -1045,16 +1045,16 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         // Written book internal id
         final RawItemStack rawItemStack = new RawItemStack("minecraft:written_book", 1, dataView);
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
-        this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
-        this.session.send(new OpenBookMessage(HandTypes.MAIN_HAND));
-        this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek()));
+        this.session.send(new PacketPlayOutSetWindowSlot(-2, slot, rawItemStack));
+        this.session.send(new OpenBookPacket(HandTypes.MAIN_HAND));
+        this.session.send(new PacketPlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek()));
     }
 
     @Override
     public void sendBlockChange(Vector3i position, BlockState state) {
         checkNotNull(state, "state");
         checkNotNull(position, "position");
-        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(state)));
+        this.session.send(new PacketPlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(state)));
     }
 
     @Override
@@ -1069,7 +1069,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
         if (world == null) {
             return;
         }
-        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
+        this.session.send(new PacketPlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
     }
 
     @Override
@@ -1133,7 +1133,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
 
     public void setViewDistance(int viewDistance) {
         this.viewDistance = viewDistance;
-        this.session.send(new UpdateViewDistanceMessage(getServerViewDistance()));
+        this.session.send(new UpdateViewDistancePacket(getServerViewDistance()));
     }
 
     @Override

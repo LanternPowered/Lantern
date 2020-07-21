@@ -10,16 +10,17 @@
  */
 package org.lanternpowered.server.advancement
 
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.emptyText
 import org.spongepowered.api.advancement.AdvancementType
 import org.spongepowered.api.advancement.AdvancementTypes
 import org.spongepowered.api.advancement.DisplayInfo
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.text.Text
 
 class LanternDisplayInfoBuilder : DisplayInfo.Builder {
 
     private var type: AdvancementType = AdvancementTypes.TASK.get()
-    private var description: Text = Text.empty()
+    private var description: Text = emptyText()
     private var title: Text? = null
     private var icon: ItemStackSnapshot? = null
     private var showToast = false
@@ -53,7 +54,7 @@ class LanternDisplayInfoBuilder : DisplayInfo.Builder {
 
     override fun reset(): DisplayInfo.Builder = apply {
         this.icon = null
-        this.description = Text.empty()
+        this.description = emptyText()
         this.type = AdvancementTypes.TASK.get()
         this.announceToChat = true
         this.hidden = false

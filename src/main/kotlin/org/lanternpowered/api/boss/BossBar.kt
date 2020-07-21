@@ -13,49 +13,26 @@
 package org.lanternpowered.api.boss
 
 import org.lanternpowered.api.text.Text
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
 
-// Use ServerBossBar instead, normal BossBar will never be used in Lantern
-typealias BossBar = org.spongepowered.api.boss.ServerBossBar
-typealias BossBarBuilder = org.spongepowered.api.boss.ServerBossBar.Builder
-typealias BossBarColor = org.spongepowered.api.boss.BossBarColor
-typealias BossBarColors = org.spongepowered.api.boss.BossBarColors
-typealias BossBarOverlay = org.spongepowered.api.boss.BossBarOverlay
-typealias BossBarOverlays = org.spongepowered.api.boss.BossBarOverlays
+typealias BossBar = net.kyori.adventure.bossbar.BossBar
+typealias BossBarColor = net.kyori.adventure.bossbar.BossBar.Color
+typealias BossBarFlag = net.kyori.adventure.bossbar.BossBar.Flag
+typealias BossBarOverlay = net.kyori.adventure.bossbar.BossBar.Overlay
 
 /**
  * Constructs a new [BossBar] with the given name and builder function.
  *
  * @param name The name
- * @param fn The builder function
- * @return The constructed boss bar
+ * @param percent The percentage
+ * @param color The color
+ * @param overlay The overlay
+ * @param flags The flags to apply
+ * @return The boss bar
  */
-inline fun bossBar(name: Text, fn: BossBarBuilder.() -> Unit = {}): BossBar {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    // Apply a few defaults, so only the name is required
-    return BossBar.builder().name(name).color(BossBarColors.PURPLE).overlay(BossBarOverlays.PROGRESS).apply(fn).build()
-}
-
-/**
- * Whether fog should be created.
- */
-inline var BossBar.createFog: Boolean
-    get() = shouldCreateFog()
-    set(value) { setCreateFog(value) }
-
-/**
- * Whether the sky should darken.
- */
-inline var BossBar.darkenSky: Boolean
-    get() = shouldDarkenSky()
-    set(value) { setDarkenSky(value) }
-
-/**
- * Whether end boss music should be played.
- */
-inline var BossBar.playEndBossMusic: Boolean
-    get() = shouldPlayEndBossMusic()
-    set(value) { setPlayEndBossMusic(value) }
+inline fun bossBarOf(
+        name: Text,
+        percent: Double = 1.0,
+        color: BossBarColor = BossBarColor.PURPLE,
+        overlay: BossBarOverlay = BossBarOverlay.PROGRESS,
+        flags: Set<BossBarFlag> = emptySet()
+): BossBar = BossBar.of(name, percent.toFloat(), color, overlay, flags)

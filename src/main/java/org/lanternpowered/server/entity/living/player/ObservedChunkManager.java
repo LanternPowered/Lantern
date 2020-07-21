@@ -24,13 +24,13 @@ import org.lanternpowered.server.network.block.AbstractBlockEntityProtocol;
 import org.lanternpowered.server.network.block.BlockEntityChunkProtocolData;
 import org.lanternpowered.server.network.block.BlockEntityProtocolHelper;
 import org.lanternpowered.server.network.block.BlockEntityProtocolUpdateContext;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockEntity;
-import org.lanternpowered.server.network.vanilla.message.type.play.ChunkMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockAction;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutMultiBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnloadChunk;
 import org.lanternpowered.api.util.palette.Palette;
 import org.lanternpowered.api.util.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
@@ -149,7 +149,7 @@ public final class ObservedChunkManager implements WorldEventListener {
         Arrays.fill(EMPTY_SECTION_SKY_LIGHT, (byte) 255);
     }*/
 
-    private static final ChunkMessage.Section EMPTY_SECTION = new ChunkMessage.Section(
+    private static final ChunkPacket.Section EMPTY_SECTION = new ChunkPacket.Section(
             EMPTY_SECTION_TYPES, new int[1], 0, new Short2ObjectOpenHashMap<>());
 
     private static Map<Vector3i, LanternBlockEntity> getMappedTileEntities(LanternChunk chunk) {
@@ -168,9 +168,9 @@ public final class ObservedChunkManager implements WorldEventListener {
         private final class QueuedBlockAction {
 
             private final BlockAction blockAction;
-            private final MessagePlayOutBlockAction blockActionData;
+            private final PacketPlayOutBlockAction blockActionData;
 
-            private QueuedBlockAction(BlockAction blockAction, MessagePlayOutBlockAction blockActionData) {
+            private QueuedBlockAction(BlockAction blockAction, PacketPlayOutBlockAction blockActionData) {
                 this.blockAction = blockAction;
                 this.blockActionData = blockActionData;
             }
@@ -227,7 +227,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 return;
             }
             // Create the message
-            final MessagePlayOutBlockAction blockActionData = new MessagePlayOutBlockAction(coords,
+            final PacketPlayOutBlockAction blockActionData = new PacketPlayOutBlockAction(coords,
                     BlockRegistryModule.get().getStateInternalId(blockType.getDefaultState()));
             blockAction.fill(blockActionData);
             this.addedBlockActions.put(coords, new QueuedBlockAction(blockAction, blockActionData));
@@ -248,8 +248,8 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             if (this.dirtyChunk) {
-                final List<Message> messages = createLoadChunkMessages(chunk, ALL_SECTIONS_BIT_MASK, true);
-                this.clientObservers.forEach(player -> player.getConnection().send(messages));
+                final List<Packet> packets = createLoadChunkMessages(chunk, ALL_SECTIONS_BIT_MASK, true);
+                this.clientObservers.forEach(player -> player.getConnection().send(packets));
                 this.dirtyChunk = false;
                 this.dirtyBlocks.clear();
                 return;
@@ -257,7 +257,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
             final Map<Vector3i, LanternBlockEntity> mappedTileEntities;
 
-            final List<Message> messages;
+            final List<Packet> packets;
             if (!this.dirtyBlocks.isEmpty()) {
                 // All the changes per coordinate
                 final Set<Vector3i> changes = new HashSet<>();
@@ -274,23 +274,23 @@ public final class ObservedChunkManager implements WorldEventListener {
 
                 final int clumpingThreshold = world.getProperties().getConfig().getChunkClumpingThreshold();
                 if (changes.size() >= clumpingThreshold) {
-                    messages = createLoadChunkMessages(chunk, dirtySections, false);
-                    this.clientObservers.forEach(player -> player.getConnection().send(messages));
+                    packets = createLoadChunkMessages(chunk, dirtySections, false);
+                    this.clientObservers.forEach(player -> player.getConnection().send(packets));
                     mappedTileEntities = Collections.emptyMap();
                 } else {
-                    messages = new ArrayList<>();
+                    packets = new ArrayList<>();
                     if (changes.size() > 1) {
-                        messages.add(new MessagePlayOutMultiBlockChange(
+                        packets.add(new PacketPlayOutMultiBlockChange(
                                 this.coords.getX(), this.coords.getY(), changes.stream().map(coords -> {
                             final int x = coords.getX() & 0xf;
                             final int z = coords.getZ() & 0xf;
-                            return new MessagePlayOutBlockChange(new Vector3i(x, coords.getY(), z), getStateId(chunk, coords));
+                            return new PacketPlayOutBlockChange(new Vector3i(x, coords.getY(), z), getStateId(chunk, coords));
                         }).collect(Collectors.toList())));
                     } else {
                         dirtyBlock = changes.iterator().next();
-                        messages.add(new MessagePlayOutBlockChange(dirtyBlock, getStateId(chunk, dirtyBlock)));
+                        packets.add(new PacketPlayOutBlockChange(dirtyBlock, getStateId(chunk, dirtyBlock)));
                     }
-                    final BlockEntityUpdateContext initContext = new BlockEntityUpdateContext(messages);
+                    final BlockEntityUpdateContext initContext = new BlockEntityUpdateContext(packets);
                     mappedTileEntities = getMappedTileEntities(chunk);
                     for (Vector3i pos : changes) {
                         final LanternBlockEntity tileEntity = mappedTileEntities.remove(pos);
@@ -303,11 +303,11 @@ public final class ObservedChunkManager implements WorldEventListener {
                     }
                 }
             } else {
-                messages = new ArrayList<>();
+                packets = new ArrayList<>();
                 mappedTileEntities = getMappedTileEntities(chunk);
             }
 
-            final BlockEntityUpdateContext updateContext = new BlockEntityUpdateContext(messages);
+            final BlockEntityUpdateContext updateContext = new BlockEntityUpdateContext(packets);
             for (Map.Entry<Vector3i, LanternBlockEntity> entry : mappedTileEntities.entrySet()) {
                 final AbstractBlockEntityProtocol protocol = entry.getValue().getProtocol();
                 if (protocol != null) {
@@ -318,7 +318,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             if (!this.addedBlockActions.isEmpty()) {
                 for (Map.Entry<Vector3i, QueuedBlockAction> entry : this.addedBlockActions.entrySet()) {
                     final QueuedBlockAction blockAction = entry.getValue();
-                    messages.add(blockAction.blockActionData);
+                    packets.add(blockAction.blockActionData);
                     if (blockAction.blockAction.type() == BlockAction.Type.CONTINUOUS) {
                         this.activeBlockActions.put(entry.getKey(), blockAction);
                     } else {
@@ -328,15 +328,15 @@ public final class ObservedChunkManager implements WorldEventListener {
                 this.addedBlockActions.clear();
             }
 
-            this.clientObservers.forEach(player -> player.getConnection().send(messages));
+            this.clientObservers.forEach(player -> player.getConnection().send(packets));
         }
 
-        private List<Message> createChunkLoadMessages(LanternChunk chunk) {
-            final List<Message> messages = createLoadChunkMessages(chunk, ALL_SECTIONS_BIT_MASK, true);
+        private List<Packet> createChunkLoadMessages(LanternChunk chunk) {
+            final List<Packet> packets = createLoadChunkMessages(chunk, ALL_SECTIONS_BIT_MASK, true);
             if (!this.activeBlockActions.isEmpty()) {
-                this.activeBlockActions.values().forEach(queuedBlockAction -> messages.add(queuedBlockAction.blockActionData));
+                this.activeBlockActions.values().forEach(queuedBlockAction -> packets.add(queuedBlockAction.blockActionData));
             }
-            return messages;
+            return packets;
         }
 
         /**
@@ -346,35 +346,35 @@ public final class ObservedChunkManager implements WorldEventListener {
          * @param chunk The chunk
          */
         void streamChunkLoad(LanternChunk chunk) {
-            List<Message> messages = null;
+            List<Packet> packets = null;
             for (LanternPlayer observer : this.observers) {
                 if (this.clientObservers.add(observer)) {
-                    if (messages == null) {
-                        messages = createChunkLoadMessages(chunk);
+                    if (packets == null) {
+                        packets = createChunkLoadMessages(chunk);
                     }
-                    observer.getConnection().send(messages);
+                    observer.getConnection().send(packets);
                 }
             }
             // TODO: Also send blockEntity entities
         }
 
         void streamChunkUnload(LanternChunk chunk) {
-            Message message = null;
+            Packet packet = null;
             for (LanternPlayer observer : this.observers) {
                 if (this.clientObservers.remove(observer)) {
-                    if (message == null) {
-                        message = new MessagePlayOutUnloadChunk(this.coords.getX(), this.coords.getY());
+                    if (packet == null) {
+                        packet = new PacketPlayOutUnloadChunk(this.coords.getX(), this.coords.getY());
                     }
-                    observer.getConnection().send(message);
+                    observer.getConnection().send(packet);
                 }
             }
         }
 
-        private List<Message> createLoadChunkMessages(LanternChunk chunk, int sectionsBitMask, boolean biomes) {
+        private List<Packet> createLoadChunkMessages(LanternChunk chunk, int sectionsBitMask, boolean biomes) {
             final LanternChunk.ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(sectionsBitMask);
-            final ChunkMessage.Section[] msgSections = new ChunkMessage.Section[sections.length];
+            final ChunkPacket.Section[] msgSections = new ChunkPacket.Section[sections.length];
 
-            final List<Message> messages = new ArrayList<>();
+            final List<Packet> packets = new ArrayList<>();
 
             for (int i = 0; i < sections.length; i++) {
                 if (sections[i] != null) {
@@ -390,7 +390,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
                     final Short2ObjectMap<DataView> tileEntityInitData = new Short2ObjectOpenHashMap<>();
                     final BlockEntityChunkInitContext initContext = new BlockEntityChunkInitContext(
-                            messages, tileEntityInitData, chunk.getX(), chunk.getZ(), i);
+                            packets, tileEntityInitData, chunk.getX(), chunk.getZ(), i);
                     // Serialize the blockEntity entities
                     for (Short2ObjectMap.Entry<LanternBlockEntity> tileEntityEntry : section.blockEntities.short2ObjectEntrySet()) {
                         if (!tileEntityEntry.getValue().isValid()) { // Ignore invalid blockEntity entities
@@ -402,7 +402,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                             BlockEntityProtocolHelper.init(protocol, initContext);
                         }
                     }
-                    msgSections[i] = new ChunkMessage.Section(
+                    msgSections[i] = new ChunkPacket.Section(
                             blockStates.getBacking(), intPalette, section.nonAirBlockCount, tileEntityInitData);
                 // The insert entry setting is used to send a "null" chunk
                 // after the chunk is already send to the client
@@ -420,12 +420,12 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             if (biomesArray != null) {
-                messages.add(0, new ChunkMessage.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
+                packets.add(0, new ChunkPacket.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
             } else {
-                messages.add(0, new ChunkMessage.Update(this.coords.getX(), this.coords.getY(), msgSections));
+                packets.add(0, new ChunkPacket.Update(this.coords.getX(), this.coords.getY(), msgSections));
             }
 
-            return messages;
+            return packets;
         }
 
         /**
@@ -440,7 +440,7 @@ public final class ObservedChunkManager implements WorldEventListener {
         public void removeObserver(LanternPlayer observer, boolean updateClient) {
             if (this.observers.remove(observer) &&
                     this.clientObservers.remove(observer) && updateClient) {
-                observer.getConnection().send(new MessagePlayOutUnloadChunk(this.coords.getX(), this.coords.getY()));
+                observer.getConnection().send(new PacketPlayOutUnloadChunk(this.coords.getX(), this.coords.getY()));
             }
             // Clear the dirty states, since no one will still want to see them
             if (this.clientObservers.isEmpty()) {
@@ -472,10 +472,10 @@ public final class ObservedChunkManager implements WorldEventListener {
 
     static class BlockEntityUpdateContext implements BlockEntityProtocolUpdateContext, BlockEntityChunkProtocolData {
 
-        private final List<Message> messages;
+        private final List<Packet> packets;
 
-        BlockEntityUpdateContext(List<Message> messages) {
-            this.messages = messages;
+        BlockEntityUpdateContext(List<Packet> packets) {
+            this.packets = packets;
         }
 
         @Override
@@ -484,13 +484,13 @@ public final class ObservedChunkManager implements WorldEventListener {
         }
 
         @Override
-        public List<Message> getMessages() {
-            return this.messages;
+        public List<Packet> getPackets() {
+            return this.packets;
         }
 
         @Override
-        public void send(Message message) {
-            this.messages.add(message);
+        public void send(Packet packet) {
+            this.packets.add(packet);
         }
     }
 
@@ -503,8 +503,8 @@ public final class ObservedChunkManager implements WorldEventListener {
 
         int currentIndex;
 
-        BlockEntityChunkInitContext(List<Message> messages, Short2ObjectMap<DataView> initData, int chunkX, int chunkZ, int section) {
-            super(messages);
+        BlockEntityChunkInitContext(List<Packet> packets, Short2ObjectMap<DataView> initData, int chunkX, int chunkZ, int section) {
+            super(packets);
             this.initData = initData;
             this.chunkX = chunkX;
             this.chunkZ = chunkZ;
@@ -512,9 +512,9 @@ public final class ObservedChunkManager implements WorldEventListener {
         }
 
         @Override
-        public void send(Message message) {
-            if (message instanceof MessagePlayOutBlockEntity) {
-                final MessagePlayOutBlockEntity tileUpdateMessage = (MessagePlayOutBlockEntity) message;
+        public void send(Packet packet) {
+            if (packet instanceof PacketPlayOutBlockEntity) {
+                final PacketPlayOutBlockEntity tileUpdateMessage = (PacketPlayOutBlockEntity) packet;
                 final Vector3i pos = tileUpdateMessage.getPosition();
                 final int chunkX = pos.getX() >> 4;
                 final int chunkY = pos.getY() >> 4;
@@ -528,7 +528,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                     }
                 }
             }
-            super.send(message);
+            super.send(packet);
         }
 
         @Override

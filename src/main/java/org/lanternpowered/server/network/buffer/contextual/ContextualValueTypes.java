@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.network.buffer.contextual;
 
+import net.kyori.adventure.text.Component;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterListContextualValueType;
 import org.lanternpowered.server.network.item.ItemStackContextualValueType;
@@ -20,7 +21,6 @@ import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipeContextualV
 import org.lanternpowered.server.network.vanilla.trade.NetworkTradeOffer;
 import org.lanternpowered.server.network.vanilla.trade.NetworkTradeOfferContextualValueType;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
 
 public final class ContextualValueTypes {
 
@@ -30,7 +30,7 @@ public final class ContextualValueTypes {
      * <p>
      * Text -> JSON -> UTF-8 encoded string prefixed by the length as a var-int.
      */
-    public static final ContextualValueType<Text> TEXT = new TextContextualValueType();
+    public static final ContextualValueType<Component> TEXT = new TextContextualValueType();
 
     /**
      * A serializer for {@link ItemStack} objects,

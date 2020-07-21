@@ -25,12 +25,12 @@ import java.util.Optional;
 
 public final class MessageRegistry {
 
-    private final Map<Class<? extends Message>, MessageRegistration<?>> registrationByMessageType = new HashMap<>();
+    private final Map<Class<? extends Packet>, MessageRegistration<?>> registrationByMessageType = new HashMap<>();
     private final Int2ObjectMap<CodecRegistration<?, ?>> registrationByOpcode = new Int2ObjectOpenHashMap<>();
 
     private int opcodeCounter;
 
-    <M extends Message> MessageRegistration<M> checkCodecBinding(Class<M> messageType) {
+    <M extends Packet> MessageRegistration<M> checkCodecBinding(Class<M> messageType) {
         final MessageRegistration messageRegistration = this.registrationByMessageType.computeIfAbsent(messageType,
                 messageType0 -> new MessageRegistration<>(messageType));
         if (messageRegistration.codecRegistration.isPresent()) {
@@ -57,7 +57,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <M extends Message, C extends Codec<M>> CodecRegistration<M, C> bind(Class<C> codec) {
+    public <M extends Packet, C extends Codec<M>> CodecRegistration<M, C> bind(Class<C> codec) {
         try {
             final Constructor<C> constructor = codec.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -76,7 +76,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <M extends Message, C extends Codec<M>> CodecRegistration<M, C> bind(int opcode, Class<C> codec) {
+    public <M extends Packet, C extends Codec<M>> CodecRegistration<M, C> bind(int opcode, Class<C> codec) {
         try {
             final Constructor<C> constructor = codec.getDeclaredConstructor();
             constructor.setAccessible(true);
@@ -95,7 +95,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <N extends Message, M extends N, C extends Codec<N>> MessageRegistration<M> bind(Class<C> codec, Class<M> messageType) {
+    public <N extends Packet, M extends N, C extends Codec<N>> MessageRegistration<M> bind(Class<C> codec, Class<M> messageType) {
         final MessageRegistration<M> registration = checkCodecBinding(messageType);
         final CodecRegistration<N, C> codecRegistration = bind(codec);
         codecRegistration.bind(messageType, registration);
@@ -111,7 +111,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <N extends Message, M extends N, C extends Codec<N>> MessageRegistration<M> bind(int opcode, Class<C> codec, Class<M> messageType) {
+    public <N extends Packet, M extends N, C extends Codec<N>> MessageRegistration<M> bind(int opcode, Class<C> codec, Class<M> messageType) {
         final MessageRegistration<M> registration = checkCodecBinding(messageType);
         final CodecRegistration<N, C> codecRegistration = bind(opcode, codec);
         codecRegistration.bind(messageType, registration);
@@ -126,7 +126,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <M extends Message, C extends Codec<M>> CodecRegistration<M, C> bindInstance(C codec) {
+    public <M extends Packet, C extends Codec<M>> CodecRegistration<M, C> bindInstance(C codec) {
         checkNotNull(codec, "codec");
         return bindInstance(this.opcodeCounter++, codec);
     }
@@ -139,7 +139,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <M extends Message, C extends Codec<M>> CodecRegistration<M, C> bindInstance(int opcode, C codec) {
+    public <M extends Packet, C extends Codec<M>> CodecRegistration<M, C> bindInstance(int opcode, C codec) {
         checkNotNull(codec, "codec");
         final CodecRegistration<M, C> registration = new CodecRegistration<>(this, opcode, codec);
         this.registrationByOpcode.put(opcode, registration);
@@ -155,7 +155,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <N extends Message, M extends N, C extends Codec<N>> MessageRegistration<M> bindInstance(C codec, Class<M> messageType) {
+    public <N extends Packet, M extends N, C extends Codec<N>> MessageRegistration<M> bindInstance(C codec, Class<M> messageType) {
         final MessageRegistration<M> registration = checkCodecBinding(messageType);
         final CodecRegistration<N, C> codecRegistration = bindInstance(codec);
         codecRegistration.bind(messageType, registration);
@@ -163,7 +163,7 @@ public final class MessageRegistry {
     }
 
     /**
-     * Binds a {@link Message} type to this registry and
+     * Binds a {@link Packet} type to this registry and
      * attaches the {@link Handler} to it.
      *
      * @param messageType The message type
@@ -172,14 +172,14 @@ public final class MessageRegistry {
      * @param <H> The type of the handler
      * @return The registration
      */
-    public <M extends Message, H extends Handler<? super M>> MessageRegistration<M> bindHandler(Class<M> messageType, H handler) {
+    public <M extends Packet, H extends Handler<? super M>> MessageRegistration<M> bindHandler(Class<M> messageType, H handler) {
         final MessageRegistration<M> registration = bindMessage(messageType);
         registration.bindHandler(handler);
         return registration;
     }
 
     /**
-     * Binds a {@link Message} type to this registry and
+     * Binds a {@link Packet} type to this registry and
      * attaches the {@link Processor} to it.
      *
      * @param messageType The message type
@@ -188,7 +188,7 @@ public final class MessageRegistry {
      * @param <P> The type of the processor
      * @return The registration
      */
-    public <M extends Message, P extends Processor<? super M>> MessageRegistration<M> bindProcessor(Class<M> messageType, P processor) {
+    public <M extends Packet, P extends Processor<? super M>> MessageRegistration<M> bindProcessor(Class<M> messageType, P processor) {
         final MessageRegistration<M> registration = bindMessage(messageType);
         registration.bindProcessor(processor);
         return registration;
@@ -202,7 +202,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(C codec) {
+    public <M extends Packet, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(C codec) {
         for (CodecRegistration<?, ?> registration : this.registrationByOpcode.values()) {
             if (codec.equals(registration.getCodec())) {
                 //noinspection unchecked
@@ -220,7 +220,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration
      */
-    public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(Class<C> codec) {
+    public <M extends Packet, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(Class<C> codec) {
         for (CodecRegistration<?, ?> registration : this.registrationByOpcode.values()) {
             if (codec.isInstance(registration.getCodec())) {
                 //noinspection unchecked
@@ -238,7 +238,7 @@ public final class MessageRegistry {
      * @param <C> The type of the codec
      * @return The codec registration, if present
      */
-    public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(int opcode) {
+    public <M extends Packet, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(int opcode) {
         //noinspection unchecked
         return Optional.ofNullable((CodecRegistration) this.registrationByOpcode.get(opcode));
     }
@@ -250,19 +250,19 @@ public final class MessageRegistry {
      * @param <M> the type of the message
      * @return The message registration
      */
-    public <M extends Message> Optional<MessageRegistration<M>> findByMessageType(Class<M> messageType) {
+    public <M extends Packet> Optional<MessageRegistration<M>> findByMessageType(Class<M> messageType) {
         //noinspection unchecked
         return Optional.ofNullable((MessageRegistration) this.registrationByMessageType.get(messageType));
     }
 
     /**
-     * Binds a {@link Message} type to this registry.
+     * Binds a {@link Packet} type to this registry.
      *
      * @param messageType The message type
      * @param <M> The type of the message
      * @return The message registration
      */
-    public <M extends Message> MessageRegistration<M> bindMessage(Class<M> messageType) {
+    public <M extends Packet> MessageRegistration<M> bindMessage(Class<M> messageType) {
         //noinspection unchecked
         return (MessageRegistration) this.registrationByMessageType.computeIfAbsent(messageType,
                 messageType0 -> new MessageRegistration<>(messageType));

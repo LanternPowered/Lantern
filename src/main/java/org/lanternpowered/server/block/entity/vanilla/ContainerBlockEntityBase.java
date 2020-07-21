@@ -17,6 +17,7 @@ import org.lanternpowered.server.inventory.InventoryViewerListener;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -78,21 +79,21 @@ public abstract class ContainerBlockEntityBase extends LanternBlockEntity implem
      *
      * @param location The location
      */
-    protected abstract void playOpenSound(Location location);
+    protected abstract void playOpenSound(ServerLocation location);
 
     /**
      * Plays the close sound at the {@link Location}.
      *
      * @param location The location
      */
-    protected abstract void playCloseSound(Location location);
+    protected abstract void playCloseSound(ServerLocation location);
 
     @Override
     public void pulse() {
         super.pulse();
 
         if (this.soundDelay > 0 && --this.soundDelay == 0) {
-            final Location location = getLocation();
+            final ServerLocation location = getLocation();
             if (this.viewers.size() > 0) {
                 playOpenSound(location);
             } else {

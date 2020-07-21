@@ -12,8 +12,8 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnExperienceOrb;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSpawnExperienceOrb;
 import org.spongepowered.api.data.Keys;
 
 public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
@@ -31,9 +31,9 @@ public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends Entity
 
     private void spawn(EntityProtocolUpdateContext context, int quantity) {
         if (quantity == 0) {
-            context.sendToAll(() -> new MessagePlayOutDestroyEntities(getRootEntityId()));
+            context.sendToAll(() -> new PacketPlayOutDestroyEntities(getRootEntityId()));
         } else {
-            context.sendToAll(() -> new MessagePlayOutSpawnExperienceOrb(getRootEntityId(), quantity, this.entity.getPosition()));
+            context.sendToAll(() -> new PacketPlayOutSpawnExperienceOrb(getRootEntityId(), quantity, this.entity.getPosition()));
         }
     }
 

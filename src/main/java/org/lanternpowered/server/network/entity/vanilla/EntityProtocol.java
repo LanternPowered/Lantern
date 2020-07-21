@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
+import static org.lanternpowered.server.network.vanilla.packet.codec.play.CodecUtils.wrapAngle;
 
 import com.google.common.base.Objects;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -30,16 +30,16 @@ import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLookAndRelativeMove;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityRelativeMove;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetEntityPassengersMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityCollectItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityHeadLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLookAndRelativeMove;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityMetadata;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityRelativeMove;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityTeleport;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetEntityPassengersPacket;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -114,20 +114,20 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void destroy(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(getRootEntityId()));
+        context.sendToAllExceptSelf(new PacketPlayOutDestroyEntities(getRootEntityId()));
     }
 
     protected void spawnWithMetadata(EntityProtocolUpdateContext context) {
         final ParameterList parameterList = new DefaultParameterList();
         spawn(parameterList);
         if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), parameterList));
+            context.sendToAll(() -> new PacketPlayOutEntityMetadata(getRootEntityId(), parameterList));
         }
     }
 
     protected void spawnWithEquipment(EntityProtocolUpdateContext context) {
         if (this.entity.isOnGround()) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityRelativeMove(getRootEntityId(), 0, 0, 0, true));
+            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityRelativeMove(getRootEntityId(), 0, 0, 0, true));
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
@@ -186,16 +186,16 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             if (!passenger) {
                 if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
-                        context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
+                        context.sendToAllExceptSelf(new PacketPlayOutEntityLookAndRelativeMove(entityId,
                                 (int) dxu, (int) dyu, (int) dzu, yaw, pitch, onGround));
                         // The rotation is already send
                         dirtyRot = false;
                     } else {
-                        context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
+                        context.sendToAllExceptSelf(new PacketPlayOutEntityRelativeMove(entityId,
                                 (int) dxu, (int) dyu, (int) dzu, onGround));
                     }
                 } else {
-                    context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
+                    context.sendToAllExceptSelf(new PacketPlayOutEntityTeleport(entityId,
                             pos, yaw, pitch, onGround));
                     // The rotation is already send
                     dirtyRot = false;
@@ -203,12 +203,12 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             }
         }
         if (dirtyRot) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, onGround));
+            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityLook(entityId, yaw, pitch, onGround));
         } else if (!passenger) {
             if (headRot != null) {
                 final byte headYaw = wrapAngle(headRot.getY());
                 if (headYaw != this.lastHeadYaw) {
-                    context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, headYaw));
+                    context.sendToAllExceptSelf(() -> new PacketPlayOutEntityHeadLook(entityId, headYaw));
                     this.lastHeadYaw = headYaw;
                 }
             }
@@ -218,7 +218,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final double vy = velocity.getY();
         final double vz = velocity.getZ();
         if (vx != this.lastVelX || vy != this.lastVelY || vz != this.lastVelZ) {
-            context.sendToAll(() -> new MessagePlayOutEntityVelocity(entityId, vx, vy, vz));
+            context.sendToAll(() -> new PacketPlayOutEntityVelocity(entityId, vx, vy, vz));
             this.lastVelX = vx;
             this.lastVelY = vy;
             this.lastVelZ = vz;
@@ -228,7 +228,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         update(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
+            context.sendToAll(() -> new PacketPlayOutEntityMetadata(entityId, parameterList));
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
@@ -254,7 +254,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         updateTranslations(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), parameterList));
+            context.sendToAll(() -> new PacketPlayOutEntityMetadata(getRootEntityId(), parameterList));
         }
     }
 
@@ -274,7 +274,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             final LanternLiving collector = (LanternLiving) ((CollectEntityEvent) event).getCollector();
             context.getId(collector).ifPresent(id -> {
                 final int count = ((CollectEntityEvent) event).getCollectedItemsCount();
-                context.sendToAll(() -> new MessagePlayOutEntityCollectItem(id, getRootEntityId(), count));
+                context.sendToAll(() -> new PacketPlayOutEntityCollectItem(id, getRootEntityId(), count));
             });
         } else {
             super.handleEvent(context, event);
@@ -286,13 +286,13 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final IntSet passengers = getPassengerIds(context);
         if (!passengers.equals(this.lastPassengers)) {
             this.lastPassengers = passengers;
-            context.sendToAll(new SetEntityPassengersMessage(getRootEntityId(), passengers.toIntArray()));
+            context.sendToAll(new SetEntityPassengersPacket(getRootEntityId(), passengers.toIntArray()));
         }
     }
 
     @Override
     public void postSpawn(EntityProtocolUpdateContext context) {
-        context.sendToAll(new SetEntityPassengersMessage(getRootEntityId(), getPassengerIds(context).toIntArray()));
+        context.sendToAll(new SetEntityPassengersPacket(getRootEntityId(), getPassengerIds(context).toIntArray()));
     }
 
     protected IntSet getPassengerIds(EntityProtocolUpdateContext context) {

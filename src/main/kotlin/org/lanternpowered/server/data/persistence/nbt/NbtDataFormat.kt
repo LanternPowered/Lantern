@@ -22,9 +22,6 @@ import java.io.OutputStream
 
 class NbtDataFormat(key: ResourceKey) : AbstractDataFormat(key) {
 
-    @Throws(InvalidDataFormatException::class, IOException::class)
     override fun readFrom(input: InputStream): DataContainer = NbtStreamUtils.read(input, false)
-
-    @Throws(IOException::class)
     override fun writeTo(output: OutputStream, data: DataView) = NbtStreamUtils.write(data, output, false)
 }

@@ -44,10 +44,10 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetMusicDiscMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
@@ -1041,7 +1041,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
     }
 
     private void stopSounds0(@Nullable SoundType sound, @Nullable SoundCategory category) {
-        broadcast(() -> new MessagePlayOutStopSounds(sound == null ? null : sound.getName(), category));
+        broadcast(() -> new StopSoundsPacket(sound == null ? null : sound.getName(), category));
     }
 
     @Override
@@ -1056,14 +1056,14 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
 
     private void playOrStopMusicDisc(Vector3i position, @Nullable MusicDisc musicDisc) {
         checkNotNull(position, "position");
-        broadcast(() -> new SetMusicDiscMessage(position, musicDisc));
+        broadcast(() -> new SetMusicDiscPacket(position, musicDisc));
     }
 
     private void spawnParticles(Iterator<LanternPlayer> players, ParticleEffect particleEffect, Vector3d position) {
         if (!players.hasNext()) {
             return;
         }
-        final MessagePlayOutParticleEffect message = new MessagePlayOutParticleEffect(position, particleEffect);
+        final PacketPlayOutParticleEffect message = new PacketPlayOutParticleEffect(position, particleEffect);
         while (players.hasNext()) {
             players.next().getConnection().send(message);
         }
@@ -1089,10 +1089,10 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
         checkNotNull(type, "chatType");
         checkNotNull(message, "message");
         if (!this.players.isEmpty()) {
-            final Message networkMessage = ((LanternChatType) type).getMessageProvider().invoke(message);
+            final Packet networkPacket = ((LanternChatType) type).getMessageProvider().invoke(message);
             for (LanternPlayer player : this.players) {
                 if (player.getChatVisibility().isVisible(type)) {
-                    player.getConnection().send(networkMessage);
+                    player.getConnection().send(networkPacket);
                 }
             }
         }
@@ -1102,8 +1102,8 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
     public void sendTitle(Title title) {
         checkNotNull(title, "title");
         if (!this.players.isEmpty()) {
-            final List<Message> networkMessages = LanternTitles.getMessages(title);
-            this.players.forEach(player -> player.getConnection().send(networkMessages));
+            final List<Packet> networkPackets = LanternTitles.getMessages(title);
+            this.players.forEach(player -> player.getConnection().send(networkPackets));
         }
     }
 
@@ -1518,11 +1518,11 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
         this.entityProtocolManager.updateTrackers(this.players);
     }
 
-    public void broadcast(Supplier<Message> message) {
+    public void broadcast(Supplier<Packet> message) {
         this.broadcast(message, null);
     }
 
-    public void broadcast(Supplier<Message> message, @Nullable Predicate<LanternPlayer> filter) {
+    public void broadcast(Supplier<Packet> message, @Nullable Predicate<LanternPlayer> filter) {
         Set<LanternPlayer> players = this.players;
         if (filter != null) {
             players = players.stream().filter(filter).collect(Collectors.toSet());
@@ -1530,8 +1530,8 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
         if (players.isEmpty()) {
             return;
         }
-        final Message message0 = message.get();
-        players.forEach(player -> player.getConnection().send(message0));
+        final Packet packet0 = message.get();
+        players.forEach(player -> player.getConnection().send(packet0));
     }
 
     @Override

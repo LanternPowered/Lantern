@@ -13,8 +13,8 @@ package org.lanternpowered.server.inventory.client;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenHorseWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenHorseWindowPacket;
 import org.spongepowered.api.text.Text;
 
 import java.util.Arrays;
@@ -54,8 +54,8 @@ public class EntityEquipmentClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenHorseWindowMessage(getContainerId(), TOP_SLOT_FLAGS.length, this.entityId);
+    protected Packet createInitMessage() {
+        return new OpenHorseWindowPacket(getContainerId(), TOP_SLOT_FLAGS.length, this.entityId);
     }
 
     @Override

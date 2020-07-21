@@ -15,7 +15,6 @@ import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.registry.type.text.TextStyleRegistry
-import org.lanternpowered.server.text.format.LanternTextFormat
 import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.text.format.TextColors

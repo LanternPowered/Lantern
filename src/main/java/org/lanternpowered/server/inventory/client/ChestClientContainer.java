@@ -16,8 +16,8 @@ import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConsta
 import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants.MAX_CHEST_ROWS;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.text.Text;
 
@@ -54,10 +54,10 @@ public class ChestClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
+    protected Packet createInitMessage() {
         final ClientWindowType windowType = ClientWindowTypes.INSTANCE.get(ResourceKey.minecraft("generic_9x" + this.rowIndex));
         checkState(windowType != null, "Window type for %s rows is currently not supported."); // TODO
-        return new OpenWindowMessage(getContainerId(), windowType, getTitle());
+        return new OpenWindowPacket(getContainerId(), windowType, getTitle());
     }
 
     @Override

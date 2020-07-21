@@ -10,6 +10,10 @@
  */
 package org.lanternpowered.server.block.entity.vanilla
 
+import org.lanternpowered.api.effect.sound.SoundCategory
+import org.lanternpowered.api.effect.sound.SoundTypes
+import org.lanternpowered.api.effect.sound.soundEffectOf
+import org.lanternpowered.api.world.Location
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.inventory.InventorySnapshot
@@ -17,9 +21,6 @@ import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.spongepowered.api.data.Keys
-import org.spongepowered.api.effect.sound.SoundCategories
-import org.spongepowered.api.effect.sound.SoundTypes
-import org.spongepowered.api.world.Location
 import kotlin.random.Random
 
 class LanternShulkerBox : ContainerBlockEntity<ChestInventory>() {
@@ -47,12 +48,14 @@ class LanternShulkerBox : ContainerBlockEntity<ChestInventory>() {
     }
 
     override fun playOpenSound(location: Location) {
-        location.world.playSound(SoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
-                location.position.add(0.5, 0.5, 0.5), 0.5, Random.nextDouble() * 0.1 + 0.9)
+        val effect = soundEffectOf(SoundTypes.BLOCK_SHULKER_BOX_OPEN,
+                category = SoundCategory.BLOCK, volume = 0.5, pitch = Random.nextDouble() * 0.1 + 0.9)
+        location.world.playSound(effect, location.position.add(0.5, 0.5, 0.5))
     }
 
     override fun playCloseSound(location: Location) {
-        location.world.playSound(SoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
-                location.position.add(0.5, 0.5, 0.5), 0.5, Random.nextDouble() * 0.1 + 0.9)
+        val effect = soundEffectOf(SoundTypes.BLOCK_SHULKER_BOX_CLOSE,
+                category = SoundCategory.BLOCK, volume = 0.5, pitch = Random.nextDouble() * 0.1 + 0.9)
+        location.world.playSound(effect, location.position.add(0.5, 0.5, 0.5))
     }
 }

@@ -12,8 +12,8 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.text.Text;
 
 public class CraftingTableClientContainer extends ClientContainer {
@@ -41,8 +41,8 @@ public class CraftingTableClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.CRAFTING, getTitle());
+    protected Packet createInitMessage() {
+        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.CRAFTING, getTitle());
     }
 
     @Override

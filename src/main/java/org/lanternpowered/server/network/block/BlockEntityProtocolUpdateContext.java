@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.network.block;
 
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 
 public interface BlockEntityProtocolUpdateContext {
 
     /**
-     * Sends a {@link Message} to all the trackers.
+     * Sends a {@link Packet} to all the trackers.
      *
-     * @param message The message
+     * @param packet The message
      */
-    void send(Message message);
+    void send(Packet packet);
 }

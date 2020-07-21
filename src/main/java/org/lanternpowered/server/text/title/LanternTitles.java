@@ -13,8 +13,8 @@ package org.lanternpowered.server.text.title;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTitle;
 import org.spongepowered.api.text.title.Title;
 
 import java.lang.ref.WeakReference;
@@ -31,18 +31,18 @@ public final class LanternTitles {
             Caffeine.newBuilder().weakKeys().build(LanternTitles::createValue);
 
     private static CacheValue createValue(Title title) {
-        final ImmutableList.Builder<Message> builder = ImmutableList.builder();
+        final ImmutableList.Builder<Packet> builder = ImmutableList.builder();
         if (title.isClear()) {
-            builder.add(new MessagePlayOutTitle.Clear());
+            builder.add(new PacketPlayOutTitle.Clear());
         }
         if (title.isReset()) {
-            builder.add(new MessagePlayOutTitle.Reset());
+            builder.add(new PacketPlayOutTitle.Reset());
         }
         final Optional<Integer> fadeIn = title.getFadeIn();
         final Optional<Integer> stay = title.getStay();
         final Optional<Integer> fadeOut = title.getFadeOut();
         if (fadeIn.isPresent() || stay.isPresent() || fadeOut.isPresent()) {
-            builder.add(new MessagePlayOutTitle.SetTimes(fadeIn.orElse(20), stay.orElse(60), fadeOut.orElse(20)));
+            builder.add(new PacketPlayOutTitle.SetTimes(fadeIn.orElse(20), stay.orElse(60), fadeOut.orElse(20)));
         }
         if (title.getTitle().isPresent() || title.getSubtitle().isPresent() || title.getActionBar().isPresent()) {
             return new LocaleCacheValue(builder.build(), title);
@@ -53,52 +53,52 @@ public final class LanternTitles {
 
     private static class CacheValue {
 
-        final List<Message> messages;
+        final List<Packet> packets;
 
-        CacheValue(List<Message> messages) {
-            this.messages = messages;
+        CacheValue(List<Packet> packets) {
+            this.packets = packets;
         }
 
-        public List<Message> getMessages(Locale locale) {
-            return this.messages;
+        public List<Packet> getMessages(Locale locale) {
+            return this.packets;
         }
     }
 
     private static class LocaleCacheValue extends CacheValue {
 
         private final WeakReference<Title> title;
-        private final Map<Locale, List<Message>> cache = new ConcurrentHashMap<>();
+        private final Map<Locale, List<Packet>> cache = new ConcurrentHashMap<>();
 
-        LocaleCacheValue(List<Message> baseMessages, Title title) {
-            super(baseMessages);
+        LocaleCacheValue(List<Packet> basePackets, Title title) {
+            super(basePackets);
             this.title = new WeakReference<>(title);
         }
 
         @Override
-        public List<Message> getMessages(Locale locale) {
+        public List<Packet> getMessages(Locale locale) {
             return this.cache.computeIfAbsent(locale, locale0 -> {
                 Title title = this.title.get();
                 if (title == null) {
                     return Collections.emptyList();
                 }
-                final ImmutableList.Builder<Message> builder = ImmutableList.builder();
-                builder.addAll(this.messages);
+                final ImmutableList.Builder<Packet> builder = ImmutableList.builder();
+                builder.addAll(this.packets);
                 title.getTitle().ifPresent(text ->
-                        builder.add(new MessagePlayOutTitle.SetTitle(text)));
+                        builder.add(new PacketPlayOutTitle.SetTitle(text)));
                 title.getSubtitle().ifPresent(text ->
-                        builder.add(new MessagePlayOutTitle.SetSubtitle(text)));
+                        builder.add(new PacketPlayOutTitle.SetSubtitle(text)));
                 title.getActionBar().ifPresent(text ->
-                        builder.add(new MessagePlayOutTitle.SetActionbarTitle(text)));
+                        builder.add(new PacketPlayOutTitle.SetActionbarTitle(text)));
                 return builder.build();
             });
         }
     }
 
-    public static List<Message> getMessages(Title title, Locale locale) {
+    public static List<Packet> getMessages(Title title, Locale locale) {
         return messagesCache.get(title).getMessages(locale);
     }
 
-    public static List<Message> getMessages(Title title) {
+    public static List<Packet> getMessages(Title title) {
         return getMessages(title, Locale.ENGLISH);
     }
 

@@ -16,7 +16,7 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.context.Parameters;
-import org.lanternpowered.server.network.vanilla.message.type.play.UpdateWorldSkyMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateWorldSkyPacket;
 import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
@@ -114,13 +114,13 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
     }
 
     /**
-     * Creates a new {@link UpdateWorldSkyMessage} for the
+     * Creates a new {@link UpdateWorldSkyPacket} for the
      * current state of the sky.
      *
      * @return The message
      */
-    public UpdateWorldSkyMessage createSkyUpdateMessage() {
-        return new UpdateWorldSkyMessage(this.rainStrength, this.darkness);
+    public UpdateWorldSkyPacket createSkyUpdateMessage() {
+        return new UpdateWorldSkyPacket(this.rainStrength, this.darkness);
     }
 
     /**

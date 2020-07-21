@@ -12,7 +12,7 @@ package org.lanternpowered.api.text.serializer
 
 import org.lanternpowered.api.registry.factoryOf
 
-interface FormattingCodeTextSerializer : SafeTextSerializer, org.spongepowered.api.text.serializer.FormattingCodeTextSerializer {
+interface FormattingCodeTextSerializer : TextSerializer {
 
     companion object {
 

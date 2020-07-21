@@ -11,14 +11,14 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.message.MessageRegistry;
-import org.lanternpowered.server.network.vanilla.message.codec.status.StatusPingCodec;
-import org.lanternpowered.server.network.vanilla.message.codec.status.StatusRequestCodec;
-import org.lanternpowered.server.network.vanilla.message.codec.status.StatusResponseCodec;
-import org.lanternpowered.server.network.vanilla.message.handler.status.StatusPingHandler;
-import org.lanternpowered.server.network.vanilla.message.handler.status.StatusRequestHandler;
-import org.lanternpowered.server.network.vanilla.message.type.status.StatusPingMessage;
-import org.lanternpowered.server.network.vanilla.message.type.status.StatusRequestMessage;
-import org.lanternpowered.server.network.vanilla.message.type.status.StatusResponseMessage;
+import org.lanternpowered.server.network.vanilla.packet.codec.status.StatusPingCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.status.StatusRequestCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.status.StatusResponseCodec;
+import org.lanternpowered.server.network.vanilla.packet.handler.status.StatusPingHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.status.StatusRequestHandler;
+import org.lanternpowered.server.network.vanilla.packet.type.status.StatusPingPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.status.StatusRequestPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.status.StatusResponsePacket;
 
 final class ProtocolStatus extends ProtocolBase {
 
@@ -26,12 +26,12 @@ final class ProtocolStatus extends ProtocolBase {
         final MessageRegistry inbound = inbound();
         final MessageRegistry outbound = outbound();
 
-        inbound.bind(StatusRequestCodec.class, StatusRequestMessage.class)
+        inbound.bind(StatusRequestCodec.class, StatusRequestPacket.class)
                 .bindHandler(new StatusRequestHandler());
-        inbound.bind(StatusPingCodec.class, StatusPingMessage.class)
+        inbound.bind(StatusPingCodec.class, StatusPingPacket.class)
                 .bindHandler(new StatusPingHandler());
 
-        outbound.bind(StatusResponseCodec.class, StatusResponseMessage.class);
-        outbound.bind(StatusPingCodec.class, StatusPingMessage.class);
+        outbound.bind(StatusResponseCodec.class, StatusResponsePacket.class);
+        outbound.bind(StatusPingCodec.class, StatusPingPacket.class);
     }
 }

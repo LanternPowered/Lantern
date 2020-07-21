@@ -11,19 +11,19 @@
 package org.lanternpowered.server.network
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.server.network.message.Message
+import org.lanternpowered.server.network.message.Packet
 import org.lanternpowered.server.network.message.handler.Handler
 import java.util.concurrent.ConcurrentHashMap
 
 object NettyThreadOnlyHelper {
 
-    private val map = ConcurrentHashMap<Class<out Handler<out Message>>, Boolean>()
+    private val map = ConcurrentHashMap<Class<out Handler<out Packet>>, Boolean>()
 
-    fun isHandlerNettyThreadOnly(handlerClass: Class<out Handler<out Message>>): Boolean {
+    fun isHandlerNettyThreadOnly(handlerClass: Class<out Handler<out Packet>>): Boolean {
         return this.map.computeIfAbsent(handlerClass) { isHandlerNettyThreadOnly0(it) }
     }
 
-    private fun isHandlerNettyThreadOnly0(handlerClass: Class<out Handler<out Message>>): Boolean {
+    private fun isHandlerNettyThreadOnly0(handlerClass: Class<out Handler<out Packet>>): Boolean {
         for (method in handlerClass.methods) {
             if (method.name != "handle" || method.parameterCount != 2 || method.isSynthetic) {
                 continue

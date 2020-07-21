@@ -22,7 +22,7 @@ import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-public final class MessageRegistration<M extends Message> {
+public final class MessageRegistration<M extends Packet> {
 
     private final Class<M> messageType;
     Optional<CodecRegistration<? super M, Codec<? super M>>> codecRegistration = Optional.empty();

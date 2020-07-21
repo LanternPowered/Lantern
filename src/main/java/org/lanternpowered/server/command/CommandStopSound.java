@@ -11,7 +11,7 @@
 package org.lanternpowered.server.command;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSounds;
+import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.command.CommandResult;
@@ -40,7 +40,7 @@ public final class CommandStopSound extends CommandProvider {
                     SoundCategory category = args.<SoundCategory>getOne("category").orElse(null);
                     String type = args.<SoundType>getOne("sound").map(CatalogType::getKey).map(ResourceKey::toString).orElse(null);
                     LanternPlayer player = args.<LanternPlayer>getOne("player").get();
-                    player.getConnection().send(new MessagePlayOutStopSounds(type, category));
+                    player.getConnection().send(new StopSoundsPacket(type, category));
                     return CommandResult.success();
                 });
     }

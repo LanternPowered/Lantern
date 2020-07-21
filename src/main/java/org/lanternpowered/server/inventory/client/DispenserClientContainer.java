@@ -12,8 +12,8 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.text.Text;
 
 public class DispenserClientContainer extends ChestClientContainer {
@@ -27,7 +27,7 @@ public class DispenserClientContainer extends ChestClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.GENERIC_3x3, getTitle());
+    protected Packet createInitMessage() {
+        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.GENERIC_3x3, getTitle());
     }
 }

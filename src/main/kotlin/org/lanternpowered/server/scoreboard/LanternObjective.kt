@@ -12,9 +12,9 @@ package org.lanternpowered.server.scoreboard
 
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore
+import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardObjective
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.criteria.Criterion
@@ -52,7 +52,7 @@ class LanternObjective internal constructor(
     private fun sendObjectiveUpdate() {
         if (this.scoreboards.isEmpty())
             return
-        val message = listOf(MessagePlayOutScoreboardObjective.Update(
+        val message = listOf(PacketPlayOutScoreboardObjective.Update(
                 this.name, this.displayName, this.displayMode))
         for (scoreboard in scoreboards) {
             (scoreboard as LanternScoreboard).sendToPlayers { message }
@@ -76,7 +76,7 @@ class LanternObjective internal constructor(
     private fun sendScoreToClient(score: Score) {
         if (this.scoreboards.isEmpty())
             return
-        val message = listOf(MessagePlayOutScoreboardScore.CreateOrUpdate(getName(), score.name, score.score))
+        val message = listOf(PacketPlayOutScoreboardScore.CreateOrUpdate(getName(), score.name, score.score))
         for (scoreboard in this.scoreboards) {
             (scoreboard as LanternScoreboard).sendToPlayers { message }
         }
@@ -99,11 +99,11 @@ class LanternObjective internal constructor(
     }
 
     private fun updateClientAfterRemove(score: Score) {
-        val messages = mutableMapOf<Objective, Message>()
+        val messages = mutableMapOf<Objective, Packet>()
         for (scoreboard in this.scoreboards) {
             (scoreboard as LanternScoreboard).sendToPlayers {
                 listOf(messages.computeIfAbsent(this) {
-                    MessagePlayOutScoreboardScore.Remove(getName(), score.name)
+                    PacketPlayOutScoreboardScore.Remove(getName(), score.name)
                 })
             }
         }

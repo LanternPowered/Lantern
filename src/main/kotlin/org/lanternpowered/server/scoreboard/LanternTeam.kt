@@ -13,9 +13,9 @@ package org.lanternpowered.server.scoreboard
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.optional
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams.AddMembers
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams.RemoveMembers
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams.AddMembers
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams.RemoveMembers
 import org.spongepowered.api.scoreboard.CollisionRule
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.Team
@@ -44,12 +44,12 @@ class LanternTeam internal constructor(
         this.scoreboard = scoreboard
     }
 
-    fun toCreateMessage(): MessagePlayOutTeams.CreateOrUpdate =
-            MessagePlayOutTeams.Create(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
+    fun toCreateMessage(): PacketPlayOutTeams.CreateOrUpdate =
+            PacketPlayOutTeams.Create(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
                     this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles, this.members.toImmutableList())
 
-    private fun toUpdateMessage(): MessagePlayOutTeams.CreateOrUpdate =
-            MessagePlayOutTeams.Update(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
+    private fun toUpdateMessage(): PacketPlayOutTeams.CreateOrUpdate =
+            PacketPlayOutTeams.Update(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
                     this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles)
 
     private fun sendUpdate() {
@@ -192,7 +192,7 @@ class LanternTeam internal constructor(
     override fun unregister(): Boolean {
         val scoreboard = this.scoreboard ?: return false
         scoreboard.removeTeam(this)
-        scoreboard.sendToPlayers { listOf(MessagePlayOutTeams.Remove(name)) }
+        scoreboard.sendToPlayers { listOf(PacketPlayOutTeams.Remove(name)) }
         this.scoreboard = null
         return true
     }

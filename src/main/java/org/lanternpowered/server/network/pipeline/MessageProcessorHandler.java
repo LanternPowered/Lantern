@@ -15,9 +15,9 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.ReferenceCountUtil;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.UnknownMessage;
+import org.lanternpowered.server.network.message.UnknownPacket;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
@@ -40,8 +40,8 @@ public class MessageProcessorHandler extends ChannelOutboundHandlerAdapter {
 
     @Override
     public void write(ChannelHandlerContext ctx, Object msg0, ChannelPromise promise) {
-        final Message msg = (Message) msg0;
-        if (msg == UnknownMessage.INSTANCE) {
+        final Packet msg = (Packet) msg0;
+        if (msg == UnknownPacket.INSTANCE) {
             return;
         }
         final Protocol protocol = this.codecContext.getSession().getProtocol();

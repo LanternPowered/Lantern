@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.block;
 
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockEntity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 
@@ -42,7 +42,7 @@ public abstract class BlockEntityProtocol<T extends LanternBlockEntity> extends 
     protected void init(BlockEntityProtocolUpdateContext context) {
         final DataView dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);
         populateInitData(dataView);
-        context.send(new MessagePlayOutBlockEntity(getType(), this.blockEntity.getLocation().getBlockPosition(), dataView));
+        context.send(new PacketPlayOutBlockEntity(getType(), this.blockEntity.getLocation().getBlockPosition(), dataView));
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class BlockEntityProtocol<T extends LanternBlockEntity> extends 
         final LazyDataView lazyDataView = new LazyDataView();
         populateUpdateData(lazyDataView);
         if (lazyDataView.dataView != null) {
-            context.send(new MessagePlayOutBlockEntity(getType(), this.blockEntity.getLocation().getBlockPosition(), lazyDataView.dataView));
+            context.send(new PacketPlayOutBlockEntity(getType(), this.blockEntity.getLocation().getBlockPosition(), lazyDataView.dataView));
         }
     }
 

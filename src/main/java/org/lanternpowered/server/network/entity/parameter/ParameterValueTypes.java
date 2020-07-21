@@ -14,7 +14,7 @@ import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecUtils;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;

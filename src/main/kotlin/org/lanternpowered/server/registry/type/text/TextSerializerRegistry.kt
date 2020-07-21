@@ -15,7 +15,7 @@ import org.lanternpowered.api.text.serializer.FormattingCodeTextSerializer
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.text.serializer.PlainTextSerializer
-import org.spongepowered.api.text.serializer.TextSerializer
+import org.lanternpowered.api.text.serializer.TextSerializer
 
 val TextSerializerRegistry = catalogTypeRegistry<TextSerializer> {
     register(PlainTextSerializer)

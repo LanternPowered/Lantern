@@ -10,12 +10,15 @@
  */
 package org.lanternpowered.server
 
+import com.google.common.collect.Iterables
 import joptsimple.OptionSet
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.Server
+import org.lanternpowered.api.audience.Audience
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.service.world.WorldStorageService
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.asUnmodifiableCollection
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
@@ -46,8 +49,6 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.service.rcon.RconService
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.user.UserManager
 import org.spongepowered.api.world.TeleportHelper
 import org.spongepowered.api.world.storage.ChunkLayout
@@ -57,6 +58,8 @@ import java.io.IOException
 import java.net.InetSocketAddress
 import java.net.URI
 import java.nio.file.Files
+import java.time.Duration
+import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.ExecutorService
@@ -67,13 +70,16 @@ import kotlin.system.exitProcess
 
 class LanternServerNew : Server {
 
+    private val startTime = Instant.now()
     private val game: LanternGame = LanternGame
     private lateinit var worldManager: LanternWorldManager
     private lateinit var ioExecutor: ExecutorService
     private lateinit var console: LanternConsole
     private lateinit var networkManager: NetworkManager
+    private lateinit var audiences: Iterable<Audience>
     private var queryServer: QueryServer? = null
     private var defaultResourcePack: ResourcePack? = null
+    @Volatile private var broadcastAudience: Audience = this
 
     private val playersByUniqueId = concurrentHashMapOf<UUID, LanternPlayer>()
     private val playersByName = concurrentHashMapOf<String, LanternPlayer>()
@@ -111,11 +117,10 @@ class LanternServerNew : Server {
         this.console = LanternConsole(this)
         this.console.init()
 
-        this.game.init(options)
-        this.game.setServer(this)
+        this.audiences = Iterables.concat(this.unsafePlayers, listOf(this.console))
 
-        // Initialize the console subject
-        this.console.resolveSubject()
+        this.game.init(options, this.console)
+        this.game.setServer(this)
 
         val config = this.game.config
 
@@ -304,20 +309,17 @@ class LanternServerNew : Server {
     override fun getPlayerIdleTimeout(): Int = this.config.server.playerIdleTimeout
     override fun setPlayerIdleTimeout(timeout: Int) { this.config.server.playerIdleTimeout = timeout }
 
+    override fun audiences(): Iterable<Audience> = this.audiences
+    override fun getBroadcastAudience(): Audience = this.broadcastAudience
+    override fun setBroadcastAudience(audience: Audience) { this.broadcastAudience = audience; }
+
     override fun onMainThread(): Boolean =
             Thread.currentThread() is SyncLanternThread
 
     override fun getOnlinePlayers(): Collection<Player> = this.playersByUniqueId.values.toImmutableList()
 
-    override fun setMessageChannel(channel: MessageChannel?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun setBroadcastChannel(channel: MessageChannel?) {
-        TODO("Not yet implemented")
-    }
-
     override fun getTicksPerSecond(): Double = 20.0
+    override fun getRunningTimeTicks(): Int = (Duration.between(this.startTime, Instant.now()).toMillis() / 50L).toInt()
 
     override fun getUserManager(): UserManager {
         TODO("Not yet implemented")
@@ -333,27 +335,10 @@ class LanternServerNew : Server {
 
     override fun getCauseStackManager(): CauseStackManager = LanternCauseStackManager
 
-    override fun sendMessage(message: Text) {
-        for (player in this.playersByUniqueId.values)
-            player.sendMessage(message)
-    }
-
-    override fun getMessageChannel(): MessageChannel {
-        TODO("Not yet implemented")
-    }
-
     override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].optional()
     override fun getPlayer(name: String): Optional<Player> = this.playersByName[name].optional()
 
-    override fun getBroadcastChannel(): MessageChannel {
-        TODO("Not yet implemented")
-    }
-
     override fun getGameProfileManager(): GameProfileManager {
-        TODO("Not yet implemented")
-    }
-
-    override fun getRunningTimeTicks(): Int {
         TODO("Not yet implemented")
     }
 

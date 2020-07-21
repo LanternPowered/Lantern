@@ -16,7 +16,6 @@ import org.lanternpowered.api.Game
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
-import org.lanternpowered.api.boss.BossBarBuilder
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
@@ -30,13 +29,14 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.scoreboard.ScoreboardBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder
 import org.lanternpowered.server.attribute.LanternAttributeTypeBuilder
+import org.lanternpowered.server.audience.LanternAudiencesFactory
 import org.lanternpowered.server.block.BlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder
-import org.lanternpowered.server.boss.LanternBossBarBuilder
 import org.lanternpowered.server.catalog.LanternResourceKeyBuilder
 import org.lanternpowered.server.command.LanternCommandCauseFactory
 import org.lanternpowered.server.config.user.ban.LanternBanBuilder
@@ -66,12 +66,11 @@ import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerReg
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
 import org.lanternpowered.server.registry.type.attribute.AttributeOperationRegistry
 import org.lanternpowered.server.registry.type.attribute.AttributeTypeRegistry
-import org.lanternpowered.server.registry.type.boss.BossBarColorRegistry
-import org.lanternpowered.server.registry.type.boss.BossBarOverlayRegistry
 import org.lanternpowered.server.registry.type.cause.DamageModifierTypeRegistry
 import org.lanternpowered.server.registry.type.cause.DamageTypeRegistry
 import org.lanternpowered.server.registry.type.data.ArmorMaterialRegistry
 import org.lanternpowered.server.registry.type.data.ArtTypeRegistry
+import org.lanternpowered.server.registry.type.data.AttachmentSurfaceRegistry
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.BedPartRegistry
 import org.lanternpowered.server.registry.type.data.CatTypeRegistry
@@ -79,12 +78,12 @@ import org.lanternpowered.server.registry.type.data.ChestAttachmentTypeRegistry
 import org.lanternpowered.server.registry.type.data.ComparatorTypeRegistry
 import org.lanternpowered.server.registry.type.data.DismountTypeRegistry
 import org.lanternpowered.server.registry.type.data.DoorHalfRegistry
+import org.lanternpowered.server.registry.type.data.DoorHingeRegistry
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.lanternpowered.server.registry.type.data.FireworkShapeRegistry
 import org.lanternpowered.server.registry.type.data.GameModeRegistry
 import org.lanternpowered.server.registry.type.data.HandPreferenceRegistry
 import org.lanternpowered.server.registry.type.data.HandTypeRegistry
-import org.lanternpowered.server.registry.type.data.DoorHingeRegistry
 import org.lanternpowered.server.registry.type.data.HorseColorRegistry
 import org.lanternpowered.server.registry.type.data.HorseStyleRegistry
 import org.lanternpowered.server.registry.type.data.InstrumentTypeRegistry
@@ -99,7 +98,6 @@ import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
 import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
-import org.lanternpowered.server.registry.type.data.AttachmentSurfaceRegistry
 import org.lanternpowered.server.registry.type.data.TeleportTypeRegistry
 import org.lanternpowered.server.registry.type.data.ToolTypeRegistry
 import org.lanternpowered.server.registry.type.data.TopHatRegistry
@@ -108,7 +106,6 @@ import org.lanternpowered.server.registry.type.data.WireAttachmentTypeRegistry
 import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
 import org.lanternpowered.server.registry.type.economy.TransactionTypeRegistry
 import org.lanternpowered.server.registry.type.effect.particle.ParticleOptionRegistry
-import org.lanternpowered.server.registry.type.effect.sound.SoundCategoryRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
@@ -123,11 +120,8 @@ import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
-import org.lanternpowered.server.registry.type.text.ChatTypeRegistry
 import org.lanternpowered.server.registry.type.text.ChatVisibilityRegistry
-import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.registry.type.text.TextSerializerRegistry
-import org.lanternpowered.server.registry.type.text.TextStyleRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
 import org.lanternpowered.server.registry.type.util.RotationRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
@@ -141,14 +135,11 @@ import org.lanternpowered.server.scheduler.LanternTaskBuilder
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder
-import org.lanternpowered.server.text.LanternTextFactory
 import org.lanternpowered.server.text.LanternTextSerializerFactory
-import org.lanternpowered.server.text.LanternTextTemplateFactory
-import org.lanternpowered.server.text.selector.LanternSelectorBuilder
 import org.lanternpowered.server.timings.DummyTimingsFactory
 import org.lanternpowered.server.world.LanternBlockChangeFlag
-import org.lanternpowered.server.world.archetype.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.LanternWorldBorderBuilder
+import org.lanternpowered.server.world.archetype.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder
 import org.spongepowered.api.CatalogType
@@ -169,7 +160,6 @@ import org.spongepowered.api.fluid.FluidStackSnapshot
 import org.spongepowered.api.item.enchantment.Enchantment
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult
 import org.spongepowered.api.scheduler.Task
-import org.spongepowered.api.text.selector.Selector
 import org.spongepowered.api.util.ResettableBuilder
 import org.spongepowered.api.util.RespawnLocation
 import org.spongepowered.api.util.ban.Ban
@@ -178,11 +168,11 @@ import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.biome.VirtualBiomeType
 import org.spongepowered.api.world.gamerule.GameRule
-import org.spongepowered.api.ResourceKey.Builder as ResourceKeyBuilder
 import java.util.function.Supplier
+import org.spongepowered.api.ResourceKey.Builder as ResourceKeyBuilder
 
 class LanternGameRegistry(
-        private val game: Game
+        private val game: LanternGame
 ) : GameRegistry {
 
     fun init() {
@@ -190,15 +180,14 @@ class LanternGameRegistry(
             register(ImmutableDataManipulatorFactory)
             register(MutableDataManipulatorFactory)
             register(ValueFactory)
-            register(BoundedValueFactory)
 
             register(LanternCommandCauseFactory)
             register(ItemStackComparatorsRegistry)
             register(LanternResourcePackFactory)
 
-            register(LanternTextFactory)
+            register(LanternAudiencesFactory(game))
+
             register(LanternTextSerializerFactory)
-            register(LanternTextTemplateFactory)
 
             register(LanternBlockChangeFlag.Factory)
 
@@ -221,7 +210,6 @@ class LanternGameRegistry(
 
             register<AttributeModifierBuilder> { LanternAttributeModifierBuilder() }
             register<AttributeTypeBuilder> { LanternAttributeTypeBuilder() }
-            register<BossBarBuilder> { LanternBossBarBuilder() }
             register<FireworkEffectBuilder> { LanternFireworkEffectBuilder() }
             register<ParticleEffect.Builder> { LanternParticleEffectBuilder() }
             register<PotionEffectBuilder> { LanternPotionEffectBuilder() }
@@ -240,8 +228,6 @@ class LanternGameRegistry(
             register<ScoreboardBuilder> { LanternScoreboardBuilder() }
             register<ScoreboardObjectiveBuilder> { LanternObjectiveBuilder() }
             register<ScoreboardTeamBuilder> { LanternTeamBuilder() }
-
-            register<Selector.Builder> { LanternSelectorBuilder() }
 
             register<Ban.Builder> { LanternBanBuilder() }
 
@@ -265,9 +251,6 @@ class LanternGameRegistry(
 
             register(AttributeOperationRegistry)
             register(AttributeTypeRegistry)
-
-            register(BossBarColorRegistry)
-            register(BossBarOverlayRegistry)
 
             register(DamageModifierTypeRegistry)
             register(DamageTypeRegistry)
@@ -314,7 +297,6 @@ class LanternGameRegistry(
 
             register(ParticleOptionRegistry)
 
-            register(SoundCategoryRegistry)
             register(SoundTypeRegistry)
 
             register(FluidTypeRegistry)
@@ -337,11 +319,8 @@ class LanternGameRegistry(
             register(ObjectiveDisplayModeRegistry)
             register(VisibilityRegistry)
 
-            register(ChatTypeRegistry)
             register(ChatVisibilityRegistry)
-            register(TextColorRegistry)
             register(TextSerializerRegistry)
-            register(TextStyleRegistry)
 
             register(BanTypeRegistry)
             register(RotationRegistry)
@@ -411,4 +390,5 @@ class LanternGameRegistry(
     override fun getFactoryRegistry() = LanternFactoryRegistry
     override fun getRecipeRegistry() = LanternRecipeRegistry
     override fun getVillagerRegistry() = LanternVillagerRegistry
+    override fun getAdventureRegistry() = LanternAdventureRegistry
 }

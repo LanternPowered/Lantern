@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.api.text.translation
 
+import org.lanternpowered.api.locale.Locales
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.toPlain
-import org.spongepowered.api.text.translation.locale.Locales
 import java.util.Locale
 
 /**

@@ -17,7 +17,7 @@ import org.lanternpowered.server.behavior.ContextKeys;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenBookMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenBookPacket;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -31,7 +31,7 @@ public class OpenHeldBookBehavior implements InteractWithItemBehavior {
         if (itemStack != null && itemStack.getType() == ItemTypes.WRITTEN_BOOK) {
             final LanternPlayer player = (LanternPlayer) context.getContext(ContextKeys.PLAYER).orElse(null);
             if (player != null) {
-                player.getConnection().send(new OpenBookMessage(
+                player.getConnection().send(new OpenBookPacket(
                         context.getContext(ContextKeys.INTERACTION_HAND).orElse(HandTypes.MAIN_HAND)));
                 return BehaviorResult.SUCCESS;
             }

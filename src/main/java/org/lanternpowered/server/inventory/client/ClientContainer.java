@@ -26,10 +26,10 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetWindowItemsMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetWindowPropertyMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowItemsPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -524,7 +524,7 @@ public abstract class ClientContainer implements ContainerBase {
     }
 
     /**
-     * Creates a init {@link Message} that can be used to
+     * Creates a init {@link Packet} that can be used to
      * open the container on the client. A {@code null} may
      * be returned if the container can't be opened by
      * the server.
@@ -532,7 +532,7 @@ public abstract class ClientContainer implements ContainerBase {
      * @return The init message
      */
     @Nullable
-    protected abstract Message createInitMessage();
+    protected abstract Packet createInitMessage();
 
     /**
      * Binds the {@link ContainerInteractionBehavior} to this container.
@@ -730,10 +730,10 @@ public abstract class ClientContainer implements ContainerBase {
     public void init() {
         checkState(this.player != null);
         populate();
-        final List<Message> messages = new ArrayList<>();
-        final Message message = createInitMessage();
-        if (message != null) {
-            messages.add(message);
+        final List<Packet> packets = new ArrayList<>();
+        final Packet packet = createInitMessage();
+        if (packet != null) {
+            packets.add(packet);
         }
         final ItemStack[] items = new ItemStack[getSlotFlags().length];
         for (int i = 0; i < items.length; i++) {
@@ -741,47 +741,47 @@ public abstract class ClientContainer implements ContainerBase {
             this.slots[i].dirtyState = 0;
         }
         // Send the inventory content
-        messages.add(new SetWindowItemsMessage(this.containerId, items));
+        packets.add(new SetWindowItemsPacket(this.containerId, items));
         // Send the cursor item if present
         if (!this.cursor.getRaw().isEmpty()) {
-            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
+            packets.add(new PacketPlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
         // Collect additional messages
-        collectInitMessages(messages);
+        collectInitMessages(packets);
         // Stream the messages to the player
-        this.player.getConnection().send(messages);
+        this.player.getConnection().send(packets);
     }
 
-    protected void collectInitMessages(List<Message> messages) {
+    protected void collectInitMessages(List<Packet> packets) {
     }
 
     public void update() {
         checkState(this.player != null);
         populate();
-        final List<Message> messages = new ArrayList<>();
+        final List<Packet> packets = new ArrayList<>();
         // Collect all the changes
-        collectChangeMessages(messages);
-        if (!messages.isEmpty()) {
+        collectChangeMessages(packets);
+        if (!packets.isEmpty()) {
             // Stream the messages to the player
-            this.player.getConnection().send(messages);
+            this.player.getConnection().send(packets);
         }
     }
 
-    protected void collectChangeMessages(List<Message> messages) {
+    protected void collectChangeMessages(List<Packet> packets) {
         for (int i = 0; i < this.slots.length; i++) {
-            collectSlotChangeMessages(messages, i, false);
+            collectSlotChangeMessages(packets, i, false);
         }
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
-            messages.add(new MessagePlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
+            packets.add(new PacketPlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
         // Collect the property changes
-        collectPropertyChanges(messages);
+        collectPropertyChanges(packets);
     }
 
-    protected void collectSlotChangeMessages(List<Message> messages, int index, boolean forceSilently) {
+    protected void collectSlotChangeMessages(List<Packet> packets, int index, boolean forceSilently) {
         final BaseClientSlot slot = this.slots[index];
         if ((slot.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
             int containerId = getContainerId();
@@ -802,18 +802,18 @@ public abstract class ClientContainer implements ContainerBase {
             // Reset the dirty state
             slot.dirtyState = 0;
             // Add a update message
-            messages.add(new MessagePlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.getItem()));
+            packets.add(new PacketPlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.getItem()));
         }
     }
 
-    protected void collectPropertyChanges(List<Message> messages) {
+    protected void collectPropertyChanges(List<Packet> packets) {
         for (int i = 0; i < this.propertySuppliers.size(); i++) {
             final PropertyEntry entry = this.propertySuppliers.get(i);
             if (entry != null) {
                 final int newValue = entry.intSupplier.getAsInt();
                 if (newValue != entry.previousValue) {
                     entry.previousValue = newValue;
-                    messages.add(new SetWindowPropertyMessage(this.containerId, i, newValue));
+                    packets.add(new SetWindowPropertyPacket(this.containerId, i, newValue));
                 }
             }
         }

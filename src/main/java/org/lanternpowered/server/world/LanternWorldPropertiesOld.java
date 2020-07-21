@@ -14,8 +14,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetDifficultyMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetReducedDebugMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetDifficultyPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket;
 import org.lanternpowered.server.world.archetype.LanternWorldArchetype;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gamerule.GameRuleContainer;
@@ -74,7 +74,7 @@ public final class LanternWorldPropertiesOld implements WorldProperties {
 
     private final GameRuleContainer gameRules = new GameRuleContainer()
             .addGameRuleListener(GameRules.REDUCED_DEBUG_INFO, value -> {
-                getWorld().ifPresent(world -> world.broadcast(() -> new SetReducedDebugMessage(value)));
+                getWorld().ifPresent(world -> world.broadcast(() -> new SetReducedDebugPacket(value)));
             });
 
     // Whether the difficulty is locked
@@ -465,7 +465,7 @@ public final class LanternWorldPropertiesOld implements WorldProperties {
     public void setDifficulty(Difficulty difficulty) {
         checkNotNull(difficulty, "difficulty");
         if (this.getDifficulty() != difficulty && this.world != null) {
-            this.world.broadcast(() -> new SetDifficultyMessage(difficulty, true));
+            this.world.broadcast(() -> new SetDifficultyPacket(difficulty, true));
         }
         this.worldConfig.setDifficulty(difficulty);
     }

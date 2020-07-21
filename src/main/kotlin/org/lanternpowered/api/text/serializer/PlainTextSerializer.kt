@@ -15,7 +15,7 @@ import org.lanternpowered.api.registry.factoryOf
 /**
  * A text serializer for plain text.
  */
-interface PlainTextSerializer : SafeTextSerializer {
+interface PlainTextSerializer : TextSerializer {
 
     /**
      * The singleton instance of [PlainTextSerializer].

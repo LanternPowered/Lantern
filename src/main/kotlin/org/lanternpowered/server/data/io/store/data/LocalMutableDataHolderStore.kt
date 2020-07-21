@@ -37,11 +37,11 @@ open class LocalMutableDataHolderStore<H : LocalMutableDataHolder> : ObjectStore
             val context = DataSerializerRegistry.typeSerializerContext
 
             for ((query, raw) in valuesView.getValues(false)) {
-                val ResourceKey = ResourceKeys.resolve(query.toString())
-                val key = ValueKeyRegistryModule[ResourceKey].orNull().uncheckedCast<Key<Value<Any>>?>()
+                val resourceKey = ResourceKeys.resolve(query.toString())
+                val key = ValueKeyRegistryModule[resourceKey].orNull().uncheckedCast<Key<Value<Any>>?>()
                 if (key == null) {
                     Lantern.getLogger().warn(
-                            "Unable to deserialize the data value with key: $ResourceKey because it doesn't exist.")
+                            "Unable to deserialize the data value with key: $resourceKey because it doesn't exist.")
                 } else {
                     val elementType = key.elementToken.uncheckedCast<TypeToken<Any>>()
                     val serializer = context.serializers.getTypeSerializer<Any, Any>(elementType).orNull()

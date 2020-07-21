@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.spongepowered.api.entity.Entity;
 
 import java.util.Optional;
@@ -36,26 +36,26 @@ final class EmptyEntityUpdateContext implements EntityProtocolUpdateContext {
     }
 
     @Override
-    public void sendToSelf(Message message) {
+    public void sendToSelf(Packet packet) {
     }
 
     @Override
-    public void sendToSelf(Supplier<Message> messageSupplier) {
+    public void sendToSelf(Supplier<Packet> messageSupplier) {
     }
 
     @Override
-    public void sendToAll(Message message) {
+    public void sendToAll(Packet packet) {
     }
 
     @Override
-    public void sendToAll(Supplier<Message> message) {
+    public void sendToAll(Supplier<Packet> message) {
     }
 
     @Override
-    public void sendToAllExceptSelf(Message message) {
+    public void sendToAllExceptSelf(Packet packet) {
     }
 
     @Override
-    public void sendToAllExceptSelf(Supplier<Message> messageSupplier) {
+    public void sendToAllExceptSelf(Supplier<Packet> messageSupplier) {
     }
 }

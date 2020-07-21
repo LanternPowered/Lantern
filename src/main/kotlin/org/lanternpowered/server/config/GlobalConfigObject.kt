@@ -11,6 +11,7 @@
 package org.lanternpowered.server.config
 
 import org.lanternpowered.api.text.textOf
+import org.lanternpowered.api.util.Tristate
 import org.lanternpowered.server.network.ProxyType
 
 class GlobalConfigObject : ConfigObject() {
@@ -23,6 +24,8 @@ class GlobalConfigObject : ConfigObject() {
 
     val query by QueryConfigObject.with(name = "query",
             description = "Configuration for the query server.")
+
+    val metrics by MetricsConfigObject.with(name = "metrics")
 
     companion object : Factory<GlobalConfigObject> by { GlobalConfigObject() }
 }
@@ -86,10 +89,10 @@ class ServerConfigObject : ConfigObject() {
     var messageOfTheDay by setting(default = textOf("A lantern minecraft server!"), name = "message-of-the-day",
             description = "This is the message that will be displayed in the server list.")
 
-    var shutdownMessage by setting(default = textOf("Server shutting down."), name = "message-of-the-day",
+    var shutdownMessage by setting(default = textOf("Server shutting down."), name = "shutdown-message",
             description = "This is the default message that will be displayed when the server is shut down.")
 
-    var whitelist by setting(default = false, name = "white=list",
+    var whitelist by setting(default = false, name = "whitelist",
             description = "Whether the white-list is enabled.")
 
     var playerIdleTimeout by setting(default = 0, name = "player-idle-timeout",
@@ -117,4 +120,16 @@ class ProxyConfigObject : ConfigObject() {
                 """.trimIndent())
 
     companion object : Factory<ProxyConfigObject> by { ProxyConfigObject() }
+}
+
+class MetricsConfigObject : ConfigObject() {
+
+    var globalState by setting(default = Tristate.UNDEFINED, name = "global-state",
+            description = "The global collection state that should be respected by all plugins that have " +
+                          "no specified collection state. If undefined then it is treated as disabled.")
+
+    var pluginStates by setting(default = mapOf<String, Tristate>(), name = "plugin-states",
+            description = "The plugin specific collection states that override the global collection state.")
+
+    companion object : Factory<MetricsConfigObject> by { MetricsConfigObject() }
 }

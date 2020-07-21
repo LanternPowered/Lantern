@@ -30,6 +30,8 @@ import io.netty.handler.timeout.TimeoutException;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.ScheduledFuture;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.LanternServerNew;
@@ -40,19 +42,19 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.lanternpowered.server.network.message.BulkMessage;
-import org.lanternpowered.server.network.message.HandlerMessage;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.BulkPacket;
+import org.lanternpowered.server.network.message.HandlerPacket;
+import org.lanternpowered.server.network.message.Packet;
 import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.UnknownMessage;
+import org.lanternpowered.server.network.message.UnknownPacket;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.vanilla.message.type.KeepAliveMessage;
-import org.lanternpowered.server.network.vanilla.message.type.DisconnectMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.ClientSettingsMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
-import org.lanternpowered.server.network.vanilla.message.type.play.PlayerJoinMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.KeepAlivePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.DisconnectPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSettingsPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerJoinPacket;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
@@ -72,11 +74,9 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.translation.locale.Locales;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.util.locale.Locales;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.dimension.DimensionTypes;
@@ -100,7 +100,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("ConstantConditions")
-public final class NetworkSession extends SimpleChannelInboundHandler<Message> implements ServerPlayerConnection {
+public final class NetworkSession extends SimpleChannelInboundHandler<Packet> implements ServerPlayerConnection {
 
     /**
      * The read timeout in seconds.
@@ -157,13 +157,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     /**
      * The reason that caused the channel to disconnect.
      */
-    @Nullable private volatile Text disconnectReason;
+    @Nullable private volatile Component disconnectReason;
 
     /**
      * A queue of incoming messages that must be handled on
      * the synchronous thread.
      */
-    private final Queue<HandlerMessage> messageQueue = new ConcurrentLinkedDeque<>();
+    private final Queue<HandlerPacket> messageQueue = new ConcurrentLinkedDeque<>();
 
     /**
      * The virtual host address.
@@ -230,7 +230,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         return System.nanoTime() / 1000000L;
     }
 
-    private void handleKeepAlive(KeepAliveMessage message) {
+    private void handleKeepAlive(KeepAlivePacket message) {
         if (this.keepAliveTime == message.getTime()) {
             final long time = currentTime();
             final int latency = this.latency;
@@ -239,87 +239,87 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.keepAliveTime = -1L;
             if (this.gameProfile != null) {
                 // Update the global tab list
-                messageReceived(new HandlerMessage<UnknownMessage>(UnknownMessage.INSTANCE, (context, initMessage) ->
+                messageReceived(new HandlerPacket<UnknownPacket>(UnknownPacket.INSTANCE, (context, initMessage) ->
                         GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(this.latency))));
             }
         }
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Message message) {
-        Message actualMessage = message;
-        if (actualMessage instanceof HandlerMessage) {
-            actualMessage = ((HandlerMessage) actualMessage).getMessage();
+    protected void channelRead0(ChannelHandlerContext ctx, Packet packet) {
+        Packet actualPacket = packet;
+        if (actualPacket instanceof HandlerPacket) {
+            actualPacket = ((HandlerPacket) actualPacket).getMessage();
         }
-        if (actualMessage instanceof ClientSettingsMessage) { // Special case, keep track of the locale
-            this.locale = ((ClientSettingsMessage) actualMessage).getLocale();
+        if (actualPacket instanceof ClientSettingsPacket) { // Special case, keep track of the locale
+            this.locale = ((ClientSettingsPacket) actualPacket).getLocale();
             if (!this.firstClientSettingsMessage) {
                 this.firstClientSettingsMessage = true;
                 // Trigger the init
-                messageReceived(new HandlerMessage<UnknownMessage>(UnknownMessage.INSTANCE,
+                messageReceived(new HandlerPacket<UnknownPacket>(UnknownPacket.INSTANCE,
                         (context, initMessage) -> finalizePlayer()));
             }
         }
-        messageReceived(message);
+        messageReceived(packet);
     }
 
     /**
-     * Handles the inbound {@link Message} with the specified {@link Handler}.
+     * Handles the inbound {@link Packet} with the specified {@link Handler}.
      *
      * @param handler The handler
-     * @param message The message
+     * @param packet The message
      */
     @SuppressWarnings("unchecked")
-    private void handleMessage(Handler handler, Message message) {
+    private void handleMessage(Handler handler, Packet packet) {
         try {
-            handler.handle(this.networkContext, message);
+            handler.handle(this.networkContext, packet);
         } catch (Throwable throwable) {
-            Lantern.getLogger().error("Error while handling {}", message, throwable);
+            Lantern.getLogger().error("Error while handling {}", packet, throwable);
         } finally {
-            ReferenceCountUtil.release(message);
+            ReferenceCountUtil.release(packet);
         }
     }
 
     /**
-     * Queues the {@link Message} to be handled.
+     * Queues the {@link Packet} to be handled.
      *
-     * @param message The message
+     * @param packet The message
      */
-    public void queueReceivedMessage(Message message) {
+    public void queueReceivedMessage(Packet packet) {
         final EventLoop eventLoop = this.channel.eventLoop();
         if (eventLoop.inEventLoop()) {
-            messageReceived(message);
+            messageReceived(packet);
         } else {
-            this.channel.eventLoop().execute(() -> messageReceived(message));
+            this.channel.eventLoop().execute(() -> messageReceived(packet));
         }
     }
 
     /**
      * Called when the server received a message from the client.
      *
-     * @param message The message
+     * @param packet The message
      */
     @SuppressWarnings("unchecked")
     @NettyThreadOnly
-    private void messageReceived(Message message) {
-        if (message == UnknownMessage.INSTANCE) {
+    private void messageReceived(Packet packet) {
+        if (packet == UnknownPacket.INSTANCE) {
             return;
         }
-        if (message instanceof KeepAliveMessage) { // Special case
-            handleKeepAlive((KeepAliveMessage) message);
-        } else if (message instanceof BulkMessage) {
-            ((BulkMessage) message).getMessages().forEach(this::messageReceived);
-        } else if (message instanceof HandlerMessage) {
-            final HandlerMessage handlerMessage = (HandlerMessage) message;
-            if (handlerMessage.getHandleThread() == HandlerMessage.HandleThread.NETTY) {
+        if (packet instanceof KeepAlivePacket) { // Special case
+            handleKeepAlive((KeepAlivePacket) packet);
+        } else if (packet instanceof BulkPacket) {
+            ((BulkPacket) packet).getPackets().forEach(this::messageReceived);
+        } else if (packet instanceof HandlerPacket) {
+            final HandlerPacket handlerMessage = (HandlerPacket) packet;
+            if (handlerMessage.getHandleThread() == HandlerPacket.HandleThread.NETTY) {
                 handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
-            } else if (handlerMessage.getHandleThread() == HandlerMessage.HandleThread.ASYNC) {
+            } else if (handlerMessage.getHandleThread() == HandlerPacket.HandleThread.ASYNC) {
                 Lantern.getAsyncScheduler().submit(() -> handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage()));
             } else {
                 this.messageQueue.add(handlerMessage);
             }
         } else {
-            final Class<? extends Message> messageClass = message.getClass();
+            final Class<? extends Packet> messageClass = packet.getClass();
             final MessageRegistration registration = getProtocol().inbound().findByMessageType(messageClass).orElse(null);
             if (registration == null) {
                 throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
@@ -327,9 +327,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             registration.getHandler().ifPresent(handler -> {
                 final Handler handler1 = (Handler) handler;
                 if (NettyThreadOnlyHelper.INSTANCE.isHandlerNettyThreadOnly((Class) handler1.getClass())) {
-                    handleMessage(handler1, message);
+                    handleMessage(handler1, packet);
                 } else {
-                    this.messageQueue.add(new HandlerMessage(message, handler1));
+                    this.messageQueue.add(new HandlerPacket(packet, handler1));
                 }
             });
         }
@@ -355,7 +355,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 final long time = currentTime();
                 if (this.keepAliveTime == -1L) {
                     this.keepAliveTime = time;
-                    send(new KeepAliveMessage(time));
+                    send(new KeepAlivePacket(time));
                 } else {
                     close(t("disconnect.timeout"));
                 }
@@ -509,7 +509,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * from the main thread.
      */
     public void pulse() {
-        HandlerMessage entry;
+        HandlerPacket entry;
         while ((entry = this.messageQueue.poll()) != null) {
             handleMessage(entry.getHandler(), entry.getMessage());
         }
@@ -588,36 +588,36 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * @param reason The reason
      */
     @NettyThreadOnly
-    private void closeChannel(Text reason) {
+    private void closeChannel(Component reason) {
         this.disconnectReason = checkNotNull(reason, "reason");
         this.channel.close();
     }
 
     /**
-     * Sends a {@link Message} and returns the {@link ChannelFuture}.
+     * Sends a {@link Packet} and returns the {@link ChannelFuture}.
      *
-     * @param message The message
+     * @param packet The message
      * @return The channel future
      */
-    public ChannelFuture sendWithFuture(Message message) {
-        checkNotNull(message, "message");
+    public ChannelFuture sendWithFuture(Packet packet) {
+        checkNotNull(packet, "message");
         if (!this.channel.isActive()) {
             return this.channel.newPromise();
         }
-        ReferenceCountUtil.retain(message);
+        ReferenceCountUtil.retain(packet);
         // Write the message and add a exception handler
-        return this.channel.writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+        return this.channel.writeAndFlush(packet).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
     }
 
     /**
-     * Sends a array of {@link Message}s and returns the {@link ChannelFuture}.
+     * Sends a array of {@link Packet}s and returns the {@link ChannelFuture}.
      *
-     * @param messages The messages
+     * @param packets The messages
      * @return The channel future
      */
-    public ChannelFuture sendWithFuture(Message... messages) {
-        checkNotNull(messages, "messages");
-        if (messages.length == 0) {
+    public ChannelFuture sendWithFuture(Packet... packets) {
+        checkNotNull(packets, "messages");
+        if (packets.length == 0) {
             return this.channel.voidPromise();
         }
         final ChannelPromise promise = this.channel.newPromise();
@@ -627,33 +627,33 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         promise.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         // Don't bother checking if we are in the event loop,
         // there is only one message.
-        if (messages.length == 1) {
-            this.channel.writeAndFlush(messages[0], promise);
+        if (packets.length == 1) {
+            this.channel.writeAndFlush(packets[0], promise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
             // Retain the messages
-            for (Message message : messages) {
-                ReferenceCountUtil.retain(message);
+            for (Packet packet : packets) {
+                ReferenceCountUtil.retain(packet);
             }
             final ChannelPromise voidPromise = this.channel.voidPromise();
             if (eventLoop.inEventLoop()) {
-                final int last = messages.length - 1;
+                final int last = packets.length - 1;
                 for (int i = 0; i < last; i++) {
-                    this.channel.write(messages[i], voidPromise);
+                    this.channel.write(packets[i], voidPromise);
                 }
-                this.channel.writeAndFlush(messages[last], promise);
+                this.channel.writeAndFlush(packets[last], promise);
             } else {
                 // If there are more then one message, combine them inside the
                 // event loop to reduce overhead of wakeup calls and object creation
 
                 // Create a copy of the list, to avoid concurrent modifications
-                final List<Message> messages0 = ImmutableList.copyOf(messages);
+                final List<Packet> messages0 = ImmutableList.copyOf(packets);
                 eventLoop.submit(() -> {
-                    final Iterator<Message> it0 = messages0.iterator();
+                    final Iterator<Packet> it0 = messages0.iterator();
                     do {
-                        final Message message0 = it0.next();
+                        final Packet packet0 = it0.next();
                         // Only use a normal channel promise for the last message
-                        this.channel.write(message0, it0.hasNext() ? voidPromise : promise);
+                        this.channel.write(packet0, it0.hasNext() ? voidPromise : promise);
                     } while (it0.hasNext());
                     this.channel.flush();
                 });
@@ -663,13 +663,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
-     * Sends a iterable of {@link Message}s.
+     * Sends a iterable of {@link Packet}s.
      *
      * @param messages The messages
      */
-    public ChannelFuture sendWithFuture(Iterable<Message> messages) {
+    public ChannelFuture sendWithFuture(Iterable<Packet> messages) {
         checkNotNull(messages, "messages");
-        final Iterator<Message> it = messages.iterator();
+        final Iterator<Packet> it = messages.iterator();
         if (!it.hasNext()) {
             return this.channel.voidPromise();
         }
@@ -678,11 +678,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             return promise;
         }
         promise.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
-        Message message = it.next();
+        Packet packet = it.next();
         // Don't bother checking if we are in the event loop,
         // there is only one message.
         if (!it.hasNext()) {
-            this.channel.writeAndFlush(message, promise);
+            this.channel.writeAndFlush(packet, promise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
             messages.forEach(ReferenceCountUtil::retain);
@@ -691,11 +691,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 while (true) {
                     final boolean next = it.hasNext();
                     // Only use a normal channel promise for the last message
-                    this.channel.write(message, next ? voidPromise : promise);
+                    this.channel.write(packet, next ? voidPromise : promise);
                     if (!next) {
                         break;
                     }
-                    message = it.next();
+                    packet = it.next();
                 }
                 this.channel.flush();
             } else {
@@ -703,13 +703,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 // event loop to reduce overhead of wakeup calls and object creation
 
                 // Create a copy of the list, to avoid concurrent modifications
-                final List<Message> messages0 = ImmutableList.copyOf(messages);
+                final List<Packet> messages0 = ImmutableList.copyOf(messages);
                 eventLoop.submit(() -> {
-                    final Iterator<Message> it0 = messages0.iterator();
+                    final Iterator<Packet> it0 = messages0.iterator();
                     do {
-                        final Message message0 = it0.next();
+                        final Packet packet0 = it0.next();
                         // Only use a normal channel promise for the last message
-                        this.channel.writeAndFlush(message0, it0.hasNext() ? voidPromise : promise);
+                        this.channel.writeAndFlush(packet0, it0.hasNext() ? voidPromise : promise);
                     } while (it0.hasNext());
                     this.channel.flush();
                 });
@@ -719,42 +719,42 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
-     * Sends a {@link Message}.
+     * Sends a {@link Packet}.
      *
-     * @param message The message
+     * @param packet The message
      */
-    public void send(Message message) {
-        checkNotNull(message, "message");
+    public void send(Packet packet) {
+        checkNotNull(packet, "message");
         if (!this.channel.isActive()) {
             return;
         }
-        ReferenceCountUtil.retain(message);
+        ReferenceCountUtil.retain(packet);
         // Thrown exceptions will be delegated through the exceptionCaught method
-        this.channel.writeAndFlush(message, this.channel.voidPromise());
+        this.channel.writeAndFlush(packet, this.channel.voidPromise());
     }
 
     /**
-     * Sends a array of {@link Message}s.
+     * Sends a array of {@link Packet}s.
      *
-     * @param messages The messages
+     * @param packets The messages
      */
-    public void send(Message... messages) {
-        checkNotNull(messages, "messages");
-        if (messages.length == 0 || !this.channel.isActive()) {
+    public void send(Packet... packets) {
+        checkNotNull(packets, "messages");
+        if (packets.length == 0 || !this.channel.isActive()) {
             return;
         }
         final ChannelPromise voidPromise = this.channel.voidPromise();
-        if (messages.length == 1) {
-            this.channel.writeAndFlush(messages[0], voidPromise);
+        if (packets.length == 1) {
+            this.channel.writeAndFlush(packets[0], voidPromise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
             // Retain the messages
-            for (Message message : messages) {
-                ReferenceCountUtil.retain(message);
+            for (Packet packet : packets) {
+                ReferenceCountUtil.retain(packet);
             }
             if (eventLoop.inEventLoop()) {
-                for (Message message : messages) {
-                    this.channel.write(message, voidPromise);
+                for (Packet packet : packets) {
+                    this.channel.write(packet, voidPromise);
                 }
                 this.channel.flush();
             } else {
@@ -762,10 +762,10 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 // event loop to reduce overhead of wakeup calls and object creation
 
                 // Create a copy of the list, to avoid concurrent modifications
-                final List<Message> messages0 = ImmutableList.copyOf(messages);
+                final List<Packet> messages0 = ImmutableList.copyOf(packets);
                 eventLoop.submit(() -> {
-                    for (Message message0 : messages0) {
-                        this.channel.write(message0, voidPromise);
+                    for (Packet packet0 : messages0) {
+                        this.channel.write(packet0, voidPromise);
                     }
                     this.channel.flush();
                 });
@@ -774,28 +774,28 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     }
 
     /**
-     * Sends a iterable of {@link Message}s.
+     * Sends a iterable of {@link Packet}s.
      *
      * @param messages The messages
      */
-    public void send(Iterable<Message> messages) {
+    public void send(Iterable<Packet> messages) {
         checkNotNull(messages, "messages");
-        final Iterator<Message> it = messages.iterator();
+        final Iterator<Packet> it = messages.iterator();
         if (!it.hasNext()) {
             return;
         }
-        Message message = it.next();
+        Packet packet = it.next();
         // Don't bother checking if we are in the event loop,
         // there is only one message.
         final ChannelPromise voidPromise = this.channel.voidPromise();
         if (!it.hasNext()) {
-            this.channel.writeAndFlush(message, voidPromise);
+            this.channel.writeAndFlush(packet, voidPromise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
             messages.forEach(ReferenceCountUtil::retain);
             if (eventLoop.inEventLoop()) {
-                for (Message message0 : messages) {
-                    this.channel.write(message0, voidPromise);
+                for (Packet packet0 : messages) {
+                    this.channel.write(packet0, voidPromise);
                 }
                 this.channel.flush();
             } else {
@@ -803,10 +803,10 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 // event loop to reduce overhead of wakeup calls and object creation
 
                 // Create a copy of the list, to avoid concurrent modifications
-                final List<Message> messages0 = ImmutableList.copyOf(messages);
+                final List<Packet> messages0 = ImmutableList.copyOf(messages);
                 eventLoop.submit(() -> {
-                    for (Message message0 : messages0) {
-                        this.channel.write(message0, voidPromise);
+                    for (Packet packet0 : messages0) {
+                        this.channel.write(packet0, voidPromise);
                     }
                     this.channel.flush();
                 });
@@ -816,11 +816,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     @Override
     public void close() {
-        close(Text.of("Unknown reason."));
+        close(TextComponent.of("Unknown reason."));
     }
 
     @Override
-    public void close(Text reason) {
+    public void close(Component reason) {
         checkNotNull(reason, "reason");
         if (this.disconnectReason != null) {
             return;
@@ -828,7 +828,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.disconnectReason = reason;
         if (this.channel.isActive() && (this.protocolState == ProtocolState.PLAY ||
                 this.protocolState == ProtocolState.LOGIN)) {
-            sendWithFuture(new DisconnectMessage(reason)).addListener(ChannelFutureListener.CLOSE);
+            sendWithFuture(new DisconnectPacket(reason)).addListener(ChannelFutureListener.CLOSE);
         } else {
             this.channel.close();
         }
@@ -875,7 +875,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     /**
      * Pre initializes the {@link LanternPlayer}, after this state we need
-     * to wait for the client to send a {@link ClientSettingsMessage}
+     * to wait for the client to send a {@link ClientSettingsPacket}
      * so that we have the {@link Locale} before we start sending translated
      * {@link Text} objects.
      */
@@ -890,7 +890,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // Actually too early to send this, but we want to trigger
         // the client settings to be send to the server, respawn
         // messages will be send afterwards with the proper values
-        send(new PlayerJoinMessage(GameModes.SURVIVAL.get(), DimensionTypes.OVERWORLD.get(),
+        send(new PlayerJoinPacket(GameModes.SURVIVAL.get(), DimensionTypes.OVERWORLD.get(),
                 this.player.getNetworkId(), getServer().getMaxPlayers(), false, false, false,
                 this.player.getServerViewDistance(), true, 0L));
     }
@@ -1009,7 +1009,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         // Send the server brand
-        send(new MessagePlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+        send(new PacketPlayInOutBrand(Lantern.getImplementationPlugin().getName()));
 
         // Reset the raw world
         this.player.setRawWorld(null);

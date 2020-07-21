@@ -13,8 +13,8 @@ package org.lanternpowered.server.network.entity.vanilla;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
-import org.lanternpowered.server.network.vanilla.message.type.play.SpawnPaintingMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityTeleport;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnPaintingPacket;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.Arts;
@@ -55,7 +55,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
     }
 
     private void spawn(EntityProtocolUpdateContext context, Art art, Direction direction, Vector3i position) {
-        context.sendToAll(() -> new SpawnPaintingMessage(getRootEntityId(),
+        context.sendToAll(() -> new SpawnPaintingPacket(getRootEntityId(),
                 this.entity.getUniqueId(), art, position.getX(), position.getY(), position.getZ(), direction));
     }
 
@@ -74,7 +74,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
             this.lastArt = art;
         } else if (!blockPos.equals(this.lastBlockPos)) {
             update0(context);
-            context.sendToAll(() -> new MessagePlayOutEntityTeleport(getRootEntityId(), pos, (byte) 0, (byte) 0, true));
+            context.sendToAll(() -> new PacketPlayOutEntityTeleport(getRootEntityId(), pos, (byte) 0, (byte) 0, true));
             this.lastBlockPos = blockPos;
         }
     }

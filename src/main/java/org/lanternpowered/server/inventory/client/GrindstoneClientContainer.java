@@ -12,8 +12,8 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
@@ -37,8 +37,8 @@ public class GrindstoneClientContainer extends ClientContainer {
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.GRINDSTONE, getTitle());
+    protected Packet createInitMessage() {
+        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.GRINDSTONE, getTitle());
     }
 
     @Override
@@ -52,12 +52,12 @@ public class GrindstoneClientContainer extends ClientContainer {
     }
 
     @Override
-    protected void collectChangeMessages(List<Message> messages) {
+    protected void collectChangeMessages(List<Packet> packets) {
         if ((this.slots[0].dirtyState & BaseClientSlot.IS_DIRTY) != 0 ||
                 (this.slots[1].dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
             // Force update the result slot if one of the inputs is modified
             // queueSilentSlotChangeSafely(this.slots[2]);
         }
-        super.collectChangeMessages(messages);
+        super.collectChangeMessages(packets);
     }
 }

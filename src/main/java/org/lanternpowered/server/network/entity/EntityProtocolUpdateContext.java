@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -43,46 +43,46 @@ public interface EntityProtocolUpdateContext {
     OptionalInt getId(Entity entity);
 
     /**
-     * Sends the {@link Message} to the owner, will only do something
+     * Sends the {@link Packet} to the owner, will only do something
      * if the owner is a {@link Player}.
      *
-     * @param message The message
+     * @param packet The message
      */
-    void sendToSelf(Message message);
+    void sendToSelf(Packet packet);
 
     /**
-     * Sends the {@link Message} to the owner, will only do something
+     * Sends the {@link Packet} to the owner, will only do something
      * if the owner is a {@link Player}.
      *
      * @param messageSupplier The message supplier
      */
-    void sendToSelf(Supplier<Message> messageSupplier);
+    void sendToSelf(Supplier<Packet> messageSupplier);
 
     /**
-     * Sends the {@link Message} to all the trackers.
+     * Sends the {@link Packet} to all the trackers.
+     *
+     * @param packet The message
+     */
+    void sendToAll(Packet packet);
+
+    /**
+     * Sends the {@link Packet} to all the trackers.
      *
      * @param message The message
      */
-    void sendToAll(Message message);
+    void sendToAll(Supplier<Packet> message);
 
     /**
-     * Sends the {@link Message} to all the trackers.
+     * Sends the {@link Packet} to all the trackers except the owner.
      *
-     * @param message The message
+     * @param packet The message
      */
-    void sendToAll(Supplier<Message> message);
+    void sendToAllExceptSelf(Packet packet);
 
     /**
-     * Sends the {@link Message} to all the trackers except the owner.
-     *
-     * @param message The message
-     */
-    void sendToAllExceptSelf(Message message);
-
-    /**
-     * Sends the {@link Message} to all the trackers except the owner.
+     * Sends the {@link Packet} to all the trackers except the owner.
      *
      * @param messageSupplier The message supplier
      */
-    void sendToAllExceptSelf(Supplier<Message> messageSupplier);
+    void sendToAllExceptSelf(Supplier<Packet> messageSupplier);
 }

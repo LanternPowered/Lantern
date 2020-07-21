@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.spongepowered.api.text.Text;
 
 import java.util.Locale;
 
 /**
  * If a {@link TranslationContext} is active {@link Text} objects will be translated
- * to be used in network {@link Message}s to match the clients {@link Locale}.
+ * to be used in network {@link Packet}s to match the clients {@link Locale}.
  * <p>This will only be applied to the current thread, so this will
  * can be used in concurrent environments.</p>
  */

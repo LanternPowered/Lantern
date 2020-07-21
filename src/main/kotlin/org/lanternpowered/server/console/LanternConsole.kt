@@ -17,13 +17,14 @@ import org.apache.logging.log4j.io.IoBuilder
 import org.apache.logging.log4j.io.LoggerPrintStream
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
+import org.lanternpowered.api.audience.Audience
 import org.lanternpowered.api.plugin.name
+import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.cause.LanternCauseStack
 import org.lanternpowered.server.ext.inject
 import org.lanternpowered.server.permission.ProxySubject
-import org.lanternpowered.server.text.LanternTexts
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.ThreadHelper
 import org.spongepowered.api.SystemSubject
@@ -31,10 +32,6 @@ import org.spongepowered.api.command.exception.CommandException
 import org.spongepowered.api.command.manager.CommandManager
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.SubjectReference
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.TextElement
-import org.spongepowered.api.text.TextTemplate
-import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.util.Tristate
 import java.io.IOException
 import java.io.PrintStream
@@ -67,8 +64,6 @@ class LanternConsole(
     override val subjectCollectionIdentifier: String get() = PermissionService.SUBJECTS_SYSTEM
     override var internalSubject: SubjectReference? = null
 
-    private var messageChannel: MessageChannel = MessageChannel.toPlayersAndServer()
-
     @Volatile private var active = false
     private var readerThread: Thread? = null
     private var lineReader: LineReader? = null
@@ -77,8 +72,8 @@ class LanternConsole(
     fun init() {
         // Register the fqcn for the console source
         redirectFqcns.add(this::class.java.name)
-        // Register the fqcn for the message channel
-        redirectFqcns.add(MessageChannel::class.java.name)
+        // Register the fqcn for the audience
+        redirectFqcns.add(Audience::class.java.name)
         // Ignore the cause stack as fqcn, stack traces will
         // already be printed nicely with PrettyPrinter
         ignoreFqcns.add(LanternCauseStack::class.java.name)
@@ -117,7 +112,7 @@ class LanternConsole(
                 try {
                     this.commandManager.process(this, command)
                 } catch (e: CommandException) {
-                    sendMessage(Text.of("Failed to execute command: $command, reason: ${e.message}"))
+                    sendMessage(textOf("Failed to execute command: $command, reason: ${e.message}"))
                 }
             }
         }
@@ -160,20 +155,6 @@ class LanternConsole(
         }
     }
 
-    override fun getIdentifier() = "Console"
-
-    override fun sendMessage(message: Text) { println(LanternTexts.toLegacy(message)) }
-
-    override fun sendMessages(vararg messages: Text) { messages.forEach(this::sendMessage) }
-    override fun sendMessages(messages: Iterable<Text>) { messages.forEach(this::sendMessage) }
-
-    override fun sendMessage(template: TextTemplate) { sendMessage(template.apply().build()) }
-    override fun sendMessage(template: TextTemplate, params: Map<String, TextElement>) {
-        sendMessage(template.apply(params).build())
-    }
-
+    override fun getIdentifier() = "console"
     override fun getPermissionDefault(permission: String) = Tristate.TRUE
-
-    override fun getMessageChannel() = this.messageChannel
-    override fun setMessageChannel(channel: MessageChannel) { this.messageChannel = channel }
 }

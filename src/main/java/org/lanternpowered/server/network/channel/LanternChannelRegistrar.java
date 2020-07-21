@@ -23,10 +23,10 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.ChannelPayloadMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutRegisterChannels;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutUnregisterChannels;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
@@ -88,7 +88,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
             binding = new LanternIndexedMessageChannel(this, channel, container);
         }
         binding.bound = true;
-        final MessagePlayInOutRegisterChannels message = new MessagePlayInOutRegisterChannels(Sets.newHashSet(channel));
+        final PacketPlayInOutRegisterChannels message = new PacketPlayInOutRegisterChannels(Sets.newHashSet(channel));
         for (Player player : this.server.getOnlinePlayers()) {
             ((NetworkSession) player.getConnection()).send(message);
         }
@@ -101,7 +101,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (binding.bound) {
             binding.bound = false;
             this.bindings.remove(channel.getName());
-            final MessagePlayInOutUnregisterChannels message = new MessagePlayInOutUnregisterChannels(Collections.singleton(channel.getName()));
+            final PacketPlayInOutUnregisterChannels message = new PacketPlayInOutUnregisterChannels(Collections.singleton(channel.getName()));
             for (Player player : this.server.getOnlinePlayers()) {
                 ((NetworkSession) player.getConnection()).send(message);
             }
@@ -126,7 +126,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (session.getRegisteredChannels().contains(channel)) {
             final ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
-            session.send(new ChannelPayloadMessage(channel, buf));
+            session.send(new ChannelPayloadPacket(channel, buf));
         }
     }
 
@@ -137,7 +137,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         if (players.hasNext()) {
             final ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
-            final Message msg = new ChannelPayloadMessage(channel, buf);
+            final Packet msg = new ChannelPayloadPacket(channel, buf);
             players.forEachRemaining(player -> ((LanternPlayer) player).getConnection().send(msg));
         }
     }

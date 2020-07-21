@@ -13,7 +13,7 @@ package org.lanternpowered.server.config;
 import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
 import static org.lanternpowered.server.config.world.WorldConfig.MAX_VIEW_DISTANCE;
 import static org.lanternpowered.server.config.world.WorldConfig.MIN_VIEW_DISTANCE;
-import static org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage.URL_ARGUMENT;
+import static org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInChatMessage.URL_ARGUMENT;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;

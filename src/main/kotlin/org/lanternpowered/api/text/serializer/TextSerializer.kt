@@ -10,11 +10,13 @@
  */
 package org.lanternpowered.api.text.serializer
 
+import net.kyori.adventure.text.serializer.ComponentSerializer
+import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.locale.Locales
 import org.lanternpowered.api.text.Text
 
-interface TextSerializer : org.spongepowered.api.text.serializer.TextSerializer {
+interface TextSerializer : ComponentSerializer<Text, Text, String>, CatalogType {
 
     override fun serialize(text: Text): String = serialize(text, Locales.DEFAULT)
 

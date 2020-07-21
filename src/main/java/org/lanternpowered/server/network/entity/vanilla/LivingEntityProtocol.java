@@ -19,9 +19,9 @@ import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutAddPotionEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityAnimation;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutRemovePotionEffect;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
@@ -121,27 +121,27 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
                 }
             }
             this.lastPotionEffects.values().forEach(potionEffect -> context.sendToAll(
-                    () -> new MessagePlayOutRemovePotionEffect(getRootEntityId(), potionEffect.getType())));
+                    () -> new PacketPlayOutRemovePotionEffect(getRootEntityId(), potionEffect.getType())));
         }
         this.lastPotionSendTime = time;
         this.lastPotionEffects = potionEffectMap;
     }
 
-    private MessagePlayOutAddPotionEffect createAddMessage(PotionEffect potionEffect) {
-        return new MessagePlayOutAddPotionEffect(getRootEntityId(), potionEffect.getType(), potionEffect.getDuration(),
+    private PacketPlayOutAddPotionEffect createAddMessage(PotionEffect potionEffect) {
+        return new PacketPlayOutAddPotionEffect(getRootEntityId(), potionEffect.getType(), potionEffect.getDuration(),
                 potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.showsParticles());
     }
 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
         if (event instanceof DamagedEntityEvent) {
-            context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 1));
+            context.sendToAll(() -> new PacketPlayOutEntityAnimation(getRootEntityId(), 1));
         } else if (event instanceof SwingHandEntityEvent) {
             final HandType handType = ((SwingHandEntityEvent) event).getHandType();
             if (handType == HandTypes.MAIN_HAND.get()) {
-                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 0));
+                context.sendToAllExceptSelf(() -> new PacketPlayOutEntityAnimation(getRootEntityId(), 0));
             } else if (handType == HandTypes.OFF_HAND.get()) {
-                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 3));
+                context.sendToAllExceptSelf(() -> new PacketPlayOutEntityAnimation(getRootEntityId(), 3));
             } else {
                 super.handleEvent(context, event);
             }

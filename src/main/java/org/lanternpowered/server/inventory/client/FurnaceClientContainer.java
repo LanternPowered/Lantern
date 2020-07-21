@@ -12,9 +12,9 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.type.play.OpenWindowMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetWindowPropertyMessage;
+import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket;
 import org.spongepowered.api.text.Text;
 
 import java.util.List;
@@ -52,15 +52,15 @@ public class FurnaceClientContainer extends ClientContainer {
     }
 
     @Override
-    protected void collectInitMessages(List<Message> messages) {
+    protected void collectInitMessages(List<Packet> packets) {
         final int containerId = getContainerId();
-        messages.add(new SetWindowPropertyMessage(containerId, 1, MAX_PROGRESS_VALUE));
-        messages.add(new SetWindowPropertyMessage(containerId, 3, MAX_PROGRESS_VALUE));
+        packets.add(new SetWindowPropertyPacket(containerId, 1, MAX_PROGRESS_VALUE));
+        packets.add(new SetWindowPropertyPacket(containerId, 3, MAX_PROGRESS_VALUE));
     }
 
     @Override
-    protected Message createInitMessage() {
-        return new OpenWindowMessage(getContainerId(), ClientWindowTypes.FURNACE, getTitle());
+    protected Packet createInitMessage() {
+        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.FURNACE, getTitle());
     }
 
     @Override

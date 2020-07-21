@@ -32,14 +32,14 @@ import org.lanternpowered.server.item.ItemKeys;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.lanternpowered.server.network.vanilla.message.type.play.ClientBlockPlacementMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutFinishUsingItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientBlockPlacementPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutFinishUsingItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerDigging;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerSwingArm;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerUseItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockBreakAnimation;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityAnimation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -163,7 +163,7 @@ public final class PlayerInteractionHandler {
         final Set<LanternPlayer> players = this.player.getWorld().getRawPlayers();
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {
-            final MessagePlayOutBlockBreakAnimation message = new MessagePlayOutBlockBreakAnimation(
+            final PacketPlayOutBlockBreakAnimation message = new PacketPlayOutBlockBreakAnimation(
                     this.diggingBlock, this.player.getNetworkId(), breakState);
             players.forEach(player -> {
                 if (player != this.player) {
@@ -174,15 +174,15 @@ public final class PlayerInteractionHandler {
     }
 
     /**
-     * Handles the {@link MessagePlayInPlayerDigging}.
+     * Handles the {@link PacketPlayInPlayerDigging}.
      *
      * @param message The message
      */
-    public void handleDigging(MessagePlayInPlayerDigging message) {
-        final MessagePlayInPlayerDigging.Action action = message.getAction();
+    public void handleDigging(PacketPlayInPlayerDigging message) {
+        final PacketPlayInPlayerDigging.Action action = message.getAction();
         final Vector3i blockPos = message.getPosition();
 
-        if (action == MessagePlayInPlayerDigging.Action.START) {
+        if (action == PacketPlayInPlayerDigging.Action.START) {
             // Check if the block is within the players reach
             if (this.player.getPosition().distanceSquared(blockPos.toDouble().add(0.5, 2.0, 0.5)) > 6.0 * 6.0) {
                 return;
@@ -206,7 +206,7 @@ public final class PlayerInteractionHandler {
             } else {
                 this.diggingEndTime = this.diggingDuration == -1 ? -1 : System.nanoTime() + this.diggingDuration;
             }
-        } else if (action == MessagePlayInPlayerDigging.Action.CANCEL) {
+        } else if (action == PacketPlayInPlayerDigging.Action.CANCEL) {
             if (this.diggingBlock == null || !this.diggingBlock.equals(blockPos)) {
                 return;
             }
@@ -281,20 +281,20 @@ public final class PlayerInteractionHandler {
                 null, this.player.getItemInHand(HandTypes.MAIN_HAND));
     }
 
-    public void handleBlockPlacing(ClientBlockPlacementMessage message) {
+    public void handleBlockPlacing(ClientBlockPlacementPacket message) {
         handleBlockPlacing0(message);
 
         // Send some updates to the client
         Vector3i position = message.getPosition();
         final World world = this.player.getWorld();
-        this.player.getConnection().send(new MessagePlayOutBlockChange(position,
+        this.player.getConnection().send(new PacketPlayOutBlockChange(position,
                 BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
         position = position.add(message.getFace().asBlockOffset());
-        this.player.getConnection().send(new MessagePlayOutBlockChange(position,
+        this.player.getConnection().send(new PacketPlayOutBlockChange(position,
                 BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
     }
 
-    private void handleBlockPlacing0(ClientBlockPlacementMessage message) {
+    private void handleBlockPlacing0(ClientBlockPlacementPacket message) {
         final HandType handType = message.getHandType();
         // Ignore the off hand interaction type for now, a main hand message
         // will always be send before this message. So we will only listen for
@@ -388,14 +388,14 @@ public final class PlayerInteractionHandler {
         }
     }
 
-    public void handleSwingArm(MessagePlayInPlayerSwingArm message) {
+    public void handleSwingArm(PacketPlayInPlayerSwingArm message) {
         if (message.getHandType() == HandTypes.OFF_HAND) {
             return;
         }
         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
     }
 
-    public void handleFinishItemInteraction(MessagePlayInOutFinishUsingItem message) {
+    public void handleFinishItemInteraction(PacketPlayInOutFinishUsingItem message) {
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND);
         // The player is already interacting
         if (!activeHand.isPresent() || this.activeHandStartTime == -1L) {
@@ -465,7 +465,7 @@ public final class PlayerInteractionHandler {
         resetItemUseTime();
     }
 
-    public void handleItemInteraction(MessagePlayInPlayerUseItem message) {
+    public void handleItemInteraction(PacketPlayInPlayerUseItem message) {
         // Prevent duplicate messages
         final long time = System.currentTimeMillis();
         if (this.lastInteractionTime != -1L && time - this.lastInteractionTime < 40) {
@@ -501,7 +501,7 @@ public final class PlayerInteractionHandler {
                         return;
                     }
                     */
-                        this.player.getConnection().send(new MessagePlayOutEntityAnimation(this.player.getNetworkId(), 3));
+                        this.player.getConnection().send(new PacketPlayOutEntityAnimation(this.player.getNetworkId(), 3));
                         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.OFF_HAND));
                     /*
                     final CooldownTracker cooldownTracker = this.player.getCooldownTracker();

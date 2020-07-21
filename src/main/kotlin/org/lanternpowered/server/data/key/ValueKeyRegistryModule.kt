@@ -33,13 +33,13 @@ object ValueKeyRegistryModule : AdditionalPluginCatalogRegistryModule<Key<*>>(Ke
 
         val valueTypeParameter = Key::class.java.typeParameters[0]
         for (field in Keys::class.java.fields) {
-            val ResourceKey = sponge(field.name.toLowerCase())
+            val resourceKey = sponge(field.name.toLowerCase())
             // Already registered manually
-            if (get(ResourceKey).isPresent) {
+            if (get(resourceKey).isPresent) {
                 continue
             }
             val valueToken = field.genericType.typeToken.resolveType(valueTypeParameter)
-            register(valueKeyOf(ResourceKey, valueToken.uncheckedCast<TypeToken<Value<Any>>>()))
+            register(valueKeyOf(resourceKey, valueToken.uncheckedCast<TypeToken<Value<Any>>>()))
         }
 
         for (field in LanternKeys::class.java.fields) {

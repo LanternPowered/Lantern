@@ -25,17 +25,17 @@ import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerHealthUpdate;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetCameraMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetEntityPassengersMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SetGameModeMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SpawnMobMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.SpawnObjectMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityHeadLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityMetadata;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutPlayerAbilities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutPlayerHealthUpdate;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetCameraPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetEntityPassengersPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetGameModePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnMobPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnObjectPacket;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -110,9 +110,9 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         } else if (type == 101) {
             parameterList.add(EntityParameters.Ageable.IS_BABY, true);
         }
-        context.sendToAll(() -> new SpawnMobMessage(this.passengerStack[index], UUID.randomUUID(), type, getEntity().getPosition(),
+        context.sendToAll(() -> new SpawnMobPacket(this.passengerStack[index], UUID.randomUUID(), type, getEntity().getPosition(),
                 (byte) 0, (byte) 0, (byte) 0, Vector3d.ZERO));
-        context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[index], parameterList));
+        context.sendToAll(() -> new PacketPlayOutEntityMetadata(this.passengerStack[index], parameterList));
     }
 
     private void sendPassengers(EntityProtocolUpdateContext context, int index, int... indexes) {
@@ -120,7 +120,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         for (int i = 0; i < indexes.length; i++) {
             passengers[i] = this.passengerStack[indexes[i]];
         }
-        context.sendToAll(() -> new SetEntityPassengersMessage(this.passengerStack[index], passengers));
+        context.sendToAll(() -> new SetEntityPassengersPacket(this.passengerStack[index], passengers));
     }
 
     private void sendPassengerStack(EntityProtocolUpdateContext context) {
@@ -146,7 +146,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     private void removePassengerStack(EntityProtocolUpdateContext context) {
-        context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.passengerStack));
+        context.sendToAll(() -> new PacketPlayOutDestroyEntities(this.passengerStack));
     }
 
     private void sendHat(EntityProtocolUpdateContext context, TopHat hat) {
@@ -238,10 +238,10 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
-        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillSpawnParameters()));
+        context.sendToSelf(() -> new PacketPlayOutEntityMetadata(getRootEntityId(), fillSpawnParameters()));
         final GameMode gameMode = getEntity().require(Keys.GAME_MODE);
-        context.sendToSelf(() -> new SetGameModeMessage(gameMode));
-        context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(this.entity.get(Keys.IS_FLYING).orElse(false),
+        context.sendToSelf(() -> new SetGameModePacket(gameMode));
+        context.sendToSelf(() -> new PacketPlayOutPlayerAbilities(this.entity.get(Keys.IS_FLYING).orElse(false),
                 canFly(), false, gameMode == GameModes.CREATIVE.get(), getFlySpeed(), getFovModifier()));
 
         @Nullable final TopHat topHat = getTopHat();
@@ -267,9 +267,9 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         if (gameMode != this.lastGameMode || canFly != this.lastCanFly || flySpeed != this.lastFlySpeed
                 || fieldOfView != this.lastFieldOfView || flying != this.lastFlying) {
             if (gameMode != this.lastGameMode) {
-                context.sendToSelf(() -> new SetGameModeMessage(gameMode));
+                context.sendToSelf(() -> new SetGameModePacket(gameMode));
             }
-            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
+            context.sendToSelf(() -> new PacketPlayOutPlayerAbilities(
                     flying, canFly, false, gameMode == GameModes.CREATIVE.get(), flySpeed, fieldOfView));
             this.lastGameMode = gameMode;
             this.lastCanFly = canFly;
@@ -281,7 +281,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final int foodLevel = this.entity.require(Keys.FOOD_LEVEL);
         final float saturation = this.entity.require(Keys.SATURATION).floatValue();
         if (health != this.lastHealth || foodLevel != this.lastFoodLevel || saturation == 0.0f != this.lastHungry) {
-            context.sendToSelf(() -> new MessagePlayOutPlayerHealthUpdate(health, foodLevel, saturation));
+            context.sendToSelf(() -> new PacketPlayOutPlayerHealthUpdate(health, foodLevel, saturation));
             this.lastHealth = health;
             this.lastFoodLevel = foodLevel;
             this.lastHungry = saturation == 0.0f;
@@ -301,20 +301,20 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         }
         if (this.lastYaw0 != this.lastYaw || this.lastPitch0 != this.lastPitch || this.lastFlags0 != this.lastFlags) {
             for (final int id : this.passengerStack) {
-                context.sendToSelf(() -> new MessagePlayOutEntityLook(id, this.lastYaw, this.lastPitch, this.entity.isOnGround()));
+                context.sendToSelf(() -> new PacketPlayOutEntityLook(id, this.lastYaw, this.lastPitch, this.entity.isOnGround()));
             }
             if (this.lastTopHat != null) {
-                context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[10], this.lastYaw));
-                context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[11], this.lastYaw));
-                context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[12], this.lastYaw));
+                context.sendToSelf(() -> new PacketPlayOutEntityHeadLook(this.passengerStack[10], this.lastYaw));
+                context.sendToSelf(() -> new PacketPlayOutEntityHeadLook(this.passengerStack[11], this.lastYaw));
+                context.sendToSelf(() -> new PacketPlayOutEntityHeadLook(this.passengerStack[12], this.lastYaw));
                 // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[13], this.lastYaw));
                 // context.sendToSelf(() -> new MessagePlayOutEntityHeadLook(this.passengerStack[14], this.lastYaw));
                 if (this.lastFlags0 != this.lastFlags) {
                     final boolean glow = (this.lastFlags & 0x40) != 0;
                     final ParameterList parameterList = new DefaultParameterList();
                     parameterList.add(EntityParameters.Base.FLAGS, (byte) (0x20 | (glow ? 0x40 : 0x00)));
-                    context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[10], parameterList));
-                    context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.passengerStack[11], parameterList));
+                    context.sendToAll(() -> new PacketPlayOutEntityMetadata(this.passengerStack[10], parameterList));
+                    context.sendToAll(() -> new PacketPlayOutEntityMetadata(this.passengerStack[11], parameterList));
                 }
             }
             this.lastYaw0 = this.lastYaw;
@@ -326,7 +326,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final boolean elytraSpeedBoost = this.entity.get(LanternKeys.ELYTRA_SPEED_BOOST).orElse(false);
         if (this.lastElytraFlying != elytraFlying || this.lastElytraSpeedBoost != elytraSpeedBoost) {
             if (this.lastElytraFlying && this.lastElytraSpeedBoost) {
-                context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.elytraRocketId));
+                context.sendToAll(() -> new PacketPlayOutDestroyEntities(this.elytraRocketId));
             } else if (elytraFlying && elytraSpeedBoost) {
                 // Create the fireworks data item
                 final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORK_ROCKET.get());
@@ -336,9 +336,9 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
                 parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, OptionalInt.of(getEntity().getNetworkId()));
 
-                context.sendToAll(() -> new SpawnObjectMessage(this.elytraRocketId, UUID.randomUUID(), 76, 0,
+                context.sendToAll(() -> new SpawnObjectPacket(this.elytraRocketId, UUID.randomUUID(), 76, 0,
                         this.entity.getPosition(), 0, 0, Vector3d.ZERO));
-                context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.elytraRocketId, parameterList));
+                context.sendToAll(() -> new PacketPlayOutEntityMetadata(this.elytraRocketId, parameterList));
             }
             this.lastElytraSpeedBoost = elytraSpeedBoost;
             this.lastElytraFlying = elytraFlying;
@@ -350,15 +350,15 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         if (event instanceof SpectateEntityEvent) {
             @Nullable final Entity entity = ((SpectateEntityEvent) event).getSpectatedEntity().orElse(null);
             if (entity == null) {
-                context.sendToSelf(() -> new SetCameraMessage(getRootEntityId()));
+                context.sendToSelf(() -> new SetCameraPacket(getRootEntityId()));
             } else {
-                context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new SetCameraMessage(id)));
+                context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new SetCameraPacket(id)));
             }
         } else if (event instanceof RefreshAbilitiesPlayerEvent) {
             final GameMode gameMode = this.entity.require(Keys.GAME_MODE);
             final float flySpeed = getFlySpeed();
             final float fov = getFovModifier();
-            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(this.entity.get(Keys.IS_FLYING).orElse(false),
+            context.sendToSelf(() -> new PacketPlayOutPlayerAbilities(this.entity.get(Keys.IS_FLYING).orElse(false),
                     canFly(), false, gameMode == GameModes.CREATIVE.get(), flySpeed, fov));
         } else {
             super.handleEvent(context, event);

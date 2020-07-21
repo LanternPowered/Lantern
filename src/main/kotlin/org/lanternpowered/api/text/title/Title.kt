@@ -13,21 +13,28 @@
 
 package org.lanternpowered.api.text.title
 
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.emptyText
+import kotlin.time.Duration
+import kotlin.time.seconds
+import kotlin.time.toJavaDuration
 
-typealias Title = org.spongepowered.api.text.title.Title
-typealias TitleBuilder = org.spongepowered.api.text.title.Title.Builder
+typealias Title = net.kyori.adventure.title.Title
 
 /**
  * Constructs a new [Title].
  *
- * @param fn The builder function
- * @return The constructed title
+ * @param title The title (big)
+ * @param subtitle The subtitle (smaller and below the primary one)
+ * @param fadeIn The fade in duration
+ * @param stay The stay duration
+ * @param fadeOut The fade out duration
+ * @return The title
  */
-inline fun title(fn: TitleBuilder.() -> Unit): Title {
-    contract {
-        callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
-    }
-    return Title.builder().apply(fn).build()
-}
+fun titleOf(
+        title: Text,
+        subtitle: Text = emptyText(),
+        fadeIn: Duration = 1.seconds,
+        stay: Duration = 3.seconds,
+        fadeOut: Duration = 1.seconds
+): Title = Title.of(title, subtitle, fadeIn.toJavaDuration(), stay.toJavaDuration(), fadeOut.toJavaDuration())

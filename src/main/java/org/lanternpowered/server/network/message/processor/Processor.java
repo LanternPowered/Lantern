@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.message.processor;
 
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 
 import java.util.List;
@@ -32,6 +32,6 @@ public interface Processor<M> {
      * @param message the message
      * @param output the output
      */
-    void process(CodecContext context, M message, List<Message> output) throws CodecException;
+    void process(CodecContext context, M message, List<Packet> output) throws CodecException;
 
 }

@@ -34,6 +34,7 @@ import org.spongepowered.api.world.Location;
 import java.util.function.Function;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.world.ServerLocation;
 
 @SuppressWarnings({"ConstantConditions", "unchecked"})
 public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDataHolder {
@@ -41,7 +42,7 @@ public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDat
     private LanternBlockEntityType blockEntityType;
     private final LocalKeyRegistry<? extends LanternBlockEntity> localKeyRegistry = LocalKeyRegistry.of();
 
-    @Nullable private volatile Location location;
+    @Nullable private volatile ServerLocation location;
     @Nullable volatile BlockState blockState;
     private volatile boolean valid;
     @Nullable private BlockEntityProtocolType<?> protocolType;
@@ -110,7 +111,7 @@ public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDat
     }
 
     @Override
-    public Location getLocation() {
+    public ServerLocation getLocation() {
         return requireNonNull(this.location, "The location isn't available.");
     }
 
@@ -149,7 +150,7 @@ public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDat
      *
      * @param location The location
      */
-    public void setLocation(Location location) {
+    public void setLocation(ServerLocation location) {
         this.location = location;
     }
 

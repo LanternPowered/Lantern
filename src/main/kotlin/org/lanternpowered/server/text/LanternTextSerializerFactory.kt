@@ -16,18 +16,15 @@ import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.text.serializer.PlainTextSerializer
 import org.lanternpowered.api.text.serializer.TextSerializerFactory
-import org.spongepowered.api.text.serializer.TextSerializers
 import java.util.concurrent.ConcurrentHashMap
 
-object LanternTextSerializerFactory : TextSerializerFactory, TextSerializers.Factory {
+object LanternTextSerializerFactory : TextSerializerFactory {
 
     private val formattingCodeSerializers = ConcurrentHashMap<Char, FormattingCodeTextSerializer>()
 
     private const val defaultFormattingCode = '&'
     private val defaultFormattingCodeTextSerializer = LanternFormattingCodeTextSerializer(
             ResourceKey.minecraft("formatting_code"), this.defaultFormattingCode)
-
-    override fun createFormattingCodeSerializer(code: Char): FormattingCodeTextSerializer = formatting(code)
 
     override val json: JsonTextSerializer
         get() = TODO("Not yet implemented")

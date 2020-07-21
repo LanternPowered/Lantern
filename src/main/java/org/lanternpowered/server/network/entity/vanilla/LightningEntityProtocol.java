@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.SpawnThunderboltMessage;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnThunderboltPacket;
 
 public class LightningEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 
@@ -24,7 +24,7 @@ public class LightningEntityProtocol<E extends LanternEntity> extends EntityProt
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new SpawnThunderboltMessage(getRootEntityId(), this.entity.getPosition()));
+        context.sendToAllExceptSelf(new SpawnThunderboltPacket(getRootEntityId(), this.entity.getPosition()));
     }
 
     @Override

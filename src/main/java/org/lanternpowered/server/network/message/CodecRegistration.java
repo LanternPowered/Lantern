@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public final class CodecRegistration<M extends Message, C extends Codec<? super M>> {
+public final class CodecRegistration<M extends Packet, C extends Codec<? super M>> {
 
     // The message types that are bound to this codec
     private final Set<Class<? extends M>> boundMessageTypes = new HashSet<>();

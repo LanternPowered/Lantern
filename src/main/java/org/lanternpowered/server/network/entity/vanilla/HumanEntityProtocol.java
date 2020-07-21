@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
@@ -34,12 +34,12 @@ public class HumanEntityProtocol extends HumanoidEntityProtocol<LanternEntity> {
 
     private void spawn(EntityProtocolUpdateContext context, String name) {
         final LanternGameProfile gameProfile = new LanternGameProfile(this.entity.getUniqueId(), name);
-        final MessagePlayOutTabListEntries.Entry.Add addEntry = new MessagePlayOutTabListEntries.Entry.Add(
+        final PacketPlayOutTabListEntries.Entry.Add addEntry = new PacketPlayOutTabListEntries.Entry.Add(
                 gameProfile, GameModes.SURVIVAL, null, 0);
-        context.sendToAllExceptSelf(() -> new MessagePlayOutTabListEntries(Collections.singleton(addEntry)));
+        context.sendToAllExceptSelf(() -> new PacketPlayOutTabListEntries(Collections.singleton(addEntry)));
         super.spawn(context);
-        final MessagePlayOutTabListEntries.Entry.Remove removeEntry = new MessagePlayOutTabListEntries.Entry.Remove(gameProfile);
-        context.sendToAllExceptSelf(() -> new MessagePlayOutTabListEntries(Collections.singleton(removeEntry)));
+        final PacketPlayOutTabListEntries.Entry.Remove removeEntry = new PacketPlayOutTabListEntries.Entry.Remove(gameProfile);
+        context.sendToAllExceptSelf(() -> new PacketPlayOutTabListEntries(Collections.singleton(removeEntry)));
     }
 
     @Override

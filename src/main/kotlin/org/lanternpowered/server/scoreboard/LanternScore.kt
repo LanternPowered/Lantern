@@ -13,8 +13,8 @@ package org.lanternpowered.server.scoreboard
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.server.network.message.Message
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore
+import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.objective.Objective
@@ -41,11 +41,11 @@ class LanternScore(private val name: Text) : Score {
             }
         }
         if (!scoreboards.isEmpty) {
-            val messages = mutableMapOf<Objective, Message>()
+            val messages = mutableMapOf<Objective, Packet>()
             for ((key, value) in scoreboards.entries()) {
                 (key as LanternScoreboard).sendToPlayers {
                     listOf(messages.computeIfAbsent(value) { obj: Objective ->
-                        MessagePlayOutScoreboardScore.CreateOrUpdate(obj.name, this.name, score)
+                        PacketPlayOutScoreboardScore.CreateOrUpdate(obj.name, this.name, score)
                     })
                 }
             }

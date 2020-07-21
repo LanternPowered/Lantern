@@ -12,8 +12,8 @@ package org.lanternpowered.server.timings
 
 import co.aikar.timings.Timing
 import co.aikar.timings.TimingsFactory
-import org.spongepowered.plugin.PluginContainer
-import org.spongepowered.api.text.channel.MessageChannel
+import org.lanternpowered.api.audience.Audience
+import org.lanternpowered.api.plugin.PluginContainer
 
 object DummyTimingsFactory : TimingsFactory {
     override fun of(plugin: PluginContainer, name: String, groupHandler: Timing?): Timing = DummyTiming
@@ -26,5 +26,5 @@ object DummyTimingsFactory : TimingsFactory {
     override fun getHistoryLength(): Int = 0
     override fun setHistoryLength(length: Int) {}
     override fun reset() {}
-    override fun generateReport(channel: MessageChannel) {}
+    override fun generateReport(channel: Audience) {}
 }

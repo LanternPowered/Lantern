@@ -15,7 +15,6 @@ import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.lanternpowered.api.util.type.typeTokenOf
-import org.lanternpowered.server.text.LanternTextTemplate
 import org.spongepowered.api.text.LiteralText
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.TextTemplate

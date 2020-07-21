@@ -14,9 +14,9 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.Packet;
 
-public interface Codec<M extends Message> {
+public interface Codec<M extends Packet> {
 
     /**
      * Encodes the message into a byte buffer.

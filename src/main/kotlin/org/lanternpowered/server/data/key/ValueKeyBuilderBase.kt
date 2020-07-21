@@ -11,10 +11,9 @@
 package org.lanternpowered.server.data.key
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.registry.BaseBuilder
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.lanternpowered.server.data.value.CopyHelper
 import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.ListValue
@@ -22,7 +21,6 @@ import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.WeightedCollectionValue
 import org.spongepowered.api.util.weighted.WeightedTable
-import java.lang.Class
 import java.util.ArrayList
 import java.util.HashSet
 import java.util.function.BiPredicate
@@ -31,8 +29,6 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
 
     private var valueType: TypeToken<V>? = null
 
-    private var minValueSupplier: (() -> E)? = null
-    private var maxValueSupplier: (() -> E)? = null
     private var comparator: (Comparator<in E>)? = null
     private var includesTester: BiPredicate<in E, in E>? = null
 
@@ -43,12 +39,6 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
     }
 
     override fun key(key: ResourceKey): B = apply { super.key(key) }.uncheckedCast()
-
-    protected fun setMinValue(minValue: E) = setMinValueSupplier { CopyHelper.copy(minValue) }
-    protected fun setMinValueSupplier(supplier: () -> E) { this.minValueSupplier = supplier }
-
-    protected fun setMaxValue(maxValue: E) = setMaxValueSupplier { CopyHelper.copy(maxValue) }
-    protected fun setMaxValueSupplier(supplier: () -> E) { this.maxValueSupplier = supplier }
 
     protected fun setComparator(comparator: Comparator<in E>) { this.comparator = comparator }
     protected fun setIncludesTester(includesTester: BiPredicate<in E, in E>?) { this.includesTester = includesTester }
@@ -90,8 +80,6 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
         super.reset()
 
         this.valueType = null
-        this.minValueSupplier = null
-        this.maxValueSupplier = null
         this.comparator = null
         this.requiresExplicitRegistration = false
     }.uncheckedCast()

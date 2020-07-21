@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.entity.living.player.tab;
 
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
@@ -68,8 +68,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.Remove(this.gameProfile)));
+        PacketPlayOutTabListEntries message = new PacketPlayOutTabListEntries(Collections.singletonList(
+                new PacketPlayOutTabListEntries.Entry.Remove(this.gameProfile)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.getList().removeRawEntry(this.gameProfile.getUniqueId());
             tabListEntry.getList().getPlayer().getConnection().send(message);
@@ -82,8 +82,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.gameProfile, displayName)));
+        PacketPlayOutTabListEntries message = new PacketPlayOutTabListEntries(Collections.singletonList(
+                new PacketPlayOutTabListEntries.Entry.UpdateDisplayName(this.gameProfile, displayName)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.setRawDisplayName(displayName);
             tabListEntry.getList().getPlayer().getConnection().send(message);
@@ -94,8 +94,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateLatency(this.gameProfile, latency)));
+        PacketPlayOutTabListEntries message = new PacketPlayOutTabListEntries(Collections.singletonList(
+                new PacketPlayOutTabListEntries.Entry.UpdateLatency(this.gameProfile, latency)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.setRawLatency(latency);
             tabListEntry.getList().getPlayer().getConnection().send(message);
@@ -106,8 +106,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateGameMode(this.gameProfile, gameMode)));
+        PacketPlayOutTabListEntries message = new PacketPlayOutTabListEntries(Collections.singletonList(
+                new PacketPlayOutTabListEntries.Entry.UpdateGameMode(this.gameProfile, gameMode)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.setRawGameMode(gameMode);
             tabListEntry.getList().getPlayer().getConnection().send(message);

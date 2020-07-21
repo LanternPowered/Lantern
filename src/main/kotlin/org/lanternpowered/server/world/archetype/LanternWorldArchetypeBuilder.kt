@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.server.world.archetype
 
-import org.lanternpowered.api.text.translation.FixedTranslation
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.world.LanternWorldProperties
 import org.lanternpowered.server.world.dimension.LanternDimensionType
@@ -131,8 +130,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     }
 
     override fun build(key: ResourceKey): WorldArchetype {
-        val name = FixedTranslation(key.value)
-        return LanternWorldArchetype(key, name,
+        return LanternWorldArchetype(key,
                 allowPlayerRespawns = this.allowPlayerRespawns,
                 buildHeight = this.buildHeight,
                 commandsEnabled = this.commandEnabled,

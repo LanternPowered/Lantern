@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.service.world
 
+import org.lanternpowered.api.ResourceKey
 import java.nio.file.Path
 import java.util.UUID
 
@@ -52,37 +53,37 @@ interface WorldStorageService {
     operator fun get(uniqueId: UUID): WorldStorage?
 
     /**
-     * Gets a data provider by the given world directory name.
+     * Gets a data provider by the given world key.
      *
-     * @param directoryName The directory name
+     * @param key The key
      * @return The data provider, or null if the world doesn't exist
      */
-    fun getByName(directoryName: String): WorldStorage?
+    fun getByKey(key: ResourceKey): WorldStorage?
 
     /**
-     * Creates a new world for the given world directory name and [UUID]. The created
+     * Creates a new world for the given world key and [UUID]. The created
      * provider will be returned if it was successful.
      *
-     * @param directoryName The directory name
+     * @param key The key
      * @param uniqueId The unique id to use for the world
      */
-    fun create(directoryName: String, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
+    fun create(key: ResourceKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
      *
-     * @param sourceName The source directory name
-     * @param copyName The copy or destination directory name
+     * @param sourceKey The source key
+     * @param copyKey The copy or destination key
      * @return The provider of the new copy
      */
-    fun copy(sourceName: String, copyName: String, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
+    fun copy(sourceKey: ResourceKey, copyKey: ResourceKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
      *
-     * @param oldName The old directory name
-     * @param newName The new directory name
+     * @param oldKey The old key
+     * @param newKey The new key
      * @return The provider of the new copy
      */
-    fun move(oldName: String, newName: String): WorldStorage?
+    fun move(oldKey: ResourceKey, newKey: ResourceKey): WorldStorage?
 }

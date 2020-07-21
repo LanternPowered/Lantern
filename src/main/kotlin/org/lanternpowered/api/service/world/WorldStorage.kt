@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.service.world
 
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataView
 import org.lanternpowered.api.util.Identifiable
@@ -34,9 +35,9 @@ interface WorldStorage : Identifiable {
     val directory: Path
 
     /**
-     * The name of the directory.
+     * The key.
      */
-    val directoryName: String
+    val key: ResourceKey
 
     /**
      * The chunk storage.

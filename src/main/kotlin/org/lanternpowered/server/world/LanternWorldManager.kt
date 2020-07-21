@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.world
 
+import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.resourceKeyOf
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList
@@ -21,7 +23,6 @@ import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.util.SyncLanternThread
-import java.nio.file.Path
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -64,9 +65,9 @@ class LanternWorldManager(
         @Volatile var world: LanternWorldNew? = null
     }
 
-    private val registrations = linkedMapOf<String, WorldArchetype>()
+    private val registrations = linkedMapOf<ResourceKey, WorldArchetype>()
 
-    private val entryByDirectory = ConcurrentHashMap<String, WorldEntry>()
+    private val entryByKey = ConcurrentHashMap<ResourceKey, WorldEntry>()
     private val entryByUniqueId = ConcurrentHashMap<UUID, WorldEntry>()
     private val modifyLock = Any()
 
@@ -75,9 +76,11 @@ class LanternWorldManager(
         this.worldStorageService.onRemove += this::onRemove
     }
 
-    override fun getSavesDirectory(): Path = this.worldStorageService.directory
-    override fun getDefaultPropertiesName(): String = this.registrations.entries.firstOrNull()?.key ?: "unknown"
-    override fun getDefaultProperties(): Optional<WorldProperties> = this.entryByDirectory[this.defaultPropertiesName]?.properties.optional()
+    override fun getDefaultPropertiesKey(): ResourceKey =
+            this.registrations.entries.firstOrNull()?.key ?: resourceKeyOf("lantern", "unknown")
+
+    override fun getDefaultProperties(): Optional<WorldProperties> =
+            this.entryByKey[this.defaultPropertiesKey]?.properties.optional()
 
     private fun onDiscover(storage: WorldStorage) {
         // Just load the new entry
@@ -88,15 +91,16 @@ class LanternWorldManager(
         // The world directory was removed, this shouldn't
         // happen to loaded worlds
         synchronized(this.modifyLock) {
-            val entry = this.entryByDirectory.remove(storage.directoryName) ?: return
+            val entry = this.entryByKey.remove(storage.key) ?: return
             this.entryByUniqueId.remove(storage.uniqueId)
             if (entry.world != null) {
                 // The world was currently loaded?
-                throw IllegalStateException("A loaded world got removed: ${storage.directoryName}")
+                throw IllegalStateException("A loaded world got removed: ${storage.key}")
             }
         }
     }
 
+    /*
     override fun submitRegistration(directoryName: String, archetype: WorldArchetype): Boolean {
         // TODO: Move to event
         @Suppress("NAME_SHADOWING")
@@ -106,28 +110,31 @@ class LanternWorldManager(
         this.registrations[directoryName] = archetype
         return true
     }
+    */
 
-    override fun copyWorld(directoryName: String, copyName: String): CompletableFuture<Optional<WorldProperties>> =
-            CompletableFuture.supplyAsync(Supplier { copyWorld0(directoryName, copyName) }, this.ioExecutor)
+    override fun copyWorld(sourceKey: ResourceKey, copyValue: String): CompletableFuture<Optional<WorldProperties>> =
+            CompletableFuture.supplyAsync(Supplier { copyWorld0(sourceKey, copyValue) }, this.ioExecutor)
 
-    private fun copyWorld0(directoryName: String, copyName: String): Optional<WorldProperties> {
+    private fun copyWorld0(sourceKey: ResourceKey, copyValue: String): Optional<WorldProperties> {
+        val copyKey = resourceKeyOf(sourceKey.namespace, copyValue)
         // The copy directory is already in use
-        if (this.entryByDirectory.contains(copyName))
+        if (this.entryByKey.contains(copyKey))
             return emptyOptional()
-        val sourceEntry = this.entryByDirectory[directoryName]
+        val sourceEntry = this.entryByKey[sourceKey]
                 ?: return emptyOptional() // The target world doesn't exist
-        val newStorage = this.worldStorageService.copy(directoryName, copyName)
+        val newStorage = this.worldStorageService.copy(sourceKey, copyKey)
                 ?: return emptyOptional() // Copying the world failed for some reason
         // TODO: Disable saving for the source world, if it's loaded
         val newEntry = loadEntry(newStorage)
         return newEntry.properties.optional()
     }
 
-    override fun renameWorld(oldDirectoryName: String, newDirectoryName: String): CompletableFuture<Optional<WorldProperties>> =
-            CompletableFuture.supplyAsync(Supplier { renameWorld0(oldDirectoryName, newDirectoryName) }, this.ioExecutor)
+    override fun renameWorld(oldKey: ResourceKey, newValue: String): CompletableFuture<Optional<WorldProperties>> =
+            CompletableFuture.supplyAsync(Supplier { renameWorld0(oldKey, newValue) }, this.ioExecutor)
 
-    private fun renameWorld0(oldDirectoryName: String, newDirectoryName: String): Optional<WorldProperties> {
-        val entry = this.entryByDirectory[oldDirectoryName] ?: return emptyOptional()
+    private fun renameWorld0(oldKey: ResourceKey, newValue: String): Optional<WorldProperties> {
+        val newKey = resourceKeyOf(oldKey.namespace, newValue)
+        val entry = this.entryByKey[oldKey] ?: return emptyOptional()
         entry.modifyLock.withLock {
             // The world is currently loaded
             if (entry.world != null) {
@@ -136,7 +143,7 @@ class LanternWorldManager(
                 if (!unloadWorld(entry))
                     return emptyOptional()
             }
-            val newStorage = this.worldStorageService.move(oldDirectoryName, newDirectoryName)
+            val newStorage = this.worldStorageService.move(oldKey, newKey)
                     ?: return emptyOptional() // Moving failed
             val newEntry = loadEntry(newStorage)
             return newEntry.properties.optional()
@@ -145,10 +152,10 @@ class LanternWorldManager(
 
     private fun loadEntry(storage: WorldStorage): WorldEntry {
         val data = storage.load()
-        val properties = WorldPropertiesSerializer.deserialize(storage.directoryName, data)
+        val properties = WorldPropertiesSerializer.deserialize(storage.key, data)
         val entry = WorldEntry(storage, properties)
         synchronized(this.modifyLock) {
-            var previous = this.entryByDirectory.putIfAbsent(storage.directoryName, entry)
+            var previous = this.entryByKey.putIfAbsent(storage.key, entry)
             // The entry was already loaded
             if (previous != null)
                 return previous
@@ -165,11 +172,11 @@ class LanternWorldManager(
         return entry
     }
 
-    override fun deleteWorld(directoryName: String): CompletableFuture<Boolean> =
-            CompletableFuture.supplyAsync(Supplier { deleteWorld0(directoryName) }, this.ioExecutor)
+    override fun deleteWorld(key: ResourceKey): CompletableFuture<Boolean> =
+            CompletableFuture.supplyAsync(Supplier { deleteWorld0(key) }, this.ioExecutor)
 
-    private fun deleteWorld0(directoryName: String): Boolean {
-        val entry = this.entryByDirectory[directoryName]
+    private fun deleteWorld0(key: ResourceKey): Boolean {
+        val entry = this.entryByKey[key]
                 ?: return false
         entry.modifyLock.withLock {
             // The world is currently loaded, so it can't be removed
@@ -179,11 +186,11 @@ class LanternWorldManager(
         }
     }
 
-    override fun loadWorld(directoryName: String): CompletableFuture<Optional<World>> =
-            CompletableFuture.supplyAsync(Supplier { loadWorld0(directoryName).optional() }, this.ioExecutor)
+    override fun loadWorld(key: ResourceKey): CompletableFuture<Optional<World>> =
+            CompletableFuture.supplyAsync(Supplier { loadWorld0(key).optional() }, this.ioExecutor)
 
-    private fun loadWorld0(directoryName: String): World? {
-        val entry = this.entryByDirectory[directoryName]
+    private fun loadWorld0(key: ResourceKey): World? {
+        val entry = this.entryByKey[key]
                 ?: return null
         return loadWorld(entry)
     }
@@ -235,18 +242,18 @@ class LanternWorldManager(
         }
     }
 
-    override fun createProperties(directoryName: String, archetype: WorldArchetype): CompletableFuture<Optional<WorldProperties>> =
-            CompletableFuture.supplyAsync(Supplier { createProperties0(directoryName, archetype) }, this.ioExecutor)
+    override fun createProperties(key: ResourceKey, archetype: WorldArchetype): CompletableFuture<Optional<WorldProperties>> =
+            CompletableFuture.supplyAsync(Supplier { createProperties0(key, archetype) }, this.ioExecutor)
 
-    private fun createProperties0(directoryName: String, archetype: WorldArchetype): Optional<WorldProperties> {
-        if (this.entryByDirectory.containsKey(directoryName))
+    private fun createProperties0(key: ResourceKey, archetype: WorldArchetype): Optional<WorldProperties> {
+        if (this.entryByKey.containsKey(key))
             return emptyOptional()
-        val storage = this.worldStorageService.create(directoryName)
+        val storage = this.worldStorageService.create(key)
                 ?: return emptyOptional() // The construction failed
-        val properties = LanternWorldProperties(directoryName, UUID.randomUUID())
+        val properties = LanternWorldProperties(key, UUID.randomUUID())
         val entry = WorldEntry(storage, properties)
         entry.modifyLock.withLock {
-            val previous = this.entryByDirectory.putIfAbsent(storage.directoryName, entry)
+            val previous = this.entryByKey.putIfAbsent(storage.key, entry)
             // Someone beat us to it
             if (previous != null)
                 return emptyOptional()
@@ -274,39 +281,39 @@ class LanternWorldManager(
     }
 
     override fun getAllProperties(): Collection<WorldProperties> =
-            this.entryByDirectory.values.asSequence()
+            this.entryByKey.values.asSequence()
                     .map { it.properties }
                     .toImmutableList()
 
     override fun getUnloadedProperties(): Collection<WorldProperties> =
-            this.entryByDirectory.values.asSequence()
+            this.entryByKey.values.asSequence()
                     .filter { it.world == null }
                     .map { it.properties }
                     .toImmutableList()
 
-    override fun getProperties(directoryName: String): Optional<WorldProperties> =
-            this.entryByDirectory[directoryName.toLowerCase()]?.properties.optional()
+    override fun getProperties(key: ResourceKey): Optional<WorldProperties> =
+            this.entryByKey[key]?.properties.optional()
 
-    override fun getProperties(uniqueId: UUID): Optional<WorldProperties> =
+    fun getProperties(uniqueId: UUID): Optional<WorldProperties> =
             this.entryByUniqueId[uniqueId]?.properties.optional()
 
     override fun getWorlds(): Collection<World> =
-            this.entryByDirectory.values.asSequence()
+            this.entryByKey.values.asSequence()
                     .map { it.world }
                     .filterNotNull()
                     .toImmutableList()
 
-    override fun getWorld(directoryName: String): Optional<World> =
-            this.entryByDirectory[directoryName.toLowerCase()]?.world.optional()
+    override fun getWorld(key: ResourceKey): Optional<World> =
+            this.entryByKey[key]?.world.optional()
 
-    override fun getWorld(uniqueId: UUID): Optional<World> =
+    fun getWorld(uniqueId: UUID): Optional<World> =
             this.entryByUniqueId[uniqueId]?.world.optional()
 
     /**
      * Runs all the world updates.
      */
     fun update() {
-        val entries = this.entryByDirectory.values.toList()
+        val entries = this.entryByKey.values.toList()
                 .filter { it.world != null }
         val locked = mutableListOf<WorldEntry>()
         try {

@@ -10,12 +10,13 @@
  */
 package org.lanternpowered.server.world
 
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataView
 
 object WorldPropertiesSerializer {
 
-    fun deserialize(directoryName: String, data: DataView): LanternWorldProperties {
+    fun deserialize(key: ResourceKey, data: DataView): LanternWorldProperties {
         TODO()
     }
 

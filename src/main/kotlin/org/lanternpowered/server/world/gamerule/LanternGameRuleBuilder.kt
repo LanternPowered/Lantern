@@ -30,7 +30,7 @@ class LanternGameRuleBuilder<V : Any> : AbstractNamedCatalogBuilder<GameRule<V>,
         this.defaultValue = defaultValue
     }
 
-    override fun build(key: ResourceKey, name: Translation): GameRule<V> {
+    override fun build(key: ResourceKey, name: String): GameRule<V> {
         val valueType = checkNotNull(this.valueType) { "The value type must be set." }
         val defaultValue = checkNotNull(this.defaultValue) { "The default value must be set." }
         return LanternGameRule(key, name, valueType, defaultValue)

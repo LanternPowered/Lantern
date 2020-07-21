@@ -11,7 +11,6 @@
 package org.lanternpowered.server.world.archetype
 
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
@@ -25,7 +24,6 @@ import org.spongepowered.api.world.gen.GeneratorType
 
 internal data class LanternWorldArchetype(
         private val key: ResourceKey,
-        private val name: Translation,
         private val gameMode: GameMode,
         private val dimensionType: LanternDimensionType<*>,
         private val generatorType: GeneratorType?,
@@ -46,7 +44,7 @@ internal data class LanternWorldArchetype(
         internal val waterEvaporates: Boolean?,
         internal val allowPlayerRespawns: Boolean?,
         val buildHeight: Int
-) : CatalogType by DefaultCatalogType.Named(key, name), WorldArchetype {
+) : CatalogType by DefaultCatalogType(key), WorldArchetype {
 
     override fun getDifficulty(): Difficulty = this.difficulty
     override fun isEnabled(): Boolean = this.enabled

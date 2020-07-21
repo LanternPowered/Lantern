@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.service.world
 
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataQuery
 import org.lanternpowered.api.data.persistence.DataView
@@ -38,6 +39,7 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 class LanternWorldStorage(
+        override val key: ResourceKey,
         @Volatile private var uniqueId: UUID,
         override val directory: Path
 ) : WorldStorage {
@@ -46,9 +48,6 @@ class LanternWorldStorage(
     private val lock = ReentrantReadWriteLock()
 
     override fun getUniqueId(): UUID = this.uniqueId
-
-    override val directoryName: String
-        get() = this.directory.fileName.toString()
 
     private val dataDirectory: Path = this.directory.resolve(DATA_DIRECTORY_NAME)
 

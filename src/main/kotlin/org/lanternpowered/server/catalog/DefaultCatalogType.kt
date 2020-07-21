@@ -12,7 +12,6 @@ package org.lanternpowered.server.catalog
 
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.ResourceKeys
-import org.lanternpowered.api.text.translation.Translation
 import org.spongepowered.api.NamedCatalogType
 
 open class DefaultCatalogType(key: ResourceKey) : AbstractCatalogType() {
@@ -44,7 +43,6 @@ open class DefaultCatalogType(key: ResourceKey) : AbstractCatalogType() {
 
     open class Named(key: ResourceKey, name: () -> String) : DefaultCatalogType(key), NamedCatalogType {
 
-        constructor(key: ResourceKey, name: Translation): this(key, name::get)
         constructor(key: ResourceKey, name: String): this(key, { name })
 
         private val theName: String by lazy(name)

@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.service.world
 
+import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList
@@ -29,15 +30,18 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * The directory structure will be the following for example:
  *  /worlds
- *     /config.json     -- The global configuration related to worlds
- *     /overworld
- *        /config.json  -- The configuration of a specific world
- *        /data         -- The world data, compatible with sponge and vanilla worlds
- *           /region
- *           /level.dat
- *           /sponge_level.dat
- *     /the_end
- *     /the_nether
+ *     /config.json        -- The global configuration related to worlds
+ *     /minecraft          -- A directory containing all the default worlds created by "minecraft"
+ *        /overworld
+ *           /config.json  -- The configuration of a specific world
+ *           /data         -- The world data, compatible with sponge and vanilla worlds
+ *              /region
+ *              /level.dat
+ *              /sponge_level.dat
+ *        /the_end
+ *        /the_nether
+ *     /myplugin           -- A directory containing all the worlds created by "myplugin"
+ *        /myworld
  *
  * @property directory The directory where all the worlds will be stored
  */
@@ -46,7 +50,7 @@ class DefaultWorldStorageService(
 ) : WorldStorageService, Closeable {
 
     private val knownStoragesByUniqueId = ConcurrentHashMap<UUID, LanternWorldStorage>()
-    private val knownStoragesByDirectory = ConcurrentHashMap<String, LanternWorldStorage>()
+    private val knownStoragesByKey = ConcurrentHashMap<ResourceKey, LanternWorldStorage>()
 
     private val modifyLock = Any()
 
@@ -98,42 +102,42 @@ class DefaultWorldStorageService(
     override fun get(uniqueId: UUID): WorldStorage? =
             this.knownStoragesByUniqueId[uniqueId]
 
-    override fun getByName(directoryName: String): WorldStorage? =
-            this.knownStoragesByDirectory[directoryName]
+    override fun getByKey(key: ResourceKey): WorldStorage? =
+            this.knownStoragesByKey[key]
 
-    override fun create(directoryName: String, uniqueId: UUID): WorldStorage? {
+    override fun create(key: ResourceKey, uniqueId: UUID): WorldStorage? {
         synchronized(this.modifyLock) {
-            if (this.knownStoragesByDirectory.containsKey(directoryName) ||
+            if (this.knownStoragesByKey.containsKey(key) ||
                     this.knownStoragesByUniqueId.containsKey(uniqueId))
                 return null
 
-            val worldDirectory = this.directory.resolve(directoryName)
+            val worldDirectory = this.directory.resolve(key.namespace).resolve(key.value)
             if (Files.exists(worldDirectory) && Files.list(worldDirectory).count() > 0)
                 return null
 
             Files.createDirectories(worldDirectory)
-            val worldStorage = LanternWorldStorage(uniqueId, worldDirectory)
+            val worldStorage = LanternWorldStorage(key, uniqueId, worldDirectory)
 
-            this.knownStoragesByDirectory[directoryName] = worldStorage
+            this.knownStoragesByKey[key] = worldStorage
             this.knownStoragesByUniqueId[uniqueId] = worldStorage
 
             return worldStorage
         }
     }
 
-    override fun copy(sourceName: String, copyName: String, uniqueId: UUID): WorldStorage? {
+    override fun copy(sourceKey: ResourceKey, copyKey: ResourceKey, uniqueId: UUID): WorldStorage? {
         TODO("Not yet implemented")
     }
 
-    override fun move(oldName: String, newName: String): WorldStorage? {
+    override fun move(oldKey: ResourceKey, newKey: ResourceKey): WorldStorage? {
         TODO("Not yet implemented")
     }
 
     override fun close() {
         synchronized(this.modifyLock) {
-            for (storage in this.knownStoragesByDirectory.values)
+            for (storage in this.knownStoragesByKey.values)
                 storage.close()
-            this.knownStoragesByDirectory.clear()
+            this.knownStoragesByKey.clear()
             this.knownStoragesByUniqueId.clear()
         }
     }

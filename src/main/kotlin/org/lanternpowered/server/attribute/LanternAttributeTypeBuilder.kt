@@ -12,10 +12,10 @@ package org.lanternpowered.server.attribute
 
 import org.lanternpowered.api.attribute.AttributeType
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.DataHolder
-import org.spongepowered.api.text.Text
 
 class LanternAttributeTypeBuilder : AbstractCatalogBuilder<AttributeType, AttributeTypeBuilder>(), AttributeTypeBuilder {
 

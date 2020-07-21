@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type
 
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 
 /**
  * Send between the client and server to keep the connection

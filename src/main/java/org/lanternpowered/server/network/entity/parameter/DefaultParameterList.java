@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.entity.parameter;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 
 import java.util.HashMap;
 import java.util.Map;

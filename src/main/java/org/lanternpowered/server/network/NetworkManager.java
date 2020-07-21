@@ -23,8 +23,8 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.LanternServerNew;
 import org.lanternpowered.server.network.buffer.LanternByteBufferAllocator;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.SimpleCodecContext;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.SimpleCodecContext;
 import org.lanternpowered.server.network.pipeline.LegacyProtocolHandler;
 import org.lanternpowered.server.network.pipeline.MessageCodecHandler;
 import org.lanternpowered.server.network.pipeline.MessageFramingHandler;
@@ -35,7 +35,6 @@ import org.lanternpowered.server.util.ThreadHelper;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

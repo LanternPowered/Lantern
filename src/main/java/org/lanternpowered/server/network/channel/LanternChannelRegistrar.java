@@ -23,7 +23,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutUnregisterChannels;

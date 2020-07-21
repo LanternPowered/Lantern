@@ -10,23 +10,24 @@
  */
 package org.lanternpowered.server.scoreboard
 
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.format.NamedTextColor
+import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.optional
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams.AddMembers
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams.RemoveMembers
+import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket.AddMembers
+import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket.RemoveMembers
 import org.spongepowered.api.scoreboard.CollisionRule
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.scoreboard.Visibility
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColor
 import java.util.Optional
 
 class LanternTeam internal constructor(
         private val name: String,
-        private var color: TextColor,
+        private var color: NamedTextColor,
         private var displayName: Text,
         private var prefix: Text,
         private var suffix: Text,
@@ -44,12 +45,12 @@ class LanternTeam internal constructor(
         this.scoreboard = scoreboard
     }
 
-    fun toCreateMessage(): PacketPlayOutTeams.CreateOrUpdate =
-            PacketPlayOutTeams.Create(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
+    fun toCreateMessage(): TeamPacket.CreateOrUpdate =
+            TeamPacket.Create(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
                     this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles, this.members.toImmutableList())
 
-    private fun toUpdateMessage(): PacketPlayOutTeams.CreateOrUpdate =
-            PacketPlayOutTeams.Update(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
+    private fun toUpdateMessage(): TeamPacket.CreateOrUpdate =
+            TeamPacket.Update(this.name, this.displayName, this.prefix, this.suffix, this.nameTagVisibility,
                     this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles)
 
     private fun sendUpdate() {
@@ -58,7 +59,7 @@ class LanternTeam internal constructor(
 
     override fun getName(): String = this.name
     override fun getDisplayName(): Text = this.displayName
-    override fun getColor(): TextColor = this.color
+    override fun getColor(): NamedTextColor = this.color
     override fun getPrefix(): Text = this.prefix
     override fun getSuffix(): Text = this.suffix
     override fun getCollisionRule(): CollisionRule = this.collisionRule
@@ -79,7 +80,7 @@ class LanternTeam internal constructor(
             sendUpdate()
     }
 
-    override fun setColor(color: TextColor) {
+    override fun setColor(color: NamedTextColor) {
         val update = color != this.color
         this.color = color
         if (update)
@@ -127,9 +128,7 @@ class LanternTeam internal constructor(
             sendUpdate()
     }
 
-    override fun getDeathMessageVisibility(): Visibility {
-        return deathMessageVisibility
-    }
+    override fun getDeathMessageVisibility(): Visibility = this.deathMessageVisibility
 
     override fun setDeathMessageVisibility(visibility: Visibility) {
         val update = visibility != this.deathMessageVisibility
@@ -192,7 +191,7 @@ class LanternTeam internal constructor(
     override fun unregister(): Boolean {
         val scoreboard = this.scoreboard ?: return false
         scoreboard.removeTeam(this)
-        scoreboard.sendToPlayers { listOf(PacketPlayOutTeams.Remove(name)) }
+        scoreboard.sendToPlayers { listOf(TeamPacket.Remove(name)) }
         this.scoreboard = null
         return true
     }

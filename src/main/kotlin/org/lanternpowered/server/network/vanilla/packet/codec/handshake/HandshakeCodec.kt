@@ -13,8 +13,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.handshake
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.ProxyType
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.message.codec.Codec
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.handshake.HandshakePacket
 
 class HandshakeCodec : Codec<HandshakePacket> {

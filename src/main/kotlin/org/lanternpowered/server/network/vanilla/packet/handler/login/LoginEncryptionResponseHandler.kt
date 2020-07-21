@@ -19,7 +19,7 @@ import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginEncryptionResponsePacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket

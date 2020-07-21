@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.api.util.VariableValueArray
 import org.spongepowered.api.data.persistence.DataView
 

@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.handler.login
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler
 import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket

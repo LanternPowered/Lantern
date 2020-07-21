@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.type.login
 
 import io.netty.util.ReferenceCounted
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 
 /**
  * A login channel response [Packet] is send by the client after a

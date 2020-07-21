@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play;
 
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 
 public final class PacketPlayOutEntityMetadata implements Packet {
 

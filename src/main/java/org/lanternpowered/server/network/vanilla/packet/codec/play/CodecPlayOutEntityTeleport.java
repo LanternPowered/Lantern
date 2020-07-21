@@ -12,20 +12,20 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityTeleport;
 
 public final class CodecPlayOutEntityTeleport implements Codec<PacketPlayOutEntityTeleport> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityTeleport message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityTeleport packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(message.getEntityId());
-        buf.writeVector3d(message.getPosition());
-        buf.writeByte(message.getYaw());
-        buf.writeByte(message.getPitch());
-        buf.writeBoolean(message.isOnGround());
+        buf.writeVarInt(packet.getEntityId());
+        buf.writeVector3d(packet.getPosition());
+        buf.writeByte(packet.getYaw());
+        buf.writeByte(packet.getPitch());
+        buf.writeBoolean(packet.isOnGround());
         return buf;
     }
 }

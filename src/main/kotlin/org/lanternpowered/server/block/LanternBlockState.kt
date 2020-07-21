@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.block
 
+import org.lanternpowered.api.world.Location
 import org.lanternpowered.server.registry.type.block.BlockRegistry
 import org.lanternpowered.server.state.AbstractState
 import org.lanternpowered.server.state.AbstractStateContainer
@@ -24,7 +25,6 @@ import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.fluid.FluidState
 import org.spongepowered.api.util.Direction
-import org.spongepowered.api.world.Location
 import java.util.Optional
 
 class LanternBlockState(

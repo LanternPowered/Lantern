@@ -13,8 +13,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTitle;
 
 public final class CodecPlayOutTitle implements Codec<PacketPlayOutTitle> {
@@ -27,23 +27,23 @@ public final class CodecPlayOutTitle implements Codec<PacketPlayOutTitle> {
     private static final int RESET = 5;
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutTitle message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutTitle packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        if (message instanceof PacketPlayOutTitle.Clear) {
+        if (packet instanceof PacketPlayOutTitle.Clear) {
             buf.writeVarInt(CLEAR);
-        } else if (message instanceof PacketPlayOutTitle.Reset) {
+        } else if (packet instanceof PacketPlayOutTitle.Reset) {
             buf.writeVarInt(RESET);
-        } else if (message instanceof PacketPlayOutTitle.SetTitle) {
+        } else if (packet instanceof PacketPlayOutTitle.SetTitle) {
             buf.writeVarInt(SET_TITLE);
-            context.write(buf, ContextualValueTypes.TEXT, ((PacketPlayOutTitle.SetTitle) message).getTitle());
-        } else if (message instanceof PacketPlayOutTitle.SetSubtitle) {
+            context.write(buf, ContextualValueTypes.TEXT, ((PacketPlayOutTitle.SetTitle) packet).getTitle());
+        } else if (packet instanceof PacketPlayOutTitle.SetSubtitle) {
             buf.writeVarInt(SET_SUBTITLE);
-            context.write(buf, ContextualValueTypes.TEXT, ((PacketPlayOutTitle.SetSubtitle) message).getTitle());
-        } else if (message instanceof PacketPlayOutTitle.SetActionbarTitle) {
+            context.write(buf, ContextualValueTypes.TEXT, ((PacketPlayOutTitle.SetSubtitle) packet).getTitle());
+        } else if (packet instanceof PacketPlayOutTitle.SetActionbarTitle) {
             buf.writeVarInt(SET_ACTIONBAR_TITLE);
-            context.write(buf, ContextualValueTypes.TEXT, ((PacketPlayOutTitle.SetActionbarTitle) message).getTitle());
+            context.write(buf, ContextualValueTypes.TEXT, ((PacketPlayOutTitle.SetActionbarTitle) packet).getTitle());
         } else {
-            final PacketPlayOutTitle.SetTimes message0 = (PacketPlayOutTitle.SetTimes) message;
+            final PacketPlayOutTitle.SetTimes message0 = (PacketPlayOutTitle.SetTimes) packet;
             buf.writeVarInt(SET_TIMES);
             buf.writeInteger(message0.getFadeIn());
             buf.writeInteger(message0.getStay());

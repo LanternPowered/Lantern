@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket;
 
 public final class HandlerPlayInChannelPayload implements Handler<ChannelPayloadPacket> {

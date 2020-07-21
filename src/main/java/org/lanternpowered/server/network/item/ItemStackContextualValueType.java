@@ -19,7 +19,7 @@ import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueType;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.text.translation.TranslationContext;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;

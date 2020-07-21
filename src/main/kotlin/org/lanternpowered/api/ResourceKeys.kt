@@ -41,7 +41,7 @@ object ResourceKeys {
     fun activePlugin(value: String): ResourceKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return ResourceKey(plugin.metadata.id, value)
+        return resourceKeyOf(plugin.metadata.id, value)
     }
 
     /**
@@ -55,7 +55,7 @@ object ResourceKeys {
     fun activePlugin(value: String, name: String): ResourceKey {
         val plugin: PluginContainer = CauseStack.current().first()
                 ?: throw IllegalStateException("No plugin found in the cause stack.")
-        return ResourceKey(plugin.metadata.id, value)
+        return resourceKeyOf(plugin.metadata.id, value)
     }
 
     /**
@@ -66,7 +66,7 @@ object ResourceKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun of(namespace: String, value: String): ResourceKey = ResourceKey(namespace, value)
+    fun of(namespace: String, value: String): ResourceKey = resourceKeyOf(namespace, value)
 
     /**
      * Creates a catalog key with the namespace of lantern.
@@ -75,7 +75,7 @@ object ResourceKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun lantern(value: String): ResourceKey = ResourceKey(LANTERN_NAMESPACE, value)
+    fun lantern(value: String): ResourceKey = resourceKeyOf(LANTERN_NAMESPACE, value)
 
     /**
      * Creates a catalog key with the namespace of sponge.
@@ -84,7 +84,7 @@ object ResourceKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun sponge(value: String): ResourceKey = ResourceKey(SPONGE_NAMESPACE, value)
+    fun sponge(value: String): ResourceKey = resourceKeyOf(SPONGE_NAMESPACE, value)
 
     /**
      * Creates a named catalog key with the namespace of minecraft.
@@ -93,7 +93,7 @@ object ResourceKeys {
      * @return A new catalog key
      */
     @JvmStatic
-    fun minecraft(value: String): ResourceKey = ResourceKey(MINECRAFT_NAMESPACE, value)
+    fun minecraft(value: String): ResourceKey = resourceKeyOf(MINECRAFT_NAMESPACE, value)
 
     /**
      * Resolves a catalog key from the given value.

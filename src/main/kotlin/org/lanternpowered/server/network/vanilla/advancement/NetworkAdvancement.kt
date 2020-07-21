@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.advancement
 import com.google.common.collect.Iterables
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class NetworkAdvancement(
         private val id: String,

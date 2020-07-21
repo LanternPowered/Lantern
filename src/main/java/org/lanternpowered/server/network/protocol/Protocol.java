@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.LanternGame;
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.packet.MessageRegistry;
 
 public interface Protocol {
 

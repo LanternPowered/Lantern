@@ -12,13 +12,13 @@ package org.lanternpowered.server.scoreboard
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.server.network.message.Packet
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore
+import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardScorePacket
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.objective.Objective
-import org.spongepowered.api.text.Text
 
 class LanternScore(private val name: Text) : Score {
 
@@ -45,7 +45,7 @@ class LanternScore(private val name: Text) : Score {
             for ((key, value) in scoreboards.entries()) {
                 (key as LanternScoreboard).sendToPlayers {
                     listOf(messages.computeIfAbsent(value) { obj: Objective ->
-                        PacketPlayOutScoreboardScore.CreateOrUpdate(obj.name, this.name, score)
+                        ScoreboardScorePacket.CreateOrUpdate(obj.name, this.name, score)
                     })
                 }
             }

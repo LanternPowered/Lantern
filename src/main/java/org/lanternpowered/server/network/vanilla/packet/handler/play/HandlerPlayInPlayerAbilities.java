@@ -15,7 +15,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
 import org.spongepowered.api.data.Keys;

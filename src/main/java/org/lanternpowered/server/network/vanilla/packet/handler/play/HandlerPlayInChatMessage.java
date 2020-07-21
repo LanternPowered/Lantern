@@ -26,7 +26,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSendChatPacket;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.text.LanternFormattingCodes;

@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.spongepowered.api.item.inventory.ItemStack
 
 class ShapedNetworkRecipe(

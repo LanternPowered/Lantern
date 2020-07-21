@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.type.play;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Iterables;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.spongepowered.api.advancement.AdvancementType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;

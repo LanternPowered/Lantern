@@ -16,7 +16,7 @@ import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConsta
 import static org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants.MAX_CHEST_ROWS;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.text.Text;

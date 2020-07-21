@@ -12,8 +12,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutPlayerPositionAndLook;
 import org.spongepowered.api.util.RelativePositions;
 
@@ -22,12 +22,12 @@ import java.util.Set;
 public final class CodecPlayOutPlayerPositionAndLook implements Codec<PacketPlayOutPlayerPositionAndLook> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutPlayerPositionAndLook message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutPlayerPositionAndLook packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVector3d(message.getPosition());
-        buf.writeFloat(message.getYaw());
-        buf.writeFloat(message.getPitch());
-        final Set<RelativePositions> relativePositions = message.getRelativePositions();
+        buf.writeVector3d(packet.getPosition());
+        buf.writeFloat(packet.getYaw());
+        buf.writeFloat(packet.getPitch());
+        final Set<RelativePositions> relativePositions = packet.getRelativePositions();
         byte flags = 0;
         if (relativePositions.contains(RelativePositions.X)) {
             flags |= 0x01;
@@ -45,7 +45,7 @@ public final class CodecPlayOutPlayerPositionAndLook implements Codec<PacketPlay
             flags |= 0x10;
         }
         buf.writeByte(flags);
-        buf.writeVarInt(message.getTeleportId());
+        buf.writeVarInt(packet.getTeleportId());
         return buf;
     }
 }

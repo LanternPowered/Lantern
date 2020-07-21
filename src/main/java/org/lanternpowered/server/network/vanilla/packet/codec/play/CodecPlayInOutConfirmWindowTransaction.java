@@ -12,18 +12,18 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutConfirmWindowTransaction;
 
 public final class CodecPlayInOutConfirmWindowTransaction implements Codec<PacketPlayInOutConfirmWindowTransaction> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayInOutConfirmWindowTransaction message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayInOutConfirmWindowTransaction packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer(4);
-        buf.writeByte((byte) message.getWindowId());
-        buf.writeShort((short) message.getTransaction());
-        buf.writeBoolean(message.isAccepted());
+        buf.writeByte((byte) packet.getWindowId());
+        buf.writeShort((short) packet.getTransaction());
+        buf.writeBoolean(packet.isAccepted());
         return buf;
     }
 

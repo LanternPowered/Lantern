@@ -44,7 +44,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;

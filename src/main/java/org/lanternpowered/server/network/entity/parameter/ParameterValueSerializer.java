@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.entity.parameter;
 
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 
 @FunctionalInterface
 public interface ParameterValueSerializer<T> {

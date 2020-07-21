@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.login
 
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 
 /**
  * The set compression message, this can be send in the

@@ -17,7 +17,7 @@ import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.world.gamerule.GameRule
 
 class LanternGameRule<V>(
-        key: ResourceKey, name: Translation, private val valueType: TypeToken<V>, private val defaultValue: V
+        key: ResourceKey, name: String, private val valueType: TypeToken<V>, private val defaultValue: V
 ) : DefaultCatalogType.Named(key, name), GameRule<V> {
 
     override fun getValueType() = this.valueType

@@ -11,9 +11,9 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.inventory.PlayerContainerSession;
-import org.lanternpowered.server.network.message.CodecRegistration;
-import org.lanternpowered.server.network.message.Packet;
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.packet.CodecRegistration;
+import org.lanternpowered.server.network.packet.Packet;
+import org.lanternpowered.server.network.packet.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.packet.codec.KeepAliveCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.DisconnectCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientAcceptBeaconEffectsCodec;
@@ -278,8 +278,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutP
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardDisplayObjective;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardObjective;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardObjectivePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardScorePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSelectAdvancementTree;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetResourcePackPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetCameraPacket;
@@ -305,7 +305,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutT
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTags;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams;
+import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TheEndPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTitle;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowTradeOffersPacket;
@@ -570,23 +570,22 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutEntityEquipment.class, PacketPlayOutEntityEquipment.class);
         outbound.bind(SetExperienceCodec.class, SetExperiencePacket.class);
         outbound.bind(CodecPlayOutPlayerHealthUpdate.class, PacketPlayOutPlayerHealthUpdate.class);
-        final CodecRegistration<PacketPlayOutScoreboardObjective, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(
+        final CodecRegistration<ScoreboardObjectivePacket, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(
                 CodecPlayOutScoreboardObjective.class);
-        codecPlayOutScoreboardObjective.bind(PacketPlayOutScoreboardObjective.Create.class);
-        codecPlayOutScoreboardObjective.bind(PacketPlayOutScoreboardObjective.Update.class);
-        codecPlayOutScoreboardObjective.bind(PacketPlayOutScoreboardObjective.Remove.class);
+        codecPlayOutScoreboardObjective.bind(ScoreboardObjectivePacket.Create.class);
+        codecPlayOutScoreboardObjective.bind(ScoreboardObjectivePacket.Update.class);
+        codecPlayOutScoreboardObjective.bind(ScoreboardObjectivePacket.Remove.class);
         outbound.bind(SetEntityPassengersCodec.class, SetEntityPassengersPacket.class);
-        final CodecRegistration<PacketPlayOutTeams, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(
-                CodecPlayOutTeams.class);
-        codecPlayOutTeams.bind(PacketPlayOutTeams.AddMembers.class);
-        codecPlayOutTeams.bind(PacketPlayOutTeams.Create.class);
-        codecPlayOutTeams.bind(PacketPlayOutTeams.Update.class);
-        codecPlayOutTeams.bind(PacketPlayOutTeams.Remove.class);
-        codecPlayOutTeams.bind(PacketPlayOutTeams.RemoveMembers.class);
-        final CodecRegistration<PacketPlayOutScoreboardScore, CodecPlayOutScoreboardScore> codecPlayOutScoreboardScore = outbound.bind(
+        final CodecRegistration<TeamPacket, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(CodecPlayOutTeams.class);
+        codecPlayOutTeams.bind(TeamPacket.AddMembers.class);
+        codecPlayOutTeams.bind(TeamPacket.Create.class);
+        codecPlayOutTeams.bind(TeamPacket.Update.class);
+        codecPlayOutTeams.bind(TeamPacket.Remove.class);
+        codecPlayOutTeams.bind(TeamPacket.RemoveMembers.class);
+        final CodecRegistration<ScoreboardScorePacket, CodecPlayOutScoreboardScore> codecPlayOutScoreboardScore = outbound.bind(
                 CodecPlayOutScoreboardScore.class);
-        codecPlayOutScoreboardScore.bind(PacketPlayOutScoreboardScore.CreateOrUpdate.class);
-        codecPlayOutScoreboardScore.bind(PacketPlayOutScoreboardScore.Remove.class);
+        codecPlayOutScoreboardScore.bind(ScoreboardScorePacket.CreateOrUpdate.class);
+        codecPlayOutScoreboardScore.bind(ScoreboardScorePacket.Remove.class);
         outbound.bind(CodecPlayOutWorldTime.class, PacketPlayOutWorldTime.class);
         final CodecRegistration<PacketPlayOutTitle, CodecPlayOutTitle> codecPlayOutTitle = outbound.bind(CodecPlayOutTitle.class);
         codecPlayOutTitle.bind(PacketPlayOutTitle.Clear.class);

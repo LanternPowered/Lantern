@@ -12,9 +12,9 @@ package org.lanternpowered.server.attribute
 
 import org.lanternpowered.api.attribute.AttributeType
 import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.DataHolder
-import org.spongepowered.api.text.Text
 
 class LanternAttributeType(
         key: ResourceKey,

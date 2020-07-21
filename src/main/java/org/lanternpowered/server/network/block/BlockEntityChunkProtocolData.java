@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.block;
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.spongepowered.api.data.persistence.DataView;
 
 import java.util.List;

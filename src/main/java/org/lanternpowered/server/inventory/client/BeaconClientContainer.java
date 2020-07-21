@@ -14,7 +14,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.inventory.behavior.event.BeaconEffectsEvent;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.text.Text;

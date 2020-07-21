@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.buffer.contextual
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.text.translation.TranslationContext
 
 internal class TextContextualValueType : ContextualValueType<Text> {

@@ -11,33 +11,33 @@
 package org.lanternpowered.server.scoreboard
 
 import com.google.common.collect.HashMultimap
+import org.lanternpowered.api.scoreboard.ScoreboardObjective
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.immutableSetBuilderOf
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.entity.living.player.LanternPlayer
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardDisplayObjective
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardObjective
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTeams
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardObjectivePacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardScorePacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket
 import org.spongepowered.api.entity.living.player.Player
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.scoreboard.criteria.Criterion
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot
-import org.spongepowered.api.scoreboard.objective.Objective
-import org.spongepowered.api.text.Text
 import java.util.Optional
 
 class LanternScoreboard : Scoreboard {
 
     private val players = mutableSetOf<LanternPlayer>()
-    private val objectives = mutableMapOf<String, Objective>()
-    private val objectivesByCriterion = HashMultimap.create<Criterion, Objective>()
-    private val objectivesInSlot = mutableMapOf<DisplaySlot, Objective>()
+    private val objectives = mutableMapOf<String, ScoreboardObjective>()
+    private val objectivesByCriterion = HashMultimap.create<Criterion, ScoreboardObjective>()
+    private val objectivesInSlot = mutableMapOf<DisplaySlot, ScoreboardObjective>()
     private val teams = mutableMapOf<String, Team>()
 
     fun sendToPlayers(packetSupplier: () -> List<Packet>) {
@@ -59,9 +59,9 @@ class LanternScoreboard : Scoreboard {
 
     private fun collectRemoveMessages(packets: MutableList<Packet>): List<Packet> {
         for (objective in objectives.values)
-            packets.add(PacketPlayOutScoreboardObjective.Remove(objective.name))
+            packets.add(ScoreboardObjectivePacket.Remove(objective.name))
         for (team in teams.values)
-            packets.add(PacketPlayOutTeams.Remove(team.name))
+            packets.add(TeamPacket.Remove(team.name))
         return packets
     }
 
@@ -88,12 +88,12 @@ class LanternScoreboard : Scoreboard {
         players.forEach { player -> (player as LanternPlayer).connection.send(messages) }
     }
 
-    fun getObjectivesInSlot(): Map<DisplaySlot, Objective> = this.objectivesInSlot.toImmutableMap()
+    fun getObjectivesInSlot(): Map<DisplaySlot, ScoreboardObjective> = this.objectivesInSlot.toImmutableMap()
 
-    override fun getObjective(name: String): Optional<Objective> = this.objectives[name].optional()
-    override fun getObjective(slot: DisplaySlot): Optional<Objective> = this.objectivesInSlot[slot].optional()
+    override fun getObjective(name: String): Optional<ScoreboardObjective> = this.objectives[name].optional()
+    override fun getObjective(slot: DisplaySlot): Optional<ScoreboardObjective> = this.objectivesInSlot[slot].optional()
 
-    override fun addObjective(objective: Objective) {
+    override fun addObjective(objective: ScoreboardObjective) {
         check(!this.objectives.containsKey(objective.name)) { "A score with the name ${objective.name} already exists!" }
         this.objectives[objective.name] = objective
         this.objectivesByCriterion.put(objective.criterion, objective)
@@ -102,18 +102,18 @@ class LanternScoreboard : Scoreboard {
         sendToPlayers { createObjectiveInitMessages(objective) }
     }
 
-    private fun createObjectiveInitMessages(objective: Objective): List<Packet> {
+    private fun createObjectiveInitMessages(objective: ScoreboardObjective): List<Packet> {
         val messages = mutableListOf<Packet>()
-        messages.add(PacketPlayOutScoreboardObjective.Create(
+        messages.add(ScoreboardObjectivePacket.Create(
                 objective.name, objective.displayName, objective.displayMode))
         for (score in (objective as LanternObjective).scores.values) {
-            messages.add(PacketPlayOutScoreboardScore.CreateOrUpdate(
+            messages.add(ScoreboardScorePacket.CreateOrUpdate(
                     objective.name, score.name, score.score))
         }
         return messages
     }
 
-    override fun updateDisplaySlot(objective: Objective?, displaySlot: DisplaySlot) {
+    override fun updateDisplaySlot(objective: ScoreboardObjective?, displaySlot: DisplaySlot) {
         if (objective == null) {
             val oldObjective = this.objectivesInSlot.remove(displaySlot)
             if (oldObjective != null) {
@@ -129,15 +129,15 @@ class LanternScoreboard : Scoreboard {
         }
     }
 
-    override fun getObjectivesByCriterion(criterion: Criterion): Set<Objective> = this.objectivesByCriterion[criterion].toImmutableSet()
-    override fun getObjectives(): Set<Objective> = this.objectives.values.toImmutableSet()
+    override fun getObjectivesByCriterion(criterion: Criterion): Set<ScoreboardObjective> = this.objectivesByCriterion[criterion].toImmutableSet()
+    override fun getObjectives(): Set<ScoreboardObjective> = this.objectives.values.toImmutableSet()
 
-    override fun removeObjective(objective: Objective) {
+    override fun removeObjective(objective: ScoreboardObjective) {
         if (this.objectives.remove(objective.name, objective)) {
             (objective as LanternObjective).scoreboards.remove(this)
             this.objectivesByCriterion.remove(objective.criterion, objective)
             this.objectivesInSlot.entries.removeIf { (_, value) -> value == objective }
-            sendToPlayers { listOf(PacketPlayOutScoreboardObjective.Remove(objective.name)) }
+            sendToPlayers { listOf(ScoreboardObjectivePacket.Remove(objective.name)) }
         }
     }
 

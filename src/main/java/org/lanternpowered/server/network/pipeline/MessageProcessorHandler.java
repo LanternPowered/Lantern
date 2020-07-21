@@ -15,11 +15,11 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.EncoderException;
 import io.netty.util.ReferenceCountUtil;
-import org.lanternpowered.server.network.message.Packet;
-import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.UnknownPacket;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.processor.Processor;
+import org.lanternpowered.server.network.packet.Packet;
+import org.lanternpowered.server.network.packet.MessageRegistration;
+import org.lanternpowered.server.network.packet.UnknownPacket;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
+import org.lanternpowered.server.network.packet.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 
 import java.util.ArrayList;

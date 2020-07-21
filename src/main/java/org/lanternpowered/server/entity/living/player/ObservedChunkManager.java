@@ -24,7 +24,7 @@ import org.lanternpowered.server.network.block.AbstractBlockEntityProtocol;
 import org.lanternpowered.server.network.block.BlockEntityChunkProtocolData;
 import org.lanternpowered.server.network.block.BlockEntityProtocolHelper;
 import org.lanternpowered.server.network.block.BlockEntityProtocolUpdateContext;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;

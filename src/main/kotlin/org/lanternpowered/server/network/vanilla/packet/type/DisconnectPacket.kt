@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type
 
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 
 /**
  * A message to send a disconnect reason to the client.

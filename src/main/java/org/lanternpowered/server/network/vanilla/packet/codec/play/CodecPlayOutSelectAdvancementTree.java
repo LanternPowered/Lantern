@@ -12,16 +12,16 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSelectAdvancementTree;
 
 public final class CodecPlayOutSelectAdvancementTree implements Codec<PacketPlayOutSelectAdvancementTree> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutSelectAdvancementTree message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutSelectAdvancementTree packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        final String id = message.getId();
+        final String id = packet.getId();
         buf.writeBoolean(id != null);
         if (id != null) {
             buf.writeString(id);

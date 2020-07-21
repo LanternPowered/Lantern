@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.protocol;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.packet.MessageRegistry;
 
 class ProtocolBase implements Protocol {
 

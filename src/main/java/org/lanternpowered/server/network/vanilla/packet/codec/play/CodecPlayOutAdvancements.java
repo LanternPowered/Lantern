@@ -14,8 +14,8 @@ import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutAdvancements;
 
@@ -25,16 +25,16 @@ import java.util.Map;
 public final class CodecPlayOutAdvancements implements Codec<PacketPlayOutAdvancements> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutAdvancements message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutAdvancements packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeBoolean(message.getClear());
-        final List<NetworkAdvancement> added = message.getAdded();
+        buf.writeBoolean(packet.getClear());
+        final List<NetworkAdvancement> added = packet.getAdded();
         buf.writeVarInt(added.size());
         added.forEach(advancement -> context.write(buf, ContextualValueTypes.ADVANCEMENT, advancement));
-        final List<String> removed = message.getRemoved();
+        final List<String> removed = packet.getRemoved();
         buf.writeVarInt(removed.size());
         removed.forEach(buf::writeString);
-        final Map<String, Object2LongMap<String>> progress = message.getProgress();
+        final Map<String, Object2LongMap<String>> progress = packet.getProgress();
         buf.writeVarInt(progress.size());
         for (Map.Entry<String, Object2LongMap<String>> entry : progress.entrySet()) {
             buf.writeString(entry.getKey());

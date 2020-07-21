@@ -12,7 +12,7 @@ package org.lanternpowered.api.item.potion
 
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectType
-import org.lanternpowered.api.ext.*
+import org.lanternpowered.api.effect.potion.potionEffectOf
 import org.lanternpowered.api.registry.CatalogBuilder
 import java.util.function.Supplier
 

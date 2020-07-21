@@ -10,17 +10,18 @@
  */
 package org.lanternpowered.server.scoreboard
 
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.server.network.message.Packet
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardObjective
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore
+import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardObjectivePacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardScorePacket
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.scoreboard.criteria.Criterion
 import org.spongepowered.api.scoreboard.objective.Objective
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode
-import org.spongepowered.api.text.Text
 
 class LanternObjective internal constructor(
         private val name: String,
@@ -52,7 +53,7 @@ class LanternObjective internal constructor(
     private fun sendObjectiveUpdate() {
         if (this.scoreboards.isEmpty())
             return
-        val message = listOf(PacketPlayOutScoreboardObjective.Update(
+        val message = listOf(ScoreboardObjectivePacket.Update(
                 this.name, this.displayName, this.displayMode))
         for (scoreboard in scoreboards) {
             (scoreboard as LanternScoreboard).sendToPlayers { message }
@@ -76,7 +77,7 @@ class LanternObjective internal constructor(
     private fun sendScoreToClient(score: Score) {
         if (this.scoreboards.isEmpty())
             return
-        val message = listOf(PacketPlayOutScoreboardScore.CreateOrUpdate(getName(), score.name, score.score))
+        val message = listOf(ScoreboardScorePacket.CreateOrUpdate(getName(), score.name, score.score))
         for (scoreboard in this.scoreboards) {
             (scoreboard as LanternScoreboard).sendToPlayers { message }
         }
@@ -103,7 +104,7 @@ class LanternObjective internal constructor(
         for (scoreboard in this.scoreboards) {
             (scoreboard as LanternScoreboard).sendToPlayers {
                 listOf(messages.computeIfAbsent(this) {
-                    PacketPlayOutScoreboardScore.Remove(getName(), score.name)
+                    ScoreboardScorePacket.Remove(getName(), score.name)
                 })
             }
         }

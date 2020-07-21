@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla.consumable
 
+import org.lanternpowered.api.effect.potion.merge
 import org.lanternpowered.api.util.collections.immutableListOf
-import org.lanternpowered.api.ext.merge
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.spongepowered.api.data.Keys

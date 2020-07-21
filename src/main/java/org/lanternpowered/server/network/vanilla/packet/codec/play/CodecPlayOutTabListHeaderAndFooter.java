@@ -13,8 +13,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListHeaderAndFooter;
 import org.spongepowered.api.text.Text;
 
@@ -25,10 +25,10 @@ public final class CodecPlayOutTabListHeaderAndFooter implements Codec<PacketPla
     private static final String EMPTY_TEXT = "{\"translate\":\"\"}";
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutTabListHeaderAndFooter message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutTabListHeaderAndFooter packet) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
-        Text header = message.getHeader();
-        Text footer = message.getFooter();
+        Text header = packet.getHeader();
+        Text footer = packet.getFooter();
         if (header != null) {
             context.write(buf, ContextualValueTypes.TEXT, header);
         } else {

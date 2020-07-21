@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.protocol;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.packet.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.packet.codec.status.StatusPingCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.status.StatusRequestCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.status.StatusResponseCodec;

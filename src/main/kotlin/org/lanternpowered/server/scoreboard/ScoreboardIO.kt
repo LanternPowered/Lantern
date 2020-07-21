@@ -12,15 +12,18 @@ package org.lanternpowered.server.scoreboard
 
 import org.lanternpowered.api.data.persistence.DataQuery
 import org.lanternpowered.api.data.persistence.DataView
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.util.collections.toImmutableSet
+import org.lanternpowered.api.util.index.requireKey
+import org.lanternpowered.api.util.index.requireValue
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
-import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.text.LanternTexts.fromLegacy
 import org.lanternpowered.server.text.LanternTexts.toLegacy
 import org.spongepowered.api.ResourceKey
@@ -31,8 +34,6 @@ import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.scoreboard.criteria.Criteria
 import org.spongepowered.api.scoreboard.objective.Objective
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayModes
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColors
 import java.util.ArrayList
 import kotlin.streams.toList
 
@@ -142,14 +143,7 @@ object ScoreboardIO {
                 entry.getString(NAME_TAG_VISIBILITY).ifPresent { value -> builder.nameTagVisibility(VisibilityRegistry.require(value)) }
                 entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent { value -> builder.deathTextVisibility(VisibilityRegistry.require(value)) }
                 entry.getString(COLLISION_RULE).ifPresent { value -> builder.collisionRule(CollisionRuleRegistry.require(value)) }
-                entry.getString(TEAM_COLOR).ifPresent { colorName ->
-                    val color = TextColorRegistry[ResourceKey.resolve(colorName)] ?: run {
-                        Lantern.getLogger().warn("Unable to find a team color with id: $colorName, default to none.")
-                        TextColors.NONE.get()
-                    }
-                    if (color != TextColors.NONE.get() && color != TextColors.RESET.get())
-                        builder.color(color)
-                }
+                entry.getString(TEAM_COLOR).ifPresent { colorName -> builder.color(NamedTextColor.NAMES.requireValue(colorName)) }
                 teams.add(builder.build())
             }
         }
@@ -225,8 +219,7 @@ object ScoreboardIO {
                     .set(PREFIX, toLegacy(team.prefix))
                     .set(SUFFIX, toLegacy(team.suffix))
             val teamColor = team.color
-            if (teamColor != TextColors.NONE.get())
-                container[TEAM_COLOR] = teamColor.key
+            container[TEAM_COLOR] = NamedTextColor.NAMES.requireKey(teamColor)
             val members = team.members
             container[MEMBERS] = members.stream().map<String> { member -> LegacyTextSerializer.serialize(member) }.toList()
             teams.add(container)

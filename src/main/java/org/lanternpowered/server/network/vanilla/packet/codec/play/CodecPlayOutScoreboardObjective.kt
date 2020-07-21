@@ -12,20 +12,20 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
-import org.lanternpowered.server.network.message.codec.Codec
-import org.lanternpowered.server.network.message.codec.CodecContext
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardObjective
+import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardObjectivePacket
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 
-class CodecPlayOutScoreboardObjective : Codec<PacketPlayOutScoreboardObjective> {
+class CodecPlayOutScoreboardObjective : Codec<ScoreboardObjectivePacket> {
 
-    override fun encode(context: CodecContext, message: PacketPlayOutScoreboardObjective): ByteBuffer {
+    override fun encode(context: CodecContext, packet: ScoreboardObjectivePacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()
-        buf.writeString(message.objectiveName)
-        if (message is PacketPlayOutScoreboardObjective.CreateOrUpdate) {
-            buf.writeByte((if (message is PacketPlayOutScoreboardObjective.Create) 0 else 2).toByte())
-            context.write(buf, ContextualValueTypes.TEXT, message.displayName)
-            buf.writeVarInt(ObjectiveDisplayModeRegistry.getId(message.displayMode))
+        buf.writeString(packet.objectiveName)
+        if (packet is ScoreboardObjectivePacket.CreateOrUpdate) {
+            buf.writeByte((if (packet is ScoreboardObjectivePacket.Create) 0 else 2).toByte())
+            context.write(buf, ContextualValueTypes.TEXT, packet.displayName)
+            buf.writeVarInt(ObjectiveDisplayModeRegistry.getId(packet.displayMode))
         } else {
             buf.writeByte(1.toByte())
         }

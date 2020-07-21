@@ -30,8 +30,6 @@ import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.effect.particle.ParticleEffect
-import org.spongepowered.api.effect.sound.SoundCategory
-import org.spongepowered.api.effect.sound.SoundType
 import org.spongepowered.api.effect.sound.music.MusicDisc
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
@@ -42,8 +40,6 @@ import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.raid.Raid
 import org.spongepowered.api.scheduler.ScheduledUpdateList
 import org.spongepowered.api.service.context.Context
-import org.spongepowered.api.text.BookView
-import org.spongepowered.api.text.title.Title
 import org.spongepowered.api.util.AABB
 import org.spongepowered.api.util.Direction
 import org.spongepowered.api.world.BlockChangeFlag
@@ -194,30 +190,6 @@ class LanternWorldNew(
         TODO("Not yet implemented")
     }
 
-    override fun playSound(sound: SoundType?, category: SoundCategory?, position: Vector3d?, volume: Double, pitch: Double, minVolume: Double) {
-        TODO("Not yet implemented")
-    }
-
-    override fun stopSounds() {
-        TODO("Not yet implemented")
-    }
-
-    override fun stopSounds(sound: SoundType?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun stopSounds(category: SoundCategory?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun stopSounds(sound: SoundType?, category: SoundCategory?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun stopSounds(sound: Supplier<out SoundType>?, category: Supplier<out SoundCategory>?) {
-        TODO("Not yet implemented")
-    }
-
     override fun createArchetypeVolume(min: Vector3i?, max: Vector3i?, origin: Vector3i?): ArchetypeVolume {
         TODO("Not yet implemented")
     }
@@ -231,10 +203,6 @@ class LanternWorldNew(
     }
 
     override fun spawnEntities(entities: MutableIterable<Entity>?): MutableCollection<Entity> {
-        TODO("Not yet implemented")
-    }
-
-    override fun sendTitle(title: Title?) {
         TODO("Not yet implemented")
     }
 
@@ -267,10 +235,6 @@ class LanternWorldNew(
     }
 
     override fun resetBlockChange(x: Int, y: Int, z: Int) {
-        TODO("Not yet implemented")
-    }
-
-    override fun sendBookView(bookView: BookView) {
         TODO("Not yet implemented")
     }
 
@@ -480,19 +444,11 @@ class LanternWorldNew(
         TODO("Not yet implemented")
     }
 
-    override fun stopSoundTypes(sound: Supplier<out SoundType>?) {
-        TODO("Not yet implemented")
-    }
-
     override fun getBlockMax(): Vector3i {
         TODO("Not yet implemented")
     }
 
     override fun getLight(type: LightType, x: Int, y: Int, z: Int): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun stopSoundCategoriess(category: Supplier<out SoundCategory>?) {
         TODO("Not yet implemented")
     }
 

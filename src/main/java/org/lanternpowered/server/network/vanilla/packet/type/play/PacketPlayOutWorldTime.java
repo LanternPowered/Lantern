@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.type.play;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.type.MoonPhase;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 
 public final class PacketPlayOutWorldTime implements Packet {
 

@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.status
 
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.util.collections.asNonNullList
-import org.lanternpowered.server.LanternServer
+import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.profile.LanternGameProfile
 import org.spongepowered.api.event.server.ClientPingServerEvent
 import org.spongepowered.api.profile.GameProfile
@@ -25,9 +25,9 @@ object LanternStatusHelper {
     private const val DEFAULT_MAX_PLAYERS_DISPLAYED = 12
 
     @JvmStatic
-    fun createPlayers(server: LanternServer): ClientPingServerEvent.Response.Players {
+    fun createPlayers(server: LanternServerNew): ClientPingServerEvent.Response.Players {
         // Get the online players
-        val players = server.rawOnlinePlayers
+        val players = server.unsafePlayers
         val online = players.size
         val max = server.maxPlayers
 

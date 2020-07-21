@@ -12,17 +12,17 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityAnimation;
 
 public class CodecPlayOutEntityAnimation implements Codec<PacketPlayOutEntityAnimation> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityAnimation message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityAnimation packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(message.getEntityId());
-        buf.writeByte((byte) message.getAnimation());
+        buf.writeVarInt(packet.getEntityId());
+        buf.writeByte((byte) packet.getAnimation());
         return buf;
     }
 }

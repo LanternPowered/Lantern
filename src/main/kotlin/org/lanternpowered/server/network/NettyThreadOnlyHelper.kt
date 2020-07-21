@@ -11,8 +11,8 @@
 package org.lanternpowered.server.network
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.server.network.message.Packet
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.packet.handler.Handler
 import java.util.concurrent.ConcurrentHashMap
 
 object NettyThreadOnlyHelper {

@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.world
 
+import net.kyori.adventure.key.KeyedValue
+import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.world.World
@@ -19,7 +21,6 @@ import org.lanternpowered.server.config.WorldConfigObject
 import org.lanternpowered.server.world.archetype.LanternWorldArchetype
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
-import org.spongepowered.api.boss.BossBar
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.trader.WanderingTrader
@@ -243,8 +244,8 @@ class LanternWorldProperties(
     // TODO: What are these "custom" boss bars? Are these just boss
     //  bars that should persist? Or something else?
 
-    override fun getCustomBossBars(): List<BossBar> = emptyList()
-    override fun setCustomBossBars(bars: List<BossBar>?) {}
+    override fun getCustomBossBars(): List<KeyedValue<BossBar>> = emptyList()
+    override fun setCustomBossBars(bars: List<KeyedValue<BossBar>>?) {}
 
     // TODO: Introduce wandering entities? Maybe a different system
     //  compared on vanilla? More than one trader?

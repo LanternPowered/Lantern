@@ -11,8 +11,8 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.message.codec.Codec
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.SoundEffectPacket
 
 class SoundEffectCodec : Codec<SoundEffectPacket> {

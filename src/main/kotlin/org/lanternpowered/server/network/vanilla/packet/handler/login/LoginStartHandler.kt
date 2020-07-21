@@ -37,7 +37,7 @@ import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NettyThreadOnly
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginEncryptionRequestPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginStartPacket

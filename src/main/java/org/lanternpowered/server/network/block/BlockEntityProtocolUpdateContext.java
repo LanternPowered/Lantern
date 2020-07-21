@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.block;
 
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 
 public interface BlockEntityProtocolUpdateContext {
 

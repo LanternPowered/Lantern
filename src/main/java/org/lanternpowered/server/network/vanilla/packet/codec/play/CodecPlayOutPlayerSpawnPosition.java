@@ -12,14 +12,14 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutPlayerSpawnPosition;
 
 public final class CodecPlayOutPlayerSpawnPosition implements Codec<PacketPlayOutPlayerSpawnPosition> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutPlayerSpawnPosition message) throws CodecException {
-        return context.byteBufAlloc().buffer().writePosition(message.getPosition());
+    public ByteBuffer encode(CodecContext context, PacketPlayOutPlayerSpawnPosition packet) throws CodecException {
+        return context.byteBufAlloc().buffer().writePosition(packet.getPosition());
     }
 }

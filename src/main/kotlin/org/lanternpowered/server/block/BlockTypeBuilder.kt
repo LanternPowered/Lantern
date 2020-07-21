@@ -11,13 +11,13 @@
 package org.lanternpowered.server.block
 
 import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.resourceKeyOf
 import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.util.AABB
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.block.state.BlockStateProperties
-import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.item.ItemTypeBuilder
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
@@ -27,7 +27,7 @@ import org.spongepowered.api.block.entity.BlockEntityTypes
 import org.spongepowered.api.state.StateProperty
 import org.spongepowered.math.vector.Vector3d
 
-val testBlockType = blockTypeOf(ResourceKey("namespace", "value")) {
+val testBlockType = blockTypeOf(resourceKeyOf("namespace", "value")) {
     name("Test Block")
     stateProperty(BlockStateProperties.IS_WET)
     properties {

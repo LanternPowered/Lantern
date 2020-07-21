@@ -42,12 +42,12 @@ import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.lanternpowered.server.network.message.BulkPacket;
-import org.lanternpowered.server.network.message.HandlerPacket;
-import org.lanternpowered.server.network.message.Packet;
-import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.UnknownPacket;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.BulkPacket;
+import org.lanternpowered.server.network.packet.HandlerPacket;
+import org.lanternpowered.server.network.packet.Packet;
+import org.lanternpowered.server.network.packet.MessageRegistration;
+import org.lanternpowered.server.network.packet.UnknownPacket;
+import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.packet.type.KeepAlivePacket;
@@ -249,7 +249,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
     protected void channelRead0(ChannelHandlerContext ctx, Packet packet) {
         Packet actualPacket = packet;
         if (actualPacket instanceof HandlerPacket) {
-            actualPacket = ((HandlerPacket) actualPacket).getMessage();
+            actualPacket = ((HandlerPacket) actualPacket).getPacket();
         }
         if (actualPacket instanceof ClientSettingsPacket) { // Special case, keep track of the locale
             this.locale = ((ClientSettingsPacket) actualPacket).getLocale();
@@ -312,9 +312,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
         } else if (packet instanceof HandlerPacket) {
             final HandlerPacket handlerMessage = (HandlerPacket) packet;
             if (handlerMessage.getHandleThread() == HandlerPacket.HandleThread.NETTY) {
-                handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
+                handleMessage(handlerMessage.getHandler(), handlerMessage.getPacket());
             } else if (handlerMessage.getHandleThread() == HandlerPacket.HandleThread.ASYNC) {
-                Lantern.getAsyncScheduler().submit(() -> handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage()));
+                Lantern.getAsyncScheduler().submit(() -> handleMessage(handlerMessage.getHandler(), handlerMessage.getPacket()));
             } else {
                 this.messageQueue.add(handlerMessage);
             }
@@ -511,7 +511,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
     public void pulse() {
         HandlerPacket entry;
         while ((entry = this.messageQueue.poll()) != null) {
-            handleMessage(entry.getHandler(), entry.getMessage());
+            handleMessage(entry.getHandler(), entry.getPacket());
         }
     }
 

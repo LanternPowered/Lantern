@@ -14,7 +14,7 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.lanternpowered.server.item.recipe.RecipeBookState;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 
 import java.util.List;
 

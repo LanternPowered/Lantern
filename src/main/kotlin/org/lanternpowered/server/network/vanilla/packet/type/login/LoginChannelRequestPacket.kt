@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.type.login
 
 import io.netty.util.ReferenceCounted
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 
 /**
  * A message send by the server to the client to request for data.

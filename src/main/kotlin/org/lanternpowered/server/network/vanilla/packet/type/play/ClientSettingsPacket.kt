@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.api.entity.player.chat.ChatVisibility
+import org.lanternpowered.server.network.packet.Packet
 import org.spongepowered.api.data.type.HandPreference
-import org.spongepowered.api.text.chat.ChatVisibility
 import java.util.Locale
 
 data class ClientSettingsPacket(

@@ -12,18 +12,18 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSpawnExperienceOrb;
 
 public final class CodecPlayOutSpawnExperienceOrb implements Codec<PacketPlayOutSpawnExperienceOrb> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutSpawnExperienceOrb message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutSpawnExperienceOrb packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(message.getEntityId());
-        buf.writeVector3d(message.getPosition());
-        buf.writeShort((short) Math.min(message.getQuantity(), Short.MAX_VALUE));
+        buf.writeVarInt(packet.getEntityId());
+        buf.writeVector3d(packet.getPosition());
+        buf.writeShort((short) Math.min(packet.getQuantity(), Short.MAX_VALUE));
         return buf;
     }
 }

@@ -12,8 +12,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -48,13 +48,13 @@ public final class CodecPlayOutUpdateBlockEntity implements Codec<PacketPlayOutB
     );
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutBlockEntity message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutBlockEntity packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        final Vector3i pos = message.getPosition();
+        final Vector3i pos = packet.getPosition();
         buf.writePosition(pos);
-        final String id = message.getType();
+        final String id = packet.getType();
         buf.writeByte((byte) (hardcodedTypes.indexOf(id) + 1));
-        final DataView dataView = message.getTileData();
+        final DataView dataView = packet.getTileData();
         dataView.set(idQuery, id);
         dataView.set(xQuery, pos.getX());
         dataView.set(yQuery, pos.getY());

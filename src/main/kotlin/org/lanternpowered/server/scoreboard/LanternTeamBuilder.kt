@@ -10,23 +10,25 @@
  */
 package org.lanternpowered.server.scoreboard
 
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.emptyText
+import org.lanternpowered.api.text.format.NamedTextColor
+import org.lanternpowered.api.text.textOf
+import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.spongepowered.api.scoreboard.CollisionRule
 import org.spongepowered.api.scoreboard.CollisionRules
 import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.scoreboard.Visibilities
 import org.spongepowered.api.scoreboard.Visibility
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.format.TextColor
-import org.spongepowered.api.text.format.TextColors
 
 class LanternTeamBuilder : Team.Builder {
 
     private var name: String? = null
     private var displayName: Text? = null
-    private var prefix: Text = Text.empty()
-    private var suffix: Text = Text.empty()
-    private var color: TextColor = TextColors.NONE.get()
+    private var prefix: Text = emptyText()
+    private var suffix: Text = emptyText()
+    private var color: NamedTextColor = NamedTextColor.WHITE
     private var allowFriendlyFire = false
     private var showFriendlyInvisibles = false
     private var nameTagVisibility: Visibility = Visibilities.ALWAYS.get()
@@ -34,17 +36,13 @@ class LanternTeamBuilder : Team.Builder {
     private var collisionRule: CollisionRule = CollisionRules.NEVER.get()
     private var members: Set<Text> = emptySet()
 
-    override fun color(color: TextColor): LanternTeamBuilder = apply {
-        require(color != TextColors.RESET.get()) { "Color cannot be TextColors.RESET!" }
-        this.color = color
-    }
-
     override fun displayName(displayName: Text): LanternTeamBuilder = apply {
         val length = displayName.toPlain().length
         check(length <= 32) { "Display name is $length characters long! It must be at most 32." }
         this.displayName = displayName
     }
 
+    override fun color(color: NamedTextColor): LanternTeamBuilder = apply { this.color = color }
     override fun name(name: String): LanternTeamBuilder = apply { this.name = name }
     override fun prefix(prefix: Text): LanternTeamBuilder = apply { this.prefix = prefix }
     override fun suffix(suffix: Text): LanternTeamBuilder = apply { this.suffix = suffix }
@@ -67,11 +65,11 @@ class LanternTeamBuilder : Team.Builder {
     override fun reset(): LanternTeamBuilder = apply {
         this.name = null
         this.displayName = null
-        this.prefix = Text.of()
-        this.suffix = Text.of()
+        this.prefix = emptyText()
+        this.suffix = emptyText()
         this.allowFriendlyFire = false
         this.showFriendlyInvisibles = false
-        this.color = TextColors.NONE.get()
+        this.color = NamedTextColor.WHITE
         this.nameTagVisibility = Visibilities.ALWAYS.get()
         this.deathMessageVisibility = Visibilities.ALWAYS.get()
         this.collisionRule = CollisionRules.NEVER.get()
@@ -80,7 +78,7 @@ class LanternTeamBuilder : Team.Builder {
 
     override fun build(): Team {
         val name = checkNotNull(this.name) { "The name must be set" }
-        val displayName = this.displayName ?: Text.of(name)
+        val displayName = this.displayName ?: textOf(name)
         val team = LanternTeam(name, this.color, displayName, this.prefix, this.suffix,
                 this.allowFriendlyFire, this.showFriendlyInvisibles, this.nameTagVisibility,
                 this.deathMessageVisibility, this.collisionRule)

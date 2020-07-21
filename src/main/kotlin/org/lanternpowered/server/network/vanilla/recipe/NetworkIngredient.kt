@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.recipe
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class NetworkIngredient(private val items: Collection<ItemStack>) {
 

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play;
 
 import org.lanternpowered.server.block.action.BlockActionData;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.spongepowered.math.vector.Vector3i;
 
 public final class PacketPlayOutBlockAction implements Packet, BlockActionData {

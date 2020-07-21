@@ -13,7 +13,6 @@ package org.lanternpowered.server.world.gamerule
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
 import org.spongepowered.api.ResourceKey
-import org.spongepowered.api.text.translation.Translation
 import org.spongepowered.api.world.gamerule.GameRule
 
 @Suppress("UNCHECKED_CAST")

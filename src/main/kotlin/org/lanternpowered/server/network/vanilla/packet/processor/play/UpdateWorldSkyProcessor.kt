@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.processor.play
 
-import org.lanternpowered.server.network.message.Packet
-import org.lanternpowered.server.network.message.codec.CodecContext
-import org.lanternpowered.server.network.message.processor.Processor
+import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.processor.Processor
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateWorldSkyPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket
 

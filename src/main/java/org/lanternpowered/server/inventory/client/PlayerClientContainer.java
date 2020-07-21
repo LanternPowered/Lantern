@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutHeldItemChange;
 import org.spongepowered.api.text.Text;
 

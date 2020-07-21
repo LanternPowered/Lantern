@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.login
 
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.profile.LanternGameProfile
 
 /**

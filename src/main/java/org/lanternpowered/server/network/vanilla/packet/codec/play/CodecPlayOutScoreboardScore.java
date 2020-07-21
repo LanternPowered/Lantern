@@ -12,27 +12,27 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardScore;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardScorePacket;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.translation.TranslationContext;
 
-public final class CodecPlayOutScoreboardScore implements Codec<PacketPlayOutScoreboardScore> {
+public final class CodecPlayOutScoreboardScore implements Codec<ScoreboardScorePacket> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutScoreboardScore message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, ScoreboardScorePacket packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         try (TranslationContext ignored = TranslationContext.enter()
                 .locale(context.getSession().getLocale())
                 .enableForcedTranslations()) {
-            buf.writeString(LanternTexts.toLegacy(message.getScoreName()));
+            buf.writeString(LanternTexts.toLegacy(packet.getScoreName()));
         }
-        final int action = message instanceof PacketPlayOutScoreboardScore.Remove ? 1 : 0;
+        final int action = packet instanceof ScoreboardScorePacket.Remove ? 1 : 0;
         buf.writeByte((byte) action);
-        buf.writeString(message.getObjectiveName());
+        buf.writeString(packet.getObjectiveName());
         if (action == 0) {
-            buf.writeVarInt(((PacketPlayOutScoreboardScore.CreateOrUpdate) message).getValue());
+            buf.writeVarInt(((ScoreboardScorePacket.CreateOrUpdate) packet).getValue());
         }
         return buf;
     }

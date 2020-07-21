@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 
 data class UpdateViewPositionPacket(
         val chunkX: Int,

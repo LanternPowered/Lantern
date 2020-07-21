@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;

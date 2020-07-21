@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.entity.parameter;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueType;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 
 public final class ParameterListContextualValueType implements ContextualValueType<ParameterList> {
 

@@ -14,7 +14,7 @@ import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.effect.sound.SoundType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.NamedSoundEffectPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SoundEffectPacket
 import org.spongepowered.math.vector.Vector3d

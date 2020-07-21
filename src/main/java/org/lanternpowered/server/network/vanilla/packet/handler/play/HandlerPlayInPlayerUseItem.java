@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerUseItem;
 
 public class HandlerPlayInPlayerUseItem implements Handler<PacketPlayInPlayerUseItem> {

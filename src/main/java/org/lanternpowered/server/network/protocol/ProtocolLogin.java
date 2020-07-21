@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.protocol;
 
-import org.lanternpowered.server.network.message.MessageRegistry;
+import org.lanternpowered.server.network.packet.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.packet.codec.DisconnectCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.login.LoginChannelResponseCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.login.LoginEncryptionResponseCodec;

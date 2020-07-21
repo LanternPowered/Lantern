@@ -16,11 +16,13 @@ import org.lanternpowered.api.Game
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
+import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.event.lifecycle.RegisterCatalogRegistryEvent
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.api.item.inventory.ItemStackBuilder
 import org.lanternpowered.api.registry.CatalogTypeRegistry
@@ -142,7 +144,6 @@ import org.lanternpowered.server.world.LanternWorldBorderBuilder
 import org.lanternpowered.server.world.archetype.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder
-import org.spongepowered.api.CatalogType
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.entity.BlockEntityArchetype
 import org.spongepowered.api.data.Key
@@ -153,7 +154,6 @@ import org.spongepowered.api.entity.living.player.tab.TabListEntry
 import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.cause.EventContextKey
 import org.spongepowered.api.event.lifecycle.RegisterBuilderEvent
-import org.spongepowered.api.event.lifecycle.RegisterCatalogRegistryEvent
 import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent
 import org.spongepowered.api.fluid.FluidStack
 import org.spongepowered.api.fluid.FluidStackSnapshot
@@ -369,7 +369,8 @@ class LanternGameRegistry(
         val catalogRegistryEvent = object : RegisterCatalogRegistryEvent {
             override fun getCause(): Cause = cause
             override fun getGame(): Game = this@LanternGameRegistry.game
-            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey): Unit = register(catalogClass, key, null)
+            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey): Unit =
+                    register(catalogClass, key, null)
             override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey, defaultsSupplier: Supplier<Set<T>>?) {
                 val registry = catalogTypeRegistry<T>(TypeToken.of(catalogClass)) {
                     allowPluginRegistrations()
@@ -381,6 +382,8 @@ class LanternGameRegistry(
                 }
                 catalogRegistry.register(registry, key)
             }
+            override fun <T : CatalogType> register(registry: CatalogTypeRegistry<T>, key: ResourceKey): Unit =
+                    catalogRegistry.register(registry, key)
         }
         EventManager.post(catalogRegistryEvent)
     }

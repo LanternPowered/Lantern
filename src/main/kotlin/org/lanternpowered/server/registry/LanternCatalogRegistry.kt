@@ -10,8 +10,10 @@
  */
 package org.lanternpowered.server.registry
 
+import net.kyori.adventure.key.Key as AdventureKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.asResourceKey
 import org.lanternpowered.api.registry.CatalogRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.DuplicateRegistrationException
@@ -76,7 +78,7 @@ object LanternCatalogRegistry : CatalogRegistry {
             requireRegistry(catalogClass).provide(suggestedId) as E
 
     override fun <T : CatalogType> get(typeClass: KClass<T>, key: ResourceKey): T? = getNullable(typeClass.java, key)
-    override fun <T : CatalogType> get(typeClass: Class<T>, key: ResourceKey): Optional<T> = getNullable(typeClass, key).optional()
+    override fun <T : CatalogType> get(typeClass: Class<T>, key: AdventureKey): Optional<T> = getNullable(typeClass, key.asResourceKey()).optional()
 
     private fun <T : CatalogType> getNullable(typeClass: Class<T>, key: ResourceKey): T? = getRegistry(typeClass)?.get(key)
 

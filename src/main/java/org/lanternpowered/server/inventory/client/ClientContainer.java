@@ -26,7 +26,7 @@ import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowItemsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket;

@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.buffer.contextual;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 
 public interface ContextualValueType<V> {
 

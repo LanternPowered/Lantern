@@ -12,19 +12,19 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLook;
 
 public final class CodecPlayOutEntityLook implements Codec<PacketPlayOutEntityLook> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityLook message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityLook packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeVarInt(message.getEntityId());
-        buf.writeByte(message.getYaw());
-        buf.writeByte(message.getPitch());
-        buf.writeBoolean(message.isOnGround());
+        buf.writeVarInt(packet.getEntityId());
+        buf.writeByte(packet.getYaw());
+        buf.writeByte(packet.getPitch());
+        buf.writeBoolean(packet.isOnGround());
         return buf;
     }
 }

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.play;
 
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.spongepowered.api.data.type.HandType;
 
 public final class PacketPlayInPlayerSwingArm implements Packet {

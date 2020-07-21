@@ -12,15 +12,15 @@ package org.lanternpowered.server.network.vanilla.packet.codec
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
-import org.lanternpowered.server.network.message.codec.Codec
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.DisconnectPacket
 
 class DisconnectCodec : Codec<DisconnectPacket> {
 
-    override fun encode(context: CodecContext, message: DisconnectPacket): ByteBuffer {
+    override fun encode(context: CodecContext, packet: DisconnectPacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()
-        context.write(buf, ContextualValueTypes.TEXT, message.reason)
+        context.write(buf, ContextualValueTypes.TEXT, packet.reason)
         return buf
     }
 }

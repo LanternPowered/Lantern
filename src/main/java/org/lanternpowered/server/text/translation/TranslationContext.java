@@ -10,8 +10,7 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import org.lanternpowered.server.network.message.Packet;
-import org.spongepowered.api.text.Text;
+import org.lanternpowered.server.network.packet.Packet;
 
 import java.util.Locale;
 

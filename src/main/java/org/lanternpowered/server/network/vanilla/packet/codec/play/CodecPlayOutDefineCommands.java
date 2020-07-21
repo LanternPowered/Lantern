@@ -14,8 +14,8 @@ import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.command.ArgumentNode;
 import org.lanternpowered.server.network.vanilla.command.LiteralNode;
 import org.lanternpowered.server.network.vanilla.command.Node;
@@ -33,9 +33,9 @@ public final class CodecPlayOutDefineCommands implements Codec<PacketPlayOutDefi
     private static final int ABSENT_VALUE = -1;
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutDefineCommands message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutDefineCommands packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        final RootNode rootNode = message.getRootNode();
+        final RootNode rootNode = packet.getRootNode();
 
         // Collect all the commands nested within the root node
         final Object2IntMap<Node> nodeToIndexMap = new Object2IntOpenHashMap<>();

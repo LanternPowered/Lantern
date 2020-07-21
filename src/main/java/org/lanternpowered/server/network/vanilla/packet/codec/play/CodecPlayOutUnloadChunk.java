@@ -12,14 +12,14 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnloadChunk;
 
 public final class CodecPlayOutUnloadChunk implements Codec<PacketPlayOutUnloadChunk> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutUnloadChunk message) throws CodecException {
-        return context.byteBufAlloc().buffer(8).writeInteger(message.getX()).writeInteger(message.getZ());
+    public ByteBuffer encode(CodecContext context, PacketPlayOutUnloadChunk packet) throws CodecException {
+        return context.byteBufAlloc().buffer(8).writeInteger(packet.getX()).writeInteger(packet.getZ());
     }
 }

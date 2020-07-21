@@ -42,7 +42,7 @@ import java.util.function.BiPredicate
  * @property elementToken The type of the element
  * @property requiresExplicitRegistration Whether this key needs to be registered explicitly on a key collection or registry
  */
-open class ValueKey<V : Value<E>, E : Any> internal constructor(
+class ValueKey<V : Value<E>, E : Any> internal constructor(
         private val key: ResourceKey,
         private val valueToken: TypeToken<V>,
         private val elementToken: TypeToken<E>,
@@ -62,7 +62,7 @@ open class ValueKey<V : Value<E>, E : Any> internal constructor(
     /**
      * The value constructor of the key.
      */
-    open val valueConstructor by lazy { ValueConstructorFactory.getConstructor(this) }
+    val valueConstructor by lazy { ValueConstructorFactory.getConstructor(this) }
 
     private val hashCode = Objects.hash(this.valueToken, this.key, this.elementToken)
 

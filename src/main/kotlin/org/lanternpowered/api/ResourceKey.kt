@@ -12,10 +12,24 @@
 
 package org.lanternpowered.api
 
+import net.kyori.adventure.key.Key as AdventureKey
+
 typealias ResourceKey = org.spongepowered.api.ResourceKey
 
 /**
  * Constructs a new [ResourceKey].
  */
-@JvmName("resourceKeyOf")
-inline fun ResourceKey(namespace: String, value: String): ResourceKey = ResourceKey.of(namespace, value)
+inline fun resourceKeyOf(namespace: String, value: String): ResourceKey =
+        ResourceKey.of(namespace, value)
+
+/**
+ * Converts the [AdventureKey] into a [ResourceKey].
+ */
+fun AdventureKey.asResourceKey(): ResourceKey =
+        if (this is ResourceKey) this else ResourceKey.of(namespace(), value())
+
+/**
+ * Converts the [AdventureKey] into a [ResourceKey].
+ */
+@Deprecated(message = "Redundant conversion.", replaceWith = ReplaceWith(""), level = DeprecationLevel.WARNING)
+fun ResourceKey.asResourceKey(): ResourceKey = this

@@ -17,7 +17,7 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ResourcePackStatusPacket
 
 class ResourcePackStatusHandler : Handler<ResourcePackStatusPacket> {

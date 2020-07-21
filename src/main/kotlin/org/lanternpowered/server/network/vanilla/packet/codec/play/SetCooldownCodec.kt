@@ -12,8 +12,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.item.NetworkItemHelper
-import org.lanternpowered.server.network.message.codec.Codec
-import org.lanternpowered.server.network.message.codec.CodecContext
+import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetCooldownPacket
 
 class SetCooldownCodec : Codec<SetCooldownPacket> {

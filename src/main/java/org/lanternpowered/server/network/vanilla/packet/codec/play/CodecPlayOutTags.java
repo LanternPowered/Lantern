@@ -16,8 +16,8 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.lanternpowered.server.game.registry.InternalIDRegistries;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTags;
 
 import java.util.Collections;
@@ -27,7 +27,7 @@ import java.util.function.IntConsumer;
 public final class CodecPlayOutTags implements Codec<PacketPlayOutTags> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutTags message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutTags packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         // TODO: Replace this hack, is currently required to
         // TODO: avoid crashes on the client.

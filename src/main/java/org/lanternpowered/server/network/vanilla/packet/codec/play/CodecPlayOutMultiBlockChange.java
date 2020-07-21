@@ -12,8 +12,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutMultiBlockChange;
 import org.spongepowered.math.vector.Vector3i;
@@ -23,11 +23,11 @@ import java.util.Collection;
 public final class CodecPlayOutMultiBlockChange implements Codec<PacketPlayOutMultiBlockChange> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutMultiBlockChange message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutMultiBlockChange packet) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeInteger(message.getChunkX());
-        buf.writeInteger(message.getChunkZ());
-        Collection<PacketPlayOutBlockChange> changes = message.getChanges();
+        buf.writeInteger(packet.getChunkX());
+        buf.writeInteger(packet.getChunkZ());
+        Collection<PacketPlayOutBlockChange> changes = packet.getChanges();
         buf.writeVarInt(changes.size());
         for (PacketPlayOutBlockChange change : changes) {
             Vector3i position = change.getPosition();

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.util
 
-import org.spongepowered.api.text.translation.locale.Locales
+import org.lanternpowered.api.locale.Locales
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 

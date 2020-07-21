@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.play.internal
 
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetGameModePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateWorldSkyPacket
 

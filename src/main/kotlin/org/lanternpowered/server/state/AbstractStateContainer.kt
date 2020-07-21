@@ -185,7 +185,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         builder.append(propertyValues.joinToString(separator = ","))
         builder.append(']')
 
-        return ResourceKey(baseKey.namespace, builder.toString())
+        return resourceKeyOf(baseKey.namespace, builder.toString())
     }
 
     override fun getValidStates(): ImmutableList<S> = this.validStates

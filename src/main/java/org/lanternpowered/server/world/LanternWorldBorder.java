@@ -15,7 +15,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutWorldBorder;
 import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.world.WorldBorder;

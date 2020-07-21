@@ -13,7 +13,7 @@ package org.lanternpowered.server.item
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.ResourceKeys.minecraft
 import org.lanternpowered.api.ext.itemStackOf
-import org.lanternpowered.api.ext.potionEffectOf
+import org.lanternpowered.api.effect.potion.potionEffectOf
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.ItemTypes
 import org.lanternpowered.api.item.inventory.ItemStack

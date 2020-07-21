@@ -23,7 +23,7 @@ import org.lanternpowered.server.network.NettyThreadOnly;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.ProxyType;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.packet.handler.login.LoginStartHandler;
 import org.lanternpowered.server.network.vanilla.packet.type.handshake.HandshakePacket;

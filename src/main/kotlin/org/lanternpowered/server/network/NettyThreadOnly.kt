@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network
 
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.handler.Handler
 
 /**
  * A annotation that can be applied to methods and

@@ -35,6 +35,11 @@ typealias TranslatableText = net.kyori.adventure.text.TranslatableComponent
 fun Text.toPlain(locale: Locale): String = PlainTextSerializer.serialize(this, locale)
 
 /**
+ * Converts the [Text] to a plain string format.
+ */
+fun Text.toPlain(): String = PlainTextSerializer.serialize(this)
+
+/**
  * Gets an empty [Text].
  */
 inline fun emptyText(): LiteralText = LiteralText.empty()

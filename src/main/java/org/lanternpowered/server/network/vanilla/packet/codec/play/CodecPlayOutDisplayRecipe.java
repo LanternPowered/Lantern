@@ -12,17 +12,17 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDisplayRecipe;
 
 public final class CodecPlayOutDisplayRecipe implements Codec<PacketPlayOutDisplayRecipe> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutDisplayRecipe message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutDisplayRecipe packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeByte((byte) message.getWindowId());
-        buf.writeString(message.getRecipeId());
+        buf.writeByte((byte) packet.getWindowId());
+        buf.writeString(packet.getRecipeId());
         return buf;
     }
 }

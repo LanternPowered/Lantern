@@ -12,8 +12,8 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutHeldItemChange;
 
 /**
@@ -23,8 +23,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOu
 public final class CodecPlayInOutHeldItemChange implements Codec<PacketPlayInOutHeldItemChange> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayInOutHeldItemChange message) throws CodecException {
-        return context.byteBufAlloc().buffer(1).writeByte((byte) message.getSlot());
+    public ByteBuffer encode(CodecContext context, PacketPlayInOutHeldItemChange packet) throws CodecException {
+        return context.byteBufAlloc().buffer(1).writeByte((byte) packet.getSlot());
     }
 
     @Override

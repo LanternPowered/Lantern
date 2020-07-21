@@ -14,7 +14,7 @@ import org.lanternpowered.api.boss.BossBarColor
 import org.lanternpowered.api.boss.BossBarFlag
 import org.lanternpowered.api.boss.BossBarOverlay
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.server.network.message.Packet
+import org.lanternpowered.server.network.packet.Packet
 import java.util.UUID
 
 sealed class BossBarPacket : Packet {

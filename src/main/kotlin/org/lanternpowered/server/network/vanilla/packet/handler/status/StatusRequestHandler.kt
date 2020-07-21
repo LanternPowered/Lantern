@@ -21,7 +21,7 @@ import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.WrappedRemoteConnection
-import org.lanternpowered.server.network.message.handler.Handler
+import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.status.LanternFavicon
 import org.lanternpowered.server.network.status.LanternStatusClient
 import org.lanternpowered.server.network.status.LanternStatusHelper
@@ -47,7 +47,7 @@ class StatusRequestHandler : Handler<StatusRequestPacket> {
         val client = LanternStatusClient(address, clientVersion, virtualAddress)
         val players = LanternStatusHelper.createPlayers(server)
         val response = LanternStatusResponse(Lantern.getGame().platform.minecraftVersion,
-                description, players, server.favicon.orElse(null))
+                description, players, server.favicon)
         val cause = causeOf(WrappedRemoteConnection(session))
         val event = LanternEventFactory.createClientPingServerEvent(cause, client, response)
         EventManager.post(event)

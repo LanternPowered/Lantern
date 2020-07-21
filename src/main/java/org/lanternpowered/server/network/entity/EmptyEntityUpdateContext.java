@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.message.Packet;
+import org.lanternpowered.server.network.packet.Packet;
 import org.spongepowered.api.entity.Entity;
 
 import java.util.Optional;

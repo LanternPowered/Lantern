@@ -12,18 +12,18 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutPlayerHealthUpdate;
 
 public final class CodecPlayOutPlayerHealthUpdate implements Codec<PacketPlayOutPlayerHealthUpdate> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutPlayerHealthUpdate message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutPlayerHealthUpdate packet) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeFloat(message.getHealth());
-        buf.writeVarInt((int) message.getFood());
-        buf.writeFloat(message.getSaturation());
+        buf.writeFloat(packet.getHealth());
+        buf.writeVarInt((int) packet.getFood());
+        buf.writeFloat(packet.getSaturation());
         return buf;
     }
 }

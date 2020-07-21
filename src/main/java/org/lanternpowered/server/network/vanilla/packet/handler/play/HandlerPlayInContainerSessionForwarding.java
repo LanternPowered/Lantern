@@ -14,8 +14,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.Packet;
-import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.packet.Packet;
+import org.lanternpowered.server.network.packet.handler.Handler;
 
 import java.util.function.BiConsumer;
 

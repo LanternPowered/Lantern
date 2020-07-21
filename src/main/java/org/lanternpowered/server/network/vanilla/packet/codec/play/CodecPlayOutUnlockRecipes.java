@@ -14,8 +14,8 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnlockRecipes;
 
 import java.util.List;
@@ -23,28 +23,28 @@ import java.util.List;
 public final class CodecPlayOutUnlockRecipes implements Codec<PacketPlayOutUnlockRecipes> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutUnlockRecipes message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutUnlockRecipes packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        if (message instanceof PacketPlayOutUnlockRecipes.Remove) {
+        if (packet instanceof PacketPlayOutUnlockRecipes.Remove) {
             buf.writeVarInt((short) 2);
-        } else if (message instanceof PacketPlayOutUnlockRecipes.Add) {
+        } else if (packet instanceof PacketPlayOutUnlockRecipes.Add) {
             buf.writeVarInt((short) 1);
-        } else if (message instanceof PacketPlayOutUnlockRecipes.Init) {
+        } else if (packet instanceof PacketPlayOutUnlockRecipes.Init) {
             buf.writeVarInt((short) 0);
         } else {
             throw new EncoderException();
         }
-        RecipeBookState bookState = message.getCraftingRecipeBookState();
+        RecipeBookState bookState = packet.getCraftingRecipeBookState();
         buf.writeBoolean(bookState.isCurrentlyOpen());
         buf.writeBoolean(bookState.isFilterActive());
-        bookState = message.getSmeltingRecipeBookState();
+        bookState = packet.getSmeltingRecipeBookState();
         buf.writeBoolean(bookState.isCurrentlyOpen());
         buf.writeBoolean(bookState.isFilterActive());
-        List<String> recipeIds = message.getRecipeIds();
+        List<String> recipeIds = packet.getRecipeIds();
         buf.writeVarInt(recipeIds.size());
         recipeIds.forEach(buf::writeString);
-        if (message instanceof PacketPlayOutUnlockRecipes.Init) {
-            recipeIds = ((PacketPlayOutUnlockRecipes.Init) message).getRecipeIdsToBeDisplayed();
+        if (packet instanceof PacketPlayOutUnlockRecipes.Init) {
+            recipeIds = ((PacketPlayOutUnlockRecipes.Init) packet).getRecipeIdsToBeDisplayed();
             buf.writeVarInt(recipeIds.size());
             recipeIds.forEach(buf::writeString);
         }

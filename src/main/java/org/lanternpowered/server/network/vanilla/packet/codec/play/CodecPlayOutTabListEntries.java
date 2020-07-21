@@ -17,8 +17,8 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.packet.codec.Codec;
+import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries.Entry;
 import org.spongepowered.api.profile.property.ProfileProperty;
@@ -49,9 +49,9 @@ public final class CodecPlayOutTabListEntries implements Codec<PacketPlayOutTabL
     }
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutTabListEntries message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, PacketPlayOutTabListEntries packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
-        final List<Entry> entries = message.getEntries();
+        final List<Entry> entries = packet.getEntries();
         final int type = this.typeLookup.getInt(entries.get(0).getClass());
         buf.writeVarInt(type);
         buf.writeVarInt(entries.size());

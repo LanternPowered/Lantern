@@ -16,7 +16,6 @@ import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import java.util.Optional
-import java.util.function.Supplier
 
 /**
  * Constructs a new [CatalogTypeRegistry].
@@ -85,20 +84,13 @@ interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
             "Can't find a ${typeToken.rawType.simpleName} with the key: $key")
 
     /**
-     * Gets a [Supplier] for a type with the suggested id. The suggested
-     * id doesn't contain a namespace. By default, the priority of namespaces
-     * is the following: `minecraft`, `lantern`, `sponge`, plugin namespaces.
-     */
-    fun provideSupplier(suggestedId: String): Supplier<T>
-
-    /**
      * Gets a provided type with the suggested id. The suggested id doesn't
      * contain a namespace. By default, the priority of namespaces  is the
      * following: `minecraft`, `lantern`, `sponge`, plugin namespaces.
      *
      * @throws UnsupportedOperationException If the registry is a mutable registry
      */
-    fun provide(suggestedId: String): T
+    fun provide(suggestedId: String): CatalogTypeProvider<T>
 
     interface Factory {
 

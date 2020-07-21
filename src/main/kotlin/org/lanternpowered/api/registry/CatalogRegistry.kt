@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.api.registry
 
-import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.CatalogType
+import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.registry.UnknownTypeException
 import java.util.function.Supplier
 import kotlin.collections.Collection
@@ -48,16 +48,6 @@ inline fun <reified T : CatalogType> CatalogRegistry.require(key: ResourceKey): 
 inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: ResourceKey): T? = get(T::class, key)
 
 /**
- * Creates a [Supplier] that will be used to get [CatalogType] instances.
- *
- * @param suggestedId The suggested id to use
- * @param T The type of catalog
- * @return The supplier
- * @throws UnknownTypeException If the type provided has not been registered
- */
-inline fun <reified T : CatalogType> CatalogRegistry.provideSupplier(suggestedId: String): Supplier<T> = provideSupplier(T::class, suggestedId)
-
-/**
  * Provides the [T] that will be used to get [CatalogType] instances.
  *
  * This method isn't supported by [MutableCatalogTypeRegistry]s, using this for
@@ -70,7 +60,7 @@ inline fun <reified T : CatalogType> CatalogRegistry.provideSupplier(suggestedId
  * @throws UnknownTypeException If the type provided has not been registered
  * @throws UnsupportedOperationException If the registry is a mutable registry
  */
-inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String): T = provide(T::class, suggestedId)
+inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String): CatalogTypeProvider<T> = provide(T::class, suggestedId)
 
 /**
  * Gets a collection of all available found specific types of
@@ -90,24 +80,16 @@ inline fun <reified T : CatalogType> CatalogRegistry.getAllOf(): Collection<T> =
  */
 interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
 
-    /**
-     * Creates a [Supplier] that will be used to get [CatalogType] instances.
-     *
-     * @param catalogClass The catalog class
-     * @param suggestedId The suggested id to use
-     * @param T The type of catalog
-     * @param E The generic of the catalog (if applicable)
-     * @return The supplier
-     * @throws UnknownTypeException If the type provided has not been registered
-     */
-    fun <T : CatalogType, E : T> provideSupplier(catalogClass: KClass<T>, suggestedId: String): Supplier<E>
+    @Deprecated(
+            message = "Use provide instead.",
+            level = DeprecationLevel.WARNING,
+            replaceWith = ReplaceWith("provide(catalogClass, suggestedId)")
+    )
+    override fun <T : CatalogType, E : T> provideSupplier(catalogClass: Class<T>, suggestedId: String): Supplier<E> =
+            provide(catalogClass.kotlin, suggestedId)
 
     /**
-     * Gets a [CatalogType] instance.
-     *
-     * This method isn't supported by [MutableCatalogTypeRegistry]s, using this for
-     * that registry will result in an [UnsupportedOperationException]. Since there's
-     * no guarantee that every time the same instance will be returned.
+     * Creates a [CatalogTypeProvider] that will be used to get [CatalogType] instances.
      *
      * @param catalogClass The catalog class
      * @param suggestedId The suggested id to use
@@ -115,9 +97,8 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @param E The generic of the catalog (if applicable)
      * @return The supplier
      * @throws UnknownTypeException If the type provided has not been registered
-     * @throws UnsupportedOperationException If the registry is a mutable registry
      */
-    fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): E
+    fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): CatalogTypeProvider<E>
 
     /**
      * Attempts to retrieve the specific type of [CatalogType] based on

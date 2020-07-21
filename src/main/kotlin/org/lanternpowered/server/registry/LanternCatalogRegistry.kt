@@ -10,19 +10,19 @@
  */
 package org.lanternpowered.server.registry
 
-import net.kyori.adventure.key.Key as AdventureKey
-import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.asResourceKey
+import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogRegistry
+import org.lanternpowered.api.registry.CatalogTypeProvider
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.DuplicateRegistrationException
 import org.lanternpowered.api.registry.UnknownTypeException
 import org.lanternpowered.api.util.optional.optional
 import java.util.Optional
-import java.util.function.Supplier
 import java.util.stream.Stream
 import kotlin.reflect.KClass
+import net.kyori.adventure.key.Key as AdventureKey
 
 object LanternCatalogRegistry : CatalogRegistry {
 
@@ -66,16 +66,9 @@ object LanternCatalogRegistry : CatalogRegistry {
     private fun <T : CatalogType> requireRegistry(catalogClass: KClass<T>): CatalogTypeRegistry<T> =
             requireRegistry(catalogClass.java)
 
-    override fun <T : CatalogType, E : T> provideSupplier(catalogClass: KClass<T>, suggestedId: String): Supplier<E> =
-            provideSupplier(catalogClass.java, suggestedId)
-
     @Suppress("UNCHECKED_CAST")
-    override fun <T : CatalogType, E : T> provideSupplier(catalogClass: Class<T>, suggestedId: String): Supplier<E> =
-            requireRegistry(catalogClass).provideSupplier(suggestedId) as Supplier<E>
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): E =
-            requireRegistry(catalogClass).provide(suggestedId) as E
+    override fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): CatalogTypeProvider<E> =
+            requireRegistry(catalogClass).provide(suggestedId) as CatalogTypeProvider<E>
 
     override fun <T : CatalogType> get(typeClass: KClass<T>, key: ResourceKey): T? = getNullable(typeClass.java, key)
     override fun <T : CatalogType> get(typeClass: Class<T>, key: AdventureKey): Optional<T> = getNullable(typeClass, key.asResourceKey()).optional()

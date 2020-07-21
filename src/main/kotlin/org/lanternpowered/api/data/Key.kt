@@ -10,11 +10,11 @@
  */
 package org.lanternpowered.api.data
 
-import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.registry.CatalogBuilder
+import org.lanternpowered.api.util.type.TypeToken
 import org.spongepowered.api.data.value.Value
 
 typealias Key<V> = org.spongepowered.api.data.Key<V>

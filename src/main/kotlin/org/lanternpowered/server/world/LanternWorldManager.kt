@@ -10,8 +10,11 @@
  */
 package org.lanternpowered.server.world
 
+import org.lanternpowered.api.Game
 import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStackManager
+import org.lanternpowered.api.event.lifecycle.RegisterWorldEvent
 import org.lanternpowered.api.resourceKeyOf
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
@@ -24,9 +27,6 @@ import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.util.SyncLanternThread
-import org.spongepowered.api.Game
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.lifecycle.RegisterWorldEvent
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.CompletableFuture

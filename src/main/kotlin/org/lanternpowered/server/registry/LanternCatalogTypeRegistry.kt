@@ -26,6 +26,7 @@ import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.registry.CatalogTypeProvider
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
 import org.lanternpowered.api.registry.MutableCatalogTypeRegistry
@@ -33,10 +34,13 @@ import org.lanternpowered.api.registry.MutableCatalogTypeRegistryBase
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.type.TypeToken
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.LanternGame
 import org.spongepowered.api.Game
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent
+import java.lang.reflect.Modifier
 import java.util.function.Supplier
+import kotlin.reflect.KClass
 
 object LanternCatalogTypeRegistryFactory : CatalogTypeRegistry.Factory {
 
@@ -111,7 +115,7 @@ private abstract class AbstractMutableCatalogTypeRegistry<T, D, B, R>(
             builder.fn()
             builder.fix().registerPluginTypes()
             this.data = builder.fix().build()
-            invalidateSuppliers()
+            invalidateProviders()
             for (watcher in this.watchers)
                 watcher(this as R)
         }
@@ -201,7 +205,7 @@ private abstract class AbstractImmutableCatalogTypeRegistry<T, D, B>(
             val data = builder.fix().build()
             this.initializer = null
             this.data = data
-            invalidateSuppliers()
+            invalidateProviders()
             return data
         } finally {
             cycleStack.removeLast()
@@ -219,7 +223,7 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
         override val typeToken: TypeToken<T>
 ) : CatalogTypeRegistry<T> {
 
-    private val suppliers: MutableMap<String, CatalogTypeSupplier<T>> = MapMaker().weakValues().makeMap()
+    private val providers: MutableMap<String, CatalogTypeProviderImpl<T>> = MapMaker().weakValues().makeMap()
 
     val typeName: String
         get() = this.typeToken.rawType.simpleName
@@ -229,21 +233,18 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
 
     override fun get(key: ResourceKey): T? = ensureLoaded().byKey[key]
 
-    override fun provideSupplier(suggestedId: String): Supplier<T> =
-            this.suppliers.computeIfAbsent(suggestedId) { CatalogTypeSupplier(suggestedId, this) }
+    override fun provide(suggestedId: String): CatalogTypeProvider<T> =
+            this.providers.computeIfAbsent(suggestedId.toLowerCase()) { id -> CatalogTypeProviderImpl(id, this) }
 
-    override fun provide(suggestedId: String): T = find(suggestedId) ?: error("There's no $typeName registered with the suggested id: $suggestedId")
-
-    protected fun invalidateSuppliers() {
-        this.suppliers.values.forEach { supplier -> supplier.invalidate() }
+    protected fun invalidateProviders() {
+        this.providers.values.forEach { supplier -> supplier.invalidate() }
     }
 
     fun find(suggestedId: String): T? {
-        val lowerId = suggestedId.toLowerCase()
         val data = ensureLoaded()
         return data.byKey.values.asSequence()
                 .filter { type ->
-                    type.key.value.toLowerCase() == lowerId || data.suggestedIdMatchers.any { matcher -> matcher(lowerId, type) }
+                    type.key.value.toLowerCase() == suggestedId || data.suggestedIdMatchers.any { matcher -> matcher(suggestedId, type) }
                 }
                 .sortedBy { type ->
                     val index = prioritizedNamespaces.indexOf(type.key.namespace)
@@ -301,10 +302,10 @@ private open class RegistryData<T>(
  */
 private class CustomCollection<E>(backing: Collection<E>) : org.lanternpowered.api.registry.Collection<E>, Collection<E> by backing
 
-private class CatalogTypeSupplier<T : CatalogType>(
-        private val suggestedId: String,
-        private val registry: LanternCatalogTypeRegistry<T, *>
-) : Supplier<T> {
+private class CatalogTypeProviderImpl<T : CatalogType>(
+        val suggestedId: String,
+        val registry: LanternCatalogTypeRegistry<T, *>
+) : CatalogTypeProvider<T> {
 
     private object Uninitialized
 
@@ -379,6 +380,8 @@ private class LanternRegistryBuilder<T : CatalogType>(typeToken: TypeToken<T>) :
     }
 }
 
+private val supplierParameter = Supplier::class.java.typeParameters[0]
+
 private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D : RegistryData<T>>(
         val typeToken: TypeToken<T>
 ): InternalCatalogTypeRegistryBuilder<T, I> {
@@ -401,6 +404,34 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
         if (internalId != null)
             this.byId[internalId] = type
         return type
+    }
+
+    override fun processSuggestions(catalogs: Iterable<KClass<*>>, function: (suggestedId: String, type: TypeToken<out T>) -> Unit) {
+        for (catalog in catalogs)
+            processSuggestions(catalog, function)
+    }
+
+    private fun processSuggestions(catalog: KClass<*>, function: (suggestedId: String, type: TypeToken<out T>) -> Unit) {
+        val objectInstance = catalog.objectInstance
+        for (field in catalog.java.declaredFields) {
+            field.isAccessible = true
+            if (!Supplier::class.java.isAssignableFrom(field.type) || !Modifier.isFinal(field.modifiers))
+                continue
+            var fieldType = TypeToken.of(field.type)
+            fieldType = fieldType.resolveType(supplierParameter)
+            if (!this.typeToken.rawType.isAssignableFrom(fieldType.rawType))
+                continue
+            val provider = if (Modifier.isStatic(field.modifiers)) {
+                field.get(null) as Supplier<T>
+            } else if (objectInstance != null) {
+                field.get(objectInstance) as Supplier<T>
+            } else {
+                continue
+            }
+            if (provider !is CatalogTypeProviderImpl<*>)
+                continue
+            function(provider.suggestedId, fieldType.uncheckedCast())
+        }
     }
 
     fun registerPluginTypes() {

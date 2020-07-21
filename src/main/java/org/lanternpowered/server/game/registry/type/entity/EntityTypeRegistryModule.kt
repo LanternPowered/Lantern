@@ -12,7 +12,6 @@ package org.lanternpowered.server.game.registry.type.entity
 
 import org.lanternpowered.api.ResourceKeys.minecraft
 import org.lanternpowered.api.ResourceKeys.sponge
-import org.lanternpowered.server.data.key.ValueKeyRegistryModule
 import org.lanternpowered.server.entity.LanternHuman
 import org.lanternpowered.server.entity.LanternItem
 import org.lanternpowered.server.entity.LanternZombie

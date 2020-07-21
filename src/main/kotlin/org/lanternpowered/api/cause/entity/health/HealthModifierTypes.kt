@@ -11,7 +11,7 @@
 package org.lanternpowered.api.cause.entity.health
 
 import org.lanternpowered.api.registry.CatalogRegistry
-import org.lanternpowered.api.registry.provideSupplier
+import org.lanternpowered.api.registry.provide
 import org.spongepowered.api.effect.potion.PotionEffect
 import org.spongepowered.api.effect.potion.PotionEffectTypes
 import org.spongepowered.api.entity.Entity
@@ -21,7 +21,6 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.world.World
 import org.spongepowered.api.world.difficulty.Difficulty
-import java.util.function.Supplier
 
 object HealthModifierTypes {
 
@@ -30,37 +29,37 @@ object HealthModifierTypes {
      * the [PotionEffectTypes.ABSORPTION] level on the
      * [Entity].
      */
-    @JvmField val ABSORPTION: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("ABSORPTION")
+    val ABSORPTION: HealthModifierType by CatalogRegistry.provide("ABSORPTION")
 
     /**
      * Represents a [HealthModifier] that will reduce damage based on
      * the armor [ItemStack]s.
      */
-    @JvmField val ARMOR: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("ARMOR")
+    val ARMOR: HealthModifierType by CatalogRegistry.provide("ARMOR")
 
     /**
      * Represents a [HealthModifier] that will modify the heal amount
      * from a [PotionEffect] affecting the target.
      */
-    @JvmField val DEFENSIVE_POTION_EFFECT: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("DEFENSIVE_POTION_EFFECT")
+    val DEFENSIVE_POTION_EFFECT: HealthModifierType by CatalogRegistry.provide("DEFENSIVE_POTION_EFFECT")
 
     /**
      * Represents a [HealthModifier] that enhances damage based on the
      * current [Difficulty] of the [World].
      */
-    @JvmField val DIFFICULTY: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("DIFFICULTY")
+    val DIFFICULTY: HealthModifierType by CatalogRegistry.provide("DIFFICULTY")
 
     /**
      * Represents a [HealthModifier] that will modify damage based on
      * magic.
      */
-    @JvmField val MAGIC: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("MAGIC")
+    val MAGIC: HealthModifierType by CatalogRegistry.provide("MAGIC")
 
     /**
      * Represents the [HealthModifier] that will increase heal amount
      * from a [PotionEffect] affecting the target.
      */
-    @JvmField val OFFENSIVE_POTION_EFFECT: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("OFFENSIVE_POTION_EFFECT")
+    val OFFENSIVE_POTION_EFFECT: HealthModifierType by CatalogRegistry.provide("OFFENSIVE_POTION_EFFECT")
 
     /**
      * Represents the [HealthModifier] that will modify heal amount from
@@ -71,5 +70,5 @@ object HealthModifierTypes {
      * that the [EnchantmentType] of the [ItemStack] is modifying the
      * incoming/outgoing heal amount.
      */
-    @JvmField val WEAPON_ENCHANTMENT: Supplier<HealthModifierType> = CatalogRegistry.provideSupplier("WEAPON_ENCHANTMENT")
+    val WEAPON_ENCHANTMENT: HealthModifierType by CatalogRegistry.provide("WEAPON_ENCHANTMENT")
 }

@@ -11,16 +11,16 @@
 package org.lanternpowered.api.cause.entity.health
 
 import org.lanternpowered.api.registry.CatalogRegistry
-import org.lanternpowered.api.registry.provideSupplier
+import org.lanternpowered.api.registry.provide
 import java.util.function.Supplier
 
 object HealingTypes {
 
-    @JvmField val BOSS: Supplier<HealingType> = CatalogRegistry.provideSupplier("BOSS")
-    @JvmField val FOOD: Supplier<HealingType> = CatalogRegistry.provideSupplier("FOOD")
-    @JvmField val PLUGIN: Supplier<HealingType> = CatalogRegistry.provideSupplier("PLUGIN")
-    @JvmField val POTION: Supplier<HealingType> = CatalogRegistry.provideSupplier("POTION")
-    @JvmField val UNDEAD: Supplier<HealingType> = CatalogRegistry.provideSupplier("UNDEAD")
-    @JvmField val MAGIC: Supplier<HealingType> = CatalogRegistry.provideSupplier("MAGIC")
-    @JvmField val GENERIC: Supplier<HealingType> = CatalogRegistry.provideSupplier("GENERIC")
+    @JvmField val BOSS: Supplier<HealingType> = CatalogRegistry.provide("BOSS")
+    @JvmField val FOOD: Supplier<HealingType> = CatalogRegistry.provide("FOOD")
+    @JvmField val PLUGIN: Supplier<HealingType> = CatalogRegistry.provide("PLUGIN")
+    @JvmField val POTION: Supplier<HealingType> = CatalogRegistry.provide("POTION")
+    @JvmField val UNDEAD: Supplier<HealingType> = CatalogRegistry.provide("UNDEAD")
+    @JvmField val MAGIC: Supplier<HealingType> = CatalogRegistry.provide("MAGIC")
+    @JvmField val GENERIC: Supplier<HealingType> = CatalogRegistry.provide("GENERIC")
 }

@@ -25,3 +25,5 @@ typealias ServerLifecycleEvent = EngineLifecycleEvent<Server>
 typealias StartingServerEvent = StartingEngineEvent<Server>
 typealias StartedServerEvent = StartedEngineEvent<Server>
 typealias StoppingServerEvent = StoppingEngineEvent<Server>
+
+typealias RegisterWorldEvent = org.spongepowered.api.event.lifecycle.RegisterWorldEvent

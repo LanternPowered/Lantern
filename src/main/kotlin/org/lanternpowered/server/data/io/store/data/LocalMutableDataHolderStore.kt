@@ -18,9 +18,9 @@ import org.lanternpowered.server.data.ElementKeyRegistration
 import org.lanternpowered.server.data.LocalMutableDataHolder
 import org.lanternpowered.server.data.io.store.ObjectStore
 import org.lanternpowered.server.data.io.store.SimpleValueContainer
-import org.lanternpowered.server.data.key.ValueKeyRegistryModule
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry
+import org.lanternpowered.server.registry.type.data.ValueKeyRegistry
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
@@ -38,7 +38,7 @@ open class LocalMutableDataHolderStore<H : LocalMutableDataHolder> : ObjectStore
 
             for ((query, raw) in valuesView.getValues(false)) {
                 val resourceKey = ResourceKeys.resolve(query.toString())
-                val key = ValueKeyRegistryModule[resourceKey].orNull().uncheckedCast<Key<Value<Any>>?>()
+                val key = ValueKeyRegistry[resourceKey].uncheckedCast<Key<Value<Any>>?>()
                 if (key == null) {
                     Lantern.getLogger().warn(
                             "Unable to deserialize the data value with key: $resourceKey because it doesn't exist.")

@@ -13,7 +13,7 @@ package org.lanternpowered.server.inventory.vanilla;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.api.ResourceKeys;
+import org.lanternpowered.api.NamespacedKeys;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
@@ -262,7 +262,7 @@ public final class VanillaInventoryArchetypes {
 
         SLOT = AbstractSlot.builder()
                 .type(LanternSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("slot"));
+                .buildArchetype(NamespacedKeys.minecraft("slot"));
 
         //////////////////
         /// Input Slot ///
@@ -270,7 +270,7 @@ public final class VanillaInventoryArchetypes {
 
         INPUT_SLOT = AbstractSlot.builder()
                 .type(LanternInputSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("input_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("input_slot"));
 
         ///////////////////
         /// Output Slot ///
@@ -278,7 +278,7 @@ public final class VanillaInventoryArchetypes {
 
         OUTPUT_SLOT = AbstractSlot.builder()
                 .type(LanternOutputSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("output_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("output_slot"));
 
         /////////////////
         /// Fuel Slot ///
@@ -288,7 +288,7 @@ public final class VanillaInventoryArchetypes {
                 .filter(ItemPredicate.ofStackPredicate(stack ->
                         Lantern.getRegistry().getFuelRegistry().findMatching(stack.createSnapshot()).isPresent()))
                 .type(LanternFuelSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("fuel_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("fuel_slot"));
 
         ////////////////////////////
         /// Crafting Output Slot ///
@@ -296,7 +296,7 @@ public final class VanillaInventoryArchetypes {
 
         CRAFTING_OUTPUT_SLOT = AbstractSlot.builder()
                 .type(LanternCraftingOutputSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("crafting_output_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("crafting_output_slot"));
 
         ///////////////////
         /// Helmet Slot ///
@@ -305,7 +305,7 @@ public final class VanillaInventoryArchetypes {
         HELMET_SLOT = AbstractSlot.builder()
                 .property(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.HEADWEAR)
                 .type(LanternEquipmentSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("helmet_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("helmet_slot"));
 
         ///////////////////////
         /// Chestplate Slot ///
@@ -314,7 +314,7 @@ public final class VanillaInventoryArchetypes {
         CHESTPLATE_SLOT = AbstractSlot.builder()
                 .property(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.CHESTPLATE)
                 .type(LanternEquipmentSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("chestplate_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("chestplate_slot"));
 
         /////////////////////
         /// Leggings Slot ///
@@ -323,7 +323,7 @@ public final class VanillaInventoryArchetypes {
         LEGGINGS_SLOT = AbstractSlot.builder()
                 .property(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.LEGGINGS)
                 .type(LanternEquipmentSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("leggings_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("leggings_slot"));
 
         //////////////////
         /// Boots Slot ///
@@ -332,7 +332,7 @@ public final class VanillaInventoryArchetypes {
         BOOTS_SLOT = AbstractSlot.builder()
                 .property(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.BOOTS)
                 .type(LanternEquipmentSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("boots_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("boots_slot"));
 
         /////////////////////
         /// Mainhand Slot ///
@@ -341,7 +341,7 @@ public final class VanillaInventoryArchetypes {
         MAIN_HAND_SLOT = AbstractSlot.builder()
                 .property(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.MAIN_HAND)
                 .type(LanternUnrestrictedEquipmentSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("main_hand_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("main_hand_slot"));
 
         ////////////////////
         /// Offhand Slot ///
@@ -350,7 +350,7 @@ public final class VanillaInventoryArchetypes {
         OFF_HAND_SLOT = AbstractSlot.builder()
                 .property(InventoryProperties.EQUIPMENT_TYPE, EquipmentTypes.OFF_HAND)
                 .type(LanternUnrestrictedEquipmentSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("off_hand_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("off_hand_slot"));
 
         //////////////
         /// Chests ///
@@ -368,15 +368,15 @@ public final class VanillaInventoryArchetypes {
         CHEST = chestBuilder
                 .title(tr("container.chest"))
                 .property(InventoryProperties.GUI_ID, GuiIds.CHEST)
-                .buildArchetype(ResourceKeys.minecraft("chest"));
+                .buildArchetype(NamespacedKeys.minecraft("chest"));
         SHULKER_BOX = chestBuilder
                 .title(tr("container.shulkerBox"))
                 .property(InventoryProperties.GUI_ID, GuiIds.SHULKER_BOX)
-                .buildArchetype(ResourceKeys.minecraft("shulker_box"));
+                .buildArchetype(NamespacedKeys.minecraft("shulker_box"));
         ENDER_CHEST = chestBuilder
                 .title(tr("container.enderchest"))
                 .property(InventoryProperties.GUI_ID, GuiIds.CHEST)
-                .buildArchetype(ResourceKeys.minecraft("ender_chest"));
+                .buildArchetype(NamespacedKeys.minecraft("ender_chest"));
 
         ////////////////////
         /// Double Chest ///
@@ -389,7 +389,7 @@ public final class VanillaInventoryArchetypes {
                 .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
                 .property(InventoryProperties.GUI_ID, GuiIds.CHEST)
                 .type(ChestInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("double_chest"));
+                .buildArchetype(NamespacedKeys.minecraft("double_chest"));
 
         /////////////////
         /// Dispenser ///
@@ -406,7 +406,7 @@ public final class VanillaInventoryArchetypes {
                 dispenserBuilder.slot(x, y, SLOT);
             }
         }
-        DISPENSER = dispenserBuilder.buildArchetype(ResourceKeys.minecraft("dispenser"));
+        DISPENSER = dispenserBuilder.buildArchetype(NamespacedKeys.minecraft("dispenser"));
 
         ///////////////
         /// Jukebox ///
@@ -414,7 +414,7 @@ public final class VanillaInventoryArchetypes {
 
         JUKEBOX = AbstractSlot.builder()
                 .type(JukeboxInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("jukebox"));
+                .buildArchetype(NamespacedKeys.minecraft("jukebox"));
 
         ///////////////
         /// Furnace ///
@@ -428,7 +428,7 @@ public final class VanillaInventoryArchetypes {
                 .shiftClickBehavior(FurnaceShiftClickBehavior.INSTANCE)
                 .property(InventoryProperties.GUI_ID, GuiIds.FURNACE)
                 .type(FurnaceInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("furnace"));
+                .buildArchetype(NamespacedKeys.minecraft("furnace"));
 
         ////////////////////////
         /// Entity Equipment ///
@@ -442,7 +442,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(LEGGINGS_SLOT)
                 .addLast(BOOTS_SLOT)
                 .type(LanternArmorEquipableInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("entity_equipment"));
+                .buildArchetype(NamespacedKeys.minecraft("entity_equipment"));
 
         ////////////////////////
         /// Player Main Grid ///
@@ -455,7 +455,7 @@ public final class VanillaInventoryArchetypes {
                 gridBuilder.slot(x, y, SLOT);
             }
         }
-        PLAYER_MAIN_GRID = gridBuilder.buildArchetype(ResourceKeys.minecraft("player_main_grid"));
+        PLAYER_MAIN_GRID = gridBuilder.buildArchetype(NamespacedKeys.minecraft("player_main_grid"));
 
         /////////////////////
         /// Player Hotbar ///
@@ -466,7 +466,7 @@ public final class VanillaInventoryArchetypes {
         for (int x = 0; x < 9; x++) {
             hotbarBuilder.addLast(SLOT);
         }
-        PLAYER_HOTBAR = hotbarBuilder.buildArchetype(ResourceKeys.minecraft("player_hotbar"));
+        PLAYER_HOTBAR = hotbarBuilder.buildArchetype(NamespacedKeys.minecraft("player_hotbar"));
 
         ///////////////////
         /// Player Main ///
@@ -476,7 +476,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(PLAYER_MAIN_GRID)
                 .addLast(PLAYER_HOTBAR)
                 .type(LanternPrimaryPlayerInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("player_main"));
+                .buildArchetype(NamespacedKeys.minecraft("player_main"));
 
         /////////////////////
         /// Crafting Grid ///
@@ -489,7 +489,7 @@ public final class VanillaInventoryArchetypes {
                 craftingGridBuilder.slot(x, y, INPUT_SLOT);
             }
         }
-        CRAFTING_GRID = craftingGridBuilder.buildArchetype(ResourceKeys.minecraft("crafting_grid"));
+        CRAFTING_GRID = craftingGridBuilder.buildArchetype(NamespacedKeys.minecraft("crafting_grid"));
 
         ////////////////
         /// Crafting ///
@@ -499,7 +499,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(CRAFTING_OUTPUT_SLOT)
                 .addLast(CRAFTING_GRID)
                 .type(LanternCraftingInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("crafting"));
+                .buildArchetype(NamespacedKeys.minecraft("crafting"));
 
         //////////////////////
         /// Workbench Grid ///
@@ -513,7 +513,7 @@ public final class VanillaInventoryArchetypes {
                 workbenchGridBuilder.slot(x, y, INPUT_SLOT);
             }
         }
-        CRAFTING_TABLE_GRID = workbenchGridBuilder.buildArchetype(ResourceKeys.minecraft("crafting_table_grid"));
+        CRAFTING_TABLE_GRID = workbenchGridBuilder.buildArchetype(NamespacedKeys.minecraft("crafting_table_grid"));
 
         /////////////////
         /// Workbench ///
@@ -524,7 +524,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(CRAFTING_TABLE_GRID)
                 .property(InventoryProperties.GUI_ID, GuiIds.CRAFTING_TABLE)
                 .type(CraftingTableInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("crafting_table"));
+                .buildArchetype(NamespacedKeys.minecraft("crafting_table"));
 
         ////////////////////
         /// Player Armor ///
@@ -536,7 +536,7 @@ public final class VanillaInventoryArchetypes {
                 .addLast(LEGGINGS_SLOT)
                 .addLast(BOOTS_SLOT)
                 .type(LanternPlayerArmorInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("player_armor"));
+                .buildArchetype(NamespacedKeys.minecraft("player_armor"));
 
         ///////////////////////
         /// Player and User ///
@@ -550,11 +550,11 @@ public final class VanillaInventoryArchetypes {
         USER = userInventoryBuilder
                 .title(tr("inventory.user.name"))
                 .type(LanternUserInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("user"));
+                .buildArchetype(NamespacedKeys.minecraft("user"));
         PLAYER = userInventoryBuilder
                 .title(tr("inventory.player.name"))
                 .type(LanternPlayerInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("player"));
+                .buildArchetype(NamespacedKeys.minecraft("player"));
 
         ///////////////////
         /// Saddle Slot ///
@@ -564,7 +564,7 @@ public final class VanillaInventoryArchetypes {
                 .type(LanternFilteringSlot.class)
                 .property(LanternInventoryProperties.ITEM_FILTER,
                         ItemPredicate.ofTypePredicate(itemType -> itemType == ItemTypes.SADDLE))
-                .buildArchetype(ResourceKeys.minecraft("saddle_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("saddle_slot"));
 
         ////////////////////////
         /// Horse Armor Slot ///
@@ -577,7 +577,7 @@ public final class VanillaInventoryArchetypes {
         HORSE_ARMOR_SLOT = AbstractSlot.builder()
                 .type(LanternFilteringSlot.class)
                 .property(LanternInventoryProperties.ITEM_FILTER, ItemPredicate.ofTypePredicate(horseArmor::contains))
-                .buildArchetype(ResourceKeys.minecraft("horse_armor_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("horse_armor_slot"));
 
         /////////////////
         /// Null Slot ///
@@ -585,7 +585,7 @@ public final class VanillaInventoryArchetypes {
 
         NULL_SLOT = AbstractSlot.builder()
                 .type(NullSlot.class)
-                .buildArchetype(ResourceKeys.minecraft("null_slot"));
+                .buildArchetype(NamespacedKeys.minecraft("null_slot"));
 
         /////////////////////////////
         /// Donkey/Mule Inventory ///
@@ -599,7 +599,7 @@ public final class VanillaInventoryArchetypes {
             }
         }
         DONKEY_MULE_CHEST = gridBuilder
-                .buildArchetype(ResourceKeys.minecraft("donkey_mule_chest"));
+                .buildArchetype(NamespacedKeys.minecraft("donkey_mule_chest"));
 
         ///////////////////////
         /// Horse Equipment ///
@@ -608,7 +608,7 @@ public final class VanillaInventoryArchetypes {
         HORSE = AbstractChildrenInventory.builder()
                 .carrierBased(new HorseCarrierBasedTransformer())
                 .type(LanternChildrenInventory.class)
-                .buildArchetype(ResourceKeys.minecraft("horse"));
+                .buildArchetype(NamespacedKeys.minecraft("horse"));
 
     }
 

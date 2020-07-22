@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.block.state
 
-import org.lanternpowered.api.ResourceKeys.minecraft
+import org.lanternpowered.api.NamespacedKeys.minecraft
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.data.type.LanternChestAttachment
 import org.lanternpowered.server.data.type.LanternInstrumentType

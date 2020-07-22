@@ -41,11 +41,11 @@ import org.lanternpowered.api.cause.CauseStack.Companion.current
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.util.future.thenAsync
 import org.spongepowered.api.command.exception.CommandException
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent
-import org.spongepowered.api.text.Text
 import java.nio.charset.StandardCharsets
 
 internal class RconHandler(
@@ -141,7 +141,7 @@ internal class RconHandler(
                 try {
                     Lantern.commandManager.process(connection, payload)
                 } catch (e: CommandException) {
-                    connection.sendMessage(Text.of("An error occurred while executing the command: $payload; $e"))
+                    connection.sendMessage(textOf("An error occurred while executing the command: $payload; $e"))
                 }
                 causeStack.popCause()
                 connection.flush()

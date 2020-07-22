@@ -14,7 +14,7 @@ import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.registry.BaseBuilder
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.data.value.SetValue
@@ -38,14 +38,14 @@ open class ValueKeyBuilderBase<E : Any, V : Value<E>, B : R, R : BaseBuilder<Key
         this.valueType = type
     }
 
-    override fun key(key: ResourceKey): B = apply { super.key(key) }.uncheckedCast()
+    override fun key(key: NamespacedKey): B = apply { super.key(key) }.uncheckedCast()
 
     protected fun setComparator(comparator: Comparator<in E>) { this.comparator = comparator }
     protected fun setIncludesTester(includesTester: BiPredicate<in E, in E>?) { this.includesTester = includesTester }
 
     protected fun setRequireExplicitRegistration() { this.requiresExplicitRegistration = true }
 
-    override fun build(key: ResourceKey): Key<V> {
+    override fun build(key: NamespacedKey): Key<V> {
         val valueType = checkNotNull(this.valueType) { "The type must be set" }
         val elementType = valueType.resolveType(elementParameter).uncheckedCast<TypeToken<E>>()
         val comparator: Comparator<in E> = this.comparator ?: run {

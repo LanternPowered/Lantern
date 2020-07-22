@@ -12,16 +12,17 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.spongepowered.api.data.type.PickupRule
 
 val PickupRuleRegistry = internalCatalogTypeRegistry<PickupRule> {
     fun register(id: String) =
-            register(LanternPickupRule(ResourceKey.minecraft(id)))
+            register(LanternPickupRule(minecraftKey(id)))
 
     register("disallowed")
     register("allowed")
     register("creative_only")
 }
 
-private class LanternPickupRule(key: ResourceKey) : DefaultCatalogType(key), PickupRule
+private class LanternPickupRule(key: NamespacedKey) : DefaultCatalogType(key), PickupRule

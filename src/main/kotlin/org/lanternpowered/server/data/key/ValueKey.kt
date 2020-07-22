@@ -19,7 +19,7 @@ import org.lanternpowered.server.data.value.ValueConstructorFactory
 import org.lanternpowered.server.event.LanternEventManager
 import org.lanternpowered.server.event.RegisteredListener
 import org.spongepowered.api.CatalogType
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
@@ -43,7 +43,7 @@ import java.util.function.BiPredicate
  * @property requiresExplicitRegistration Whether this key needs to be registered explicitly on a key collection or registry
  */
 class ValueKey<V : Value<E>, E : Any> internal constructor(
-        private val key: ResourceKey,
+        private val key: NamespacedKey,
         private val valueToken: TypeToken<V>,
         private val elementToken: TypeToken<E>,
         private val elementComparator: Comparator<in E>,

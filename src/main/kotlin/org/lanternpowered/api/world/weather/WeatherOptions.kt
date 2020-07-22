@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.world.weather
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.ext.*
 
 /**
@@ -21,10 +21,10 @@ object WeatherOptions {
     /**
      * Affects the darkness of the sky.
      */
-    @JvmStatic val SKY_DARKNESS = weatherOptionOf(ResourceKey.minecraft("sky_darkness"), 0.0)
+    @JvmStatic val SKY_DARKNESS = weatherOptionOf(NamespacedKey.minecraft("sky_darkness"), 0.0)
 
     /**
      * Affects how hard it is raining. A value of 0 means no rain.
      */
-    @JvmStatic val RAIN_STRENGTH = weatherOptionOf(ResourceKey.minecraft("rain_strength"), 0.0)
+    @JvmStatic val RAIN_STRENGTH = weatherOptionOf(NamespacedKey.minecraft("rain_strength"), 0.0)
 }

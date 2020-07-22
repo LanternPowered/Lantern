@@ -11,11 +11,11 @@
 package org.lanternpowered.server.attribute
 
 import org.lanternpowered.api.attribute.AttributeOperation
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 
 class LanternAttributeOperation(
-        key: ResourceKey,
+        key: NamespacedKey,
         private val priority: Int,
         val changeValueImmediately: Boolean,
         private val function: AttributeOperationFunction

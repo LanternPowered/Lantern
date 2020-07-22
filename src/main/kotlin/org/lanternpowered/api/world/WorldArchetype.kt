@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.world
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.builderOf
 
 typealias WorldArchetype = org.spongepowered.api.world.WorldArchetype
@@ -20,5 +20,5 @@ typealias WorldArchetypes = org.spongepowered.api.world.WorldArchetypes
 /**
  * Constructs a new [WorldArchetype] with the given [key] and applied settings.
  */
-fun worldArchetypeOf(key: ResourceKey, fn: WorldArchetypeBuilder.() -> Unit): WorldArchetype =
+fun worldArchetypeOf(key: NamespacedKey, fn: WorldArchetypeBuilder.() -> Unit): WorldArchetype =
         builderOf<WorldArchetypeBuilder>().key(key).apply(fn).build()

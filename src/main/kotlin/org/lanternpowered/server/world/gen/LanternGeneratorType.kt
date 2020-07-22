@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.world.gen
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 
-abstract class LanternGeneratorType protected constructor(key: ResourceKey) : DefaultCatalogType(key), IGeneratorType {
+abstract class LanternGeneratorType protected constructor(key: NamespacedKey) : DefaultCatalogType(key), IGeneratorType {
 
     // The maximum height the generator will generate the world,
     // for example 128 blocks in the nether and in overworld 256

@@ -11,7 +11,7 @@
 package org.lanternpowered.api.registry
 
 import org.spongepowered.api.CatalogType
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.registry.UnknownTypeException
 import java.util.function.Supplier
 import kotlin.collections.Collection
@@ -30,7 +30,7 @@ import kotlin.reflect.KClass
  * @return The found type, if available
  * @see CatalogType
  */
-inline fun <reified T : CatalogType> CatalogRegistry.require(key: ResourceKey): T = require(T::class, key)
+inline fun <reified T : CatalogType> CatalogRegistry.require(key: NamespacedKey): T = require(T::class, key)
 
 /**
  * Attempts to retrieve the specific type of {@link CatalogType} based on
@@ -45,7 +45,7 @@ inline fun <reified T : CatalogType> CatalogRegistry.require(key: ResourceKey): 
  * @return The found type, if available
  * @see CatalogType
  */
-inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: ResourceKey): T? = get(T::class, key)
+inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: NamespacedKey): T? = get(T::class, key)
 
 /**
  * Provides the [T] that will be used to get [CatalogType] instances.
@@ -114,7 +114,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @return The found type, if available
      * @see CatalogType
      */
-    fun <T : CatalogType> get(typeClass: KClass<T>, key: ResourceKey): T?
+    fun <T : CatalogType> get(typeClass: KClass<T>, key: NamespacedKey): T?
 
     /**
      * Attempts to retrieve the specific type of [CatalogType] based on
@@ -130,7 +130,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @return The found type, if available
      * @see CatalogType
      */
-    fun <T : CatalogType> require(typeClass: KClass<T>, key: ResourceKey): T =
+    fun <T : CatalogType> require(typeClass: KClass<T>, key: NamespacedKey): T =
             get(typeClass, key) ?: throw IllegalArgumentException("Can't find a ${typeClass.simpleName} with the key: $key")
 
     /**

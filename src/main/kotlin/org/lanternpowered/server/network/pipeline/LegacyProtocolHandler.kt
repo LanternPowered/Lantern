@@ -17,6 +17,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.network.NetworkSession
@@ -138,8 +139,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 val address = ctx.channel().remoteAddress() as InetSocketAddress
                 val client = LanternStatusClient(address, clientVersion, virtualAddress1)
                 val players = LanternStatusHelper.createPlayers(server)
-                val response = LanternStatusResponse(
-                        serverVersion, description, players, server.favicon.orElse(null))
+                val response = LanternStatusResponse(serverVersion, description, players, server.favicon)
                 val connection = SimpleRemoteConnection.of(ctx.channel(), virtualAddress1)
                 val cause = causeOf(connection)
                 val event = LanternEventFactory.createClientPingServerEvent(cause, client, response)

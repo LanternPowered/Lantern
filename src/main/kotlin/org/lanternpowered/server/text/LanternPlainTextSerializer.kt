@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.serializer.PlainTextSerializer
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.TranslationContext
 import java.util.Locale
 
-object LanternPlainTextSerializer : DefaultCatalogType(ResourceKey.minecraft("plain")), PlainTextSerializer {
+object LanternPlainTextSerializer : DefaultCatalogType(NamespacedKey.minecraft("plain")), PlainTextSerializer {
     override fun serialize(text: Text): String = serialize(text, TranslationContext.current().locale)
     override fun serialize(text: Text, locale: Locale): String = LegacyTexts.toLegacy(locale, text, 0.toChar())
     override fun deserialize(input: String): Text = Text.of(input)

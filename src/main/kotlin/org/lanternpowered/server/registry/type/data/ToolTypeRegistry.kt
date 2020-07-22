@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.data.type.LanternToolType
 import org.spongepowered.api.data.type.ToolType
 
 val ToolTypeRegistry = catalogTypeRegistry<ToolType> {
     fun register(id: String) =
-            register(LanternToolType(ResourceKey.minecraft(id)))
+            register(LanternToolType(minecraftKey(id)))
 
     register("diamond")
     register("gold")

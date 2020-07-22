@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.world
 
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.math.minus
 import org.lanternpowered.api.util.math.plus
@@ -46,7 +47,6 @@ import java.time.Duration
 import java.time.temporal.TemporalUnit
 import java.util.Objects
 import java.util.Optional
-import java.util.UUID
 import java.util.function.BiFunction
 
 fun Vector3i.toBiomePosition(): Vector3i = this.div(4).mul(4) // TODO: Move these
@@ -62,11 +62,11 @@ class LanternLocation : Location {
         override fun create(world: World, blockPosition: Vector3i): Location =
                 LanternLocation(world, blockPosition)
 
-        override fun create(worldUniqueId: UUID, position: Vector3d): Location =
-                LanternLocation(WeakWorldReference(worldUniqueId), position)
+        override fun create(key: NamespacedKey, position: Vector3d): Location =
+                LanternLocation(WeakWorldReference(key), position)
 
-        override fun create(worldUniqueId: UUID, blockPosition: Vector3i): Location =
-                LanternLocation(WeakWorldReference(worldUniqueId), blockPosition)
+        override fun create(key: NamespacedKey, blockPosition: Vector3i): Location =
+                LanternLocation(WeakWorldReference(key), blockPosition)
     }
 
     private val worldRef: WeakWorldReference
@@ -93,7 +93,7 @@ class LanternLocation : Location {
     }
 
     override fun getWorld(): World = this.worldRef.world ?: error("The world is unavailable.")
-    override fun getWorldUniqueId(): UUID = this.worldRef.uniqueId
+    override fun getWorldKey(): NamespacedKey = this.worldRef.key
     override fun getWorldIfAvailable(): Optional<World> = this.worldRef.world.optional()
     override fun inWorld(world: World): Boolean = this.world == world
 

@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.advancement
 
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
@@ -17,7 +18,6 @@ import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
 import org.spongepowered.api.advancement.AdvancementType
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.text.Text
 import org.spongepowered.math.vector.Vector2d
 
 class NetworkAdvancementDisplay(

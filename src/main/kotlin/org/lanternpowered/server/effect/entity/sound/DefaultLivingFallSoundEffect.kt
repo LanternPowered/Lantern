@@ -11,10 +11,10 @@
 package org.lanternpowered.server.effect.entity.sound
 
 import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.effect.sound.SoundType
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.event.LanternEventContextKeys
-import org.spongepowered.api.effect.sound.SoundType
 import org.spongepowered.math.vector.Vector3d
 import java.util.function.Supplier
 import kotlin.random.Random

@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.state
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateProperty
 
 abstract class AbstractCatalogTypeStateContainer<S : State<S>>(
-        private val key: ResourceKey, stateProperties: Iterable<StateProperty<*>>, constructor: (StateBuilder<S>) -> S
+        private val key: NamespacedKey, stateProperties: Iterable<StateProperty<*>>, constructor: (StateBuilder<S>) -> S
 ) : AbstractStateContainer<S>(key, stateProperties, constructor), CatalogType {
 
     override fun getKey() = this.key

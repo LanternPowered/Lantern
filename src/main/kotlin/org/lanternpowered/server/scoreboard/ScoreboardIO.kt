@@ -26,7 +26,7 @@ import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRe
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 import org.lanternpowered.server.text.LanternTexts.fromLegacy
 import org.lanternpowered.server.text.LanternTexts.toLegacy
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
@@ -80,7 +80,7 @@ object ScoreboardIO {
                         .displayName(displayName)
 
                 val criterionName = entry.getString(CRITERION_NAME).get()
-                val criterion = CriterionRegistry[ResourceKey.resolve(criterionName)]
+                val criterion = CriterionRegistry[NamespacedKey.resolve(criterionName)]
                 if (criterion == null) {
                     Lantern.getLogger().warn("Unable to find a criterion with id: $criterionName, default to dummy.")
                     builder.criterion(Criteria.DUMMY)
@@ -89,7 +89,7 @@ object ScoreboardIO {
                 }
 
                 val displayModeName = entry.getString(DISPLAY_MODE).get()
-                val displayMode = ObjectiveDisplayModeRegistry[ResourceKey.resolve(displayModeName)]
+                val displayMode = ObjectiveDisplayModeRegistry[NamespacedKey.resolve(displayModeName)]
                 if (displayMode == null) {
                     Lantern.getLogger().warn("Unable to find a display mode with id: $displayModeName, default to integer.")
                     builder.objectiveDisplayMode(ObjectiveDisplayModes.INTEGER)

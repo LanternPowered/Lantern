@@ -19,6 +19,10 @@ typealias TextDecoration = net.kyori.adventure.text.format.TextDecoration
 typealias TextDecorationState = net.kyori.adventure.text.format.TextDecoration.State
 typealias TextStyle = net.kyori.adventure.text.format.Style
 
+fun textStyleOf(color: TextColor): TextStyle = TextStyle.of(color as TextColor?)
+fun textStyleOf(color: TextColor, vararg decorations: TextDecoration): TextStyle = TextStyle.of(color as TextColor?, *decorations)
+fun textStyleOf(vararg decorations: TextDecoration): TextStyle = TextStyle.of(*decorations)
+
 inline operator fun TextStyle.plus(decoration: TextDecoration): TextStyle = decoration(decoration, true)
 inline operator fun TextStyle.plus(color: TextColor): TextStyle = color(color)
 inline operator fun TextStyle.plus(style: TextStyle): TextStyle = merge(style)

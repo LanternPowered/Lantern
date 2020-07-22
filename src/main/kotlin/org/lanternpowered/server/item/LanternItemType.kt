@@ -20,12 +20,12 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.data.LocalImmutableDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.item.appearance.ItemAppearance
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.block.BlockType
 import java.util.Optional
 
 class LanternItemType(
-        key: ResourceKey,
+        key: NamespacedKey,
         val nameFunction: ItemStack.() -> Translation,
         private val blockType: BlockType?,
         private val maxStackQuantity: Int,

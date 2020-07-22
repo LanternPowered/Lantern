@@ -32,7 +32,6 @@ import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.entity.ExpireEntityEvent;
-import org.spongepowered.api.event.entity.item.ItemMergeItemEvent;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -52,7 +51,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class LanternItem extends LanternEntity implements Item {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
-            .add(EntityEffectTypes.DEATH, ItemDeathParticleEffect.INSTANCE)
+            .add(EntityEffectTypes.INSTANCE.getDEATH(), ItemDeathParticleEffect.INSTANCE)
             .build();
 
     public static final int DROPPED_PICKUP_DELAY = 40;
@@ -101,7 +100,7 @@ public class LanternItem extends LanternEntity implements Item {
                 despawnDelay = data.despawnDelay;
 
                 // Play the merge effect?
-                getEffectCollection().getCombinedOrEmpty(EntityEffectTypes.MERGE).play(this);
+                getEffectCollection().getCombinedOrEmpty(EntityEffectTypes.INSTANCE.getMERGE()).play(this);
             }
         }
         if (this.counter % 10 == 0 && pickupDelay != NO_PICKUP_DELAY && pickupDelay <= 0) {
@@ -128,7 +127,7 @@ public class LanternItem extends LanternEntity implements Item {
             }
 
             // Play the death effect?
-            getEffectCollection().getCombinedOrEmpty(EntityEffectTypes.DEATH).play(this);
+            getEffectCollection().getCombinedOrEmpty(EntityEffectTypes.INSTANCE.getDEATH()).play(this);
         } else {
             pulsePhysics();
         }

@@ -11,25 +11,23 @@
 @file:JvmName("AdvancementTypeRegistry")
 package org.lanternpowered.server.registry.type.advancement
 
-import org.lanternpowered.api.ResourceKey
-import org.lanternpowered.api.text.format.TextColor
-import org.lanternpowered.api.text.format.TextColors
-import org.lanternpowered.api.text.format.TextFormat
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.text.format.NamedTextColor
+import org.lanternpowered.api.text.format.TextStyle
+import org.lanternpowered.api.text.format.textStyleOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.advancement.AdvancementType
-import java.util.function.Supplier
 
 @get:JvmName("get")
 val AdvancementTypeRegistry = internalCatalogTypeRegistry<AdvancementType> {
-    fun register(id: String, color: Supplier<out TextColor>) =
-            register(LanternAdvancementType(ResourceKey.minecraft(id), TextFormat.of(color.get())))
+    fun register(id: String, color: NamedTextColor) =
+            register(LanternAdvancementType(minecraftKey(id), textStyleOf(color)))
 
-    register("task", TextColors.YELLOW)
-    register("challenge", TextColors.LIGHT_PURPLE)
-    register("goal", TextColors.YELLOW)
+    register("task", NamedTextColor.YELLOW)
+    register("challenge", NamedTextColor.LIGHT_PURPLE)
+    register("goal", NamedTextColor.YELLOW)
 }
 
-private class LanternAdvancementType(key: ResourceKey, private val textFormat: TextFormat) : DefaultCatalogType(key), AdvancementType {
-    override fun getTextFormat(): TextFormat = this.textFormat
-}
+private class LanternAdvancementType(key: NamespacedKey, val textStyle: TextStyle) : DefaultCatalogType(key), AdvancementType

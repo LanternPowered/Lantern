@@ -10,7 +10,8 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.NotePitch
@@ -45,12 +46,12 @@ val NotePitchRegistry = internalCatalogTypeRegistry<NotePitch> {
     )
 
     val entries = sortedNotePitches.mapIndexed { index, name ->
-        register(index, LanternNotePitch(ResourceKey.minecraft(name.toLowerCase())))
+        register(index, LanternNotePitch(minecraftKey(name.toLowerCase())))
     }
     entries.forEachIndexed { index, notePitch -> notePitch.next = entries[(index + 1) % entries.size] }
 }
 
-private class LanternNotePitch(key: ResourceKey) : DefaultCatalogType(key), NotePitch {
+private class LanternNotePitch(key: NamespacedKey) : DefaultCatalogType(key), NotePitch {
     lateinit var next: NotePitch
     override fun cycleNext(): NotePitch = this.next
 }

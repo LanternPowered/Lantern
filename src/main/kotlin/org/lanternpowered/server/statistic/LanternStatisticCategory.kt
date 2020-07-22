@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.statistic
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.text.translation.Translation
 import java.util.Collections
 
 class LanternStatisticCategory(
-        key: ResourceKey, translation: Translation
+        key: NamespacedKey, translation: Translation
 ) : AbstractStatisticCategory<Statistic>(key, translation) {
 
     private val statistics = arrayListOf<Statistic>()

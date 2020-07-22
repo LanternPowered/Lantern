@@ -13,13 +13,13 @@ package org.lanternpowered.server.registry.type.data
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.spongepowered.api.data.type.WoodType
-import org.spongepowered.api.text.translation.Translatable
 
 val WoodTypeRegistry = catalogTypeRegistry<WoodType> {
     fun register(id: String) =
-            register(LanternWoodType(ResourceKey.minecraft(id), "tree.$id"))
+            register(LanternWoodType(minecraftKey(id), "tree.$id"))
 
     register("oak")
     register("spruce")
@@ -29,5 +29,5 @@ val WoodTypeRegistry = catalogTypeRegistry<WoodType> {
     register("dark_oak")
 }
 
-private class LanternWoodType(key: ResourceKey, translationKey: String) :
+private class LanternWoodType(key: NamespacedKey, translationKey: String) :
         DefaultCatalogType(key), Translatable by Translated(translationKey), WoodType

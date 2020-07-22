@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 
 class InternalRegistry<T : Any>(keyToId: Object2IntMap<String>, objectConstructor: (String, Int) -> T) {
 
@@ -58,6 +58,6 @@ class InternalRegistry<T : Any>(keyToId: Object2IntMap<String>, objectConstructo
         fun identityKey(keyToId: Object2IntMap<String>) = InternalRegistry(keyToId) { key -> key }
 
         @JvmStatic
-        fun resourceKey(keyToId: Object2IntMap<String>) = InternalRegistry(keyToId) { key -> ResourceKey.resolve(key) }
+        fun resourceKey(keyToId: Object2IntMap<String>) = InternalRegistry(keyToId) { key -> NamespacedKey.resolve(key) }
     }
 }

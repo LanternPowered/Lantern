@@ -12,7 +12,7 @@ package org.lanternpowered.server.world.gamerule
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.world.gamerule.GameRule
 
 @Suppress("UNCHECKED_CAST")
@@ -30,7 +30,7 @@ class LanternGameRuleBuilder<V : Any> : AbstractNamedCatalogBuilder<GameRule<V>,
         this.defaultValue = defaultValue
     }
 
-    override fun build(key: ResourceKey, name: String): GameRule<V> {
+    override fun build(key: NamespacedKey, name: String): GameRule<V> {
         val valueType = checkNotNull(this.valueType) { "The value type must be set." }
         val defaultValue = checkNotNull(this.defaultValue) { "The default value must be set." }
         return LanternGameRule(key, name, valueType, defaultValue)

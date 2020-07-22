@@ -15,8 +15,8 @@ typealias Index<K, V> = net.kyori.adventure.util.Index<K, V>
 fun <K, V> indexOf(values: Array<V>, function: (value: V) -> K): Index<K, V> =
         indexOf(values.asList(), function)
 
-fun <K, V> indexOf(first: V, vararg more: V, function: (value: V) -> K): Index<K, V> =
-        indexOf(listOf(first) + more.asList(), function)
+fun <K, V> indexOf(first: V, second: V, vararg more: V, function: (value: V) -> K): Index<K, V> =
+        indexOf(listOf(first, second) + more.asList(), function)
 
 fun <K, V> indexOf(values: Iterable<V>, function: (value: V) -> K): Index<K, V> =
         Index.create(function, values.toList())
@@ -24,8 +24,8 @@ fun <K, V> indexOf(values: Iterable<V>, function: (value: V) -> K): Index<K, V> 
 fun <K, V> indexOf(values: Array<V>, function: (index: Int, value: V) -> K): Index<K, V> =
         indexOf(values.asList(), function)
 
-fun <K, V> indexOf(first: V, vararg more: V, function: (index: Int, value: V) -> K): Index<K, V> =
-        indexOf(listOf(first) + more.asList(), function)
+fun <K, V> indexOf(first: V, second: V, vararg more: V, function: (index: Int, value: V) -> K): Index<K, V> =
+        indexOf(listOf(first, second) + more.asList(), function)
 
 fun <K, V> indexOf(values: Iterable<V>, function: (index: Int, value: V) -> K): Index<K, V> {
     return Index.create(object : java.util.function.Function<V, K> {

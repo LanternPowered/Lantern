@@ -11,11 +11,11 @@
 package org.lanternpowered.server.data.persistence
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataTranslator
 
-abstract class AbstractDataTranslator<T>(key: ResourceKey, private val typeToken: TypeToken<T>) :
+abstract class AbstractDataTranslator<T>(key: NamespacedKey, private val typeToken: TypeToken<T>) :
         DefaultCatalogType(key), DataTranslator<T> {
 
     override fun getToken() = this.typeToken

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.world
 
 import net.kyori.adventure.key.KeyedValue
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
@@ -42,7 +42,7 @@ import java.util.UUID
 import kotlin.random.Random
 
 class LanternWorldProperties(
-        private val key: ResourceKey,
+        private val key: NamespacedKey,
         private val uniqueId: UUID
 ) : WorldProperties {
 
@@ -95,7 +95,7 @@ class LanternWorldProperties(
      */
     var doesWaterEvaporate: Boolean = false
 
-    override fun getKey(): ResourceKey = this.key
+    override fun getKey(): NamespacedKey = this.key
     override fun getUniqueId(): UUID = this.uniqueId
 
     fun loadFrom(archetype: WorldArchetype) {

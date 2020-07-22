@@ -10,18 +10,18 @@
  */
 package org.lanternpowered.server.registry.type.world
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.world.SerializationBehavior
 
 val SerializationBehaviorRegistry = catalogTypeRegistry<SerializationBehavior> {
     fun register(id: String) =
-            register(LanternSerializationBehavior(ResourceKey.minecraft(id)))
+            register(LanternSerializationBehavior(NamespacedKey.minecraft(id)))
 
     register("automatic")
     register("manual")
     register("none")
 }
 
-private class LanternSerializationBehavior(key: ResourceKey) : DefaultCatalogType(key), SerializationBehavior
+private class LanternSerializationBehavior(key: NamespacedKey) : DefaultCatalogType(key), SerializationBehavior

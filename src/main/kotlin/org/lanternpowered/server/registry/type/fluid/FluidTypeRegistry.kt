@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.fluid
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.fluid.LanternFluidType
@@ -18,7 +18,7 @@ import org.spongepowered.api.fluid.FluidType
 
 val FluidTypeRegistry = catalogTypeRegistry<FluidType> {
     fun register(id: String) =
-            register(LanternFluidType(ResourceKey.minecraft(id), emptyList(), LocalKeyRegistry.of()))
+            register(LanternFluidType(NamespacedKey.minecraft(id), emptyList(), LocalKeyRegistry.of()))
 
     register("water")
     register("lava")

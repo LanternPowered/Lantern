@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.util
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.util.rotation.Rotation
 
 val RotationRegistry = catalogTypeRegistry<Rotation> {
     fun register(id: String, angle: Int) =
-            register(LanternRotation(ResourceKey.minecraft(id), angle))
+            register(LanternRotation(NamespacedKey.minecraft(id), angle))
 
     register("top", 0)
     register("top_right", 45)
@@ -29,7 +29,7 @@ val RotationRegistry = catalogTypeRegistry<Rotation> {
     register("top_left", 315)
 }
 
-private class LanternRotation(key: ResourceKey, private val angle: Int) : DefaultCatalogType(key), Rotation {
+private class LanternRotation(key: NamespacedKey, private val angle: Int) : DefaultCatalogType(key), Rotation {
     override fun getAngle() = this.angle
     override fun toStringHelper() = super.toStringHelper()
             .add("angle", this.angle)

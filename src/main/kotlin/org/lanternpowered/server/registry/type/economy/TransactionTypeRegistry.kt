@@ -10,18 +10,18 @@
  */
 package org.lanternpowered.server.registry.type.economy
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.service.economy.transaction.TransactionType
 
 val TransactionTypeRegistry = catalogTypeRegistry<TransactionType> {
     fun register(id: String) =
-            register(LanternTransactionType(ResourceKey.sponge(id)))
+            register(LanternTransactionType(NamespacedKey.sponge(id)))
 
     register("deposit")
     register("withdraw")
     register("transfer")
 }
 
-private class LanternTransactionType(key: ResourceKey) : DefaultCatalogType(key), TransactionType
+private class LanternTransactionType(key: NamespacedKey) : DefaultCatalogType(key), TransactionType

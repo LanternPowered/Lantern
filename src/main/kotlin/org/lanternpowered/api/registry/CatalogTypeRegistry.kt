@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.registry
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.type.TypeToken
@@ -69,18 +69,18 @@ interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
     /**
      * Attempts to get a type for the given [key].
      */
-    operator fun get(key: ResourceKey): T?
+    operator fun get(key: NamespacedKey): T?
 
     /**
      * Attempts to get a type for the given [key].
      */
-    fun getOptional(key: ResourceKey): Optional<T> = get(key).optional()
+    fun getOptional(key: NamespacedKey): Optional<T> = get(key).optional()
 
     /**
      * Attempts to get a type for the given [key]. Throws an
      * [IllegalArgumentException] if the key couldn't be found.
      */
-    fun require(key: ResourceKey): T = get(key) ?: throw IllegalArgumentException(
+    fun require(key: NamespacedKey): T = get(key) ?: throw IllegalArgumentException(
             "Can't find a ${typeToken.rawType.simpleName} with the key: $key")
 
     /**

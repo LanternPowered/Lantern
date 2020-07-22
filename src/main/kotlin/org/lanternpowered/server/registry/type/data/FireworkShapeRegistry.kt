@@ -11,15 +11,16 @@
 @file:JvmName("FireworkShapeRegistry")
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.effect.firework.FireworkShape
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 
 @get:JvmName("get")
 val FireworkShapeRegistry = internalCatalogTypeRegistry<FireworkShape> {
     fun register(id: String) =
-            register(LanternFireworkShape(ResourceKey.minecraft(id)))
+            register(LanternFireworkShape(minecraftKey(id)))
 
     register("ball")
     register("large_ball")
@@ -28,4 +29,4 @@ val FireworkShapeRegistry = internalCatalogTypeRegistry<FireworkShape> {
     register("burst")
 }
 
-private class LanternFireworkShape(key: ResourceKey) : DefaultCatalogType(key), FireworkShape
+private class LanternFireworkShape(key: NamespacedKey) : DefaultCatalogType(key), FireworkShape

@@ -10,14 +10,15 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.ArtType
 
 val ArtTypeRegistry = internalCatalogTypeRegistry<ArtType> {
     fun register(id: String, name: String, width: Int, height: Int) =
-            register(LanternArtType(ResourceKey.minecraft(id), name, width, height))
+            register(LanternArtType(minecraftKey(id), name, width, height))
 
     register("alban", "Alban", 1, 1)
     register("aztec", "Aztec", 1, 1)
@@ -47,7 +48,7 @@ val ArtTypeRegistry = internalCatalogTypeRegistry<ArtType> {
     register("wither", "Wither", 2, 2)
 }
 
-private class LanternArtType(key: ResourceKey, name: String, private val width: Int, private val height: Int):
+private class LanternArtType(key: NamespacedKey, name: String, private val width: Int, private val height: Int):
         DefaultCatalogType.Named(key, name), ArtType {
 
     override fun getHeight(): Int = this.height

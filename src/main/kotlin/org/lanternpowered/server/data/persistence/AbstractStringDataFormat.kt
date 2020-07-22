@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data.persistence
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.persistence.StringDataFormat
 
-abstract class AbstractStringDataFormat(key: ResourceKey) : AbstractDataFormat(key), StringDataFormat
+abstract class AbstractStringDataFormat(key: NamespacedKey) : AbstractDataFormat(key), StringDataFormat

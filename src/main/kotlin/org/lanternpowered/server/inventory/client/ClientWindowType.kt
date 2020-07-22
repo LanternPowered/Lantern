@@ -10,6 +10,6 @@
  */
 package org.lanternpowered.server.inventory.client
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 
-data class ClientWindowType(val id: ResourceKey, val internalId: Int)
+data class ClientWindowType(val id: NamespacedKey, val internalId: Int)

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.data.io.store.data
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ResourceKeys
+import org.lanternpowered.api.NamespacedKeys
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.ElementKeyRegistration
@@ -37,11 +37,11 @@ open class LocalMutableDataHolderStore<H : LocalMutableDataHolder> : ObjectStore
             val context = DataSerializerRegistry.typeSerializerContext
 
             for ((query, raw) in valuesView.getValues(false)) {
-                val resourceKey = ResourceKeys.resolve(query.toString())
-                val key = ValueKeyRegistry[resourceKey].uncheckedCast<Key<Value<Any>>?>()
+                val NamespacedKey = NamespacedKeys.resolve(query.toString())
+                val key = ValueKeyRegistry[NamespacedKey].uncheckedCast<Key<Value<Any>>?>()
                 if (key == null) {
                     Lantern.getLogger().warn(
-                            "Unable to deserialize the data value with key: $resourceKey because it doesn't exist.")
+                            "Unable to deserialize the data value with key: $NamespacedKey because it doesn't exist.")
                 } else {
                     val elementType = key.elementToken.uncheckedCast<TypeToken<Any>>()
                     val serializer = context.serializers.getTypeSerializer<Any, Any>(elementType).orNull()

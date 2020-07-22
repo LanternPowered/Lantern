@@ -13,7 +13,7 @@ package org.lanternpowered.server.world.weather;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.api.ResourceKeys;
+import org.lanternpowered.api.NamespacedKeys;
 import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.server.script.CatalogTypeConstructor;
@@ -146,7 +146,7 @@ public class WeatherBuilder implements CopyableBuilder<LanternWeather, WeatherBu
         checkNotNull(pluginId, "pluginId");
         checkNotNull(name, "name");
         checkNotNull(id, "id");
-        return new LanternWeather(ResourceKeys.of(pluginId, id), this.action, this.aliases,
+        return new LanternWeather(NamespacedKeys.of(pluginId, id), this.action, this.aliases,
                 new UnmodifiableOptionValueMap(this.options), this.weight, this.duration);
     }
 }

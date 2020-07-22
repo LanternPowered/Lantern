@@ -26,8 +26,8 @@ class ResourcePackStatusHandler : Handler<ResourcePackStatusPacket> {
         val resourcePack = context.session.player.resourcePackSendQueue.poll(packet.status)
         val player = context.session.player
         if (resourcePack == null) {
-            Lantern.getLogger().warn("{} received a unexpected resource pack status message ({}), no resource pack was pending",
-                    player.name, packet.status)
+            Lantern.getLogger().warn("${player.name} received a unexpected resource pack status " +
+                    "message (${packet.status}), no resource pack was pending.")
             return
         }
         val causeStack = CauseStack.current()

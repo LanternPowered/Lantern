@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.world.gen
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.world.gen.GeneratorType
 
-class DelegateGeneratorType(key: ResourceKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {
+class DelegateGeneratorType(key: NamespacedKey, generatorType: GeneratorType) : DefaultCatalogType(key), IGeneratorType {
 
     /**
      * The actual [GeneratorType].

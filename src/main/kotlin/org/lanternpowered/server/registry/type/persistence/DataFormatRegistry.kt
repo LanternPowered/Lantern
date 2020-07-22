@@ -14,11 +14,11 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.data.persistence.HoconDataFormat
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.persistence.DataFormat
 
 val DataFormatRegistry = catalogTypeRegistry<DataFormat> {
-    register(HoconDataFormat(ResourceKey.sponge("hocon")))
-    register(JsonDataFormat(ResourceKey.sponge("json")))
-    register(NbtDataFormat(ResourceKey.minecraft("nbt")))
+    register(HoconDataFormat(NamespacedKey.sponge("hocon")))
+    register(JsonDataFormat(NamespacedKey.sponge("json")))
+    register(NbtDataFormat(NamespacedKey.minecraft("nbt")))
 }

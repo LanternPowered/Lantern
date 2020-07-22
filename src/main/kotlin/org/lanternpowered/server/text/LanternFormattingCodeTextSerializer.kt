@@ -14,7 +14,7 @@ import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.text.serializer.FormattingCodeTextSerializer
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.TranslationContext
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.text.LiteralText
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColor
@@ -25,7 +25,7 @@ import org.spongepowered.api.text.format.TextStyles
 /**
  * TODO: Separate the usage of [TextColors.RESET] and [TextStyles.RESET].
  */
-open class LanternFormattingCodeTextSerializer(key: ResourceKey, private val formattingCode: Char) : DefaultCatalogType(key), FormattingCodeTextSerializer {
+open class LanternFormattingCodeTextSerializer(key: NamespacedKey, private val formattingCode: Char) : DefaultCatalogType(key), FormattingCodeTextSerializer {
 
     companion object {
 

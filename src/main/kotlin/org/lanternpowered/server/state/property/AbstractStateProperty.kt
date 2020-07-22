@@ -12,7 +12,7 @@ package org.lanternpowered.server.state.property
 
 import com.google.common.collect.ImmutableCollection
 import com.google.common.collect.Iterables
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.state.IStateProperty
 import org.lanternpowered.server.state.StateKeyValueTransformer
@@ -21,7 +21,7 @@ import org.spongepowered.api.data.value.Value
 import java.util.function.Predicate
 
 abstract class AbstractStateProperty<T : Comparable<T>, V>(
-        key: ResourceKey,
+        key: NamespacedKey,
         private val valueClass: Class<T>,
         private val possibleValues: ImmutableCollection<T>,
         override val valueKey: Key<out Value<V>>,

@@ -21,7 +21,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMaps
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStackManager
@@ -231,7 +231,7 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
     override val all: org.lanternpowered.api.registry.Collection<T>
         get() = ensureLoaded().values
 
-    override fun get(key: ResourceKey): T? = ensureLoaded().byKey[key]
+    override fun get(key: NamespacedKey): T? = ensureLoaded().byKey[key]
 
     override fun provide(suggestedId: String): CatalogTypeProvider<T> =
             this.providers.computeIfAbsent(suggestedId.toLowerCase()) { id -> CatalogTypeProviderImpl(id, this) }
@@ -264,7 +264,7 @@ private abstract class LanternCatalogTypeRegistry<T : CatalogType, D : RegistryD
 }
 
 private class GenericInternalRegistryData<T : CatalogType, I>(
-        byKey: Map<ResourceKey, T> = emptyMap(),
+        byKey: Map<NamespacedKey, T> = emptyMap(),
         private val byId: BiMap<I, T> = HashBiMap.create(),
         suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
 ) : RegistryData<T>(byKey, suggestedIdMatchers) {
@@ -274,7 +274,7 @@ private class GenericInternalRegistryData<T : CatalogType, I>(
 }
 
 private class InternalRegistryData<T : CatalogType>(
-        byKey: Map<ResourceKey, T> = emptyMap(),
+        byKey: Map<NamespacedKey, T> = emptyMap(),
         private val byId: Int2ObjectMap<T> = Int2ObjectMaps.emptyMap(),
         private val toId: Object2IntMap<T> = Object2IntOpenHashMap<T>().apply { defaultReturnValue(Integer.MIN_VALUE) },
         suggestedIdMatchers: List<(String, T) -> Boolean> = emptyList()
@@ -291,7 +291,7 @@ private class InternalRegistryData<T : CatalogType>(
 }
 
 private open class RegistryData<T>(
-        val byKey: Map<ResourceKey, T>,
+        val byKey: Map<NamespacedKey, T>,
         val suggestedIdMatchers: List<(String, T) -> Boolean>
 ) {
     val values = CustomCollection(this.byKey.values)
@@ -388,7 +388,7 @@ private abstract class AbstractCatalogTypeRegistryBuilder<T : CatalogType, I, D 
 
     private val typeName: String get() = this.typeToken.rawType.simpleName
     protected val suggestedIdMatchers: MutableList<(String, T) -> Boolean> = mutableListOf()
-    protected val byKey: MutableMap<ResourceKey, T> = mutableMapOf()
+    protected val byKey: MutableMap<NamespacedKey, T> = mutableMapOf()
     protected val byId: BiMap<I, T> = HashBiMap.create()
     private var allowPluginRegistrations = false
 

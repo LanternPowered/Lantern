@@ -12,19 +12,19 @@ package org.lanternpowered.server.registry.type.util
 
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.util.ban.Ban
 import org.spongepowered.api.util.ban.BanType
 import kotlin.reflect.KClass
 
 val BanTypeRegistry = catalogTypeRegistry<BanType> {
     fun register(id: String, banClass: KClass<out Ban>) =
-            register(LanternBanType(ResourceKey.minecraft(id), banClass.java))
+            register(LanternBanType(NamespacedKey.minecraft(id), banClass.java))
 
     register("profile", Ban.Profile::class)
     register("ip", Ban.Ip::class)
 }
 
-private class LanternBanType(key: ResourceKey, private val banClass: Class<out Ban>) : DefaultCatalogType(key), BanType {
+private class LanternBanType(key: NamespacedKey, private val banClass: Class<out Ban>) : DefaultCatalogType(key), BanType {
     override fun getBanClass(): Class<out Ban> = this.banClass
 }

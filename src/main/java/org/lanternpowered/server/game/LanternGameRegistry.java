@@ -125,7 +125,6 @@ import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegis
 import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.sound.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.sound.SoundTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntityEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.extra.AccessoryRegistryModule;
@@ -149,7 +148,6 @@ import org.lanternpowered.server.game.registry.type.text.TextStyleRegistryModule
 import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.BanTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.RotationRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;

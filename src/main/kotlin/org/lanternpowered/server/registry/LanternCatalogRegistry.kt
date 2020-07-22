@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.registry
 
-import org.lanternpowered.api.ResourceKey
-import org.lanternpowered.api.asResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.asNamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogRegistry
 import org.lanternpowered.api.registry.CatalogTypeProvider
@@ -27,7 +27,7 @@ import net.kyori.adventure.key.Key as AdventureKey
 object LanternCatalogRegistry : CatalogRegistry {
 
     private val registriesByType = mutableMapOf<Class<*>, CatalogTypeRegistry<*>>()
-    private val registeredResourceKeys = mutableSetOf<ResourceKey>()
+    private val registeredNamespacedKeys = mutableSetOf<NamespacedKey>()
 
     /**
      * Makes sure that all the registries are loaded.
@@ -43,13 +43,13 @@ object LanternCatalogRegistry : CatalogRegistry {
      * @param registry The catalog type registry
      * @throws DuplicateRegistrationException If there's already a registry for the target type
      */
-    fun register(registry: CatalogTypeRegistry<*>, key: ResourceKey) {
+    fun register(registry: CatalogTypeRegistry<*>, key: NamespacedKey) {
         val type = registry.typeToken.rawType
         if (type in this.registriesByType)
             throw DuplicateRegistrationException("The type ${type.simpleName} is already registered.")
-        if (key in this.registeredResourceKeys)
+        if (key in this.registeredNamespacedKeys)
             throw DuplicateRegistrationException("There's already a registry bound to: $key")
-        this.registeredResourceKeys += key
+        this.registeredNamespacedKeys += key
         this.registriesByType[type] = registry
     }
 
@@ -70,10 +70,10 @@ object LanternCatalogRegistry : CatalogRegistry {
     override fun <T : CatalogType, E : T> provide(catalogClass: KClass<T>, suggestedId: String): CatalogTypeProvider<E> =
             requireRegistry(catalogClass).provide(suggestedId) as CatalogTypeProvider<E>
 
-    override fun <T : CatalogType> get(typeClass: KClass<T>, key: ResourceKey): T? = getNullable(typeClass.java, key)
-    override fun <T : CatalogType> get(typeClass: Class<T>, key: AdventureKey): Optional<T> = getNullable(typeClass, key.asResourceKey()).optional()
+    override fun <T : CatalogType> get(typeClass: KClass<T>, key: NamespacedKey): T? = getNullable(typeClass.java, key)
+    override fun <T : CatalogType> get(typeClass: Class<T>, key: AdventureKey): Optional<T> = getNullable(typeClass, key.asNamespacedKey()).optional()
 
-    private fun <T : CatalogType> getNullable(typeClass: Class<T>, key: ResourceKey): T? = getRegistry(typeClass)?.get(key)
+    private fun <T : CatalogType> getNullable(typeClass: Class<T>, key: NamespacedKey): T? = getRegistry(typeClass)?.get(key)
 
     override fun <T : CatalogType> getAllOf(typeClass: KClass<T>): Collection<T> = getAllOf(typeClass.java)
     override fun <T : CatalogType> getAllOf(typeClass: Class<T>): Collection<T> = getRegistry(typeClass)?.all ?: emptyList()

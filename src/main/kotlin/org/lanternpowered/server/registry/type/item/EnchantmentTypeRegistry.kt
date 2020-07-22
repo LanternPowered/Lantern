@@ -11,7 +11,7 @@
 @file:JvmName("EnchantmentTypeRegistry")
 package org.lanternpowered.server.registry.type.item
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder
@@ -21,11 +21,11 @@ import org.spongepowered.api.item.enchantment.EnchantmentTypes
 
 @get:JvmName("get")
 val EnchantmentTypeRegistry = internalCatalogTypeRegistry<EnchantmentType> {
-    fun register(key: ResourceKey, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
+    fun register(key: NamespacedKey, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
             register(LanternEnchantmentTypeBuilder().key(key).name(TranslationHelper.tr(name)).apply(fn).build())
 
     fun register(id: String, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
-            register(ResourceKey.minecraft(id), name, fn)
+            register(NamespacedKey.minecraft(id), name, fn)
 
     register("protection", "enchantment.protect.all")
     register("fire_protection", "enchantment.protect.fire")

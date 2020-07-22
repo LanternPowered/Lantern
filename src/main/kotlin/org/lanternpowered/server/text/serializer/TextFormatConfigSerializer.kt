@@ -15,7 +15,7 @@ import ninja.leaping.configurate.ConfigurationNode
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
 import org.lanternpowered.server.registry.type.text.TextColorRegistry
 import org.lanternpowered.server.registry.type.text.TextStyleRegistry
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.text.format.TextColor
 import org.spongepowered.api.text.format.TextColors
 import org.spongepowered.api.text.format.TextFormat
@@ -31,7 +31,7 @@ class TextFormatConfigSerializer : TypeSerializer<TextFormat> {
         var color: TextColor = TextColors.NONE.get()
         val colorId = value.getNode(FORMAT_NODE_COLOR).string
         if (colorId != null) {
-            color = TextColorRegistry.require(ResourceKey.resolve(colorId))
+            color = TextColorRegistry.require(NamespacedKey.resolve(colorId))
         }
 
         var style = TextStyle.of()

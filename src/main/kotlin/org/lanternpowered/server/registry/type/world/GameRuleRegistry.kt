@@ -16,12 +16,12 @@ import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistryBuilder
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
 import org.lanternpowered.server.world.gamerule.LanternGameRule
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.world.gamerule.GameRule
 
 private fun <T> InternalCatalogTypeRegistryBuilder<GameRule<*>, String>.register(
         id: String, name: String, type: TypeToken<T>, value: T
-) = register(name, LanternGameRule(ResourceKey.minecraft(id), FixedTranslation(name), type, value))
+) = register(name, LanternGameRule(NamespacedKey.minecraft(id), FixedTranslation(name), type, value))
 
 private inline fun <reified T> InternalCatalogTypeRegistryBuilder<GameRule<*>, String>.register(
         id: String, name: String, value: T

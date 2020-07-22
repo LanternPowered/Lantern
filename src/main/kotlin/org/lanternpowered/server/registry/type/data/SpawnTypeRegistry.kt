@@ -10,14 +10,15 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType
 
 val SpawnTypeRegistry = catalogTypeRegistry<SpawnType> {
     fun register(id: String) =
-            register(LanternSpawnType(ResourceKey.minecraft(id)))
+            register(LanternSpawnType(minecraftKey(id)))
 
     register("block_spawning")
     register("breeding")
@@ -39,4 +40,4 @@ val SpawnTypeRegistry = catalogTypeRegistry<SpawnType> {
     register("world_spawner")
 }
 
-private class LanternSpawnType(key: ResourceKey) : DefaultCatalogType(key), SpawnType
+private class LanternSpawnType(key: NamespacedKey) : DefaultCatalogType(key), SpawnType

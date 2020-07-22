@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.service.world
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataQuery
 import org.lanternpowered.api.data.persistence.DataView
@@ -39,7 +39,7 @@ import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 class LanternWorldStorage(
-        override val key: ResourceKey,
+        override val key: NamespacedKey,
         @Volatile private var uniqueId: UUID,
         override val directory: Path
 ) : WorldStorage {

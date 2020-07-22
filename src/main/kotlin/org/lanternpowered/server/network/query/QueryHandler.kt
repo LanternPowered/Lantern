@@ -42,6 +42,7 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.plugin.version
+import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.SimpleRemoteConnection
@@ -226,7 +227,7 @@ internal class QueryHandler(
     }
 
     private val worldName: String
-        get() = WorldManager.worlds.firstOrNull()?.properties?.directoryName ?: "none"
+        get() = WorldManager.worlds.firstOrNull()?.properties?.key?.formatted ?: "none"
 
     companion object {
 

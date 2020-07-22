@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.cause.entity.damage
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierType
 
-class LanternDamageModifierType(key: ResourceKey) : DefaultCatalogType(key), DamageModifierType
+class LanternDamageModifierType(key: NamespacedKey) : DefaultCatalogType(key), DamageModifierType

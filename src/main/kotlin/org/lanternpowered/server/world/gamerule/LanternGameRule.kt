@@ -11,12 +11,12 @@
 package org.lanternpowered.server.world.gamerule
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.world.gamerule.GameRule
 
 class LanternGameRule<V>(
-        key: ResourceKey, name: String, private val valueType: TypeToken<V>, private val defaultValue: V
+        key: NamespacedKey, name: String, private val valueType: TypeToken<V>, private val defaultValue: V
 ) : DefaultCatalogType.Named(key, name), GameRule<V> {
 
     override fun getValueType() = this.valueType

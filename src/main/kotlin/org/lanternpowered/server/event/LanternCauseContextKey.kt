@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.event
 
-import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.ResourceKey
-import org.spongepowered.api.event.cause.EventContextKey
 
-class LanternEventContextKey<T>(
-        key: ResourceKey, private val typeToken: TypeToken<T>
-) : DefaultCatalogType(key), EventContextKey<T> {
+class LanternCauseContextKey<T>(
+        key: NamespacedKey, private val typeToken: TypeToken<T>
+) : DefaultCatalogType(key), CauseContextKey<T> {
 
     override fun getAllowedType(): TypeToken<T> = this.typeToken
 

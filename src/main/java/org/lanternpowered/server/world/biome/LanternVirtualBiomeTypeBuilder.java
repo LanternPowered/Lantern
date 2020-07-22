@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.lanternpowered.api.ResourceKeys;
+import org.lanternpowered.api.NamespacedKeys;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -101,7 +101,7 @@ public class LanternVirtualBiomeTypeBuilder implements VirtualBiomeType.Builder 
             pluginId = "minecraft";
         }
         final LanternVirtualBiomeType biomeType = new LanternVirtualBiomeType(
-                ResourceKeys.of(pluginId, id), this.settingsBuilder, this.persisted);
+                NamespacedKeys.of(pluginId, id), this.settingsBuilder, this.persisted);
         biomeType.setHumidity(this.humidity);
         biomeType.setTemperature(this.temperature);
         return biomeType;

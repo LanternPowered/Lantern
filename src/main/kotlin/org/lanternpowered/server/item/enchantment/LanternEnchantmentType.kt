@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item.enchantment
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
@@ -21,7 +21,7 @@ import org.spongepowered.api.text.translation.Translatable
 import org.spongepowered.api.text.translation.Translation
 
 class LanternEnchantmentType internal constructor(
-        key: ResourceKey, translation: Translation, override val internalId: Int,
+        key: NamespacedKey, translation: Translation, override val internalId: Int,
         override val levelRange: IntRange,
         private val weight: Int,
         private val treasure: Boolean,

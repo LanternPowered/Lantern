@@ -10,14 +10,15 @@
  */
 package org.lanternpowered.server.registry.type.data
 
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.spongepowered.api.ResourceKey
 import org.spongepowered.api.data.type.HorseColor
 
 val HorseColorRegistry = internalCatalogTypeRegistry<HorseColor> {
     fun register(id: String) =
-            register(LanternHorseColor(ResourceKey.minecraft(id)))
+            register(LanternHorseColor(minecraftKey(id)))
 
     register("white")
     register("creamy")
@@ -28,4 +29,4 @@ val HorseColorRegistry = internalCatalogTypeRegistry<HorseColor> {
     register("dark_brown")
 }
 
-private class LanternHorseColor(key: ResourceKey) : DefaultCatalogType(key), HorseColor
+private class LanternHorseColor(key: NamespacedKey) : DefaultCatalogType(key), HorseColor

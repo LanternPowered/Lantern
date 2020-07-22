@@ -11,7 +11,7 @@
 package org.lanternpowered.server.statistic
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.statistic.StatisticCategory
@@ -19,7 +19,7 @@ import org.spongepowered.api.text.translation.Translation
 import java.util.Collections
 
 class LanternStatisticCategoryForCatalogType<T : CatalogType>(
-        key: ResourceKey, translation: Translation, private val catalogType: TypeToken<T>
+        key: NamespacedKey, translation: Translation, private val catalogType: TypeToken<T>
 ) : AbstractStatisticCategory<Statistic.ForCatalog<T>>(key, translation), StatisticCategory.ForCatalogType<T> {
 
     private val statistics = hashMapOf<T, Statistic.ForCatalog<T>>()

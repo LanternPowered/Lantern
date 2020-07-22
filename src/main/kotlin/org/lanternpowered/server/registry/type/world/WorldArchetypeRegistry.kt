@@ -14,7 +14,7 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldArchetypeBuilder
 import org.lanternpowered.api.world.worldArchetypeOf
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.world.SerializationBehaviors
 import org.spongepowered.api.world.difficulty.Difficulties
@@ -23,7 +23,7 @@ import org.spongepowered.api.world.gen.GeneratorTypes
 
 val WorldArchetypeRegistry = catalogTypeRegistry<WorldArchetype> {
     fun register(id: String, fn: WorldArchetypeBuilder.() -> Unit) =
-            register(worldArchetypeOf(ResourceKey.minecraft(id), fn))
+            register(worldArchetypeOf(NamespacedKey.minecraft(id), fn))
 
     val overworld = register("overworld") {
         enabled(true)

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.entity
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.factoryOf
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.util.annotation.CatalogedBy
@@ -18,7 +18,7 @@ import org.spongepowered.api.util.annotation.CatalogedBy
 /**
  * Constructs a new [EntityEffectType].
  */
-fun entityEffectOf(key: ResourceKey): EntityEffectType =
+fun entityEffectTypeOf(key: NamespacedKey): EntityEffectType =
         factoryOf<EntityEffectType.Factory>().of(key)
 
 /**
@@ -30,6 +30,6 @@ interface EntityEffectType : CatalogType {
 
     interface Factory {
 
-        fun of(key: ResourceKey): EntityEffectType
+        fun of(key: NamespacedKey): EntityEffectType
     }
 }

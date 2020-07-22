@@ -11,14 +11,14 @@
 package org.lanternpowered.server.effect.particle
 
 import com.google.common.collect.ImmutableMap
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.effect.particle.ParticleOption
 import org.spongepowered.api.effect.particle.ParticleType
 import java.util.Optional
 
 @Suppress("UNCHECKED_CAST")
-class LanternParticleType(key: ResourceKey, val internalType: Int?, options: Map<ParticleOption<*>, Any>) :
+class LanternParticleType(key: NamespacedKey, val internalType: Int?, options: Map<ParticleOption<*>, Any>) :
         DefaultCatalogType(key), ParticleType {
 
     private val options: Map<ParticleOption<*>, Any> = ImmutableMap.copyOf(options)

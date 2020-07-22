@@ -14,7 +14,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonObject;
-import org.lanternpowered.api.ResourceKeys;
+import org.lanternpowered.api.NamespacedKeys;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.api.util.ToStringHelper;
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements;
@@ -52,7 +52,7 @@ public class LanternTrigger<C extends FilteredTriggerConfiguration> extends Defa
     private final Multimap<LanternPlayerAdvancements, AbstractCriterionProgress> progress = HashMultimap.create();
 
     LanternTrigger(LanternTriggerBuilder<C> builder) {
-        super(ResourceKeys.activePlugin(builder.id, builder.name == null ? builder.id : builder.name));
+        super(NamespacedKeys.activePlugin(builder.id, builder.name == null ? builder.id : builder.name));
         this.configTypeToken = TypeToken.of(builder.configType);
         this.configType = builder.configType;
         this.configConstructor = builder.constructor;

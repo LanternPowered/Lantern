@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.sound
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.effect.sound.SoundType
 import org.lanternpowered.server.catalog.DefaultCatalogType
@@ -20,7 +20,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SoundEffectPac
 import org.spongepowered.math.vector.Vector3d
 
 class LanternSoundType @JvmOverloads constructor(
-        key: ResourceKey, private val eventId: Int? = null
+        key: NamespacedKey, private val eventId: Int? = null
 ) : DefaultCatalogType(key), SoundType {
 
     fun createMessage(position: Vector3d, soundCategory: SoundCategory, volume: Float, pitch: Float): Packet {

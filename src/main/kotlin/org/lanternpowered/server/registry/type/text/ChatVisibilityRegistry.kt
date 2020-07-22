@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.text
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.audience.MessageType
 import org.lanternpowered.api.entity.player.chat.ChatVisibility
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
@@ -18,7 +18,7 @@ import org.lanternpowered.server.text.chat.LanternChatVisibility
 
 val ChatVisibilityRegistry = internalCatalogTypeRegistry<ChatVisibility> {
     fun register(id: String, isChatVisible: (MessageType) -> Boolean) =
-            register(LanternChatVisibility(ResourceKey.minecraft(id), isChatVisible))
+            register(LanternChatVisibility(NamespacedKey.minecraft(id), isChatVisible))
 
     register("full") { true }
     register("system") { type -> type == MessageType.SYSTEM }

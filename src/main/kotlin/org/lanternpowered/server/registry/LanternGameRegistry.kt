@@ -13,7 +13,7 @@ package org.lanternpowered.server.registry
 import com.google.common.base.CaseFormat
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.Game
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.catalog.CatalogType
@@ -21,7 +21,6 @@ import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
-import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.lifecycle.RegisterCatalogRegistryEvent
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.api.item.inventory.ItemStackBuilder
@@ -39,7 +38,7 @@ import org.lanternpowered.server.block.BlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder
-import org.lanternpowered.server.catalog.LanternResourceKeyBuilder
+import org.lanternpowered.server.catalog.LanternNamespacedKeyBuilder
 import org.lanternpowered.server.command.LanternCommandCauseFactory
 import org.lanternpowered.server.config.user.ban.LanternBanBuilder
 import org.lanternpowered.server.data.key.SpongeValueKeyBuilder
@@ -68,6 +67,7 @@ import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerReg
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
 import org.lanternpowered.server.registry.type.attribute.AttributeOperationRegistry
 import org.lanternpowered.server.registry.type.attribute.AttributeTypeRegistry
+import org.lanternpowered.server.registry.type.cause.CauseContextKeyRegistry
 import org.lanternpowered.server.registry.type.cause.DamageModifierTypeRegistry
 import org.lanternpowered.server.registry.type.cause.DamageTypeRegistry
 import org.lanternpowered.server.registry.type.data.ArmorMaterialRegistry
@@ -94,7 +94,7 @@ import org.lanternpowered.server.registry.type.data.MusicDiscRegistry
 import org.lanternpowered.server.registry.type.data.NotePitchRegistry
 import org.lanternpowered.server.registry.type.data.PickupRuleRegistry
 import org.lanternpowered.server.registry.type.data.PortionTypeRegistry
-import org.lanternpowered.server.registry.type.data.ProfessionRegistry
+import org.lanternpowered.server.registry.type.data.ProfessionTypeRegistry
 import org.lanternpowered.server.registry.type.data.RabbitTypeRegistry
 import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
@@ -103,10 +103,12 @@ import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
 import org.lanternpowered.server.registry.type.data.TeleportTypeRegistry
 import org.lanternpowered.server.registry.type.data.ToolTypeRegistry
 import org.lanternpowered.server.registry.type.data.TopHatRegistry
+import org.lanternpowered.server.registry.type.data.ValueKeyRegistry
 import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
 import org.lanternpowered.server.registry.type.data.WireAttachmentTypeRegistry
 import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
 import org.lanternpowered.server.registry.type.economy.TransactionTypeRegistry
+import org.lanternpowered.server.registry.type.effect.entity.EntityEffectTypeRegistry
 import org.lanternpowered.server.registry.type.effect.particle.ParticleOptionRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
@@ -169,7 +171,7 @@ import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.biome.VirtualBiomeType
 import org.spongepowered.api.world.gamerule.GameRule
 import java.util.function.Supplier
-import org.spongepowered.api.ResourceKey.Builder as ResourceKeyBuilder
+import org.lanternpowered.api.namespace.NamespacedKey.Builder as NamespacedKeyBuilder
 
 class LanternGameRegistry(
         private val game: LanternGame
@@ -195,7 +197,7 @@ class LanternGameRegistry(
         }
 
         builderRegistry.apply {
-            register<ResourceKeyBuilder> { LanternResourceKeyBuilder() }
+            register<NamespacedKeyBuilder> { LanternNamespacedKeyBuilder() }
             register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
             register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }
             register<EventContextKey.Builder<Any>> { LanternEventContextKeyBuilder() }
@@ -241,7 +243,7 @@ class LanternGameRegistry(
             fun register(registry: CatalogTypeRegistry<*>) {
                 val value = CaseFormat.UPPER_CAMEL.to(
                         CaseFormat.LOWER_UNDERSCORE, registry.typeToken.rawType.simpleName)
-                register(registry, ResourceKey.minecraft(value))
+                register(registry, NamespacedKey.minecraft(value))
             }
 
             register(AdvancementRegistry)
@@ -252,6 +254,7 @@ class LanternGameRegistry(
             register(AttributeOperationRegistry)
             register(AttributeTypeRegistry)
 
+            register(CauseContextKeyRegistry)
             register(DamageModifierTypeRegistry)
             register(DamageTypeRegistry)
 
@@ -270,13 +273,14 @@ class LanternGameRegistry(
             register(MusicDiscRegistry)
             register(NotePitchRegistry)
             register(PickupRuleRegistry)
-            register(ProfessionRegistry)
+            register(ProfessionTypeRegistry)
             register(RabbitTypeRegistry)
             register(SkinPartRegistry)
             register(SpawnTypeRegistry)
             register(TeleportTypeRegistry)
             register(ToolTypeRegistry)
             register(TopHatRegistry)
+            register(ValueKeyRegistry)
             register(VillagerTypeRegistry)
             register(WoodTypeRegistry)
 
@@ -294,6 +298,8 @@ class LanternGameRegistry(
             register(WireAttachmentTypeRegistry)
 
             register(TransactionTypeRegistry)
+
+            register(EntityEffectTypeRegistry)
 
             register(ParticleOptionRegistry)
 
@@ -350,7 +356,7 @@ class LanternGameRegistry(
             override fun <T : Any> register(factoryClass: Class<T>, factory: T): T =
                     factoryRegistry.register(factoryClass, factory)
         }
-        EventManager.post(factoryRegistryEvent)
+        this.game.eventManager.post(factoryRegistryEvent)
     }
 
     private fun postBuilderRegistryEvent() {
@@ -361,7 +367,7 @@ class LanternGameRegistry(
             override fun <T : ResettableBuilder<*, in T>> register(builderClass: Class<T>, supplier: Supplier<in T>) =
                     builderRegistry.register(builderClass, supplier)
         }
-        EventManager.post(builderRegistryEvent)
+        this.game.eventManager.post(builderRegistryEvent)
     }
 
     private fun postCatalogRegistryEvent() {
@@ -369,9 +375,9 @@ class LanternGameRegistry(
         val catalogRegistryEvent = object : RegisterCatalogRegistryEvent {
             override fun getCause(): Cause = cause
             override fun getGame(): Game = this@LanternGameRegistry.game
-            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey): Unit =
+            override fun <T : CatalogType> register(catalogClass: Class<T>, key: NamespacedKey): Unit =
                     register(catalogClass, key, null)
-            override fun <T : CatalogType> register(catalogClass: Class<T>, key: ResourceKey, defaultsSupplier: Supplier<Set<T>>?) {
+            override fun <T : CatalogType> register(catalogClass: Class<T>, key: NamespacedKey, defaultsSupplier: Supplier<Set<T>>?) {
                 val registry = catalogTypeRegistry<T>(TypeToken.of(catalogClass)) {
                     allowPluginRegistrations()
                     if (defaultsSupplier != null) {
@@ -382,10 +388,10 @@ class LanternGameRegistry(
                 }
                 catalogRegistry.register(registry, key)
             }
-            override fun <T : CatalogType> register(registry: CatalogTypeRegistry<T>, key: ResourceKey): Unit =
+            override fun <T : CatalogType> register(registry: CatalogTypeRegistry<T>, key: NamespacedKey): Unit =
                     catalogRegistry.register(registry, key)
         }
-        EventManager.post(catalogRegistryEvent)
+        this.game.eventManager.post(catalogRegistryEvent)
     }
 
     override fun getBuilderRegistry() = LanternBuilderRegistry

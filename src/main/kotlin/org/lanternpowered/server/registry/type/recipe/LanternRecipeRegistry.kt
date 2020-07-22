@@ -15,7 +15,7 @@ import org.lanternpowered.api.registry.RecipeRegistry
 import org.lanternpowered.api.registry.mutableCatalogTypeRegistry
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.world.World
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.Recipe
@@ -29,7 +29,7 @@ object LanternRecipeRegistry : RecipeRegistry, MutableCatalogTypeRegistry<Recipe
     override fun <T : Recipe> getAllOfType(type: RecipeType<T>): Collection<T> =
             this.all.filter { recipe -> recipe.type == type } as Collection<T>
 
-    override fun getByKey(key: ResourceKey): Optional<Recipe> = this[key].optional()
+    override fun getByKey(key: NamespacedKey): Optional<Recipe> = this[key].optional()
     override fun getAll(): Collection<Recipe> = this.all
 
     override fun findMatchingRecipe(inventory: Inventory, world: World): Optional<Recipe> {

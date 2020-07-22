@@ -12,7 +12,7 @@
 
 package org.lanternpowered.api.util.option
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.util.type.TypeToken
 import kotlin.reflect.KClass
 
@@ -26,13 +26,13 @@ import kotlin.reflect.KClass
  * @param V The value type of this option
  */
 data class Option<T : OptionMapType, V>(
-        val key: ResourceKey,
+        val key: NamespacedKey,
         val type: TypeToken<V>,
         val defaultValue: V,
         val mapType: Class<T>
 ) {
 
-    constructor(key: ResourceKey, type: TypeToken<V>, defaultValue: V, mapType: KClass<T>) :
+    constructor(key: NamespacedKey, type: TypeToken<V>, defaultValue: V, mapType: KClass<T>) :
             this(key, type, defaultValue, mapType.java)
 
     init {

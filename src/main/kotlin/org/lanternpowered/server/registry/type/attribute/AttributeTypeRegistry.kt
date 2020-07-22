@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.attribute
 
 import org.lanternpowered.api.attribute.AttributeType
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.attribute.LanternAttributeType
@@ -32,7 +32,7 @@ val AttributeTypeRegistry = catalogTypeRegistry<AttributeType> {
 
     fun register(id: String, name: String, default: Double,
                  range: ClosedFloatingPointRange<Double>, supports: (DataHolder) -> Boolean = { true }) =
-            register(LanternAttributeType(ResourceKey.minecraft(id), textOf(name), range, default, supports))
+            register(LanternAttributeType(minecraftKey(id), textOf(name), range, default, supports))
 
     register("generic.max_health", "Max Health", 20.0, 0.0..1024.0)
     register("generic.follow_range", "Follow Range", 32.0, 0.0..2048.0)

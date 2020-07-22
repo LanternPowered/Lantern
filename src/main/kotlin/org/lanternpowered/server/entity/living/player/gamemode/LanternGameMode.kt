@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.entity.living.player.gamemode
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.text.translation.Translatable
 
-class LanternGameMode(key: ResourceKey, translationPart: String, val abilityApplier: DataHolder.Mutable.() -> Unit) :
+class LanternGameMode(key: NamespacedKey, translationPart: String, val abilityApplier: DataHolder.Mutable.() -> Unit) :
         DefaultCatalogType(key), GameMode, Translatable by Translated("gameMode.$translationPart")

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.data.property.LocalPropertyHolder
 import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.state.AbstractStateContainer
@@ -27,7 +27,7 @@ import java.util.Optional
  * @property blockEntityProvider The provider for block entities of this block type
  */
 class LanternBlockType(
-        private val key: ResourceKey,
+        private val key: NamespacedKey,
         private val translation: Translation,
         val blockEntityProvider: (() -> BlockEntity)?,
         stateProperties: Iterable<StateProperty<*>>,

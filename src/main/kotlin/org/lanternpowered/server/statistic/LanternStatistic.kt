@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.statistic
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.Translated
@@ -21,7 +21,7 @@ import org.spongepowered.api.text.translation.Translation
 import java.text.NumberFormat
 
 open class LanternStatistic(
-        key: ResourceKey, translation: Translation,
+        key: NamespacedKey, translation: Translation,
         val internalId: String,
         private val format: NumberFormat,
         private val type: StatisticCategory,

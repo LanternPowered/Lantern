@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.service.world
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import java.nio.file.Path
 import java.util.UUID
 
@@ -58,7 +58,7 @@ interface WorldStorageService {
      * @param key The key
      * @return The data provider, or null if the world doesn't exist
      */
-    fun getByKey(key: ResourceKey): WorldStorage?
+    fun getByKey(key: NamespacedKey): WorldStorage?
 
     /**
      * Creates a new world for the given world key and [UUID]. The created
@@ -67,7 +67,7 @@ interface WorldStorageService {
      * @param key The key
      * @param uniqueId The unique id to use for the world
      */
-    fun create(key: ResourceKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
+    fun create(key: NamespacedKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
@@ -76,7 +76,7 @@ interface WorldStorageService {
      * @param copyKey The copy or destination key
      * @return The provider of the new copy
      */
-    fun copy(sourceKey: ResourceKey, copyKey: ResourceKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
+    fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
@@ -85,5 +85,5 @@ interface WorldStorageService {
      * @param newKey The new key
      * @return The provider of the new copy
      */
-    fun move(oldKey: ResourceKey, newKey: ResourceKey): WorldStorage?
+    fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage?
 }

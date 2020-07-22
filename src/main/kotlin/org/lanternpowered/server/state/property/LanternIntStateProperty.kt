@@ -14,13 +14,13 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.state.StateKeyValueTransformer
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.IntegerStateProperty
 
 internal class LanternIntStateProperty<V>(
-        key: ResourceKey, possibleValues: ImmutableSet<Int>, valueKey: Key<out Value<V>>, keyValueTransformer: StateKeyValueTransformer<Int, V>
+        key: NamespacedKey, possibleValues: ImmutableSet<Int>, valueKey: Key<out Value<V>>, keyValueTransformer: StateKeyValueTransformer<Int, V>
 ) : AbstractStateProperty<Int, V>(key, Int::class.java, possibleValues, valueKey, keyValueTransformer), IntegerStateProperty {
 
     override var sortedPossibleValues: List<Int> = ImmutableList.sortedCopyOf(this.possibleValues)

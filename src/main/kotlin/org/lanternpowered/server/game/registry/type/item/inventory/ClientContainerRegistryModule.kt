@@ -29,7 +29,7 @@ import org.lanternpowered.server.inventory.client.HopperClientContainer
 import org.lanternpowered.server.inventory.client.ShulkerBoxClientContainer
 import org.lanternpowered.server.inventory.client.TradingClientContainer
 import org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.item.inventory.ContainerType
 import org.spongepowered.api.item.inventory.ContainerTypes
@@ -40,7 +40,7 @@ object ClientContainerRegistryModule : DefaultCatalogRegistryModule<ContainerTyp
 
     override fun registerDefaults() {
         fun register(id: String, supplier: (AbstractInventory) -> ClientContainer) {
-            register(ClientContainerType(ResourceKey.minecraft(id), supplier))
+            register(ClientContainerType(NamespacedKey.minecraft(id), supplier))
         }
 
         register("chest") { inventory ->

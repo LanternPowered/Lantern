@@ -13,7 +13,7 @@ package org.lanternpowered.server.state.property
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.state.StateKeyValueTransformer
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.BooleanStateProperty
@@ -29,7 +29,7 @@ import kotlin.reflect.KClass
  * @param valueKey The value key this property is mapped to
  * @return The constructed boolean state property
  */
-fun booleanStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<Boolean>>>): BooleanStateProperty =
+fun booleanStatePropertyOf(key: NamespacedKey, valueKey: Supplier<out Key<out Value<Boolean>>>): BooleanStateProperty =
         booleanStatePropertyOf(key, valueKey.get())
 
 /**
@@ -39,7 +39,7 @@ fun booleanStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Valu
  * @param valueKey The value key this property is mapped to
  * @return The constructed boolean state property
  */
-fun booleanStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Boolean>>): BooleanStateProperty =
+fun booleanStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<Boolean>>): BooleanStateProperty =
         LanternBooleanStateProperty(key, valueKey, identityStateKeyValueTransformer())
 
 /**
@@ -50,7 +50,7 @@ fun booleanStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Boolean>>):
  * @param keyValueTransformer The transformer to translate between state and key values
  * @return The constructed boolean state property
  */
-fun <T> booleanStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>,
+fun <T> booleanStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<T>>,
                                keyValueTransformer: StateKeyValueTransformer<Boolean, T>): BooleanStateProperty
         = LanternBooleanStateProperty(key, valueKey, keyValueTransformer)
 
@@ -64,7 +64,7 @@ fun <T> booleanStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>,
  * @param values The values that are available for the state property
  * @return The constructed enum state property
  */
-fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<E>>, values: Iterable<E>): EnumStateProperty<E>
+fun <E : Enum<E>> enumStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<E>>, values: Iterable<E>): EnumStateProperty<E>
         = LanternEnumStateProperty(key, values.iterator().next().javaClass, values.toImmutableSet(), valueKey)
 
 /**
@@ -75,7 +75,7 @@ fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<
  * @param values The values that are available for the state property
  * @return The constructed enum state property
  */
-fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<E>>>, vararg values: E): EnumStateProperty<E>
+fun <E : Enum<E>> enumStatePropertyOf(key: NamespacedKey, valueKey: Supplier<out Key<out Value<E>>>, vararg values: E): EnumStateProperty<E>
         = enumStatePropertyOf(key, valueKey.get(), values.toImmutableSet())
 
 /**
@@ -86,7 +86,7 @@ fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Supplier<out K
  * @param values The values that are available for the state property
  * @return The constructed enum state property
  */
-fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<E>>, vararg values: E): EnumStateProperty<E>
+fun <E : Enum<E>> enumStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<E>>, vararg values: E): EnumStateProperty<E>
         = enumStatePropertyOf(key, valueKey, values.toImmutableSet())
 
 /**
@@ -97,7 +97,7 @@ fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<
  * @param type The enum class
  * @return The constructed enum state property
  */
-fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<E>>, type: Class<E>): EnumStateProperty<E>
+fun <E : Enum<E>> enumStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<E>>, type: Class<E>): EnumStateProperty<E>
         = LanternEnumStateProperty(key, type, type.enumConstants.toImmutableSet(), valueKey)
 
 /**
@@ -108,7 +108,7 @@ fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<
  * @param type The enum class
  * @return The constructed enum state property
  */
-fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<E>>, type: KClass<E>): EnumStateProperty<E>
+fun <E : Enum<E>> enumStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<E>>, type: KClass<E>): EnumStateProperty<E>
         = enumStatePropertyOf(key, valueKey, type.java)
 
 /**
@@ -119,7 +119,7 @@ fun <E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<
  * @param E The enum type
  * @return The constructed enum state property
  */
-inline fun <reified E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<E>>): EnumStateProperty<E>
+inline fun <reified E : Enum<E>> enumStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<E>>): EnumStateProperty<E>
         = enumStatePropertyOf(key, valueKey, E::class)
 
 // Int state properties
@@ -132,7 +132,7 @@ inline fun <reified E : Enum<E>> enumStatePropertyOf(key: ResourceKey, valueKey:
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
-fun intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Int>>, values: Iterable<Int>): IntegerStateProperty
+fun intStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<Int>>, values: Iterable<Int>): IntegerStateProperty
         = LanternIntStateProperty(key, values.toImmutableSet(), valueKey, identityStateKeyValueTransformer())
 
 /**
@@ -143,7 +143,7 @@ fun intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Int>>, values: 
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
-fun intStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<Int>>>, vararg values: Int): IntegerStateProperty
+fun intStatePropertyOf(key: NamespacedKey, valueKey: Supplier<out Key<out Value<Int>>>, vararg values: Int): IntegerStateProperty
         = intStatePropertyOf(key, valueKey.get(), *values)
 
 /**
@@ -154,7 +154,7 @@ fun intStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<In
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
-fun intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Int>>, vararg values: Int): IntegerStateProperty
+fun intStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<Int>>, vararg values: Int): IntegerStateProperty
         = LanternIntStateProperty(key, values.toImmutableSet(), valueKey, identityStateKeyValueTransformer())
 
 /**
@@ -165,7 +165,7 @@ fun intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Int>>, vararg v
  * @param valueRange The range of values that are available for the state property
  * @return The constructed int state property
  */
-fun intStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<Int>>>, valueRange: IntRange): IntegerStateProperty =
+fun intStatePropertyOf(key: NamespacedKey, valueKey: Supplier<out Key<out Value<Int>>>, valueRange: IntRange): IntegerStateProperty =
         intStatePropertyOf(key, valueKey.get(), valueRange)
 
 /**
@@ -176,7 +176,7 @@ fun intStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<In
  * @param valueRange The range of values that are available for the state property
  * @return The constructed int state property
  */
-fun intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Int>>, valueRange: IntRange): IntegerStateProperty
+fun intStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<Int>>, valueRange: IntRange): IntegerStateProperty
         = LanternIntStateProperty(key, valueRange.toImmutableSet(), valueKey, identityStateKeyValueTransformer())
 
 /**
@@ -189,7 +189,7 @@ fun intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<Int>>, valueRan
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
-fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>, values: Iterable<Int>,
+fun <T> intStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<T>>, values: Iterable<Int>,
                            keyValueTransformer: StateKeyValueTransformer<Int, T>): IntegerStateProperty
         = LanternIntStateProperty(key, values.toImmutableSet(), valueKey, keyValueTransformer)
 
@@ -203,7 +203,7 @@ fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>, values
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
-fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Value<T>>>, values: Iterable<Int>,
+fun <T> intStatePropertyOf(key: NamespacedKey, valueKey: Supplier<out Key<out Value<T>>>, values: Iterable<Int>,
                            keyValueTransformer: StateKeyValueTransformer<Int, T>): IntegerStateProperty
         = intStatePropertyOf(key, valueKey.get(), values, keyValueTransformer)
 
@@ -217,7 +217,7 @@ fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Supplier<out Key<out Valu
  * @param values The values that are available for the state property
  * @return The constructed int state property
  */
-fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>, vararg values: Int,
+fun <T> intStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<T>>, vararg values: Int,
                            keyValueTransformer: StateKeyValueTransformer<Int, T>): IntegerStateProperty
         = LanternIntStateProperty(key, values.toImmutableSet(), valueKey, keyValueTransformer)
 
@@ -231,6 +231,6 @@ fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>, vararg
  * @param valueRange The range of values that are available for the state property
  * @return The constructed int state property
  */
-fun <T> intStatePropertyOf(key: ResourceKey, valueKey: Key<out Value<T>>, valueRange: IntRange,
+fun <T> intStatePropertyOf(key: NamespacedKey, valueKey: Key<out Value<T>>, valueRange: IntRange,
                            keyValueTransformer: StateKeyValueTransformer<Int, T>): IntegerStateProperty
         = LanternIntStateProperty(key, valueRange.toImmutableSet(), valueKey, keyValueTransformer)

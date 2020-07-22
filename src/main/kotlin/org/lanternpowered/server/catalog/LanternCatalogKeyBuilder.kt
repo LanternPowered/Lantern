@@ -10,27 +10,27 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.id
-import org.spongepowered.api.ResourceKey.Builder as ResourceKeyBuilder
+import org.lanternpowered.api.namespace.NamespacedKey.Builder as NamespacedKeyBuilder
 
-class LanternResourceKeyBuilder : ResourceKeyBuilder {
+class LanternNamespacedKeyBuilder : NamespacedKeyBuilder {
 
     private var namespace: String? = null
     private var value: String? = null
 
-    override fun namespace(namespace: String): ResourceKeyBuilder = apply { this.namespace = namespace }
-    override fun namespace(container: PluginContainer): ResourceKeyBuilder = namespace(container.id)
-    override fun value(value: String): ResourceKeyBuilder = apply { this.value = value }
+    override fun namespace(namespace: String): NamespacedKeyBuilder = apply { this.namespace = namespace }
+    override fun namespace(container: PluginContainer): NamespacedKeyBuilder = namespace(container.id)
+    override fun value(value: String): NamespacedKeyBuilder = apply { this.value = value }
 
-    override fun build(): ResourceKey {
+    override fun build(): NamespacedKey {
         val namespace = checkNotNull(this.namespace) { "The namespace must be set" }
         val value = checkNotNull(this.value) { "The value must be set" }
-        return LanternResourceKey(namespace, value)
+        return LanternNamespacedKey(namespace, value)
     }
 
-    override fun reset(): ResourceKeyBuilder = apply {
+    override fun reset(): NamespacedKeyBuilder = apply {
         this.namespace = null
         this.value = null
     }

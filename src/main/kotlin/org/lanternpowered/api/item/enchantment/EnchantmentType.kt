@@ -13,7 +13,7 @@
 
 package org.lanternpowered.api.item.enchantment
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
@@ -39,7 +39,7 @@ fun EnchantmentType.enchantabilityRangeForLevel(level: Int): IntRange = (this as
  * @param key The key of the enchantment type
  * @param fn The builder function to apply
  */
-inline fun enchantmentTypeOf(key: ResourceKey, fn: EnchantmentTypeBuilder.() -> Unit): EnchantmentType {
+inline fun enchantmentTypeOf(key: NamespacedKey, fn: EnchantmentTypeBuilder.() -> Unit): EnchantmentType {
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }

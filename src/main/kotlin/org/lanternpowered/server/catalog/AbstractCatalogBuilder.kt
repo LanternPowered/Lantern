@@ -12,7 +12,7 @@
 
 package org.lanternpowered.server.catalog
 
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.util.ResettableBuilder
 
@@ -23,5 +23,5 @@ abstract class AbstractCatalogBuilder<C : CatalogType, B : ResettableBuilder<C, 
         return build(key)
     }
 
-    protected abstract fun build(key: ResourceKey): C
+    protected abstract fun build(key: NamespacedKey): C
 }

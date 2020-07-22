@@ -14,7 +14,7 @@ import org.lanternpowered.api.attribute.AttributeType
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.data.DataHolder
 
 class LanternAttributeTypeBuilder : AbstractCatalogBuilder<AttributeType, AttributeTypeBuilder>(), AttributeTypeBuilder {
@@ -29,7 +29,7 @@ class LanternAttributeTypeBuilder : AbstractCatalogBuilder<AttributeType, Attrib
     override fun name(name: Text) = apply { this.name = name }
     override fun valueRange(range: ClosedFloatingPointRange<Double>) = apply { this.valueRange = range }
 
-    override fun build(key: ResourceKey): AttributeType {
+    override fun build(key: NamespacedKey): AttributeType {
         val supports = this.supports ?: { true }
         val name = checkNotNull(this.name) { "The name must be set" }
         val valueRange = checkNotNull(this.valueRange) { "The value range must be set" }

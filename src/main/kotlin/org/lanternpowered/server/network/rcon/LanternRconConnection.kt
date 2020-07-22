@@ -11,12 +11,12 @@
 package org.lanternpowered.server.network.rcon
 
 import io.netty.channel.Channel
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.permission.AbstractProxySubject
 import org.spongepowered.api.network.RconConnection
 import org.spongepowered.api.service.permission.PermissionService
-import org.spongepowered.api.text.Text
-import org.spongepowered.api.text.channel.MessageChannel
 import org.spongepowered.api.util.Tristate
 import java.net.InetSocketAddress
 
@@ -48,9 +48,6 @@ class LanternRconConnection internal constructor(
     override fun sendMessage(message: Text) {
         this.buffer.append(message.toPlain()).append('\n')
     }
-
-    override fun getMessageChannel(): MessageChannel = MessageChannel.toPlayersAndServer()
-    override fun setMessageChannel(channel: MessageChannel) {}
 
     override val subjectCollectionIdentifier: String
         get() = PermissionService.SUBJECTS_SYSTEM

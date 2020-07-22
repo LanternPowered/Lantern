@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.ResourceKey
-import org.lanternpowered.api.ResourceKeys.minecraft
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.NamespacedKeys.minecraft
 import org.lanternpowered.api.ext.itemStackOf
 import org.lanternpowered.api.effect.potion.potionEffectOf
 import org.lanternpowered.api.item.ItemType
@@ -82,7 +82,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
         }
     }
 
-    private fun register(key: ResourceKey, fn: ItemTypeBuilder.() -> Unit = {}): ItemType {
+    private fun register(key: NamespacedKey, fn: ItemTypeBuilder.() -> Unit = {}): ItemType {
         return itemTypeOf(key, fn)//.also { register(it) }
     }
 
@@ -734,7 +734,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerMinecarts() {
-        fun registerMinecart(key: ResourceKey, entityType: () -> Supplier<out EntityType<out MinecartEntity>>) {
+        fun registerMinecart(key: NamespacedKey, entityType: () -> Supplier<out EntityType<out MinecartEntity>>) {
             register(key) {
                 maxStackQuantity(1)
             }
@@ -900,7 +900,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerDoors() {
-        fun registerWoodenDoor(key: ResourceKey, woodType: Supplier<out WoodType>) {
+        fun registerWoodenDoor(key: NamespacedKey, woodType: Supplier<out WoodType>) {
             register(key) {
                 keys {
                     register(ItemKeys.WOOD_TYPE, woodType)
@@ -917,7 +917,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerBoats() {
-        fun registerBoat(key: ResourceKey, woodType: Supplier<out WoodType>) {
+        fun registerBoat(key: NamespacedKey, woodType: Supplier<out WoodType>) {
             register(key) {
                 maxStackQuantity(1)
                 keys {
@@ -957,7 +957,7 @@ object ItemTypeRegistry : AdditionalPluginCatalogRegistryModule<ItemType>(ItemTy
     }
 
     private fun registerMusicDiscs() {
-        fun registerMusicDisc(key: ResourceKey, musicDisc: Supplier<out MusicDisc>) {
+        fun registerMusicDisc(key: NamespacedKey, musicDisc: Supplier<out MusicDisc>) {
             register(key) {
                 maxStackQuantity(1)
                 keys {

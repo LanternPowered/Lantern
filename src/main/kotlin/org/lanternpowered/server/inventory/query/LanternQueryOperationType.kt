@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.inventory.query
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.item.inventory.query.QueryOperation
 import org.spongepowered.api.item.inventory.query.QueryOperationType
 
-class LanternQueryOperationType<T>(key: ResourceKey, protected val queryOperator: QueryOperator<T>) :
+class LanternQueryOperationType<T>(key: NamespacedKey, protected val queryOperator: QueryOperator<T>) :
         DefaultCatalogType(key), QueryOperationType<T> {
 
     override fun of(arg: T): QueryOperation<T> = LanternQueryOperation(this, arg)

@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.game.registry.type.entity
 
-import org.lanternpowered.api.ResourceKeys.minecraft
-import org.lanternpowered.api.ResourceKeys.sponge
+import org.lanternpowered.api.NamespacedKeys.minecraft
+import org.lanternpowered.api.NamespacedKeys.sponge
 import org.lanternpowered.server.entity.LanternHuman
 import org.lanternpowered.server.entity.LanternItem
 import org.lanternpowered.server.entity.LanternZombie
@@ -20,7 +20,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.entity.living.player.OfflineUser
 import org.lanternpowered.server.entity.weather.LanternLightning
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
-import org.lanternpowered.server.game.registry.type.effect.sound.entity.EntityEffectTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule
 import org.spongepowered.api.entity.Entity

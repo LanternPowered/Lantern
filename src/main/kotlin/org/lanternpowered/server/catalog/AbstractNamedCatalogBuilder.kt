@@ -12,7 +12,7 @@
 
 package org.lanternpowered.server.catalog
 
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.NamedCatalogType
 import org.spongepowered.api.util.NamedCatalogBuilder
 import org.spongepowered.api.util.ResettableBuilder
@@ -35,7 +35,7 @@ abstract class AbstractNamedCatalogBuilder<C : NamedCatalogType, B : ResettableB
         return build(key, name)
     }
 
-    protected abstract fun build(key: ResourceKey, name: String): C
+    protected abstract fun build(key: NamespacedKey, name: String): C
 
     override fun reset() = super.reset().apply {
         name = null

@@ -10,18 +10,17 @@
  */
 package org.lanternpowered.server.world
 
-import com.google.common.base.Objects
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.fix
-import org.spongepowered.api.world.World as SpongeWorld
 import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3i
 import java.lang.ref.WeakReference
-import java.util.UUID
+import org.spongepowered.api.world.World as SpongeWorld
 
 /**
  * Represents a weak reference to a [World].
@@ -33,7 +32,7 @@ class WeakWorldReference {
     /**
      * The unique id of the world of this reference.
      */
-    val uniqueId: UUID
+    val key: NamespacedKey
 
     /**
      * Creates a new weak world reference.
@@ -43,16 +42,16 @@ class WeakWorldReference {
     constructor(world: SpongeWorld<*>) {
         world.fix()
         this.reference = WeakReference(world)
-        this.uniqueId = world.uniqueId
+        this.key = world.key
     }
 
     /**
-     * Creates a new weak world reference with the unique id of the world.
+     * Creates a new weak world reference with the key of the world.
      *
-     * @param uniqueId The unique id
+     * @param key The key
      */
-    constructor(uniqueId: UUID) {
-        this.uniqueId = uniqueId
+    constructor(key: NamespacedKey) {
+        this.key = key
     }
 
     /**
@@ -66,7 +65,7 @@ class WeakWorldReference {
         var world = reference?.get()
         if (world != null)
             return world
-        world = WorldManager.getWorld(this.uniqueId).orNull()
+        world = WorldManager.getWorld(this.key).orNull()
         if (world != null) {
             this.reference = WeakReference(world)
             return world
@@ -75,22 +74,21 @@ class WeakWorldReference {
     }
 
     fun toLocation(position: Vector3i): Location =
-            this.world?.let { world -> Location.of(world, position) } ?: Location.of(this.uniqueId, position)
+            this.world?.let { world -> Location.of(world, position) } ?: Location.of(this.key, position)
 
     fun toLocation(position: Vector3d): Location =
-            this.world?.let { world -> Location.of(world, position) } ?: Location.of(this.uniqueId, position)
+            this.world?.let { world -> Location.of(world, position) } ?: Location.of(this.key, position)
 
     override fun toString(): String = ToStringHelper(this)
             .omitNullValues()
-            .add("uniqueId", this.uniqueId)
-            .add("name", this.world?.properties?.directoryName)
+            .add("key", this.key)
             .toString()
 
     override fun equals(other: Any?): Boolean {
         if (other !is WeakWorldReference)
             return false
-        return other.uniqueId == this.uniqueId
+        return other.key == this.key
     }
 
-    override fun hashCode(): Int = Objects.hashCode(this.uniqueId)
+    override fun hashCode(): Int = this.key.hashCode()
 }

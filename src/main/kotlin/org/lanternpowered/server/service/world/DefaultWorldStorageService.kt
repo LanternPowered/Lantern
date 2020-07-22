@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.service.world
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList
@@ -50,7 +50,7 @@ class DefaultWorldStorageService(
 ) : WorldStorageService, Closeable {
 
     private val knownStoragesByUniqueId = ConcurrentHashMap<UUID, LanternWorldStorage>()
-    private val knownStoragesByKey = ConcurrentHashMap<ResourceKey, LanternWorldStorage>()
+    private val knownStoragesByKey = ConcurrentHashMap<NamespacedKey, LanternWorldStorage>()
 
     private val modifyLock = Any()
 
@@ -102,10 +102,10 @@ class DefaultWorldStorageService(
     override fun get(uniqueId: UUID): WorldStorage? =
             this.knownStoragesByUniqueId[uniqueId]
 
-    override fun getByKey(key: ResourceKey): WorldStorage? =
+    override fun getByKey(key: NamespacedKey): WorldStorage? =
             this.knownStoragesByKey[key]
 
-    override fun create(key: ResourceKey, uniqueId: UUID): WorldStorage? {
+    override fun create(key: NamespacedKey, uniqueId: UUID): WorldStorage? {
         synchronized(this.modifyLock) {
             if (this.knownStoragesByKey.containsKey(key) ||
                     this.knownStoragesByUniqueId.containsKey(uniqueId))
@@ -125,11 +125,11 @@ class DefaultWorldStorageService(
         }
     }
 
-    override fun copy(sourceKey: ResourceKey, copyKey: ResourceKey, uniqueId: UUID): WorldStorage? {
+    override fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID): WorldStorage? {
         TODO("Not yet implemented")
     }
 
-    override fun move(oldKey: ResourceKey, newKey: ResourceKey): WorldStorage? {
+    override fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage? {
         TODO("Not yet implemented")
     }
 

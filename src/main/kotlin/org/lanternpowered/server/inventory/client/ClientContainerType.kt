@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.inventory.client
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.inventory.AbstractInventory
 import org.spongepowered.api.item.inventory.ContainerType
 
-class ClientContainerType(key: ResourceKey, private val containerProvider: (AbstractInventory) -> ClientContainer) :
+class ClientContainerType(key: NamespacedKey, private val containerProvider: (AbstractInventory) -> ClientContainer) :
         DefaultCatalogType(key), ContainerType {
 
     /**

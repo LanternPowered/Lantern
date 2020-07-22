@@ -10,20 +10,18 @@
  */
 package org.lanternpowered.server.world.dimension
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
-import org.lanternpowered.server.world.LanternWorld
+import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.world.dimension.DimensionType
 import org.spongepowered.api.world.gen.GeneratorType
-import java.util.function.BiFunction
 
-class LanternDimensionType<T : LanternDimension>(
-        key: ResourceKey,
+class LanternDimensionType(
+        key: NamespacedKey,
         name: String,
         override val internalId: Int,
-        private val dimensionClass: Class<T>,
         /**
          * The default generator type of this dimension type. This one will be used
          * if there can't be one found in the world data.
@@ -32,8 +30,7 @@ class LanternDimensionType<T : LanternDimension>(
         val keepSpawnLoaded: Boolean,
         val doesWaterEvaporate: Boolean,
         private val hasSkylight: Boolean,
-        val allowsPlayerRespawns: Boolean,
-        private val supplier: BiFunction<LanternWorld, LanternDimensionType<T>, T>
+        val allowsPlayerRespawns: Boolean
 ) : DefaultCatalogType.Named(key, name), DimensionType, InternalCatalogType {
 
     /**
@@ -47,13 +44,8 @@ class LanternDimensionType<T : LanternDimension>(
      * @param world The world to create the dimension for
      * @return The dimension instance
      */
-    fun newDimension(world: LanternWorld): T {
-        return this.supplier.apply(world, this)
-    }
+    fun newDimension(world: LanternWorldNew): LanternDimension = LanternDimension(world, this)
 
     override fun hasSkylight() = this.hasSkylight
     override fun getContext() = this.context
-
-    override fun toStringHelper() = super.toStringHelper()
-            .add("dimensionClass", this.dimensionClass.name)
 }

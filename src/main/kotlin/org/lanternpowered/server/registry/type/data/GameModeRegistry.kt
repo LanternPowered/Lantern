@@ -11,7 +11,7 @@
 @file:JvmName("GameModeRegistry")
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.DataHolder
@@ -21,7 +21,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode
 @get:JvmName("get")
 val GameModeRegistry = internalCatalogTypeRegistry<GameMode> {
     fun register(internalId: Int, id: String, translationPart: String, abilityApplier: DataHolder.Mutable.() -> Unit) =
-            register(internalId, LanternGameMode(ResourceKey.minecraft(id), translationPart, abilityApplier))
+            register(internalId, LanternGameMode(NamespacedKey.minecraft(id), translationPart, abilityApplier))
 
     register(-1, "not_set", "notSet") {}
     register(0, "survival", "survival") {

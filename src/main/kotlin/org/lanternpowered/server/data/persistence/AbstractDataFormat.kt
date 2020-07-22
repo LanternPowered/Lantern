@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.data.persistence
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataFormat
 
-abstract class AbstractDataFormat(key: ResourceKey) : DefaultCatalogType(key), DataFormat
+abstract class AbstractDataFormat(key: NamespacedKey) : DefaultCatalogType(key), DataFormat

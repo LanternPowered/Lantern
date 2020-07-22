@@ -15,9 +15,9 @@ import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.world.dimension.Dimension
 import org.spongepowered.api.world.dimension.DimensionType
 
-open class LanternDimension protected constructor(
+open class LanternDimension(
         private val world: LanternWorldNew,
-        private val dimensionType: LanternDimensionType<*>
+        private val dimensionType: LanternDimensionType
 ) : Dimension {
 
     override fun getType(): DimensionType = this.dimensionType
@@ -34,7 +34,7 @@ open class LanternDimension protected constructor(
 
     override fun toString(): String = ToStringHelper(this)
             .add("worldUUID", this.world.uniqueId)
-            .add("worldName", this.world.properties.directoryName)
+            .add("worldKey", this.world.properties.key)
             .add("dimensionType", this.dimensionType.key)
             .toString()
 }

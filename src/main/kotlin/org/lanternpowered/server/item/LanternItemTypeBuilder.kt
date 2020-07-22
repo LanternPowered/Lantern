@@ -10,10 +10,9 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
-import org.lanternpowered.api.text.translation.FixedTranslation
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
@@ -64,7 +63,7 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
         this.behaviorsBuilderFunctions += fn
     }
 
-    fun build(key: ResourceKey): ItemType {
+    fun build(key: NamespacedKey): ItemType {
         var nameFunction = this.nameFunction
         if (nameFunction == null) {
             val def = tr("item.${key.namespace}.${key.value}")

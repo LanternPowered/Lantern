@@ -10,13 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.lanternpowered.api.ResourceKeys;
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.api.NamespacedKeys;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
@@ -26,27 +20,12 @@ import org.lanternpowered.server.world.gen.flat.FlatNetherGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatOverworldGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatTheEndGeneratorType;
 import org.lanternpowered.server.world.gen.thevoid.TheVoidGeneratorType;
-import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.asset.Asset;
-import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.util.CustomCatalogRegistration;
 import org.spongepowered.api.registry.util.DelayedRegistration;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.gen.GeneratorType;
 import org.spongepowered.api.world.gen.GeneratorTypes;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RegistrationDependency({ BlockRegistryModule.class, BlockStateRegistryModule.class })
 public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<GeneratorType> {
@@ -57,35 +36,34 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        final FlatOverworldGeneratorType flat = new FlatOverworldGeneratorType(ResourceKeys.minecraft("flat"));
-        final FlatNetherGeneratorType flatNether = new FlatNetherGeneratorType(ResourceKeys.lantern("flat_nether"));
-        final FlatTheEndGeneratorType flatTheEnd = new FlatTheEndGeneratorType(ResourceKeys.lantern("flat_the_end"));
+        final FlatOverworldGeneratorType flat = new FlatOverworldGeneratorType(NamespacedKeys.minecraft("flat"));
+        final FlatNetherGeneratorType flatNether = new FlatNetherGeneratorType(NamespacedKeys.lantern("flat_the_nether"));
+        final FlatTheEndGeneratorType flatTheEnd = new FlatTheEndGeneratorType(NamespacedKeys.lantern("flat_the_end"));
 
         // Default inbuilt generator types
         register(flat);
         register(flatNether);
         register(flatTheEnd);
-        register(new DebugGeneratorType(ResourceKeys.minecraft("minecraft")));
+        register(new DebugGeneratorType(NamespacedKeys.minecraft("minecraft")));
 
         // Plugin provided generator types, these will fall back
         // to flat if missing
-        register(new DelegateGeneratorType(ResourceKeys.minecraft("default"), flat));
-        register(new DelegateGeneratorType(ResourceKeys.minecraft("overworld"), flat));
-        register(new DelegateGeneratorType(ResourceKeys.minecraft("large_biomes"), flat));
-        register(new DelegateGeneratorType(ResourceKeys.minecraft("amplified"), flat));
-        register(new DelegateGeneratorType(ResourceKeys.minecraft("nether"), flatNether));
-        register(new DelegateGeneratorType(ResourceKeys.minecraft("the_end"), flatTheEnd));
+        register(new DelegateGeneratorType(NamespacedKeys.minecraft("default"), flat));
+        register(new DelegateGeneratorType(NamespacedKeys.minecraft("overworld"), flat));
+        register(new DelegateGeneratorType(NamespacedKeys.minecraft("large_biomes"), flat));
+        register(new DelegateGeneratorType(NamespacedKeys.minecraft("amplified"), flat));
+        register(new DelegateGeneratorType(NamespacedKeys.minecraft("the_nether"), flatNether));
+        register(new DelegateGeneratorType(NamespacedKeys.minecraft("the_end"), flatTheEnd));
 
         // Sponge
-        register(new TheVoidGeneratorType(ResourceKeys.sponge("void")));
+        register(new TheVoidGeneratorType(NamespacedKeys.sponge("void")));
     }
 
     /**
      * Post initialize the {@link GeneratorType}s. All the default world generators
      * here be selected by scanning for 'default-world-gen.json' files.
      */
-    @CustomCatalogRegistration
-    @DelayedRegistration(RegistrationPhase.POST_INIT)
+    /*
     public void postInit() {
         final Multimap<String, DefaultEntry> entries = HashMultimap.create();
         final Gson gson = new Gson();
@@ -148,4 +126,5 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
             this.type = type;
         }
     }
+    */
 }

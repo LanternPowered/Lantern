@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.fluid
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.data.LocalImmutableDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.state.AbstractCatalogTypeStateContainer
@@ -19,6 +19,6 @@ import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.state.StateProperty
 
 class LanternFluidType(
-        key: ResourceKey, stateProperties: Iterable<StateProperty<*>>,
+        key: NamespacedKey, stateProperties: Iterable<StateProperty<*>>,
         override val keyRegistry: LocalKeyRegistry<out LocalImmutableDataHolder<FluidType>>
 ) : AbstractCatalogTypeStateContainer<FluidState>(key, stateProperties, ::LanternFluidState), FluidType, LocalImmutableDataHolder<FluidType>

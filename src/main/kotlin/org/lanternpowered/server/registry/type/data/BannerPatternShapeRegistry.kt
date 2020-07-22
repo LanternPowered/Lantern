@@ -10,14 +10,15 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
 import org.spongepowered.api.data.type.BannerPatternShape
 
 val BannerPatternShapeRegistry = customInternalCatalogTypeRegistry<BannerPatternShape, String> {
     fun register(internalId: String, id: String) =
-            register(internalId, LanternBannerPatternShape(ResourceKey.minecraft(id)))
+            register(internalId, LanternBannerPatternShape(minecraftKey(id)))
 
     register("b", "base")
     register("bo", "border")
@@ -60,4 +61,4 @@ val BannerPatternShapeRegistry = customInternalCatalogTypeRegistry<BannerPattern
     register("tt", "triangle_top")
 }
 
-private class LanternBannerPatternShape(key: ResourceKey) : DefaultCatalogType(key), BannerPatternShape
+private class LanternBannerPatternShape(key: NamespacedKey) : DefaultCatalogType(key), BannerPatternShape

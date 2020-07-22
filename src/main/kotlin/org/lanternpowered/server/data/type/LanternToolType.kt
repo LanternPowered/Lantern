@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.data.type
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.ToolType
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 
-class LanternToolType(key: ResourceKey) : DefaultCatalogType(key), ToolType {
+class LanternToolType(key: NamespacedKey) : DefaultCatalogType(key), ToolType {
     override fun getRepairIngredient(): Ingredient {
         TODO("Not yet implemented")
     }

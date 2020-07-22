@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.cause
 
-import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.cause.entity.damage.DamageModifierType
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.cause.entity.damage.LanternDamageModifierType
 
 val DamageModifierTypeRegistry = catalogTypeRegistry<DamageModifierType> {
     fun register(id: String) =
-            register(LanternDamageModifierType(ResourceKey.minecraft(id)))
+            register(LanternDamageModifierType(minecraftKey(id)))
 
     register("absorption")
     register("armor")

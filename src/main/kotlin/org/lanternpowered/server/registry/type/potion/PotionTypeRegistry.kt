@@ -11,7 +11,7 @@
 @file:JvmName("PotionTypeRegistry")
 package org.lanternpowered.server.registry.type.potion
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.effect.potion.PotionEffectTypes
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
@@ -20,11 +20,11 @@ import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 
 @get:JvmName("get")
 val PotionTypeRegistry = internalCatalogTypeRegistry<PotionType> {
-    fun register(key: ResourceKey, fn: PotionTypeBuilder.() -> Unit = {}) =
+    fun register(key: NamespacedKey, fn: PotionTypeBuilder.() -> Unit = {}) =
             register(potionTypeOf(key, fn))
 
     fun register(key: String, fn: PotionTypeBuilder.() -> Unit = {}) =
-            register(ResourceKey.minecraft(key), fn)
+            register(NamespacedKey.minecraft(key), fn)
 
     register("empty")
     register("water")

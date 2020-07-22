@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.cause
 
-import org.lanternpowered.api.ResourceKey
 import org.lanternpowered.api.cause.entity.damage.DamageType
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.cause.entity.damage.LanternDamageType
 
 val DamageTypeRegistry = catalogTypeRegistry<DamageType> {
     fun register(id: String) =
-            register(LanternDamageType(ResourceKey.minecraft(id)))
+            register(LanternDamageType(minecraftKey(id)))
 
     register("attack")
     register("contact")

@@ -12,7 +12,7 @@ package org.lanternpowered.server.event
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.spongepowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.event.cause.EventContextKey
 
 class LanternEventContextKeyBuilder<T> : AbstractCatalogBuilder<EventContextKey<T>, EventContextKey.Builder<T>>(), EventContextKey.Builder<T> {
@@ -29,8 +29,8 @@ class LanternEventContextKeyBuilder<T> : AbstractCatalogBuilder<EventContextKey<
         this.typeToken = null
     }
 
-    override fun build(key: ResourceKey): EventContextKey<T> {
+    override fun build(key: NamespacedKey): EventContextKey<T> {
         val typeToken = checkNotNull(this.typeToken) { "The allowed type must be set" }
-        return LanternEventContextKey<T>(key, typeToken)
+        return LanternCauseContextKey<T>(key, typeToken)
     }
 }

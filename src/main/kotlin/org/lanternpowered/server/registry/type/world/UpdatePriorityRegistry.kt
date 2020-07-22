@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.world
 
-import org.lanternpowered.api.ResourceKey
+import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.world.scheduler.UpdatePriority
 import org.lanternpowered.server.world.update.LanternUpdatePriority
 
 val UpdatePriorityRegistry = catalogTypeRegistry<UpdatePriority> {
     fun register(id: String, value: Int) =
-            register(LanternUpdatePriority(ResourceKey.minecraft(id), value))
+            register(LanternUpdatePriority(NamespacedKey.minecraft(id), value))
 
     register("extremely_high", -3)
     register("very_high", -2)

@@ -20,7 +20,7 @@ import org.lanternpowered.api.util.index.requireKey
 import org.lanternpowered.api.util.index.requireValue
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
-import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
+import org.lanternpowered.server.registry.type.scoreboard.ScoreboardCriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
@@ -80,7 +80,7 @@ object ScoreboardIO {
                         .displayName(displayName)
 
                 val criterionName = entry.getString(CRITERION_NAME).get()
-                val criterion = CriterionRegistry[NamespacedKey.resolve(criterionName)]
+                val criterion = ScoreboardCriterionRegistry[NamespacedKey.resolve(criterionName)]
                 if (criterion == null) {
                     Lantern.getLogger().warn("Unable to find a criterion with id: $criterionName, default to dummy.")
                     builder.criterion(Criteria.DUMMY)

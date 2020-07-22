@@ -16,5 +16,5 @@ import org.spongepowered.api.statistic.Statistic
 
 interface XStatistic : Statistic, NamedCatalogType {
 
-    interface ForCatalog<T : CatalogType> : XStatistic, Statistic.ForCatalog<T>
+    interface TypeInstance<T : CatalogType> : XStatistic, Statistic.TypeInstance<T>
 }

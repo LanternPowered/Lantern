@@ -12,6 +12,7 @@ package org.lanternpowered.server.registry.type.potion
 
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.namespace.resolveNamespacedKey
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType
 import org.lanternpowered.server.game.registry.InternalRegistries
@@ -25,7 +26,7 @@ val PotionEffectTypeRegistry = internalCatalogTypeRegistry<PotionEffectType> {
     }
 
     fun register(id: String): LanternPotionEffectType {
-        val key = NamespacedKey.minecraft(id)
+        val key = minecraftKey(id)
         val internalId = internalIds[key]!!
         return register(internalId, LanternPotionEffectType(key))
     }

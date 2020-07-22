@@ -11,21 +11,21 @@
 @file:JvmName("EnchantmentTypeRegistry")
 package org.lanternpowered.server.registry.type.item
 
-import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
+import org.lanternpowered.api.item.enchantment.EnchantmentTypes
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.lanternpowered.server.text.translation.TranslationHelper
-import org.spongepowered.api.item.enchantment.EnchantmentTypes
 
 @get:JvmName("get")
 val EnchantmentTypeRegistry = internalCatalogTypeRegistry<EnchantmentType> {
-    fun register(key: NamespacedKey, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
-            register(LanternEnchantmentTypeBuilder().key(key).name(TranslationHelper.tr(name)).apply(fn).build())
+    fun register(key: NamespacedKey, translationKey: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
+            register(LanternEnchantmentTypeBuilder().key(key).name(translatableTextOf(translationKey)).apply(fn).build())
 
-    fun register(id: String, name: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
-            register(NamespacedKey.minecraft(id), name, fn)
+    fun register(id: String, translationKey: String, fn: EnchantmentTypeBuilder.() -> Unit = {}) =
+            register(NamespacedKey.minecraft(id), translationKey, fn)
 
     register("protection", "enchantment.protect.all")
     register("fire_protection", "enchantment.protect.fire")

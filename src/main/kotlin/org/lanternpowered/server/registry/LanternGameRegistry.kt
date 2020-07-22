@@ -112,6 +112,7 @@ import org.lanternpowered.server.registry.type.effect.entity.EntityEffectTypeReg
 import org.lanternpowered.server.registry.type.effect.particle.ParticleOptionRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
+import org.lanternpowered.server.registry.type.inventory.EquipmentGroupRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
 import org.lanternpowered.server.registry.type.item.EnchantmentTypeRegistry
 import org.lanternpowered.server.registry.type.persistence.DataFormatRegistry
@@ -120,7 +121,7 @@ import org.lanternpowered.server.registry.type.potion.PotionTypeRegistry
 import org.lanternpowered.server.registry.type.recipe.LanternRecipeRegistry
 import org.lanternpowered.server.registry.type.recipe.RecipeTypeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
-import org.lanternpowered.server.registry.type.scoreboard.CriterionRegistry
+import org.lanternpowered.server.registry.type.scoreboard.ScoreboardCriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
@@ -307,6 +308,7 @@ class LanternGameRegistry(
 
             register(FluidTypeRegistry)
 
+            register(EquipmentGroupRegistry)
             register(EquipmentTypeRegistry)
 
             register(EnchantmentTypeRegistry)
@@ -320,9 +322,9 @@ class LanternGameRegistry(
             register(LanternRecipeRegistry)
 
             register(CollisionRuleRegistry)
-            register(CriterionRegistry)
             register(DisplaySlotRegistry)
             register(ObjectiveDisplayModeRegistry)
+            register(ScoreboardCriterionRegistry)
             register(VisibilityRegistry)
 
             register(ChatVisibilityRegistry)

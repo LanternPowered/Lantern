@@ -10,25 +10,25 @@
  */
 package org.lanternpowered.server.item.enchantment
 
+import org.lanternpowered.api.item.enchantment.EnchantmentType
+import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.catalog.InternalCatalogType
-import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.item.enchantment.EnchantmentType
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.translation.Translatable
-import org.spongepowered.api.text.translation.Translation
 
 class LanternEnchantmentType internal constructor(
-        key: NamespacedKey, translation: Translation, override val internalId: Int,
+        key: NamespacedKey,
+        private val name: String,
         override val levelRange: IntRange,
         private val weight: Int,
         private val treasure: Boolean,
         private val curse: Boolean,
+        text: Text,
         enchantabilityRangeProvider: ((Int) -> IntRange)?,
         compatibilityTester: ((EnchantmentType) -> Boolean)?
-) : DefaultCatalogType(key), XEnchantmentType, InternalCatalogType, Translatable by Translated(translation) {
+) : DefaultCatalogType(key), XEnchantmentType, TextRepresentable by text {
 
     private val compatibilityTester = compatibilityTester ?: { true }
     private val enchantabilityRangeProvider = enchantabilityRangeProvider ?: {
@@ -37,7 +37,7 @@ class LanternEnchantmentType internal constructor(
         min..max
     }
 
-    override fun getName(): String = this.translation.get()
+    override fun getName(): String = this.name
     override fun getWeight(): Int = this.weight
     override fun isTreasure(): Boolean = this.treasure
     override fun isCurse(): Boolean = this.curse

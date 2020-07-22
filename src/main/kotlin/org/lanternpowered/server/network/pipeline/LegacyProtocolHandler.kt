@@ -14,10 +14,13 @@ import io.netty.buffer.ByteBuf
 import io.netty.channel.ChannelFutureListener
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.cause.causeOf
-import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.text.toPlain
+import org.lanternpowered.api.text.toText
+import org.lanternpowered.api.text.translatableTextOf
+import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.network.NetworkSession
@@ -26,12 +29,16 @@ import org.lanternpowered.server.network.status.LanternStatusClient
 import org.lanternpowered.server.network.status.LanternStatusHelper
 import org.lanternpowered.server.network.status.LanternStatusResponse
 import org.lanternpowered.server.text.LanternTexts.toLegacy
-import org.lanternpowered.server.text.translation.TranslationHelper
-import org.spongepowered.api.MinecraftVersion
 import java.net.InetSocketAddress
 import java.nio.charset.StandardCharsets
 
 class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboundHandlerAdapter() {
+
+    private val server: LanternServerNew
+        get() = this.session.server
+
+    private val logger: Logger
+        get() = this.session.server.logger
 
     override fun channelRead(ctx: ChannelHandlerContext, buf: Any) {
         buf as ByteBuf
@@ -60,14 +67,15 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 if (buf.readableBytes() > 0)
                     return
                 legacy = true
-                ctx.disconnect(TranslationHelper.t("multiplayer.disconnect.outdated_client",
-                        Lantern.getGame().platform.minecraftVersion.name).toPlain())
+                ctx.disconnect(translatableTextOf("multiplayer.disconnect.outdated_client",
+                        this.server.platform.minecraftVersion.name.toText()).toPlain())
                 val clientVersion = Lantern.getGame().minecraftVersionCache.getVersionOrUnknown(protocol, true)
                 if (clientVersion === LanternMinecraftVersion.UNKNOWN_LEGACY) {
-                    Lantern.getLogger().debug("Client with unknown legacy protocol version {} attempted to join the server.", protocol)
+                    this.logger.debug(
+                            "Client with unknown legacy protocol version $protocol attempted to join the server.")
                 } else {
-                    Lantern.getLogger().debug("Client with legacy protocol version {} (mc-version {}) attempted to join the server.", protocol,
-                            clientVersion.name)
+                    this.logger.debug(
+                            "Client with legacy protocol version $protocol (mc-version ${clientVersion.name}) attempted to join the server.")
                 }
                 return
             }
@@ -118,7 +126,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 }
                 readable = buf.readableBytes()
                 if (readable > 0) {
-                    Lantern.getLogger().warn("Trailing bytes on a legacy ping message: {}b", readable)
+                    this.logger.warn("Trailing bytes on a legacy ping message: {}b", readable)
                 }
             }
 
@@ -130,11 +138,10 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
 
             // Call the event in the main thread
             Lantern.getSyncScheduler().submit {
-                val clientVersion: MinecraftVersion = Lantern.getGame().minecraftVersionCache.getVersionOrUnknown(protocol1, true)
-                if (clientVersion === LanternMinecraftVersion.UNKNOWN) {
-                    Lantern.getLogger().debug("Client with unknown legacy protocol version {} pinged the server.", protocol1)
-                }
-                val serverVersion: MinecraftVersion = Lantern.getGame().platform.minecraftVersion
+                val clientVersion = this.server.game.minecraftVersionCache.getVersionOrUnknown(protocol1, true)
+                if (clientVersion === LanternMinecraftVersion.UNKNOWN)
+                    this.logger.debug("Client with unknown legacy protocol version {} pinged the server.", protocol1)
+                val serverVersion = this.server.platform.minecraftVersion
                 var description = server.motd
                 val address = ctx.channel().remoteAddress() as InetSocketAddress
                 val client = LanternStatusClient(address, clientVersion, virtualAddress1)
@@ -143,7 +150,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 val connection = SimpleRemoteConnection.of(ctx.channel(), virtualAddress1)
                 val cause = causeOf(connection)
                 val event = LanternEventFactory.createClientPingServerEvent(cause, client, response)
-                EventManager.post(event)
+                this.server.eventManager.post(event)
 
                 // Cancelled, we are done here
                 if (event.isCancelled) {
@@ -160,8 +167,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 if (!response.players.isPresent) {
                     online = -1
                 }
-                val data: String
-                data = if (full1) {
+                val data = if (full1) {
                     val description0 = getFirstLine(toLegacy(description))
                     // 1. This value is always 1.
                     // 2. The protocol version, just use a value out of range

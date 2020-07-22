@@ -14,7 +14,6 @@ import org.lanternpowered.api.util.optional.optional
 import org.spongepowered.plugin.PluginCandidate
 import org.spongepowered.plugin.PluginEnvironment
 import org.spongepowered.plugin.PluginKeys
-import org.spongepowered.plugin.jvm.JVMPluginContainer
 import org.spongepowered.plugin.jvm.JVMPluginLanguageService
 import java.util.Optional
 
@@ -22,7 +21,7 @@ class LanternPluginLanguageService : JVMPluginLanguageService<LanternPluginConta
 
     override fun getName(): String = "lantern"
 
-    override fun createPluginInstance(environment: PluginEnvironment, container: JVMPluginContainer, targetClassLoader: ClassLoader): Any {
+    override fun createPluginInstance(environment: PluginEnvironment, container: LanternPluginContainer, targetClassLoader: ClassLoader): Any {
         val pluginClass = Class.forName(container.metadata.mainClass, true, targetClassLoader)
         val objectInstance = pluginClass.kotlin.objectInstance
         if (objectInstance != null)

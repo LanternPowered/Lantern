@@ -11,16 +11,15 @@
 package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.statistic.StatisticCategory
-import org.spongepowered.api.text.translation.Translatable
-import org.spongepowered.api.text.translation.Translation
 
 abstract class AbstractStatisticCategory<T : Statistic>(
-        key: NamespacedKey, translation: Translation
-) : DefaultCatalogType(key), StatisticCategory, Translatable by Translated(translation) {
+        key: NamespacedKey, text: Text
+) : DefaultCatalogType(key), StatisticCategory, TextRepresentable by text {
 
     abstract fun addStatistic(statistic: T)
 }

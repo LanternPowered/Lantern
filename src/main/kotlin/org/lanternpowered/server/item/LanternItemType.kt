@@ -10,23 +10,23 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.block.BlockType
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
-import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.data.LocalImmutableDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.item.appearance.ItemAppearance
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.spongepowered.api.block.BlockType
 import java.util.Optional
 
 class LanternItemType(
         key: NamespacedKey,
-        val nameFunction: ItemStack.() -> Translation,
+        val nameFunction: ItemStack.() -> Text,
         private val blockType: BlockType?,
         private val maxStackQuantity: Int,
         private val stackKeyRegistry: LocalKeyRegistry<ItemStack>,
@@ -37,7 +37,7 @@ class LanternItemType(
 
     private val name by lazy { this.nameFunction(ItemStack.of(this)) }
 
-    override fun getTranslation() = this.name
+    override fun asComponent(): Text = this.name
     override fun getBlock() = this.blockType.optional()
     override fun getMaxStackQuantity() = this.maxStackQuantity
 

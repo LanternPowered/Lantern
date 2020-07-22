@@ -12,17 +12,14 @@ package org.lanternpowered.server.item.enchantment
 
 import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
-import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
-import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.textOf
+import org.lanternpowered.api.text.toPlain
 
 class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
-
-    companion object {
-        var idCounter: Int = 0
-    }
 
     private var weight = 5
     private var levelRange = 1..1
@@ -30,6 +27,7 @@ class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentTy
     private var treasure = false
     private var enchantabilityRange: ((Int) -> IntRange)? = null
     private var compatibilityTester: ((EnchantmentType) -> Boolean)? = null
+    private var textName: Text? = null
 
     override fun weight(weight: Int) = apply { this.weight = weight }
     override fun levelRange(levelRange: IntRange) = apply { this.levelRange = levelRange }
@@ -37,17 +35,23 @@ class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentTy
     override fun treasure(treasure: Boolean) = apply { this.treasure = treasure }
     override fun enchantabilityRange(provider: (Int) -> IntRange) = apply { this.enchantabilityRange = provider }
     override fun compatibilityTester(tester: (EnchantmentType) -> Boolean) = apply { this.compatibilityTester = tester }
-    override fun name(name: Translation) = apply { this.name = name }
-    override fun name(name: String) = apply { this.name = tr(name) }
 
-    override fun build(key: NamespacedKey, name: Translation): XEnchantmentType {
-        return LanternEnchantmentType(key, name, idCounter++,
-                this.levelRange, this.weight, this.treasure, this.curse, this.enchantabilityRange, this.compatibilityTester)
+    override fun name(name: Text) = apply {
+        if (this.name == null)
+            this.name = name.toPlain()
+        this.textName = name
+    }
+
+    override fun build(key: NamespacedKey, name: String): XEnchantmentType {
+        val textName = this.textName ?: textOf(name)
+        return LanternEnchantmentType(key, name, this.levelRange, this.weight, this.treasure,
+                this.curse, textName, this.enchantabilityRange, this.compatibilityTester)
     }
 
     override fun reset() = apply {
         super.reset()
         this.name = null
+        this.textName = null
         this.weight = 5
         this.levelRange = 1..1
         this.curse = false

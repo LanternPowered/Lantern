@@ -13,10 +13,10 @@ package org.lanternpowered.server.registry.type.data
 import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.data.type.HandType
-import org.spongepowered.api.text.translation.Translatable
 
 val HandTypeRegistry = catalogTypeRegistry<HandType> {
     fun register(id: String, translationKey: String) =
@@ -27,4 +27,4 @@ val HandTypeRegistry = catalogTypeRegistry<HandType> {
 }
 
 private class LanternHandType(key: NamespacedKey, translationKey: String) :
-        DefaultCatalogType(key), HandType, Translatable by Translated(translationKey)
+        DefaultCatalogType(key), HandType, TextRepresentable by translatableTextOf(translationKey)

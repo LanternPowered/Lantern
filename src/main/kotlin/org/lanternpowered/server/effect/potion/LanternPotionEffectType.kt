@@ -13,29 +13,27 @@ package org.lanternpowered.server.effect.potion
 import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectType
-import org.lanternpowered.api.text.translation.Translatable
-import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.api.entity.Entity
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
-import org.lanternpowered.server.text.translation.TranslationHelper.tr
-import org.spongepowered.api.entity.Entity
 
-class LanternPotionEffectType @JvmOverloads constructor(
-        key: NamespacedKey, translation: Translation,
-        private val potionTranslation: Translation,
+class LanternPotionEffectType(
+        key: NamespacedKey,
+        text: Text,
+        val potionText: Text,
         val effectConsumer: (Entity, PotionEffect) -> Unit = { _,_ -> },
         private var instant: Boolean = false
-) : DefaultCatalogType(key), PotionEffectType, Translatable by Translated(translation) {
+) : DefaultCatalogType(key), PotionEffectType, TextRepresentable by text {
 
-    @JvmOverloads constructor(key: NamespacedKey,
-                              effectConsumer: (Entity, PotionEffect) -> Unit = { _,_ -> }, instant: Boolean = false) :
+    constructor(key: NamespacedKey, effectConsumer: (Entity, PotionEffect) -> Unit = { _,_ -> }, instant: Boolean = false) :
             this(key,
-                    tr("effect.${key.namespace}.${key.value}"),
-                    tr("item.minecraft.potion.effect.${key.value}"),
+                    translatableTextOf("effect.${key.namespace}.${key.value}"),
+                    translatableTextOf("item.minecraft.potion.effect.${key.value}"),
                     effectConsumer, instant)
 
     fun instant() = apply { this.instant = true }
 
     override fun isInstant() = this.instant
-    override fun getPotionTranslation() = this.potionTranslation
 }

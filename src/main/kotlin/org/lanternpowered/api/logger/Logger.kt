@@ -15,7 +15,7 @@ package org.lanternpowered.api.logger
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
-import org.lanternpowered.api.text.text
+import org.lanternpowered.api.text.toText
 import java.util.function.Supplier
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -48,7 +48,7 @@ private fun Text.toLegacy(): String = LegacyTextSerializer.serialize(this)
  */
 private fun toLoggableString(any: Any): String {
     if (any is TextRepresentable) {
-        return any.text().toLegacy()
+        return any.toText().toLegacy()
     } else if (any is Supplier<*>) {
         return toLoggableString(any.get())
     }

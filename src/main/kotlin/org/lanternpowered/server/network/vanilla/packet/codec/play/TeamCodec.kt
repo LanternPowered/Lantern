@@ -49,7 +49,7 @@ object TeamCodec : PacketEncoder<TeamPacket> {
             buf.writeByte(flags.toByte())
             buf.writeString(VisibilityRegistry.requireId(packet.nameTagVisibility))
             buf.writeString(CollisionRuleRegistry.requireId(packet.collisionRule))
-            buf.writeByte(if (packet.color == null) 21 else colorIndex.getInt(packet.color).toByte())
+            buf.writeByte(if (packet.color == null) 21 else this.colorIndex.getInt(packet.color).toByte())
             context.write(buf, ContextualValueTypes.TEXT, packet.prefix)
             context.write(buf, ContextualValueTypes.TEXT, packet.suffix)
         }

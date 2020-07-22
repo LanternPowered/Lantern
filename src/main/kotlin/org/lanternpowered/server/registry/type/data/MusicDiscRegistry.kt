@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.registry.type.data
 
+import org.lanternpowered.api.effect.sound.SoundType
+import org.lanternpowered.api.effect.sound.SoundTypes
 import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.namespace.minecraftKey
-import org.lanternpowered.api.text.translation.Translatable
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.effect.sound.SoundType
-import org.spongepowered.api.effect.sound.SoundTypes
 import org.spongepowered.api.effect.sound.music.MusicDisc
 import java.util.function.Supplier
 
@@ -39,8 +39,8 @@ val MusicDiscRegistry = internalCatalogTypeRegistry<MusicDisc> {
     register("wait", "item.record.wait.desc", SoundTypes.MUSIC_DISC_WAIT)
 }
 
-private class LanternMusicDisc(key: NamespacedKey, translation: String, private val soundType: SoundType) :
-        DefaultCatalogType(key), MusicDisc, Translatable by Translated(translation) {
+private class LanternMusicDisc(key: NamespacedKey, translationKey: String, private val soundType: SoundType) :
+        DefaultCatalogType(key), MusicDisc, TextRepresentable by translatableTextOf(translationKey) {
 
     override fun getSound(): SoundType = this.soundType
 }

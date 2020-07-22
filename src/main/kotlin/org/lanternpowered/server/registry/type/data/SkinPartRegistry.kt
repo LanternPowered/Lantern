@@ -13,12 +13,12 @@ package org.lanternpowered.server.registry.type.data
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistry
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.data.type.SkinPart
-import org.spongepowered.api.text.translation.Translatable
 
 object SkinPartRegistry : InternalCatalogTypeRegistry<SkinPart> by internalCatalogTypeRegistry({
     fun register(id: String) =
@@ -67,4 +67,4 @@ object SkinPartRegistry : InternalCatalogTypeRegistry<SkinPart> by internalCatal
 }
 
 private class LanternSkinPart(key: NamespacedKey) : DefaultCatalogType(key), SkinPart,
-        Translatable by Translated("options.modelPart.${key.value}")
+        TextRepresentable by translatableTextOf("options.modelPart.${key.value}")

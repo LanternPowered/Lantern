@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.item.enchantment
 
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.spongepowered.api.util.NamedCatalogBuilder
 import java.util.function.Predicate
@@ -19,6 +20,7 @@ import java.util.function.Predicate
  */
 interface EnchantmentTypeBuilder : NamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder> {
 
+    fun name(name: Text): EnchantmentTypeBuilder
     fun weight(weight: Int): EnchantmentTypeBuilder
     fun levelRange(levelRange: IntRange): EnchantmentTypeBuilder
     fun maxLevel(level: Int): EnchantmentTypeBuilder = levelRange(1..level)

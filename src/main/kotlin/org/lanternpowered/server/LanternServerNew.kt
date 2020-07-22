@@ -13,10 +13,12 @@ package org.lanternpowered.server
 import com.google.common.collect.Iterables
 import joptsimple.OptionSet
 import org.apache.logging.log4j.Logger
+import org.lanternpowered.api.Platform
 import org.lanternpowered.api.Server
 import org.lanternpowered.api.audience.Audience
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.entity.player.Player
+import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.asUnmodifiableCollection
@@ -107,6 +109,12 @@ class LanternServerNew : Server {
 
     val logger: Logger
         get() = this.game.logger
+
+    val platform: Platform
+        get() = this.game.platform
+
+    val eventManager: EventManager
+        get() = this.game.eventManager
 
     /**
      * Initializes the game and starts the server.

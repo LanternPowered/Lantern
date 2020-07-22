@@ -127,7 +127,7 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutT
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTabListHeaderAndFooter;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTags;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTeams;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTitle;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TitleCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowTradeOffersCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutUnloadChunk;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutUnlockRecipes;
@@ -307,7 +307,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutT
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTags;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TheEndPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTitle;
+import org.lanternpowered.server.network.vanilla.packet.type.play.TitlePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowTradeOffersPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnloadChunk;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnlockRecipes;
@@ -587,13 +587,13 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutScoreboardScore.bind(ScoreboardScorePacket.CreateOrUpdate.class);
         codecPlayOutScoreboardScore.bind(ScoreboardScorePacket.Remove.class);
         outbound.bind(CodecPlayOutWorldTime.class, PacketPlayOutWorldTime.class);
-        final CodecRegistration<PacketPlayOutTitle, CodecPlayOutTitle> codecPlayOutTitle = outbound.bind(CodecPlayOutTitle.class);
-        codecPlayOutTitle.bind(PacketPlayOutTitle.Clear.class);
-        codecPlayOutTitle.bind(PacketPlayOutTitle.Reset.class);
-        codecPlayOutTitle.bind(PacketPlayOutTitle.SetSubtitle.class);
-        codecPlayOutTitle.bind(PacketPlayOutTitle.SetActionbarTitle.class);
-        codecPlayOutTitle.bind(PacketPlayOutTitle.SetTimes.class);
-        codecPlayOutTitle.bind(PacketPlayOutTitle.SetTitle.class);
+        final CodecRegistration<TitlePacket, TitleCodec> codecPlayOutTitle = outbound.bind(TitleCodec.class);
+        codecPlayOutTitle.bind(TitlePacket.Clear.class);
+        codecPlayOutTitle.bind(TitlePacket.Reset.class);
+        codecPlayOutTitle.bind(TitlePacket.SetSubtitle.class);
+        codecPlayOutTitle.bind(TitlePacket.SetActionbarTitle.class);
+        codecPlayOutTitle.bind(TitlePacket.SetTimes.class);
+        codecPlayOutTitle.bind(TitlePacket.SetTitle.class);
         outbound.bind(EntitySoundEffectCodec.class, EntitySoundEffectPacket.class);
         outbound.bind(SoundEffectCodec.class, SoundEffectPacket.class);
         outbound.bind(StopSoundsCodec.class, StopSoundsPacket.class);

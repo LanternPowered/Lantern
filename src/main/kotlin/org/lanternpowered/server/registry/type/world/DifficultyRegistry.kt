@@ -11,15 +11,16 @@
 package org.lanternpowered.server.registry.type.world
 
 import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.api.world.difficulty.Difficulty
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
-import org.lanternpowered.server.text.translation.Translated
-import org.spongepowered.api.text.translation.Translatable
 
 val DifficultyRegistry = internalCatalogTypeRegistry<Difficulty> {
     fun register(id: String) =
-            register(LanternDifficulty(NamespacedKey.minecraft(id)))
+            register(LanternDifficulty(NamespacedKey.minecraft(id), translatableTextOf("options.difficulty.$id")))
 
     register("peaceful")
     register("easy")
@@ -27,5 +28,4 @@ val DifficultyRegistry = internalCatalogTypeRegistry<Difficulty> {
     register("hard")
 }
 
-private class LanternDifficulty(key: NamespacedKey) : DefaultCatalogType(key), Difficulty,
-        Translatable by Translated("options.difficulty.${key.value}")
+private class LanternDifficulty(key: NamespacedKey, text: Text) : DefaultCatalogType(key), Difficulty, TextRepresentable by text

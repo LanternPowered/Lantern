@@ -11,22 +11,22 @@
 package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
 import org.spongepowered.api.scoreboard.criteria.Criterion
+import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.statistic.StatisticCategory
-import org.spongepowered.api.text.translation.Translatable
-import org.spongepowered.api.text.translation.Translation
 import java.text.NumberFormat
 
 open class LanternStatistic(
-        key: NamespacedKey, translation: Translation,
+        key: NamespacedKey,
+        text: Text,
         val internalId: String,
         private val format: NumberFormat,
         private val type: StatisticCategory,
         private val criterion: Criterion?
-) : DefaultCatalogType(key), XStatistic, Translatable by Translated(translation) {
+) : DefaultCatalogType(key), Statistic, Text by text {
 
     override fun toStringHelper() = super.toStringHelper()
             .omitNullValues()
@@ -35,5 +35,4 @@ open class LanternStatistic(
 
     override fun getCriterion() = this.criterion.optional()
     override fun getFormat() = this.format
-    override fun getType() = this.type
 }

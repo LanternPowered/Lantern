@@ -19,6 +19,7 @@ data class SimpleRemoteConnection(
         private val virtualHostAddress: InetSocketAddress?,
         private val close: () -> Unit
 ) : RemoteConnection {
+
     override fun getAddress(): InetSocketAddress = this.address
     override fun getVirtualHost(): InetSocketAddress = this.virtualHostAddress ?: this.address
     override fun close() = this.close.invoke()

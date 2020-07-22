@@ -15,3 +15,4 @@ typealias ScoreboardObjectiveBuilder = org.spongepowered.api.scoreboard.objectiv
 typealias ScoreboardScore = org.spongepowered.api.scoreboard.Score
 typealias Scoreboard = org.spongepowered.api.scoreboard.Scoreboard
 typealias ScoreboardBuilder = org.spongepowered.api.scoreboard.Scoreboard.Builder
+typealias ScoreboardCriterion = org.spongepowered.api.scoreboard.criteria.Criterion

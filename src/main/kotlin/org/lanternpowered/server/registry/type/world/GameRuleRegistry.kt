@@ -10,18 +10,17 @@
  */
 package org.lanternpowered.server.registry.type.world
 
-import org.lanternpowered.api.text.translation.FixedTranslation
+import org.lanternpowered.api.namespace.minecraftKey
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistryBuilder
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
 import org.lanternpowered.server.world.gamerule.LanternGameRule
-import org.lanternpowered.api.namespace.NamespacedKey
 import org.spongepowered.api.world.gamerule.GameRule
 
 private fun <T> InternalCatalogTypeRegistryBuilder<GameRule<*>, String>.register(
         id: String, name: String, type: TypeToken<T>, value: T
-) = register(name, LanternGameRule(NamespacedKey.minecraft(id), FixedTranslation(name), type, value))
+) = register(name, LanternGameRule(minecraftKey(id), name, type, value))
 
 private inline fun <reified T> InternalCatalogTypeRegistryBuilder<GameRule<*>, String>.register(
         id: String, name: String, value: T

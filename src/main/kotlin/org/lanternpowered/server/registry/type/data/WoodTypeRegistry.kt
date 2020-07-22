@@ -10,11 +10,12 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.registry.catalogTypeRegistry
-import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.text.translation.Translated
 import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.registry.catalogTypeRegistry
+import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.translatableTextOf
+import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.WoodType
 
 val WoodTypeRegistry = catalogTypeRegistry<WoodType> {
@@ -30,4 +31,4 @@ val WoodTypeRegistry = catalogTypeRegistry<WoodType> {
 }
 
 private class LanternWoodType(key: NamespacedKey, translationKey: String) :
-        DefaultCatalogType(key), Translatable by Translated(translationKey), WoodType
+        DefaultCatalogType(key), TextRepresentable by translatableTextOf(translationKey), WoodType

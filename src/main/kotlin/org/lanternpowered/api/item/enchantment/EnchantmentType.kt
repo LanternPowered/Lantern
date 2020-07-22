@@ -15,8 +15,8 @@ package org.lanternpowered.api.item.enchantment
 
 import org.lanternpowered.api.namespace.NamespacedKey
 import org.lanternpowered.api.registry.builderOf
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
-import org.lanternpowered.server.text.translation.TranslationHelper.tr
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -43,5 +43,5 @@ inline fun enchantmentTypeOf(key: NamespacedKey, fn: EnchantmentTypeBuilder.() -
     contract {
         callsInPlace(fn, InvocationKind.EXACTLY_ONCE)
     }
-    return builderOf<EnchantmentTypeBuilder>().key(key).name(tr("enchantment.${key.value}")).apply(fn).build()
+    return builderOf<EnchantmentTypeBuilder>().key(key).name(translatableTextOf("enchantment.${key.value}")).apply(fn).build()
 }

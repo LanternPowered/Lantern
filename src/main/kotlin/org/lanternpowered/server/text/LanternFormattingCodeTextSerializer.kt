@@ -14,7 +14,7 @@ import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.text.serializer.FormattingCodeTextSerializer
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.TranslationContext
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.text.LiteralText
 import org.spongepowered.api.text.Text
 import org.spongepowered.api.text.format.TextColor

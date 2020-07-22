@@ -13,7 +13,7 @@ package org.lanternpowered.server.registry.type.world
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.world.dimension.DimensionType
 import org.lanternpowered.server.world.dimension.LanternDimensionType
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.world.gen.GeneratorTypes
 
 val DimensionTypeRegistry = catalogTypeRegistry<DimensionType> {

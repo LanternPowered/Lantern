@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.data.Key
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack

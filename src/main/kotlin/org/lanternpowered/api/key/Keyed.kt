@@ -8,9 +8,6 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.service
+package org.lanternpowered.api.key
 
-interface CloseableService {
-
-    fun close()
-}
+typealias Keyed = net.kyori.adventure.key.Keyed

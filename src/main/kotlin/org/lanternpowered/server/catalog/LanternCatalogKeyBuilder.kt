@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.id
-import org.lanternpowered.api.namespace.NamespacedKey.Builder as NamespacedKeyBuilder
+import org.lanternpowered.api.key.NamespacedKey.Builder as NamespacedKeyBuilder
 
 class LanternNamespacedKeyBuilder : NamespacedKeyBuilder {
 

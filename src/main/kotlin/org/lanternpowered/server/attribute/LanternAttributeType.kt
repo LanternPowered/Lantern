@@ -11,7 +11,7 @@
 package org.lanternpowered.server.attribute
 
 import org.lanternpowered.api.attribute.AttributeType
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.DataHolder

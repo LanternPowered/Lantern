@@ -222,7 +222,7 @@ class LanternCauseStack : CauseStack {
                 frame.store(key, existing)
             }
         }
-        return Optional.ofNullable(existing)
+        return existing.optional()
     }
 
     private class CauseStackFrameImpl internal constructor(

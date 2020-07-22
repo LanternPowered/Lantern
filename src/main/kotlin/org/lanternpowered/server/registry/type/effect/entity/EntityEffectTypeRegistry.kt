@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.effect.entity
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.effect.entity.EntityEffectType
 import org.lanternpowered.server.effect.entity.EntityEffectTypes

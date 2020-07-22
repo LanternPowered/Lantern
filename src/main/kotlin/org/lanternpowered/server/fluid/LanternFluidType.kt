@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.fluid
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.data.LocalImmutableDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.state.AbstractCatalogTypeStateContainer

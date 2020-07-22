@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.dimension
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
 import org.lanternpowered.server.world.LanternWorldNew

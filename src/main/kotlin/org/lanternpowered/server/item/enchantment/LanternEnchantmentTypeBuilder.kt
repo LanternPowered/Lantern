@@ -14,7 +14,7 @@ import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.text.toPlain

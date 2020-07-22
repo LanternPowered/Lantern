@@ -11,19 +11,14 @@
 package org.lanternpowered.api.event.lifecycle
 
 import org.lanternpowered.api.Server
-import org.spongepowered.api.event.lifecycle.ConstructPluginEvent
-import org.spongepowered.api.event.lifecycle.EngineLifecycleEvent
-import org.spongepowered.api.event.lifecycle.LifecycleEvent
-import org.spongepowered.api.event.lifecycle.StartedEngineEvent
-import org.spongepowered.api.event.lifecycle.StartingEngineEvent
-import org.spongepowered.api.event.lifecycle.StoppingEngineEvent
 
-typealias LifecycleEvent = LifecycleEvent
-typealias ConstructPluginEvent = ConstructPluginEvent
+typealias LifecycleEvent = org.spongepowered.api.event.lifecycle.LifecycleEvent
+typealias ConstructPluginEvent = org.spongepowered.api.event.lifecycle.ConstructPluginEvent
 
-typealias ServerLifecycleEvent = EngineLifecycleEvent<Server>
-typealias StartingServerEvent = StartingEngineEvent<Server>
-typealias StartedServerEvent = StartedEngineEvent<Server>
-typealias StoppingServerEvent = StoppingEngineEvent<Server>
+typealias ServerLifecycleEvent = org.spongepowered.api.event.lifecycle.EngineLifecycleEvent<Server>
+typealias StartingServerEvent = org.spongepowered.api.event.lifecycle.StartingEngineEvent<Server>
+typealias StartedServerEvent = org.spongepowered.api.event.lifecycle.StartedEngineEvent<Server>
+typealias StoppingServerEvent = org.spongepowered.api.event.lifecycle.StoppingEngineEvent<Server>
 
 typealias RegisterWorldEvent = org.spongepowered.api.event.lifecycle.RegisterWorldEvent
+typealias ProvideServiceEvent<T> = org.spongepowered.api.event.lifecycle.ProvideServiceEvent<T>

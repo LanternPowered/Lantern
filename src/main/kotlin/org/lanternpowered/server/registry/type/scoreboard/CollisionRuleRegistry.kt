@@ -11,8 +11,8 @@
 @file:JvmName("CollisionRuleRegistry")
 package org.lanternpowered.server.registry.type.scoreboard
 
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.text.translatableTextOf

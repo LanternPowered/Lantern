@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.game.registry.type.cause
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.ext.*
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule
 import org.spongepowered.api.event.cause.entity.health.HealingType

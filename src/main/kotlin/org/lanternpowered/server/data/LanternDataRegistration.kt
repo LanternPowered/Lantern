@@ -15,7 +15,7 @@ import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DataRegistration

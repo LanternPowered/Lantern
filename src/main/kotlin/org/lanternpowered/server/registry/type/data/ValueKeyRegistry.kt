@@ -12,7 +12,7 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.data.Key
 import org.lanternpowered.api.data.valueKeyOf
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.uncheckedCast

@@ -12,7 +12,7 @@ package org.lanternpowered.server.data.key
 
 import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.data.valueKeyOf
-import org.lanternpowered.api.namespace.lanternKey
+import org.lanternpowered.api.key.lanternKey
 import org.lanternpowered.server.data.type.LanternBedPart
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.LanternWireAttachmentType

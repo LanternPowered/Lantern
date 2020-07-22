@@ -12,7 +12,7 @@ package org.lanternpowered.server.registry.type.cause
 
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseContextKeys
-import org.lanternpowered.api.namespace.spongeKey
+import org.lanternpowered.api.key.spongeKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.event.LanternCauseContextKey
 

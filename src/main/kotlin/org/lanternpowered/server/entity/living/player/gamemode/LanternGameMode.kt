@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.entity.living.player.gamemode
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.server.catalog.DefaultCatalogType

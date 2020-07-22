@@ -10,7 +10,7 @@
  */
 @file:Suppress("UNUSED_PARAMETER", "FunctionName", "NOTHING_TO_INLINE")
 
-package org.lanternpowered.api.namespace
+package org.lanternpowered.api.key
 
 import net.kyori.adventure.key.Key as AdventureKey
 

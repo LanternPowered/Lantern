@@ -13,7 +13,7 @@ package org.lanternpowered.server.state.property
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.state.StateKeyValueTransformer
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.BooleanStateProperty

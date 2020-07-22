@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data.type
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.ArmorMaterial

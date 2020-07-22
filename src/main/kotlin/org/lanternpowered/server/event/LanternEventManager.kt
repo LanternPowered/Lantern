@@ -12,6 +12,7 @@ package org.lanternpowered.server.event
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.collect.HashMultimap
+import org.apache.logging.log4j.LogManager
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.Event
@@ -28,7 +29,6 @@ import org.lanternpowered.server.util.DefineableClassLoader
 import org.lanternpowered.server.util.SyncLanternThread
 import org.lanternpowered.server.util.SystemProperties
 import org.lanternpowered.server.util.annotations.getAnnotation
-import org.slf4j.LoggerFactory
 import org.spongepowered.api.event.Cancellable
 import org.spongepowered.api.event.EventListener
 import org.spongepowered.api.event.GenericEvent
@@ -46,7 +46,7 @@ object LanternEventManager : EventManager {
 
     private val allShouldFire = SystemProperties.get().getBooleanProperty("sponge.shouldFireAll")
 
-    private val logger = LoggerFactory.getLogger("EventManager")
+    private val logger = LogManager.getLogger("event-manager")
     private val lock = Any()
     private val registeredListeners = mutableSetOf<Any>()
     private val listenersByEvent = HashMultimap.create<Class<*>, RegisteredListener<*>>()

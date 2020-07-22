@@ -15,8 +15,9 @@ import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import com.google.common.collect.Lists
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.key.namespacedKey
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.util.collections.immutableMapBuilderOf
 import org.lanternpowered.api.util.collections.immutableSetBuilderOf
@@ -185,7 +186,7 @@ abstract class AbstractStateContainer<S : State<S>>(
         builder.append(propertyValues.joinToString(separator = ","))
         builder.append(']')
 
-        return NamespacedKeyOf(baseKey.namespace, builder.toString())
+        return namespacedKey(baseKey.namespace, builder.toString())
     }
 
     override fun getValidStates(): ImmutableList<S> = this.validStates

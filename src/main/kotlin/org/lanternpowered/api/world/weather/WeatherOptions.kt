@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.world.weather
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.ext.*
 
 /**

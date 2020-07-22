@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.state.StateKeyValueTransformer
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.IntegerStateProperty

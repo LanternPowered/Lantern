@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.state
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.spongepowered.api.state.State
 import org.spongepowered.api.state.StateProperty

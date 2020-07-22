@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.inventory.query
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.item.inventory.query.QueryOperation
 import org.spongepowered.api.item.inventory.query.QueryOperationType

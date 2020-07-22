@@ -12,7 +12,7 @@ package org.lanternpowered.server.registry.type.text
 
 import org.lanternpowered.api.audience.MessageType
 import org.lanternpowered.api.entity.player.chat.ChatVisibility
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.text.translatableTextOf

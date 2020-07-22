@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data.persistence.nbt
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.data.persistence.AbstractDataFormat
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView

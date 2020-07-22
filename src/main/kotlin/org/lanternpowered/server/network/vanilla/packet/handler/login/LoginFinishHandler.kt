@@ -20,7 +20,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPa
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginSuccessPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.SetCompressionPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutRegisterChannels
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.Platform
 import org.spongepowered.api.Sponge
 import java.util.stream.Collectors

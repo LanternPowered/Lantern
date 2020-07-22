@@ -142,7 +142,7 @@ class LanternServerNew : Server {
         this.worldManager = LanternWorldManager(this, this.ioExecutor, worldStorageService)
         this.worldManager.init()
 
-        this.game.eventManager.post(LanternStartingServerEvent(game, this))
+        this.eventManager.post(LanternStartingServerEvent(game, this))
 
         if (config.server.proxy.type == ProxyType.NONE && !config.server.onlineMode) {
             this.logger.warn("It is not recommend to run the server in offline mode, this allows people to")
@@ -162,7 +162,7 @@ class LanternServerNew : Server {
         loadFavicon()
         loadDefaultResourcePack()
 
-        this.game.eventManager.post(LanternStartedServerEvent(this.game, this))
+        this.eventManager.post(LanternStartedServerEvent(this.game, this))
 
         // Start reading inputs
         this.console.start()
@@ -289,7 +289,7 @@ class LanternServerNew : Server {
         // Don't shut down twice
         if (!this.shuttingDown.compareAndSet(false, true))
             return
-        this.game.eventManager.post(LanternStoppingServerEvent(this.game, this))
+        this.eventManager.post(LanternStoppingServerEvent(this.game, this))
         this.ioExecutor.shutdown()
 
         this.queryServer?.shutdown()

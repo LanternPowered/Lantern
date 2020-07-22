@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.data.property.LocalPropertyHolder
 import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.state.AbstractStateContainer

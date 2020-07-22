@@ -11,11 +11,11 @@
 package org.lanternpowered.server.world
 
 import org.lanternpowered.api.Game
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.event.lifecycle.RegisterWorldEvent
-import org.lanternpowered.api.namespace.namespacedKey
+import org.lanternpowered.api.key.namespacedKey
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList

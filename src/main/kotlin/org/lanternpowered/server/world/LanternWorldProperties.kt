@@ -11,7 +11,7 @@
 package org.lanternpowered.server.world
 
 import net.kyori.adventure.key.KeyedValue
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional

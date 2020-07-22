@@ -14,7 +14,7 @@ package org.lanternpowered.server.registry.type.item
 import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
 import org.lanternpowered.api.item.enchantment.EnchantmentTypes
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry

@@ -16,19 +16,17 @@ import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.emptyCause
 import org.lanternpowered.api.cause.first
-import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.event.lifecycle.ProvideServiceEvent
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.service.ServiceProvider
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.optional
-import org.lanternpowered.server.LanternGame
-import org.spongepowered.api.event.lifecycle.ProvideServiceEvent
 import org.spongepowered.api.service.ServiceRegistration
 import java.util.Optional
 import java.util.function.Supplier
 import kotlin.reflect.KClass
 
-class LanternServiceProvider(private val eventManager: EventManager) : ServiceProvider {
+class LanternServiceProvider(private val game: Game) : ServiceProvider {
 
     private val registrationMap = mutableMapOf<Class<*>, ServiceRegistration<*>>()
 
@@ -43,7 +41,7 @@ class LanternServiceProvider(private val eventManager: EventManager) : ServicePr
         var supplier: (() -> Pair<PluginContainer, T>)? = null
         val event = object : ProvideServiceEvent<T> {
             override fun getCause(): Cause = cause
-            override fun getGame(): Game = LanternGame
+            override fun getGame(): Game = this@LanternServiceProvider.game
             override fun getGenericType(): TypeToken<T> = TypeToken.of(serviceClass)
             override fun suggest(serviceFactory: Supplier<T>) {
                 val plugin: PluginContainer = CauseStack.current().first()
@@ -53,7 +51,7 @@ class LanternServiceProvider(private val eventManager: EventManager) : ServicePr
                     supplier = { plugin to serviceFactory.get() }
             }
         }
-        this.eventManager.post(event)
+        this.game.eventManager.post(event)
         if (supplier == null)
             supplier = default
         if (supplier == null)

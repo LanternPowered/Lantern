@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.world
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.builderOf
 
 typealias WorldArchetype = org.spongepowered.api.world.WorldArchetype

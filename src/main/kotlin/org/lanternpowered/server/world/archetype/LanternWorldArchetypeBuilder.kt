@@ -14,7 +14,7 @@ import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.world.LanternWorldProperties
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.gamemode.GameModes

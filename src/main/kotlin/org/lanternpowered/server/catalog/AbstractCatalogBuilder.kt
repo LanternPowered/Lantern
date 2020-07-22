@@ -12,7 +12,7 @@
 
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.util.ResettableBuilder
 

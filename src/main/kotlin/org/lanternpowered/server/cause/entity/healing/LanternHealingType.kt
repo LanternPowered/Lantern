@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.cause.entity.healing
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.cause.entity.health.HealingType
 import org.lanternpowered.server.catalog.DefaultCatalogType
 

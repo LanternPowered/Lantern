@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.inventory.client
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.inventory.AbstractInventory
 import org.spongepowered.api.item.inventory.ContainerType

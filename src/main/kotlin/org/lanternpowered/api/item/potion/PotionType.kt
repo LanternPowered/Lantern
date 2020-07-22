@@ -12,7 +12,7 @@
 
 package org.lanternpowered.api.item.potion
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.builderOf
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract

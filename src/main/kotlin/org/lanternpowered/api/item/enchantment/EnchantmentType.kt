@@ -13,7 +13,7 @@
 
 package org.lanternpowered.api.item.enchantment
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.api.x.item.enchantment.XEnchantmentType

@@ -15,8 +15,7 @@ package org.lanternpowered.api.world.weather
 
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.x.world.weather.XWeather
-import org.lanternpowered.api.x.world.weather.XWeatherUniverse
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 

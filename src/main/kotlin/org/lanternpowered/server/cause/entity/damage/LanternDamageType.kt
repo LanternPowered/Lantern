@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.cause.entity.damage
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.event.cause.entity.damage.DamageType
 

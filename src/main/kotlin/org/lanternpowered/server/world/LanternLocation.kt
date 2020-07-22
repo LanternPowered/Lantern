@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.math.minus
 import org.lanternpowered.api.util.math.plus

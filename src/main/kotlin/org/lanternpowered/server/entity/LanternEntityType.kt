@@ -12,7 +12,7 @@ package org.lanternpowered.server.entity
 
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.text.translation.TranslationHelper.tr
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.text.translation.Translation

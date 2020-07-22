@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.effect.sound
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.effect.sound.LanternSoundType
 import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry

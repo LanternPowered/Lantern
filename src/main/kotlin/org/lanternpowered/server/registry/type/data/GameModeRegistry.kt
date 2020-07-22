@@ -11,7 +11,7 @@
 @file:JvmName("GameModeRegistry")
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry

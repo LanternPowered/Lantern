@@ -15,7 +15,7 @@ import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeAdvancementTreePacket
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 
 class ClientAdvancementTreeHandler : Handler<ChangeAdvancementTreePacket> {
 

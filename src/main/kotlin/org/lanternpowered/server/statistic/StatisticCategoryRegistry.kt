@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.statistic
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.text.Text

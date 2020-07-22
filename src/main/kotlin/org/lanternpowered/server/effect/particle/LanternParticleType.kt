@@ -11,7 +11,7 @@
 package org.lanternpowered.server.effect.particle
 
 import com.google.common.collect.ImmutableMap
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.effect.particle.ParticleOption
 import org.spongepowered.api.effect.particle.ParticleType

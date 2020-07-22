@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.scoreboard
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.scoreboard.ScoreboardCriterion
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry

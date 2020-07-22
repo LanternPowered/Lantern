@@ -12,8 +12,8 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.data.type.DyeColor
 import org.lanternpowered.api.data.type.TopHat
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.lanternKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.lanternKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.DyeColors

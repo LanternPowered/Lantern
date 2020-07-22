@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.inventory.client
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.game.registry.InternalRegistries
 
 object ClientWindowTypes {

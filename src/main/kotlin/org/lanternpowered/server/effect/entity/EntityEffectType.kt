@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.entity
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.factoryOf
 import org.spongepowered.api.CatalogType
 import org.spongepowered.api.util.annotation.CatalogedBy

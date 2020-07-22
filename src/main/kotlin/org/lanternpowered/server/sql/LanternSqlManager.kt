@@ -106,7 +106,7 @@ class LanternSqlManager(private val configManager: ConfigManager) : SqlManager {
     private val connectionUrlRegex = Pattern.compile("(?:jdbc:)?([^:]+):(//)?(?:([^:]+)(?::([^@]+))?@)?(.*)")
 
     /**
-     * Extracts the connection info from a JDBC url with additional authentication information as specified in [SqlService].
+     * Extracts the connection info from a JDBC url with additional authentication information as specified in [SqlManager].
      *
      * @param container The plugin to put a path relative to
      * @param fullUrl The full JDBC URL as specified in SqlService

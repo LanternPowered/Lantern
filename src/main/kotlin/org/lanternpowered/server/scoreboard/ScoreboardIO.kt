@@ -26,7 +26,7 @@ import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRe
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 import org.lanternpowered.server.text.LanternTexts.fromLegacy
 import org.lanternpowered.server.text.LanternTexts.toLegacy
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard

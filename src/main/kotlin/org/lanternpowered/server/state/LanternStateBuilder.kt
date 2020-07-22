@@ -12,7 +12,7 @@ package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.state.State

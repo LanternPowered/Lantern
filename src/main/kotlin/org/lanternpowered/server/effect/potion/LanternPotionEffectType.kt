@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.potion
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.effect.potion.PotionEffectType
 import org.lanternpowered.api.entity.Entity

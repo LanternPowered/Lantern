@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.world
 
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import org.lanternpowered.server.registry.InternalCatalogTypeRegistryBuilder

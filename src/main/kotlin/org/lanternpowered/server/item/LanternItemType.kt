@@ -13,7 +13,7 @@ package org.lanternpowered.server.item
 import org.lanternpowered.api.block.BlockType
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.behavior.Behavior

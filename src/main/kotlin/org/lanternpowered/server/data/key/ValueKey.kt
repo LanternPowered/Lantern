@@ -19,7 +19,7 @@ import org.lanternpowered.server.data.value.ValueConstructorFactory
 import org.lanternpowered.server.event.LanternEventManager
 import org.lanternpowered.server.event.RegisteredListener
 import org.spongepowered.api.CatalogType
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value

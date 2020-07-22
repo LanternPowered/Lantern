@@ -11,7 +11,7 @@
 package org.lanternpowered.server.event
 
 import org.lanternpowered.api.cause.CauseContextKey
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.server.catalog.DefaultCatalogType
 

@@ -13,7 +13,7 @@ package org.lanternpowered.server.state
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.optional.orNull

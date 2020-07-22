@@ -12,7 +12,7 @@
 
 package org.lanternpowered.api.util.option
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.type.TypeToken
 import kotlin.reflect.KClass
 

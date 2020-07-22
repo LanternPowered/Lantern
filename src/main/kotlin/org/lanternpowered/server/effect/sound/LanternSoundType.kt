@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.effect.sound
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.effect.sound.SoundType
 import org.lanternpowered.server.catalog.DefaultCatalogType

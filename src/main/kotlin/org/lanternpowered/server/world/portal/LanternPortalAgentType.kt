@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.portal
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.teleport.PortalAgent
 import org.lanternpowered.api.world.teleport.PortalAgentType

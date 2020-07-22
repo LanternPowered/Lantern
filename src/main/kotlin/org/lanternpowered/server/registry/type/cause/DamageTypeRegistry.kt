@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.cause
 
 import org.lanternpowered.api.cause.entity.damage.DamageType
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.cause.entity.damage.LanternDamageType
 

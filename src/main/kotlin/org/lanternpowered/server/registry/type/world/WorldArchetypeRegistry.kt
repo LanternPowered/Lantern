@@ -14,7 +14,7 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldArchetypeBuilder
 import org.lanternpowered.api.world.worldArchetypeOf
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.world.SerializationBehaviors
 import org.spongepowered.api.world.difficulty.Difficulties

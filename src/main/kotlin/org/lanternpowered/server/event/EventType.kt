@@ -49,7 +49,7 @@ class EventType<T : Event> internal constructor(val eventClass: Class<T>, val ge
 
     companion object {
 
-        private val genericEventType: TypeVariable<*> = org.spongepowered.api.event.GenericEvent::class.java.typeParameters[0]
+        private val genericEventType: TypeVariable<*> = GenericEvent::class.java.typeParameters[0]
 
         fun <T : Event> of(typeToken: TypeToken<T>): EventType<T> {
             if (!GenericEvent::class.java.isAssignableFrom(typeToken.rawType))

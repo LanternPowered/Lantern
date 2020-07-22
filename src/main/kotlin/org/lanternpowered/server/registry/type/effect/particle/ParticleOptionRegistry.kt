@@ -15,7 +15,7 @@ import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.effect.particle.LanternParticleOption
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.data.type.NotePitch
 import org.spongepowered.api.effect.particle.ParticleOption

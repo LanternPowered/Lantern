@@ -11,7 +11,7 @@
 package org.lanternpowered.server.effect.sound
 
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.effect.sound.SoundType
 
 class LanternSoundTypeBuilder : AbstractCatalogBuilder<SoundType, SoundType.Builder>(), SoundType.Builder {

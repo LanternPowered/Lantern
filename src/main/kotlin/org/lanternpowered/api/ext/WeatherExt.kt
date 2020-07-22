@@ -13,7 +13,7 @@
 package org.lanternpowered.api.ext
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.option.Option
 import org.lanternpowered.api.world.weather.Weather
 import org.lanternpowered.api.world.weather.WeatherOption

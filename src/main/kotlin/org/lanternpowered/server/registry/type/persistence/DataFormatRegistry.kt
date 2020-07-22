@@ -14,7 +14,7 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.data.persistence.HoconDataFormat
 import org.lanternpowered.server.data.persistence.json.JsonDataFormat
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.persistence.DataFormat
 
 val DataFormatRegistry = catalogTypeRegistry<DataFormat> {

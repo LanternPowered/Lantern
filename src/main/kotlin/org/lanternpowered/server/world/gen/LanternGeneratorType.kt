@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.gen
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView

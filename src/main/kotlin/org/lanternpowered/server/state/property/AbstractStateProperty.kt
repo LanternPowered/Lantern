@@ -12,7 +12,7 @@ package org.lanternpowered.server.state.property
 
 import com.google.common.collect.ImmutableCollection
 import com.google.common.collect.Iterables
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.state.IStateProperty
 import org.lanternpowered.server.state.StateKeyValueTransformer

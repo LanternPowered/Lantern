@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.attribute
 
 import org.lanternpowered.api.attribute.AttributeOperation
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.server.attribute.LanternAttributeOperation
 import org.lanternpowered.server.attribute.attributeOperationFunction
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry

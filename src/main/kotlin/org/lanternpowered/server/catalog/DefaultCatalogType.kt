@@ -10,10 +10,10 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.lanternKey
-import org.lanternpowered.api.namespace.minecraftKey
-import org.lanternpowered.api.namespace.spongeKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.lanternKey
+import org.lanternpowered.api.key.minecraftKey
+import org.lanternpowered.api.key.spongeKey
 import org.spongepowered.api.NamedCatalogType
 
 open class DefaultCatalogType(key: NamespacedKey) : AbstractCatalogType() {

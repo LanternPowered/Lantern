@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.update
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.world.scheduler.UpdatePriority
 import org.lanternpowered.server.catalog.DefaultCatalogType
 

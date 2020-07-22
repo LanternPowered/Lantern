@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.service.world
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import java.nio.file.Path
 import java.util.UUID
 

@@ -12,7 +12,7 @@ package org.lanternpowered.server.event
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.event.cause.EventContextKey
 
 class LanternEventContextKeyBuilder<T> : AbstractCatalogBuilder<EventContextKey<T>, EventContextKey.Builder<T>>(), EventContextKey.Builder<T> {

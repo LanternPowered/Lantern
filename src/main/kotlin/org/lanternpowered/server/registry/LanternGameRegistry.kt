@@ -13,7 +13,7 @@ package org.lanternpowered.server.registry
 import com.google.common.base.CaseFormat
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.Game
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.catalog.CatalogType
@@ -172,7 +172,7 @@ import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.biome.VirtualBiomeType
 import org.spongepowered.api.world.gamerule.GameRule
 import java.util.function.Supplier
-import org.lanternpowered.api.namespace.NamespacedKey.Builder as NamespacedKeyBuilder
+import org.lanternpowered.api.key.NamespacedKey.Builder as NamespacedKeyBuilder
 
 class LanternGameRegistry(
         private val game: LanternGame

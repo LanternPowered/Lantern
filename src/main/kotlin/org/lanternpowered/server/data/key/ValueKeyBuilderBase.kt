@@ -14,7 +14,7 @@ import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.registry.BaseBuilder
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.data.value.SetValue

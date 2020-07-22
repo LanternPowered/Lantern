@@ -12,8 +12,8 @@ package org.lanternpowered.server.registry.type.inventory
 
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.minecraftKey
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroup
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroups
 import org.spongepowered.api.item.inventory.equipment.EquipmentType

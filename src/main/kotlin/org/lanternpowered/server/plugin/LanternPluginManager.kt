@@ -16,6 +16,7 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withCause
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.PluginManager
+import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.getAndRemoveAll
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.optional
@@ -77,7 +78,7 @@ class LanternPluginManager(
             try {
                 services += it.next()
             } catch (ex: ServiceConfigurationError) {
-                this.logger.error("Error encountered initializing plugin loader!", ex)
+                this.logger.error("Error encountered initializing plugin language service!", ex)
                 continue
             }
         }
@@ -96,9 +97,22 @@ class LanternPluginManager(
         val resources = mutableSetOf<Path>()
         val candidatesByService = mutableListOf<Pair<PluginLanguageService<out PluginContainer>, PluginCandidate>>()
         for (service in languageServices) {
-            resources += service.discoverPluginResources(environment)
+            try {
+                resources += service.discoverPluginResources(environment)
+            } catch (t: Throwable) {
+                this.logger.error("The plugin language service ${service.name} " +
+                        "(${service.javaClass.name}) failed to discover plugin resources.", t)
+                continue
+            }
 
-            val candidates = service.createPluginCandidates(environment)
+            val candidates = try {
+                service.createPluginCandidates(environment)
+            } catch (t: Throwable) {
+                this.logger.error("The plugin language service ${service.name} " +
+                        "(${service.javaClass.name}) failed to create plugin candidates.", t)
+                continue
+            }
+
             for (candidate in candidates)
                 candidatesByService += service to candidate
         }
@@ -132,26 +146,45 @@ class LanternPluginManager(
         val causeStack = CauseStack.current()
 
         for ((service, candidate) in candidatesByService) {
-            val pluginContainer = service.createPluginContainer(candidate, environment).orNull() ?: continue
+            val pluginContainer = try {
+                service.createPluginContainer(candidate, environment).orNull() ?: continue
+            } catch (t: Throwable) {
+                this.logger.error("Failed to create the plugin plugin of ${candidate.asString()}", t)
+                continue
+            }
+
             // Already store it so it can be looked up through injections.
-            this.byId[pluginContainer.metadata.id] = pluginContainer
+            this.byId[candidate.metadata.id] = pluginContainer
 
             // Already put the plugin container in the cause stack so
             // it's available during injections, etc.
             causeStack.withCause(pluginContainer) {
                 // Instantiate the plugin instance.
-                @Suppress("UNCHECKED_CAST")
-                (service as PluginLanguageService<PluginContainer>).loadPlugin(environment, pluginContainer, classLoader)
-                this.byInstance[pluginContainer.instance] = pluginContainer
+                try {
+                    @Suppress("UNCHECKED_CAST")
+                    (service as PluginLanguageService<PluginContainer>).loadPlugin(environment, pluginContainer, classLoader)
+                    this.byInstance[pluginContainer.instance] = pluginContainer
+                } catch (t: Throwable) {
+                    this.logger.error("Failed to instantiate the plugin instance of ${candidate.asString()}", t)
+                    // Remove the failed plugin
+                    this.byId -= candidate.metadata.id
+                }
             }
         }
     }
+
+    private fun PluginCandidate.asString(): String = ToStringHelper(this)
+            .add("file", this.file)
+            .add("metadata", this.metadata)
+            .toString()
 
     /**
      * Registers all the listeners of the plugins and
      * calls their construction events.
      */
     fun construct() {
+        // Register the listeners of all the plugins first, so they can
+        // already receive events posted by other plugins.
         for (plugin in this.byInstance.values)
             this.eventManager.registerListeners(plugin, plugin.instance)
 

@@ -14,7 +14,7 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.AbstractDataSerializable
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.meta.BannerPatternLayer
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataContainer

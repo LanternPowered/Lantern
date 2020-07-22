@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.service.world
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList

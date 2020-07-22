@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.data.type.LanternToolType
 import org.spongepowered.api.data.type.ToolType

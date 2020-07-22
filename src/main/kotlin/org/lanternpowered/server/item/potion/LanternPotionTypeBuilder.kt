@@ -13,8 +13,8 @@ package org.lanternpowered.server.item.potion
 import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.resolveNamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.resolveNamespacedKey
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.server.effect.potion.LanternPotionType

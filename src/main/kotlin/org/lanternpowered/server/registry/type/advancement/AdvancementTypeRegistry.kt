@@ -11,8 +11,8 @@
 @file:JvmName("AdvancementTypeRegistry")
 package org.lanternpowered.server.registry.type.advancement
 
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.format.textStyleOf

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.registry
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.type.TypeToken

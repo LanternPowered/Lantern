@@ -12,7 +12,7 @@
 package org.lanternpowered.server.registry.type.scoreboard
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.util.index.requireKey

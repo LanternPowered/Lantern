@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.recipe
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.item.recipe.Recipe

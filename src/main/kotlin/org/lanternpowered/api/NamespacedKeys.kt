@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.api
 
-import org.lanternpowered.api.namespace.Namespace
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.Namespace
+import org.lanternpowered.api.key.NamespacedKey
 
 @Suppress("NOTHING_TO_INLINE")
 object NamespacedKeys {

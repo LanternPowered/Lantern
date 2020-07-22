@@ -11,7 +11,7 @@
 package org.lanternpowered.server.statistic
 
 import com.google.common.reflect.TypeToken
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.spongepowered.api.statistic.Statistic
 import org.spongepowered.api.statistic.StatisticCategory

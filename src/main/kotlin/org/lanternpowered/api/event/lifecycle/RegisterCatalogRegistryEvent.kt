@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.event.lifecycle
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.DuplicateRegistrationException

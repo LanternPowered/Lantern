@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.catalog
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import java.util.Objects
 
 open class LanternNamespacedKey(private val namespace: String, private val value: String) : NamespacedKey {

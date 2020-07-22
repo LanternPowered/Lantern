@@ -11,12 +11,12 @@
 @file:JvmName("PotionTypeRegistry")
 package org.lanternpowered.server.registry.type.potion
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.effect.potion.PotionEffectTypes
 import org.lanternpowered.api.item.potion.PotionType
 import org.lanternpowered.api.item.potion.PotionTypeBuilder
 import org.lanternpowered.api.item.potion.potionTypeOf
-import org.lanternpowered.api.namespace.minecraftKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 
 @get:JvmName("get")

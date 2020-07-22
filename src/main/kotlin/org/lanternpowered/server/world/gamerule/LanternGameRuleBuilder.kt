@@ -12,7 +12,7 @@ package org.lanternpowered.server.world.gamerule
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.world.gamerule.GameRule
 
 @Suppress("UNCHECKED_CAST")

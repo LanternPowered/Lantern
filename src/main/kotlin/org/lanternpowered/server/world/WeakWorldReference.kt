@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Location

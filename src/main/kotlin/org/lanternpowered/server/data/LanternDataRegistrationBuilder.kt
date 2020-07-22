@@ -17,7 +17,7 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DataRegistration
 import org.spongepowered.api.data.DuplicateProviderException

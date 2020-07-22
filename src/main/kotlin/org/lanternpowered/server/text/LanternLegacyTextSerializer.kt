@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 
 object LanternLegacyTextSerializer : LegacyTextSerializer, LanternFormattingCodeTextSerializer(

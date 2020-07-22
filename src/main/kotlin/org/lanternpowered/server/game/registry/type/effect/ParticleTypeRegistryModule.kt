@@ -18,7 +18,7 @@ import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule
 import org.lanternpowered.server.inventory.LanternItemStack
 import org.lanternpowered.server.item.ItemTypeRegistry
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.data.type.NotePitches
 import org.spongepowered.api.effect.particle.ParticleOption

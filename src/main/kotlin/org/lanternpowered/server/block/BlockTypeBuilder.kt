@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.block
 
-import org.lanternpowered.api.namespace.NamespacedKey
-import org.lanternpowered.api.namespace.namespacedKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.namespacedKey
 import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.util.AABB

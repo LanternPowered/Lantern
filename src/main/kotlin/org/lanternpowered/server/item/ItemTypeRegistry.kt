@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item
 
-import org.lanternpowered.api.namespace.NamespacedKey
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.NamespacedKeys.minecraft
 import org.lanternpowered.api.ext.itemStackOf
 import org.lanternpowered.api.effect.potion.potionEffectOf

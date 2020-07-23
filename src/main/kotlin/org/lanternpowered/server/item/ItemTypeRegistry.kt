@@ -12,7 +12,7 @@ package org.lanternpowered.server.item
 
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.NamespacedKeys.minecraft
-import org.lanternpowered.api.ext.itemStackOf
+import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.api.effect.potion.potionEffectOf
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.ItemTypes

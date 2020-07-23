@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item.predicate
 
-import org.lanternpowered.api.ext.itemStackOf
+import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.server.inventory.LanternItemStack
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack

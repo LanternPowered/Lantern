@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.plugin
 
+import com.google.inject.Guice
 import org.apache.logging.log4j.Logger
-import org.lanternpowered.api.Game
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withCause
 import org.lanternpowered.api.plugin.PluginContainer
@@ -22,8 +22,10 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.launch.LanternClassLoader
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.event.LanternEventManager
 import org.lanternpowered.server.event.lifecycle.LanternConstructPluginEvent
+import org.lanternpowered.server.plugin.inject.ParentGuiceModule
 import org.spongepowered.plugin.PluginCandidate
 import org.spongepowered.plugin.PluginEnvironment
 import org.spongepowered.plugin.PluginKeys
@@ -35,7 +37,7 @@ import java.util.ServiceConfigurationError
 import java.util.ServiceLoader
 
 class LanternPluginManager(
-        private val game: Game,
+        private val game: LanternGame,
         private val logger: Logger,
         private val eventManager: LanternEventManager,
         private val baseDirectory: Path,
@@ -53,6 +55,10 @@ class LanternPluginManager(
     private val byId = mutableMapOf<String, PluginContainer>()
     private val byInstance = mutableMapOf<Any, PluginContainer>()
 
+    private lateinit var pluginEnvironment: PluginEnvironment
+    private lateinit var resources: List<Path>
+    private lateinit var candidatesByService: List<Pair<PluginLanguageService<out PluginContainer>, PluginCandidate>>
+
     lateinit var lanternPlugin: PluginContainer
         private set
 
@@ -65,9 +71,9 @@ class LanternPluginManager(
     lateinit var minecraftPlugin: PluginContainer
         private set
 
-    fun instantiate() {
+    fun findCandidates() {
         val languageServices = findLanguageServices()
-        instantiate(languageServices)
+        findCandidates(languageServices)
     }
 
     private fun findLanguageServices(): List<PluginLanguageService<out PluginContainer>> {
@@ -86,19 +92,16 @@ class LanternPluginManager(
         return services
     }
 
-    private fun instantiate(languageServices: List<PluginLanguageService<out PluginContainer>>) {
-        val classLoader = LanternClassLoader.get()
-
-        val environment = PluginEnvironment()
-        environment.blackboard.getOrCreate(PluginKeys.BASE_DIRECTORY) { this.baseDirectory }
-        environment.blackboard.getOrCreate(PluginKeys.PLUGIN_DIRECTORIES) { listOf(this.pluginsDirectory) }
-        // TODO: Add parent injector
+    private fun findCandidates(languageServices: List<PluginLanguageService<out PluginContainer>>) {
+        this.pluginEnvironment = PluginEnvironment()
+        this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.BASE_DIRECTORY) { this.baseDirectory }
+        this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.PLUGIN_DIRECTORIES) { listOf(this.pluginsDirectory) }
 
         val resources = mutableSetOf<Path>()
         val candidatesByService = mutableListOf<Pair<PluginLanguageService<out PluginContainer>, PluginCandidate>>()
         for (service in languageServices) {
             try {
-                resources += service.discoverPluginResources(environment)
+                resources += service.discoverPluginResources(this.pluginEnvironment)
             } catch (t: Throwable) {
                 this.logger.error("The plugin language service ${service.name} " +
                         "(${service.javaClass.name}) failed to discover plugin resources.", t)
@@ -106,7 +109,7 @@ class LanternPluginManager(
             }
 
             val candidates = try {
-                service.createPluginCandidates(environment)
+                service.createPluginCandidates(this.pluginEnvironment)
             } catch (t: Throwable) {
                 this.logger.error("The plugin language service ${service.name} " +
                         "(${service.javaClass.name}) failed to create plugin candidates.", t)
@@ -116,11 +119,6 @@ class LanternPluginManager(
             for (candidate in candidates)
                 candidatesByService += service to candidate
         }
-
-        // Load all the plugin jars and directories
-        // TODO: Only add jars/directories that aren't on the classpath
-        for (path in resources)
-            classLoader.addBaseURL(path.toUri().toURL())
 
         fun extractInternalCandidate(id: String): PluginContainer {
             val candidate = candidatesByService
@@ -141,13 +139,27 @@ class LanternPluginManager(
         this.spongePlugin = extractInternalCandidate(SPONGE_ID)
         this.minecraftPlugin = extractInternalCandidate(MINECRAFT_ID)
 
-        // Load other plugin instances
+        this.resources = resources.toImmutableList()
+        this.candidatesByService = candidatesByService.toImmutableList()
+    }
 
+    fun instantiate() {
+        val classLoader = LanternClassLoader.get()
+
+        val injector = Guice.createInjector(ParentGuiceModule(this.game))
+        this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.PARENT_INJECTOR) { injector }
+
+        // Load all the plugin jars and directories
+        // TODO: Only add jars/directories that aren't on the classpath
+        for (path in resources)
+            classLoader.addBaseURL(path.toUri().toURL())
+
+        // Load other plugin instances
         val causeStack = CauseStack.current()
 
         for ((service, candidate) in candidatesByService) {
             val pluginContainer = try {
-                service.createPluginContainer(candidate, environment).orNull() ?: continue
+                service.createPluginContainer(candidate, this.pluginEnvironment).orNull() ?: continue
             } catch (t: Throwable) {
                 this.logger.error("Failed to create the plugin plugin of ${candidate.asString()}", t)
                 continue
@@ -162,7 +174,7 @@ class LanternPluginManager(
                 // Instantiate the plugin instance.
                 try {
                     @Suppress("UNCHECKED_CAST")
-                    (service as PluginLanguageService<PluginContainer>).loadPlugin(environment, pluginContainer, classLoader)
+                    (service as PluginLanguageService<PluginContainer>).loadPlugin(this.pluginEnvironment, pluginContainer, classLoader)
                     this.byInstance[pluginContainer.instance] = pluginContainer
                 } catch (t: Throwable) {
                     this.logger.error("Failed to instantiate the plugin instance of ${candidate.asString()}", t)

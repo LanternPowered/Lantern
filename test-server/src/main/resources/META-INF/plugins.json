@@ -1,0 +1,28 @@
+{
+  "plugins": [
+    {
+      "id": "lan-broadcast",
+      "name": "LAN Broadcast",
+      "version": "1.0.0",
+      "main-class": "org.lanternpowered.LANBroadcastPlugin",
+      "description": "A plugin which broadcasts the server over LAN for quick joining.",
+      "links": {
+        "homepage": "https://www.lanternpowered.org",
+        "source": "https://github.com/LanternPowered/Lantern",
+        "issues": "https://github.com/LanternPowered/Lantern/issues"
+      },
+      "contributors": [
+        {
+          "name": "LanternPowered",
+          "description": "Lead Developer"
+        }
+      ],
+      "dependencies": [
+        {
+          "id": "lantern",
+          "version": "1.0.0"
+        }
+      ]
+    }
+  ]
+}

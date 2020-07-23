@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server
 
+import com.google.inject.Guice
 import joptsimple.OptionSet
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -17,7 +18,7 @@ import org.lanternpowered.api.Game
 import org.lanternpowered.api.MinecraftVersion
 import org.lanternpowered.api.Platform
 import org.lanternpowered.api.PlatformComponent
-import org.lanternpowered.api.Server
+import org.lanternpowered.api.Sponge
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.injector.Injector
 import org.lanternpowered.api.plugin.PluginContainer
@@ -41,6 +42,7 @@ import org.lanternpowered.server.service.permission.LanternContextCalculator
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.lanternpowered.server.sql.LanternSqlManager
 import org.lanternpowered.server.util.LocaleCache
+import org.lanternpowered.server.util.guice.GuiceModule
 import org.lanternpowered.server.util.metric.LanternMetricsConfigManager
 import org.lanternpowered.server.util.palette.LanternPaletteBasedArrayFactory
 import org.spongepowered.api.SystemSubject
@@ -123,21 +125,26 @@ object LanternGame : Game {
         get() = TODO("Not yet implemented")
 
     fun init(options: OptionSet, console: LanternConsole) {
+        injectSpongeGame()
+
         this.console = console
 
         this.gameDirectory = Paths.get("")
         this.configDirectory = this.gameDirectory.resolve(options.valueOf(LaunchOptions.CONFIG_DIRECTORY) ?: "config")
 
+        // TODO: Load config
+
         this.eventManager = LanternEventManager
         this.configManager = LanternConfigManager(this.logger, this.configDirectory)
         this.sqlManager = LanternSqlManager(this.configManager)
-        this.serviceProvider = LanternServiceProvider(this.eventManager)
+        this.serviceProvider = LanternServiceProvider(this)
+        this.metricsConfigManager = LanternMetricsConfigManager(this.config)
 
         val pluginsDirectory = this.gameDirectory.resolve(options.valueOf(LaunchOptions.PLUGINS_DIRECTORY) ?: "plugins")
 
         // Construct all the plugins
         this.pluginManager = LanternPluginManager(this, this.logger, this.eventManager, this.gameDirectory, pluginsDirectory)
-        this.pluginManager.instantiate()
+        this.pluginManager.findCandidates()
 
         this.platform = LanternPlatform(mapOf(
                 PlatformComponent.API to this.spongeApiPlugin,
@@ -155,14 +162,13 @@ object LanternGame : Game {
         check(versionCacheEntry == this.minecraftVersion) {
             "The current version and version in the cache don't match: $minecraftVersion != $versionCacheEntry" }
 
-        // Call the plugin construct lifecycle events
+        // Instantiate plugins and call construct lifecycle events
+        this.pluginManager.instantiate()
         this.pluginManager.construct()
 
         // Register all factories, builders and catalog registries
         this.registry = LanternGameRegistry(this)
         this.registry.init()
-
-        this.metricsConfigManager = LanternMetricsConfigManager(this.config)
 
         initPermissionService()
 
@@ -176,6 +182,18 @@ object LanternGame : Game {
 
         // And... done
         this.eventManager.post(LanternLoadedGameEvent(this))
+    }
+
+    /**
+     * Inject this [Game] instance into the [Sponge] class.
+     */
+    private fun injectSpongeGame() {
+        Guice.createInjector(object : GuiceModule() {
+            override fun configure() {
+                bind<org.spongepowered.api.Game>().toInstance(this@LanternGame)
+                requestStaticInjection(Sponge::class.java)
+            }
+        })
     }
 
     /**

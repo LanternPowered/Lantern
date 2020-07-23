@@ -52,8 +52,7 @@ class InjectionPointProvider : AbstractMatcher<Binding<*>>(), Module, ProvisionL
             val spiInjectionPoint = dependency.injectionPoint
             if (spiInjectionPoint != null) {
                 val source = spiInjectionPoint.declaringType.type.typeToken
-                val member = spiInjectionPoint.member
-                return when (member) {
+                return when (val member = spiInjectionPoint.member) {
                     is Field -> LanternInjectionPoint.Field(source, member.genericType.typeToken, member.annotations, member)
                     is Executable -> {
                         val parameterAnnotations = member.parameterAnnotations

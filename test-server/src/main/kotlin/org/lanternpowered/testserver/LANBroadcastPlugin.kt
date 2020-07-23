@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.testserver
 
-import org.lanternpowered.api.text.serializer.TextSerializers
-import org.lanternpowered.server.ext.inject
-import org.slf4j.Logger
-import org.spongepowered.api.Sponge
-import org.spongepowered.api.event.Listener
-import org.spongepowered.api.event.game.state.GameStartedServerEvent
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent
-import org.spongepowered.api.plugin.Plugin
+import org.lanternpowered.api.Server
+import org.lanternpowered.api.event.lifecycle.StartedServerEvent
+import org.lanternpowered.api.event.lifecycle.StoppingServerEvent
+import org.lanternpowered.api.injector.inject
+import org.lanternpowered.api.logger.Logger
+import org.lanternpowered.api.text.serializer.LegacyTextSerializer
+import org.lanternpowered.api.plugin.Plugin
+import org.lanternpowered.api.event.Listener
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -27,21 +27,16 @@ import java.net.InetAddress
  * A plugin which broadcasts the server to the LAN. This could
  * save you a few seconds of precious time.
  */
-@Plugin(
-        id = "lan_broadcast",
-        name = "LAN Broadcast",
-        version = "1.0.0",
-        description = "Broadcasts the server to the LAN.",
-        authors = [ "Cybermaxke" ]
-)
+@Plugin("lan-broadcast")
 class LANBroadcastPlugin {
 
-    private val logger: Logger by inject()
+    private val logger: Logger = inject()
+    private val server: Server = inject()
 
     private lateinit var socket: DatagramSocket
 
     @Listener
-    fun onServerStarted(event: GameStartedServerEvent) {
+    fun onServerStarted(event: StartedServerEvent) {
         try {
             this.socket = DatagramSocket()
         } catch (ex: IOException) {
@@ -57,15 +52,14 @@ class LANBroadcastPlugin {
     }
 
     @Listener
-    fun onServerStopping(event: GameStoppingServerEvent) {
+    fun onServerStopping(event: StoppingServerEvent) {
         this.socket.close()
     }
 
     private fun broadcast() {
-        val server = Sponge.getServer()
         // Formatting codes are still supported by the LAN motd
-        val motd = TextSerializers.LEGACY_FORMATTING_CODE.serialize(server.motd)
-        val port = server.boundAddress.get().port
+        val motd = LegacyTextSerializer.serialize(this.server.motd)
+        val port = this.server.boundAddress.get().port
 
         val message = "[MOTD]$motd[/MOTD][AD]$port[/AD]"
         val data = message.toByteArray(Charsets.UTF_8)

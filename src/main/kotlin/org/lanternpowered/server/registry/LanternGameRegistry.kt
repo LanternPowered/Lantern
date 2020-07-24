@@ -53,7 +53,7 @@ import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder
-import org.lanternpowered.server.event.LanternEventContextKeyBuilder
+import org.lanternpowered.server.cause.LanternCauseContextKeyBuilder
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder
 import org.lanternpowered.server.inventory.LanternItemStackBuilder
@@ -201,7 +201,7 @@ class LanternGameRegistry(
             register<NamespacedKeyBuilder> { LanternNamespacedKeyBuilder() }
             register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
             register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }
-            register<EventContextKey.Builder<Any>> { LanternEventContextKeyBuilder() }
+            register<EventContextKey.Builder<Any>> { LanternCauseContextKeyBuilder() }
 
             register<BlockSnapshot.Builder> { LanternBlockSnapshotBuilder() }
             register<BlockSnapshotBuilder> { LanternBlockSnapshotBuilder() }

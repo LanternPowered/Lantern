@@ -12,13 +12,13 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerSprint;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSprintStatePacket;
 import org.spongepowered.api.data.Keys;
 
-public final class HandlerPlayInPlayerSprint implements Handler<PacketPlayInPlayerSprint> {
+public final class HandlerPlayInPlayerSprint implements Handler<ClientSprintStatePacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerSprint packet) {
+    public void handle(NetworkContext context, ClientSprintStatePacket packet) {
         context.getSession().getPlayer().offer(Keys.IS_SPRINTING, packet.isSprinting());
     }
 }

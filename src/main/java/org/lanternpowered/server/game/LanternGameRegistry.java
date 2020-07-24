@@ -75,7 +75,7 @@ import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
-import org.lanternpowered.server.event.LanternEventContextKeyBuilder;
+import org.lanternpowered.server.cause.LanternCauseContextKeyBuilder;
 import org.lanternpowered.server.extra.accessory.Accessory;
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder;
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder;
@@ -149,7 +149,6 @@ import org.lanternpowered.server.game.registry.type.text.TranslationManagerRegis
 import org.lanternpowered.server.game.registry.type.util.BanTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.util.RotationRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
@@ -468,7 +467,7 @@ public class LanternGameRegistry implements XGameRegistry {
                 .registerBuilderSupplier(FluidStack.Builder.class, LanternFluidStackBuilder::new)
                 .registerBuilderSupplier(FluidStackSnapshot.Builder.class, LanternFluidStackSnapshotBuilder::new)
                 .registerBuilderSupplier(ItemStack.Builder.class, LanternItemStackBuilder::new)
-                .registerBuilderSupplier(EventContextKey.Builder.class, LanternEventContextKeyBuilder::new)
+                .registerBuilderSupplier(EventContextKey.Builder.class, LanternCauseContextKeyBuilder::new)
                 .registerBuilderSupplier(Enchantment.Builder.class, LanternEnchantmentBuilder::new)
                 .registerBuilderSupplier(Key.Builder.class, LanternKeyBuilder::new)
                 .registerBuilderSupplier(InventoryTransactionResult.Builder.class, LanternInventoryTransactionResult.Builder::new)

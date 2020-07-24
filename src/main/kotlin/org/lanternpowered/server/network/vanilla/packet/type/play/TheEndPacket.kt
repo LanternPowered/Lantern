@@ -17,6 +17,6 @@ import org.spongepowered.api.entity.living.monster.boss.dragon.EnderDragon
 /**
  * This message will be send when a [Player] the
  * [EnderDragon] defeats. This will open the credits
- * or directly send a [PacketPlayInPerformRespawn].
+ * or directly send a [ClientRequestRespawnPacket].
  */
 data class TheEndPacket(val playCredits: Boolean) : Packet

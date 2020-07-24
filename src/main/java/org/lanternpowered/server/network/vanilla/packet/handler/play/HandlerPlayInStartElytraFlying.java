@@ -12,12 +12,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInStartElytraFlying;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientStartElytraFlyingPacket;
 
-public class HandlerPlayInStartElytraFlying implements Handler<PacketPlayInStartElytraFlying> {
+public class HandlerPlayInStartElytraFlying implements Handler<ClientStartElytraFlyingPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInStartElytraFlying packet) {
+    public void handle(NetworkContext context, ClientStartElytraFlyingPacket packet) {
         context.getSession().getPlayer().handleStartElytraFlying();
     }
 }

@@ -1,0 +1,51 @@
+/*
+ * Lantern
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * This work is licensed under the terms of the MIT License (MIT). For
+ * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
+ */
+package org.lanternpowered.server.network.vanilla.packet.codec.play
+
+import io.netty.handler.codec.CodecException
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.packet.PacketEncoder
+import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityStatus
+import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetOpLevel
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket
+
+object EntityStatusCodec : PacketEncoder<Packet> {
+
+    private const val LENGTH = Int.SIZE_BYTES + Byte.SIZE_BYTES
+
+    override fun encode(context: CodecContext, packet: Packet): ByteBuffer {
+        val entityId: Int
+        val action: Int
+        when (packet) {
+            is SetReducedDebugPacket -> {
+                entityId = context.channel.attr(PlayerJoinCodec.PLAYER_ENTITY_ID).get()
+                action = if (packet.isReduced) 22 else 23
+            }
+            is PacketPlayOutSetOpLevel -> {
+                entityId = context.channel.attr(PlayerJoinCodec.PLAYER_ENTITY_ID).get()
+                action = 24 + packet.opLevel.coerceIn(0..4)
+            }
+            is PacketPlayOutEntityStatus -> {
+                entityId = packet.entityId
+                action = packet.status
+            }
+            is ClientFinishUsingItemPacket -> {
+                entityId = context.channel.attr(PlayerJoinCodec.PLAYER_ENTITY_ID).get()
+                action = 9
+            }
+            else -> throw CodecException("Unsupported message type: " + packet.javaClass.name)
+        }
+        return context.byteBufAlloc().buffer(LENGTH).writeInt(entityId).writeByte(action.toByte())
+    }
+}

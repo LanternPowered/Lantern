@@ -15,6 +15,7 @@ import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.server.LanternServerNew
+import org.lanternpowered.server.network.entity.EntityProtocolManager
 import org.lanternpowered.server.world.chunk.ChunkManager
 import org.lanternpowered.server.world.storage.SpongeWorldStorage
 import org.spongepowered.api.Server
@@ -29,6 +30,7 @@ import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
+import org.spongepowered.api.data.value.ValueContainer
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.sound.music.MusicDisc
 import org.spongepowered.api.entity.Entity
@@ -78,6 +80,11 @@ class LanternWorldNew(
      * The manager of all the regions in this world.
      */
     val regionManager = WorldRegionManager(this)
+
+    /**
+     * The entity protocol manager of this world.
+     */
+    val entityProtocolManager: EntityProtocolManager = TODO()
 
     /**
      * Whether this world is currently loaded.
@@ -256,15 +263,15 @@ class LanternWorldNew(
         TODO("Not yet implemented")
     }
 
-    override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, from: DataHolder?): DataTransactionResult {
+    override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, from: ValueContainer): DataTransactionResult {
         TODO("Not yet implemented")
     }
 
-    override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, from: DataHolder?, function: MergeFunction?): DataTransactionResult {
+    override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, from: ValueContainer, function: MergeFunction): DataTransactionResult {
         TODO("Not yet implemented")
     }
 
-    override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, xFrom: Int, yFrom: Int, zFrom: Int, function: MergeFunction?): DataTransactionResult {
+    override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, xFrom: Int, yFrom: Int, zFrom: Int, function: MergeFunction): DataTransactionResult {
         TODO("Not yet implemented")
     }
 

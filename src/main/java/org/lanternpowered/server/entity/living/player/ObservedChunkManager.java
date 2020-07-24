@@ -25,7 +25,7 @@ import org.lanternpowered.server.network.block.BlockEntityChunkProtocolData;
 import org.lanternpowered.server.network.block.BlockEntityProtocolHelper;
 import org.lanternpowered.server.network.block.BlockEntityProtocolUpdateContext;
 import org.lanternpowered.server.network.packet.Packet;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockAction;
+import org.lanternpowered.server.network.vanilla.packet.type.play.BlockActionPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket;
@@ -168,9 +168,9 @@ public final class ObservedChunkManager implements WorldEventListener {
         private final class QueuedBlockAction {
 
             private final BlockAction blockAction;
-            private final PacketPlayOutBlockAction blockActionData;
+            private final BlockActionPacket blockActionData;
 
-            private QueuedBlockAction(BlockAction blockAction, PacketPlayOutBlockAction blockActionData) {
+            private QueuedBlockAction(BlockAction blockAction, BlockActionPacket blockActionData) {
                 this.blockAction = blockAction;
                 this.blockActionData = blockActionData;
             }
@@ -227,7 +227,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 return;
             }
             // Create the message
-            final PacketPlayOutBlockAction blockActionData = new PacketPlayOutBlockAction(coords,
+            final BlockActionPacket blockActionData = new BlockActionPacket(coords,
                     BlockRegistryModule.get().getStateInternalId(blockType.getDefaultState()));
             blockAction.fill(blockActionData);
             this.addedBlockActions.put(coords, new QueuedBlockAction(blockAction, blockActionData));

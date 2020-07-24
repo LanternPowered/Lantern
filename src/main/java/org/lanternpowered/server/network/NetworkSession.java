@@ -53,7 +53,7 @@ import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.packet.type.KeepAlivePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.DisconnectPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSettingsPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.packet.type.play.BrandPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerJoinPacket;
 import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -1009,7 +1009,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
         }
 
         // Send the server brand
-        send(new PacketPlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+        send(new BrandPacket(Lantern.getImplementationPlugin().getName()));
 
         // Reset the raw world
         this.player.setRawWorld(null);

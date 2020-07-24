@@ -12,11 +12,11 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerVehicleMovement;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerVehicleMovementPacket;
 
-public class HandlerPlayInPlayerVehicleMovement implements Handler<PacketPlayInPlayerVehicleMovement> {
+public class HandlerPlayInPlayerVehicleMovement implements Handler<ClientPlayerVehicleMovementPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerVehicleMovement packet) {
+    public void handle(NetworkContext context, ClientPlayerVehicleMovementPacket packet) {
     }
 }

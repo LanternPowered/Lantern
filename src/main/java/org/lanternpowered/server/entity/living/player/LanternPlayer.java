@@ -62,9 +62,9 @@ import org.lanternpowered.server.network.vanilla.command.SuggestionTypes;
 import org.lanternpowered.server.network.vanilla.command.argument.ArgumentAndType;
 import org.lanternpowered.server.network.vanilla.command.argument.ArgumentTypes;
 import org.lanternpowered.server.network.vanilla.command.argument.StringArgument;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.packet.type.play.BrandPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDefineCommands;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetCommandsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenBookPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutParticleEffect;
@@ -317,8 +317,8 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
      *
      * @return The opened sign position
      */
-    public Optional<Vector3i> getOpenedSignPosition() {
-        return Optional.ofNullable(this.openedSignPosition);
+    public @Nullable Vector3i getOpenedSignPosition() {
+        return this.openedSignPosition;
     }
 
     /**
@@ -472,7 +472,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 this.session.send(new PlayerRespawnPacket(gameMode, dimensionType, lowHorizon, 0L));
                 this.session.send(new SetReducedDebugPacket(reducedDebug));
                 // Send the server brand
-                this.session.send(new PacketPlayInOutBrand(Lantern.getImplementationPlugin().getName()));
+                this.session.send(new BrandPacket(Lantern.getImplementationPlugin().getName()));
                 // We just have to send this to prevent the client from crashing in some
                 // occasions, for example when clicking a furnace fuel slot.
                 // It's not used for anything else, so there aren't any arguments.
@@ -501,7 +501,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
                 final ArgumentNode argumentNode = new ArgumentNode(Collections.emptyList(), "my-argument",
                         ArgumentAndType.of(ArgumentTypes.STRING, new StringArgument(StringArgument.Type.GREEDY_PHRASE)),
                         null, null, SuggestionTypes.ASK_SERVER);
-                this.session.send(new PacketPlayOutDefineCommands(new RootNode(
+                this.session.send(new SetCommandsPacket(new RootNode(
                         Collections.singletonList(
                                 new LiteralNode(Collections.singletonList(argumentNode), "test", null, "test")),
                         null, null)));

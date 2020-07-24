@@ -14,14 +14,14 @@ import com.google.common.collect.Lists;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInTabComplete;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientTabCompletePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabComplete;
 import org.spongepowered.api.text.Text;
 
-public final class HandlerPlayInTabComplete implements Handler<PacketPlayInTabComplete> {
+public final class HandlerPlayInTabComplete implements Handler<ClientTabCompletePacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInTabComplete packet) {
+    public void handle(NetworkContext context, ClientTabCompletePacket packet) {
         final String text = packet.getInput();
         final LanternPlayer player = context.getSession().getPlayer();
         player.sendMessage(Text.of("Received tab completion (" + packet.getId() + "): " + text));

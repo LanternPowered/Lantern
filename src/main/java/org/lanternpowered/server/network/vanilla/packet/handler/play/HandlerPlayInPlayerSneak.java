@@ -12,13 +12,13 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerSneak;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSneakStatePacket;
 import org.spongepowered.api.data.Keys;
 
-public final class HandlerPlayInPlayerSneak implements Handler<PacketPlayInPlayerSneak> {
+public final class HandlerPlayInPlayerSneak implements Handler<ClientSneakStatePacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerSneak packet) {
+    public void handle(NetworkContext context, ClientSneakStatePacket packet) {
         context.getSession().getPlayer().offer(Keys.IS_SNEAKING, packet.isSneaking());
     }
 }

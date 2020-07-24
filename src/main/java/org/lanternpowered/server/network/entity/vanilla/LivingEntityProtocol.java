@@ -19,7 +19,7 @@ import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutAddPotionEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.AddPotionEffectPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityAnimation;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutRemovePotionEffect;
 import org.spongepowered.api.data.Keys;
@@ -127,8 +127,8 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
         this.lastPotionEffects = potionEffectMap;
     }
 
-    private PacketPlayOutAddPotionEffect createAddMessage(PotionEffect potionEffect) {
-        return new PacketPlayOutAddPotionEffect(getRootEntityId(), potionEffect.getType(), potionEffect.getDuration(),
+    private AddPotionEffectPacket createAddMessage(PotionEffect potionEffect) {
+        return new AddPotionEffectPacket(getRootEntityId(), potionEffect.getType(), potionEffect.getDuration(),
                 potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.showsParticles());
     }
 

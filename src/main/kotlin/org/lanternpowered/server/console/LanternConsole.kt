@@ -23,13 +23,11 @@ import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.LanternServerNew
 import org.lanternpowered.server.cause.LanternCauseStack
-import org.lanternpowered.server.ext.inject
 import org.lanternpowered.server.permission.ProxySubject
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.ThreadHelper
 import org.spongepowered.api.SystemSubject
 import org.spongepowered.api.command.exception.CommandException
-import org.spongepowered.api.command.manager.CommandManager
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.SubjectReference
 import org.spongepowered.api.util.Tristate
@@ -49,14 +47,12 @@ class LanternConsole(
 
         @JvmField internal val ignoreFqcns = mutableSetOf<String>()
 
-        private val historyFileName = "console_history.txt"
+        private const val historyFileName = "console_history.txt"
         private val historySaveInterval = Duration.ofMinutes(2)
     }
 
     private val game: LanternGame
         get() = this.server.game
-
-    private val commandManager: CommandManager by inject()
 
     private val consoleHistoryFile: Path by lazy { this.server.game.configDirectory.resolve(historyFileName) }
     private val lock = Any()
@@ -110,7 +106,7 @@ class LanternConsole(
             command = if (command.startsWith("/")) command.substring(1) else command
             this.game.syncScheduler.submit {
                 try {
-                    this.commandManager.process(this, command)
+                    this.game.commandManager.process(this, command)
                 } catch (e: CommandException) {
                     sendMessage(textOf("Failed to execute command: $command, reason: ${e.message}"))
                 }

@@ -36,6 +36,7 @@ import org.lanternpowered.server.util.LanternTransform;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldNew;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.Keys;
@@ -424,7 +425,7 @@ public class LanternEntity implements SerializableLocalMutableDataHolder, Entity
     }
 
     @Override
-    public LanternWorld getWorld() {
+    public LanternWorldNew getWorld() {
         return this.world;
     }
 

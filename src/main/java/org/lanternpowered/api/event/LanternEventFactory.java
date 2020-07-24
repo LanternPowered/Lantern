@@ -10,19 +10,21 @@
  */
 package org.lanternpowered.api.event;
 
-import com.google.common.reflect.TypeParameter;
+import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.block.entity.Sign;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.block.entity.ChangeSignEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
@@ -52,7 +54,6 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 

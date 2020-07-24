@@ -24,15 +24,15 @@ import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientAcceptBeaconEffectsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientItemRenamePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeTradeOfferPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInClickRecipe;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClickWindowPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInCreativeWindowAction;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickRecipePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWindowPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientCreativeWindowActionPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInDisplayedRecipe;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInDropHeldItem;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInEnchantItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDropHeldItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEnchantItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.CloseWindowPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutHeldItemChange;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPickItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerHeldItemChangePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPickItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDisplayRecipe;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
@@ -205,7 +205,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleHeldItemChange(PacketPlayInOutHeldItemChange message) {
+    public void handleHeldItemChange(PlayerHeldItemChangePacket message) {
         final PlayerClientContainer clientContainer = this.player.getInventoryContainer().getClientContainer();
         clientContainer.handleHeldItemChange(message.getSlot());
     }
@@ -223,7 +223,7 @@ public class PlayerContainerSession {
         runnable.run();
     }
 
-    public void handleRecipeClick(PacketPlayInClickRecipe message) {
+    public void handleRecipeClick(ClientClickRecipePacket message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             // Just display the recipe for now, all the other behavior will be implemented later,
             // this requires recipes to be added first
@@ -231,7 +231,7 @@ public class PlayerContainerSession {
         });
     }
 
-    public void handleWindowCreativeClick(PacketPlayInCreativeWindowAction message) {
+    public void handleWindowCreativeClick(ClientCreativeWindowActionPacket message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
@@ -240,9 +240,9 @@ public class PlayerContainerSession {
                 message.getItemStack() == null ? LanternItemStack.empty() : message.getItemStack());
     }
 
-    public void handleItemDrop(PacketPlayInDropHeldItem message) {
+    public void handleItemDrop(ClientDropHeldItemPacket message) {
         final AbstractSlot slot = this.player.getInventory().getHotbar().getSelectedSlot();
-        final ItemStack itemStack = message.isFullStack() ? slot.peek() : slot.peek(1);
+        final ItemStack itemStack = message.getFullStack() ? slot.peek() : slot.peek(1);
 
         if (!itemStack.isEmpty()) {
             final CauseStack causeStack = CauseStack.current();
@@ -260,7 +260,7 @@ public class PlayerContainerSession {
                 Sponge.getEventManager().post(event);
 
                 if (!event.isCancelled()) {
-                    if (message.isFullStack()) {
+                    if (message.getFullStack()) {
                         slot.poll();
                     } else {
                         slot.poll(1);
@@ -277,14 +277,14 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleWindowClick(ClickWindowPacket message) {
+    public void handleWindowClick(ClientClickWindowPacket message) {
         applyIfContainerMatches(message.getWindowId(), () -> {
             final ClientContainer clientContainer = getClientContainer();
             clientContainer.handleClick(message.getSlot(), message.getMode(), message.getButton());
         });
     }
 
-    public void handlePickItem(PacketPlayInPickItem message) {
+    public void handlePickItem(ClientPickItemPacket message) {
         final ClientContainer clientContainer = getClientContainer();
         clientContainer.handlePick(message.getSlot());
     }
@@ -311,7 +311,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleEnchantItem(PacketPlayInEnchantItem message) {
+    public void handleEnchantItem(ClientEnchantItemPacket message) {
         if (message.getWindowId() != getContainerId()) {
             return;
         }

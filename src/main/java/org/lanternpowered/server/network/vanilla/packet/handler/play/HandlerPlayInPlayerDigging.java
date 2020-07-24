@@ -13,12 +13,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerDigging;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDiggingPacket;
 
-public final class HandlerPlayInPlayerDigging implements Handler<PacketPlayInPlayerDigging> {
+public final class HandlerPlayInPlayerDigging implements Handler<ClientDiggingPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerDigging packet) {
+    public void handle(NetworkContext context, ClientDiggingPacket packet) {
         final LanternPlayer player = context.getSession().getPlayer();
         player.resetIdleTimeoutCounter();
         player.resetOpenedSignPosition();

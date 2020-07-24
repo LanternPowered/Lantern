@@ -12,12 +12,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutFinishUsingItem;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket;
 
-public class HandlerPlayInFinishUsingItem implements Handler<PacketPlayInOutFinishUsingItem> {
+public class HandlerPlayInFinishUsingItem implements Handler<ClientFinishUsingItemPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInOutFinishUsingItem packet) {
+    public void handle(NetworkContext context, ClientFinishUsingItemPacket packet) {
         context.getSession().getPlayer().getInteractionHandler().handleFinishItemInteraction(packet);
     }
 }

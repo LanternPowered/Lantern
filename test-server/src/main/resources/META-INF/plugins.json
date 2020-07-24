@@ -4,7 +4,7 @@
       "id": "lan-broadcast",
       "name": "LAN Broadcast",
       "version": "1.0.0",
-      "main-class": "org.lanternpowered.LANBroadcastPlugin",
+      "main-class": "org.lanternpowered.testserver.LANBroadcastPlugin",
       "description": "A plugin which broadcasts the server over LAN for quick joining.",
       "links": {
         "homepage": "https://www.lanternpowered.org",

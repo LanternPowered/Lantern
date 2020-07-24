@@ -16,17 +16,17 @@ import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerAbilities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFlyingStatePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.math.vector.Vector3d;
 
-public class HandlerPlayInPlayerAbilities implements Handler<PacketPlayInPlayerAbilities> {
+public class HandlerPlayInPlayerAbilities implements Handler<ClientFlyingStatePacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerAbilities packet) {
+    public void handle(NetworkContext context, ClientFlyingStatePacket packet) {
         final boolean flying = packet.isFlying();
         final LanternPlayer player = context.getSession().getPlayer();
         if (!flying || player.get(Keys.CAN_FLY).orElse(false)) {

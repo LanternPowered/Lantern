@@ -14,7 +14,7 @@ import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.key.spongeKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
-import org.lanternpowered.server.event.LanternCauseContextKey
+import org.lanternpowered.server.cause.LanternCauseContextKey
 
 val CauseContextKeyRegistry = catalogTypeRegistry<CauseContextKey<*>> {
     // TODO: Process LanternEventContextKeys and ContextKeys

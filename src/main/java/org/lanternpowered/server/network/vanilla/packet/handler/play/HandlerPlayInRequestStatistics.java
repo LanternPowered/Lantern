@@ -13,12 +13,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInRequestStatistics;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientRequestStatisticsPacket;
 
-public class HandlerPlayInRequestStatistics implements Handler<PacketPlayInRequestStatistics> {
+public class HandlerPlayInRequestStatistics implements Handler<ClientRequestStatisticsPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInRequestStatistics packet) {
+    public void handle(NetworkContext context, ClientRequestStatisticsPacket packet) {
         final NetworkSession session = context.getSession();
         // TODO: Update statistics protocol
         // session.send(session.getPlayer().getStatisticMap().createStatisticsMessage());

@@ -18,7 +18,7 @@ import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInSwapHandItems;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSwapHandItemsPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("ConstantConditions")
-public final class HandlerPlayInSwapHandItems implements Handler<PacketPlayInSwapHandItems> {
+public final class HandlerPlayInSwapHandItems implements Handler<ClientSwapHandItemsPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInSwapHandItems packet) {
+    public void handle(NetworkContext context, ClientSwapHandItemsPacket packet) {
         final LanternPlayer player = context.getSession().getPlayer();
         final LanternPlayerInventory inventory = player.getInventory();
 

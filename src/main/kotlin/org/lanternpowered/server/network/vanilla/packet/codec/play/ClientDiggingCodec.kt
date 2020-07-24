@@ -1,0 +1,39 @@
+/*
+ * Lantern
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * This work is licensed under the terms of the MIT License (MIT). For
+ * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
+ */
+package org.lanternpowered.server.network.vanilla.packet.codec.play
+
+import io.netty.handler.codec.DecoderException
+import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.packet.PacketDecoder
+import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDropHeldItemPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDiggingPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSwapHandItemsPacket
+
+object ClientDiggingCodec : PacketDecoder<Packet> {
+
+    private val diggingActions = ClientDiggingPacket.Action.values()
+
+    override fun decode(context: CodecContext, buf: ByteBuffer): Packet {
+        val action = buf.readByte().toInt()
+        val position = buf.readPosition()
+        val face = buf.readByte().toInt()
+        return when (action) {
+            0, 1, 2 -> ClientDiggingPacket(this.diggingActions[action], position, CodecUtils.decodeDirection(face))
+            3, 4 -> ClientDropHeldItemPacket(action == 3)
+            5 -> ClientFinishUsingItemPacket
+            6 -> ClientSwapHandItemsPacket
+            else -> throw DecoderException("Unknown player digging message action: $action")
+        }
+    }
+}

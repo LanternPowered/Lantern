@@ -15,14 +15,14 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInModifyBook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientModifyBookPacket;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.ItemTypes;
 
-public class HandlerPlayInEditBook implements Handler<PacketPlayInModifyBook.Edit> {
+public class HandlerPlayInEditBook implements Handler<ClientModifyBookPacket.Edit> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInModifyBook.Edit packet) {
+    public void handle(NetworkContext context, ClientModifyBookPacket.Edit packet) {
         final LanternPlayer player = context.getSession().getPlayer();
         final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 

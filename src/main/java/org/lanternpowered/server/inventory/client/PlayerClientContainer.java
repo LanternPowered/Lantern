@@ -17,7 +17,7 @@ import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.behavior.HotbarBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleHotbarBehavior;
 import org.lanternpowered.server.network.packet.Packet;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutHeldItemChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerHeldItemChangePacket;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class PlayerClientContainer extends ClientContainer {
     protected void collectInitMessages(List<Packet> packets) {
         super.collectInitMessages(packets);
         this.previousSelectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
-        packets.add(new PacketPlayInOutHeldItemChange(this.previousSelectedHotbarSlot));
+        packets.add(new PlayerHeldItemChangePacket(this.previousSelectedHotbarSlot));
     }
 
     @Override
@@ -120,7 +120,7 @@ public class PlayerClientContainer extends ClientContainer {
         // Update the selected hotbar slot
         if (selectedHotbarSlot != this.previousSelectedHotbarSlot) {
             this.previousSelectedHotbarSlot = selectedHotbarSlot;
-            packets.add(new PacketPlayInOutHeldItemChange(selectedHotbarSlot));
+            packets.add(new PlayerHeldItemChangePacket(selectedHotbarSlot));
         }
     }
 

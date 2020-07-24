@@ -12,11 +12,11 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerMovementInput;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientMovementInputPacket;
 
-public class HandlerPlayInPlayerMovementInput implements Handler<PacketPlayInPlayerMovementInput> {
+public class HandlerPlayInPlayerMovementInput implements Handler<ClientMovementInputPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerMovementInput packet) {
+    public void handle(NetworkContext context, ClientMovementInputPacket packet) {
     }
 }

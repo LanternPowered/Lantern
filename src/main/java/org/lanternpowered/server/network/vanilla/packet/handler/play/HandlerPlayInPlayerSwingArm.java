@@ -13,12 +13,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerSwingArm;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerSwingArmPacket;
 
-public class HandlerPlayInPlayerSwingArm implements Handler<PacketPlayInPlayerSwingArm> {
+public class HandlerPlayInPlayerSwingArm implements Handler<ClientPlayerSwingArmPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerSwingArm packet) {
+    public void handle(NetworkContext context, ClientPlayerSwingArmPacket packet) {
         final LanternPlayer player = context.getSession().getPlayer();
         player.resetIdleTimeoutCounter();
         player.resetOpenedSignPosition();

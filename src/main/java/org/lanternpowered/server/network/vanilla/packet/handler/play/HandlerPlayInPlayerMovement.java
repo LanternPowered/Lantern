@@ -13,12 +13,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInPlayerMovement;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerMovementPacket;
 
-public class HandlerPlayInPlayerMovement implements Handler<PacketPlayInPlayerMovement> {
+public class HandlerPlayInPlayerMovement implements Handler<ClientPlayerMovementPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInPlayerMovement packet) {
+    public void handle(NetworkContext context, ClientPlayerMovementPacket packet) {
         final LanternPlayer player = context.getSession().getPlayer();
         player.setRawPosition(packet.getPosition());
         player.handleOnGroundState(packet.isOnGround());

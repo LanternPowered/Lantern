@@ -76,7 +76,7 @@ internal class RconHandler(
         val channel = ctx.channel()
         val connection = LanternRconConnection(channel, this.server.address)
         check(channel.attr(CONNECTION).compareAndSet(null, connection)) { "Rcon source may not be set more than once!" }
-        LanternGame.syncScheduler
+        this.server.syncExecutor
                 .submit {
                     val cause = causeOf(connection)
                     val event = LanternEventFactory.createRconConnectionEventConnect(cause, connection)
@@ -98,7 +98,48 @@ internal class RconHandler(
         val cause = causeOf(connection)
         this.server.remove(connection)
         val event = LanternEventFactory.createRconConnectionEventDisconnect(cause, connection)
-        LanternGame.syncScheduler.submit { EventManager.post(event) }
+        this.server.syncExecutor.execute { EventManager.post(event) }
+    }
+
+    private fun handleAuth(ctx: ChannelHandlerContext, payload: String, password: String, requestId: Int) {
+        val connection = ctx.channel().attr(CONNECTION).get()
+        this.server.syncExecutor.execute {
+            val cause = causeOf(connection)
+            val event: RconConnectionEvent.Auth = LanternEventFactory.createRconConnectionEventAuth(cause, connection)
+            event.isCancelled = password != payload
+            EventManager.post(event)
+            connection.isAuthorized = !event.isCancelled
+            if (connection.isAuthorized) {
+                LanternGame.logger.info("Rcon connection from [" + ctx.channel().remoteAddress() + "]")
+                ctx.channel().eventLoop().submit { sendResponse(ctx, requestId, TYPE_COMMAND, "") }
+            } else {
+                ctx.channel().eventLoop().submit { sendResponse(ctx, FAILURE, TYPE_COMMAND, "") }
+            }
+        }
+    }
+
+    private fun handleCommand(ctx: ChannelHandlerContext, payload: String, requestId: Int) {
+        val connection = ctx.channel().attr(CONNECTION).get()
+        if (!connection.isAuthorized) {
+            sendResponse(ctx, FAILURE, TYPE_COMMAND, "")
+            return
+        }
+        // Process the command on the main thread and send
+        // the response on the netty thread.
+        this.server.syncExecutor.submit {
+            val causeStack = current()
+            causeStack.pushCause(connection)
+            try {
+                Lantern.commandManager.process(connection, payload)
+            } catch (e: CommandException) {
+                connection.sendMessage(textOf("An error occurred while executing the command: $payload; $e"))
+            }
+            causeStack.popCause()
+            connection.flush()
+        }.thenAsync(ctx.channel().eventLoop()) { content ->
+            // Send the response on the netty thread
+            sendLargeResponse(ctx, requestId, content)
+        }
     }
 
     companion object {
@@ -109,47 +150,6 @@ internal class RconHandler(
         private const val TYPE_RESPONSE = 0
         private const val TYPE_COMMAND = 2
         private const val TYPE_AUTH = 3
-
-        private fun handleAuth(ctx: ChannelHandlerContext, payload: String, password: String, requestId: Int) {
-            val connection = ctx.channel().attr(CONNECTION).get()
-            LanternGame.syncScheduler.submit {
-                val cause = causeOf(connection)
-                val event: RconConnectionEvent.Auth = LanternEventFactory.createRconConnectionEventAuth(cause, connection)
-                event.isCancelled = password != payload
-                EventManager.post(event)
-                connection.isAuthorized = !event.isCancelled
-                if (connection.isAuthorized) {
-                    LanternGame.logger.info("Rcon connection from [" + ctx.channel().remoteAddress() + "]")
-                    ctx.channel().eventLoop().submit { sendResponse(ctx, requestId, TYPE_COMMAND, "") }
-                } else {
-                    ctx.channel().eventLoop().submit { sendResponse(ctx, FAILURE, TYPE_COMMAND, "") }
-                }
-            }
-        }
-
-        private fun handleCommand(ctx: ChannelHandlerContext, payload: String, requestId: Int) {
-            val connection = ctx.channel().attr(CONNECTION).get()
-            if (!connection.isAuthorized) {
-                sendResponse(ctx, FAILURE, TYPE_COMMAND, "")
-                return
-            }
-            // Process the command on the main thread and send
-            // the response on the netty thread.
-            LanternGame.syncScheduler.submit {
-                val causeStack = current()
-                causeStack.pushCause(connection)
-                try {
-                    Lantern.commandManager.process(connection, payload)
-                } catch (e: CommandException) {
-                    connection.sendMessage(textOf("An error occurred while executing the command: $payload; $e"))
-                }
-                causeStack.popCause()
-                connection.flush()
-            }.thenAsync(ctx.channel().eventLoop()) { content ->
-                // Send the response on the netty thread
-                sendLargeResponse(ctx, requestId, content)
-            }
-        }
 
         private fun sendResponse(ctx: ChannelHandlerContext, requestId: Int, type: Int, payload: String) {
             val buf = ctx.alloc().buffer()

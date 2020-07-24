@@ -37,7 +37,7 @@ import java.nio.file.Path
 import java.time.Duration
 
 class LanternConsole(
-        private val server: LanternServerNew
+        val server: LanternServerNew
 ) : SimpleTerminalConsole(), ProxySubject, SystemSubject {
 
     companion object {
@@ -74,7 +74,7 @@ class LanternConsole(
         // already be printed nicely with PrettyPrinter
         ignoreFqcns.add(LanternCauseStack::class.java.name)
 
-        val logger = this.game.logger
+        val logger = this.server.logger
         System.setOut(IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintStream())
         System.setErr(IoBuilder.forLogger(logger).setLevel(Level.ERROR).buildPrintStream())
     }
@@ -104,7 +104,7 @@ class LanternConsole(
         var command = rawCommand.trim()
         if (command.isNotEmpty()) {
             command = if (command.startsWith("/")) command.substring(1) else command
-            this.game.syncScheduler.submit {
+            this.server.syncExecutor.execute {
                 try {
                     this.game.commandManager.process(this, command)
                 } catch (e: CommandException) {
@@ -120,7 +120,7 @@ class LanternConsole(
     }
 
     override fun shutdown() {
-        this.game.syncScheduler.submit { this.server.shutdown() }
+        this.server.syncExecutor.execute { this.server.shutdown() }
     }
 
     fun stop() {
@@ -146,7 +146,7 @@ class LanternConsole(
             try {
                 history.save()
             } catch (e: IOException) {
-                this.game.logger.error("Error while saving the console history!", e)
+                this.server.logger.error("Error while saving the console history!", e)
             }
         }
     }

@@ -15,6 +15,7 @@ import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.server.util.executor.LanternScheduledExecutorService
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.scheduler.Task
@@ -28,7 +29,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 
-class LanternScheduler(val service: ScheduledExecutorService) : Scheduler {
+class LanternScheduler(val service: LanternScheduledExecutorService) : Scheduler {
 
     private val tasksByUniqueId: MutableMap<UUID, LanternScheduledTask> = ConcurrentHashMap()
 
@@ -104,17 +105,6 @@ class LanternScheduler(val service: ScheduledExecutorService) : Scheduler {
         return scheduledTask
     }
 
-    fun <R> submit(callable: () -> R): CompletableFuture<R> {
-        val future = CompletableFuture<R>()
-        this.service.execute {
-            try {
-                future.complete(callable())
-            } catch (e: Throwable) {
-                future.completeExceptionally(e)
-            }
-        }
-        return future
-    }
-
+    fun <R> submit(callable: () -> R): CompletableFuture<R> = this.service.submit(callable)
     fun submit(runnable: Runnable): CompletableFuture<Unit> = submit { runnable.run() }
 }

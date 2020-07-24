@@ -60,7 +60,7 @@ class LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
         val secretKey = SecretKeySpec(decryptedSharedSecret, "AES")
 
         requestAuth(authData.username, serverId, preventProxiesIp)
-                .thenAsync(LanternGame.syncExecutor) { profile ->
+                .thenAsync(session.server.syncExecutor) { profile ->
                     val cause = causeOf(session, profile)
                     val messageFormatter = MessageEvent.MessageFormatter(TranslationHelper.t("multiplayer.disconnect.not_allowed_to_join"))
                     val event: ServerSideConnectionEvent.Auth = LanternEventFactory.createClientConnectionEventAuth(

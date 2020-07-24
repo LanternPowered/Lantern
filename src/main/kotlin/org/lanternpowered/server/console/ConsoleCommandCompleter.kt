@@ -15,11 +15,9 @@ import org.jline.reader.Completer
 import org.jline.reader.LineReader
 import org.jline.reader.ParsedLine
 import org.lanternpowered.api.util.text.normalizeSpaces
-import org.lanternpowered.server.LanternGame
 import java.util.concurrent.ExecutionException
 
 internal class ConsoleCommandCompleter(
-        private val game: LanternGame,
         private val console: LanternConsole
 ) : Completer {
 
@@ -42,8 +40,8 @@ internal class ConsoleCommandCompleter(
         }
 
         val command0 = command
-        val tabComplete = this.game.syncScheduler.submit<List<String>> {
-            this.game.commandManager.suggest(this.console, command0)
+        val tabComplete = this.console.server.syncExecutor.submit<List<String>> {
+            this.console.server.game.commandManager.suggest(this.console, command0)
         }
 
         try {
@@ -66,7 +64,7 @@ internal class ConsoleCommandCompleter(
         } catch (e: InterruptedException) {
             Thread.currentThread().interrupt()
         } catch (e: ExecutionException) {
-            this.game.logger.error("Failed to tab complete", e)
+            this.console.server.logger.error("Failed to tab complete", e)
         }
     }
 }

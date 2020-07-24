@@ -12,6 +12,7 @@ package org.lanternpowered.server
 
 import com.google.common.collect.Iterables
 import joptsimple.OptionSet
+import kotlinx.coroutines.Dispatchers
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.Platform
 import org.lanternpowered.api.Server
@@ -19,11 +20,13 @@ import org.lanternpowered.api.audience.Audience
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.plugin.version
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.asUnmodifiableCollection
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.server.cause.LanternCauseStack
@@ -39,10 +42,15 @@ import org.lanternpowered.server.network.ProxyType
 import org.lanternpowered.server.network.query.QueryServer
 import org.lanternpowered.server.network.rcon.EmptyRconService
 import org.lanternpowered.server.network.rcon.RconServer
+import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.service.world.DefaultWorldStorageService
 import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.ShutdownMonitorThread
 import org.lanternpowered.server.util.SyncLanternThread
+import org.lanternpowered.server.util.coroutines.asScheduledExecutorService
+import org.lanternpowered.server.util.executor.LanternExecutorService
+import org.lanternpowered.server.util.executor.LanternScheduledExecutorService
+import org.lanternpowered.server.util.executor.asLanternExecutorService
 import org.lanternpowered.server.world.LanternTeleportHelper
 import org.lanternpowered.server.world.LanternWorldManager
 import org.spongepowered.api.network.status.Favicon
@@ -66,6 +74,7 @@ import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.system.exitProcess
@@ -75,7 +84,28 @@ class LanternServerNew : Server {
     private val startTime = Instant.now()
     private val game: LanternGame = LanternGame
     private lateinit var worldManager: LanternWorldManager
-    private lateinit var ioExecutor: ExecutorService
+
+    /**
+     * The [ExecutorService] that should be used for IO operations.
+     */
+    lateinit var ioExecutor: LanternExecutorService
+        private set
+
+    /**
+     * The [ScheduledExecutorService] that should be used for "sync" tasks.
+     */
+    lateinit var syncExecutor: LanternScheduledExecutorService
+        private set
+
+    /**
+     * The [ScheduledExecutorService] that should be used for "async" tasks.
+     */
+    lateinit var asyncExecutor: LanternScheduledExecutorService
+        private set
+
+    private lateinit var syncScheduler: LanternScheduler
+    private lateinit var asyncScheduler: LanternScheduler
+
     private lateinit var console: LanternConsole
     private lateinit var networkManager: NetworkManager
     private lateinit var audiences: Iterable<Audience>
@@ -127,8 +157,13 @@ class LanternServerNew : Server {
 
         this.audiences = Iterables.concat(this.unsafePlayers, listOf(this.console))
 
-        this.game.init(options, this.console)
-        this.game.setServer(this)
+        this.asyncExecutor = Dispatchers.Default.asScheduledExecutorService()
+        this.asyncScheduler = LanternScheduler(this.asyncExecutor)
+
+        this.game.init(options, this.console, this.asyncScheduler)
+        this.game.server = this
+
+        showWelcome()
 
         val config = this.game.config
 
@@ -137,12 +172,17 @@ class LanternServerNew : Server {
             this.game.lanternPlugin to DefaultWorldStorageService(worldsDirectory)
         }
 
-        this.ioExecutor = Executors.newCachedThreadPool() // TODO: Use a specific amount of threads
+        this.syncExecutor = Executors.newSingleThreadScheduledExecutor { SyncLanternThread(it, "main") }.asLanternExecutorService()
+        this.syncExecutor.submit { LanternCauseStackManager.setCurrentCauseStack(LanternCauseStack()) }
+
+        this.ioExecutor = Dispatchers.IO.asScheduledExecutorService()
+
+        this.syncScheduler = LanternScheduler(this.syncExecutor)
 
         this.worldManager = LanternWorldManager(this, this.ioExecutor, worldStorageService)
         this.worldManager.init()
 
-        this.eventManager.post(LanternStartingServerEvent(game, this))
+        this.eventManager.post(LanternStartingServerEvent(this.game, this))
 
         if (config.server.proxy.type == ProxyType.NONE && !config.server.onlineMode) {
             this.logger.warn("It is not recommend to run the server in offline mode, this allows people to")
@@ -162,10 +202,31 @@ class LanternServerNew : Server {
         loadFavicon()
         loadDefaultResourcePack()
 
+        this.syncExecutor.scheduleAtFixedRate({
+            try {
+                update();
+            } catch (e: Exception) {
+                this.logger.error("Error while updating main loop", e)
+            }
+        }, 0, 50, TimeUnit.MILLISECONDS)
+
         this.eventManager.post(LanternStartedServerEvent(this.game, this))
 
         // Start reading inputs
         this.console.start()
+
+        this.logger.info("Ready for connections.")
+    }
+
+    private fun showWelcome() {
+        val lanternVersion = this.game.lanternPlugin.version
+        val minecraftVersion = this.game.minecraftVersion.name
+        val protocolVersion = this.game.minecraftVersion.protocol
+        val apiVersion = this.game.spongeApiPlugin.version
+
+        this.logger.info("Starting Lantern $lanternVersion")
+        this.logger.info("   for  Minecraft $minecraftVersion with protocol version $protocolVersion")
+        this.logger.info("   with SpongeAPI $apiVersion")
     }
 
     private fun tryBindServer() {
@@ -204,7 +265,7 @@ class LanternServerNew : Server {
         if (!config.enabled)
             return null
 
-        val server = QueryServer(this.game, config.showPlugins)
+        val server = QueryServer(this, config.showPlugins)
         val address = getBindAddress(config.ip, config.port)
 
         this.logger.info("Starting query server and binding it to: $address...")
@@ -227,7 +288,7 @@ class LanternServerNew : Server {
         if (!config.enabled)
             return EmptyRconService(config.password)
 
-        val server = RconServer(config.password)
+        val server = RconServer(config.password, this.syncExecutor)
         val address = getBindAddress(config.ip, config.port)
 
         this.logger.info("Starting rcon server and binding it to: $address...")
@@ -272,6 +333,11 @@ class LanternServerNew : Server {
         }
     }
 
+    private fun update() {
+        this.networkManager.pulseSessions()
+        this.worldManager.update()
+    }
+
     override fun getBoundAddress(): Optional<InetSocketAddress> = this.networkManager.address.optional()
 
     /**
@@ -290,9 +356,15 @@ class LanternServerNew : Server {
         if (!this.shuttingDown.compareAndSet(false, true))
             return
         this.eventManager.post(LanternStoppingServerEvent(this.game, this))
+
         this.ioExecutor.shutdown()
+        this.syncExecutor.shutdown()
+        this.networkManager.shutdown()
 
         this.queryServer?.shutdown()
+
+        // Stop the async scheduler
+        this.asyncExecutor.shutdown()
 
         for (service in this.game.serviceProvider.registrations.map { it.service() }.distinct()) {
             if (service is Closeable)
@@ -308,6 +380,7 @@ class LanternServerNew : Server {
     override fun getWorldManager(): WorldManager = this.worldManager
     override fun getDefaultResourcePack(): Optional<ResourcePack> = this.defaultResourcePack.optional()
     override fun getTeleportHelper(): TeleportHelper = LanternTeleportHelper
+    override fun getScheduler(): Scheduler = this.syncScheduler
 
     override fun getMaxPlayers(): Int = this.config.server.maxPlayers
     override fun getMotd(): Text = this.config.server.messageOfTheDay
@@ -335,14 +408,7 @@ class LanternServerNew : Server {
         TODO("Not yet implemented")
     }
 
-    override fun getServerScoreboard(): Optional<Scoreboard> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getScheduler(): Scheduler {
-        TODO("Not yet implemented")
-    }
-
+    override fun getServerScoreboard(): Optional<Scoreboard> = emptyOptional()
     override fun getCauseStackManager(): CauseStackManager = LanternCauseStackManager
 
     override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].optional()

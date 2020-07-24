@@ -15,7 +15,6 @@ import joptsimple.OptionSet
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.Game
-import org.lanternpowered.api.MinecraftVersion
 import org.lanternpowered.api.Platform
 import org.lanternpowered.api.PlatformComponent
 import org.lanternpowered.api.Sponge
@@ -51,7 +50,6 @@ import org.spongepowered.api.command.manager.CommandManager
 import org.spongepowered.api.config.ConfigManager
 import org.spongepowered.api.data.DataManager
 import org.spongepowered.api.network.channel.ChannelRegistry
-import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.service.economy.EconomyService
 import org.spongepowered.api.service.pagination.PaginationService
@@ -61,7 +59,6 @@ import org.spongepowered.api.sql.SqlManager
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Locale
-import java.util.concurrent.ScheduledExecutorService
 
 object LanternGame : Game {
 
@@ -86,11 +83,12 @@ object LanternGame : Game {
     private lateinit var metricsConfigManager: LanternMetricsConfigManager
     private lateinit var gameDirectory: Path
     private lateinit var console: LanternConsole
+    private lateinit var asyncScheduler: LanternScheduler
 
     /**
      * The current minecraft version.
      */
-    lateinit var minecraftVersion: MinecraftVersion
+    lateinit var minecraftVersion: LanternMinecraftVersion
         private set
 
     lateinit var minecraftVersionCache: MinecraftVersionCache
@@ -115,8 +113,6 @@ object LanternGame : Game {
         get() = this.pluginManager.spongePlugin
 
     val config: GlobalConfigObject = TODO()
-    val syncExecutor: ScheduledExecutorService = TODO()
-    val syncScheduler: LanternScheduler = TODO()
 
     override val paletteBasedArrayFactory: PaletteBasedArrayFactory
         get() = LanternPaletteBasedArrayFactory
@@ -124,9 +120,10 @@ object LanternGame : Game {
     override val injector: Injector
         get() = TODO("Not yet implemented")
 
-    fun init(options: OptionSet, console: LanternConsole) {
+    fun init(options: OptionSet, console: LanternConsole, asyncScheduler: LanternScheduler) {
         injectSpongeGame()
 
+        this.asyncScheduler = asyncScheduler
         this.console = console
 
         this.gameDirectory = Paths.get("")
@@ -222,14 +219,11 @@ object LanternGame : Game {
     override fun getServiceProvider(): LanternServiceProvider = this.serviceProvider
     override fun getGameDirectory(): Path = this.gameDirectory
     override fun getSystemSubject(): SystemSubject = this.console
+    override fun getAsyncScheduler(): LanternScheduler = this.asyncScheduler
 
     override fun getLocale(locale: String): Locale = LocaleCache[locale]
 
     override fun getCommandManager(): CommandManager {
-        TODO("Not yet implemented")
-    }
-
-    override fun getAsyncScheduler(): Scheduler {
         TODO("Not yet implemented")
     }
 

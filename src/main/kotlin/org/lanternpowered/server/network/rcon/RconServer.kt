@@ -40,12 +40,16 @@ import io.netty.channel.socket.SocketChannel
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.server.network.TransportType
 import org.lanternpowered.server.util.ThreadHelper
+import org.lanternpowered.server.util.executor.LanternExecutorService
 import org.spongepowered.api.service.rcon.RconService
 import java.io.Closeable
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 
-class RconServer(private val password: String) : RconService, Closeable {
+class RconServer(
+        private val password: String,
+        val syncExecutor: LanternExecutorService
+) : RconService, Closeable {
 
     private val connectionByHostname = concurrentHashMapOf<String, LanternRconConnection>()
 

@@ -65,7 +65,7 @@ internal class QueryHandler(
 ) : SimpleChannelInboundHandler<DatagramPacket>() {
 
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        this.queryServer.game.logger.error("Error in query handling", cause)
+        this.queryServer.server.logger.error("Error in query handling", cause)
     }
 
     override fun channelReadComplete(ctx: ChannelHandlerContext) {
@@ -111,7 +111,7 @@ internal class QueryHandler(
 
     private fun handleBasicStats(ctx: ChannelHandlerContext, packet: DatagramPacket, sessionId: Int) {
         val sender = packet.sender()
-        LanternGame.syncScheduler.submit {
+        this.queryServer.server.syncExecutor.submit {
             val event = createBasicEvent(ctx.channel())
             EventManager.post(event)
             event
@@ -148,7 +148,7 @@ internal class QueryHandler(
 
     private fun handleFullStats(ctx: ChannelHandlerContext, packet: DatagramPacket, sessionId: Int) {
         val sender = packet.sender()
-        LanternGame.syncScheduler.submit {
+        this.queryServer.server.syncExecutor.submit {
             val event = createFullEvent(ctx.channel())
             EventManager.post(event)
             event

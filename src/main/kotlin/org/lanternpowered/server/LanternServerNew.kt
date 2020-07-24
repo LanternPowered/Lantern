@@ -149,7 +149,7 @@ class LanternServerNew : Server {
     /**
      * Initializes the game and starts the server.
      */
-    fun launch(options: OptionSet) {
+    fun launch(options: OptionSet, mainExecutor: ScheduledExecutorService) {
         LanternCauseStackManager.setCurrentCauseStack(LanternCauseStack())
 
         this.console = LanternConsole(this)
@@ -172,7 +172,7 @@ class LanternServerNew : Server {
             this.game.lanternPlugin to DefaultWorldStorageService(worldsDirectory)
         }
 
-        this.syncExecutor = Executors.newSingleThreadScheduledExecutor { SyncLanternThread(it, "main") }.asLanternExecutorService()
+        this.syncExecutor = mainExecutor.asLanternExecutorService()
         this.syncExecutor.submit { LanternCauseStackManager.setCurrentCauseStack(LanternCauseStack()) }
 
         this.ioExecutor = Dispatchers.IO.asScheduledExecutorService()

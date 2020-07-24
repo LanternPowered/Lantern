@@ -14,7 +14,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay as delayCoroutine
 import kotlinx.coroutines.future.asCompletableFuture
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
@@ -28,6 +27,7 @@ import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlinx.coroutines.delay as delayCoroutine
 
 /**
  * Gets the [CoroutineDispatcher] as a [ScheduledExecutorService].
@@ -174,9 +174,10 @@ private class ScheduledDispatcherService(private val dispatcher: CoroutineDispat
 
     override fun scheduleWithFixedDelay(command: Runnable, initialDelay: Long, delay: Long, unit: TimeUnit): ScheduledFuture<Unit> {
         val initialDelayMillis = unit.toMillis(initialDelay)
+        val initialStart = System.currentTimeMillis()
         val delayMillis = unit.toMillis(delay)
         val deferred = GlobalScope.async(this.dispatcher) {
-            delayCoroutine(initialDelayMillis)
+            delayCoroutine(initialDelayMillis - (System.currentTimeMillis() - initialStart))
             while (true) {
                 command.run()
                 delayCoroutine(delayMillis)

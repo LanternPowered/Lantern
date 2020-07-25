@@ -12,26 +12,28 @@ package org.lanternpowered.server.network.vanilla.packet.handler.login
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.future.asCompletableFuture
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
-import org.lanternpowered.server.LanternGame
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
+import org.lanternpowered.server.network.WrappedServerSideConnection
 import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginEncryptionResponsePacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.profile.LanternGameProfile
 import org.lanternpowered.server.profile.LanternProfileProperty
-import org.lanternpowered.server.text.translation.TranslationHelper
 import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.InetAddressHelper
 import org.lanternpowered.server.util.UUIDHelper
 import org.lanternpowered.server.util.future.thenAsync
-import org.spongepowered.api.event.message.MessageEvent
-import org.spongepowered.api.event.network.ServerSideConnectionEvent
 import java.io.InputStreamReader
 import java.io.UnsupportedEncodingException
 import java.net.URL
@@ -39,8 +41,9 @@ import java.net.URLEncoder
 import java.util.concurrent.CompletableFuture
 import javax.crypto.spec.SecretKeySpec
 
-class LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
+object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
 
+    private const val authBaseUrl = "https://sessionserver.mojang.com/session/minecraft/hasJoined"
     private val gson = Gson()
 
     override fun handle(context: NetworkContext, packet: LoginEncryptionResponsePacket) {
@@ -58,17 +61,18 @@ class LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
         val preventProxiesIp = preventProxiesIp(context.session)
 
         val secretKey = SecretKeySpec(decryptedSharedSecret, "AES")
+        val connection = WrappedServerSideConnection(context.session)
 
-        requestAuth(authData.username, serverId, preventProxiesIp)
+        requestAuthAsync(authData.username, serverId, preventProxiesIp)
                 .thenAsync(session.server.syncExecutor) { profile ->
                     val cause = causeOf(session, profile)
-                    val messageFormatter = MessageEvent.MessageFormatter(TranslationHelper.t("multiplayer.disconnect.not_allowed_to_join"))
-                    val event: ServerSideConnectionEvent.Auth = LanternEventFactory.createClientConnectionEventAuth(
-                            cause, session, messageFormatter, false)
+                    val originalMessage = translatableTextOf("multiplayer.disconnect.not_allowed_to_join")
+                    val event = LanternEventFactory.createServerSideConnectionEventAuth(
+                            cause, originalMessage, originalMessage, connection, false)
                     EventManager.post(event)
                     if (event.isCancelled) {
                         val disconnectMessage = if (event.isMessageCancelled) {
-                            TranslationHelper.t("multiplayer.disconnect.generic")
+                            translatableTextOf("multiplayer.disconnect.generic")
                         } else event.message
                         session.close(disconnectMessage)
                         null
@@ -97,16 +101,16 @@ class LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
         }
     }
 
-    private fun requestAuth(username: String, serverId: String, preventProxiesIp: String?): CompletableFuture<LanternGameProfile> {
-        val postUrl = "$AUTH_BASE_URL?username=$username&serverId=$serverId" +
+    private fun requestAuthAsync(username: String, serverId: String, preventProxiesIp: String?): CompletableFuture<LanternGameProfile> {
+        val postUrl = "$authBaseUrl?username=$username&serverId=$serverId" +
                 if (preventProxiesIp == null) "" else "?ip=$preventProxiesIp"
-        return Lantern.getAsyncScheduler().submit {
+        return GlobalScope.async(Dispatchers.IO) {
             val connection = URL(postUrl).openConnection()
             val json = connection.getInputStream().use { input ->
                 if (input.available() == 0)
                     throw IllegalStateException("Invalid username or session id.")
                 try {
-                    this.gson.fromJson(InputStreamReader(input), JsonObject::class.java)
+                    gson.fromJson(InputStreamReader(input), JsonObject::class.java)
                 } catch (e: Exception) {
                     throw IllegalStateException("Username $username failed to authenticate.")
                 }
@@ -124,11 +128,6 @@ class LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
             val properties = LanternProfileProperty
                     .createPropertiesMapFromJson(json.getAsJsonArray("properties"))
             LanternGameProfile(uniqueId, name, properties)
-        }
-    }
-
-    companion object {
-
-        private const val AUTH_BASE_URL = "https://sessionserver.mojang.com/session/minecraft/hasJoined"
+        }.asCompletableFuture()
     }
 }

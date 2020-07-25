@@ -132,12 +132,13 @@ public class LanternEventFactory {
         return SpongeEventFactory.createClientPingServerEvent(cause, client, response);
     }
 
-    public static ServerSideConnectionEvent.@NonNull Auth createClientConnectionEventAuth(
+    public static ServerSideConnectionEvent.@NonNull Auth createServerSideConnectionEventAuth(
             @NonNull Cause cause,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
             @NonNull ServerSideConnection connection,
-            MessageEvent.@NonNull MessageFormatter formatter,
             boolean messageCancelled) {
-        return SpongeEventFactory.createServerSideConnectionEventAuth(cause, connection, formatter, messageCancelled);
+        return SpongeEventFactory.createServerSideConnectionEventAuth(cause, originalMessage, message, connection, messageCancelled);
     }
 
     public static @NonNull PlayerChangeClientSettingsEvent createPlayerChangeClientSettingsEvent(

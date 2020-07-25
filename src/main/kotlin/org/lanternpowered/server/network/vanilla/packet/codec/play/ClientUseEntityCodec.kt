@@ -26,7 +26,8 @@ object ClientUseEntityCodec : PacketDecoder<ClientUseEntityPacket> {
         val entityId = buf.readVarInt()
         val action = buf.readVarInt()
         return if (action == 1) {
-            Attack(entityId)
+            val isSneaking = buf.readBoolean()
+            Attack(entityId, isSneaking)
         } else if (action == 0 || action == 2) {
             val position = if (action == 2) {
                 val x = buf.readFloat().toDouble()
@@ -35,7 +36,8 @@ object ClientUseEntityCodec : PacketDecoder<ClientUseEntityPacket> {
                 Vector3d(x, y, z)
             } else null
             val hand = if (buf.readVarInt() == 0) HandTypes.MAIN_HAND.get() else HandTypes.OFF_HAND.get()
-            Interact(entityId, hand, position)
+            val isSneaking = buf.readBoolean()
+            Interact(entityId, hand, position, isSneaking)
         } else {
             throw DecoderException("Received a UseEntity message with a unknown action: $action")
         }

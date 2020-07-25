@@ -18,10 +18,11 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateLightPac
 
 class UpdateLightCodec : Codec<UpdateLightPacket> {
 
-    override fun encode(ctx: CodecContext, packet: UpdateLightPacket): ByteBuffer {
-        val buf = ctx.byteBufAlloc().buffer()
+    override fun encode(context: CodecContext, packet: UpdateLightPacket): ByteBuffer {
+        val buf = context.byteBufAlloc().buffer()
         buf.writeVarInt(packet.chunkX)
         buf.writeVarInt(packet.chunkZ)
+        buf.writeBoolean(packet.trustEdges)
         var mask = 0
         var emptyMask = 0
         var dataBlockCount = 0 // The amount of sky light blocks, each 2048 bytes

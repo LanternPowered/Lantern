@@ -14,12 +14,12 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.packet.codec.Codec;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLook;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookPacket;
 
-public final class CodecPlayOutEntityLook implements Codec<PacketPlayOutEntityLook> {
+public final class CodecPlayOutEntityLook implements Codec<EntityLookPacket> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutEntityLook packet) throws CodecException {
+    public ByteBuffer encode(CodecContext context, EntityLookPacket packet) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(packet.getEntityId());
         buf.writeByte(packet.getYaw());

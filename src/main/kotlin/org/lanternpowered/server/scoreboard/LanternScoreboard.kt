@@ -20,7 +20,7 @@ import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutScoreboardDisplayObjective
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetActiveScoreboardObjectivePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardObjectivePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardScorePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket
@@ -69,7 +69,7 @@ class LanternScoreboard : Scoreboard {
         for (objective in objectives.values)
             packets.addAll(createObjectiveInitMessages(objective))
         for ((key, value) in objectivesInSlot) {
-            packets.add(PacketPlayOutScoreboardDisplayObjective(value.name, key))
+            packets.add(SetActiveScoreboardObjectivePacket(value.name, key))
         }
         for (team in teams.values) {
             packets.add((team as LanternTeam).toCreateMessage())
@@ -118,13 +118,13 @@ class LanternScoreboard : Scoreboard {
             val oldObjective = this.objectivesInSlot.remove(displaySlot)
             if (oldObjective != null) {
                 // Clear the display slot on the client
-                sendToPlayers { listOf(PacketPlayOutScoreboardDisplayObjective(null, displaySlot)) }
+                sendToPlayers { listOf(SetActiveScoreboardObjectivePacket(null, displaySlot)) }
             }
         } else {
             check(this.objectives.containsValue(objective)) { "The specified objective does not exist in this scoreboard." }
             if (this.objectivesInSlot.put(displaySlot, objective) !== objective) {
                 // Update the displayed objective on the client
-                sendToPlayers { listOf(PacketPlayOutScoreboardDisplayObjective(objective.name, displaySlot)) }
+                sendToPlayers { listOf(SetActiveScoreboardObjectivePacket(objective.name, displaySlot)) }
             }
         }
     }

@@ -17,8 +17,8 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityHeadLook;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityHeadLookPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityVelocityPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnPlayerPacket;
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry;
 import org.spongepowered.api.data.Keys;
@@ -56,10 +56,10 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         context.sendToAllExceptSelf(() -> new SpawnPlayerPacket(entityId, this.entity.getUniqueId(),
                 pos, wrapAngle(yaw), wrapAngle(pitch)));
         if (headRot != null) {
-            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
+            context.sendToAllExceptSelf(() -> new EntityHeadLookPacket(entityId, wrapAngle(headRot.getY())));
         }
         if (!vel.equals(Vector3d.ZERO)) {
-            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
+            context.sendToAllExceptSelf(() -> new EntityVelocityPacket(entityId, vel.getX(), vel.getY(), vel.getZ()));
         }
         spawnWithMetadata(context);
         spawnWithEquipment(context);

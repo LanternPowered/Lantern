@@ -27,9 +27,9 @@ class SmeltingNetworkRecipe(
 
     override fun write(ctx: CodecContext, buf: ByteBuffer) {
         super.write(ctx, buf)
-        ingredient.write(ctx, buf)
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, result)
-        buf.writeFloat(experience.toFloat())
-        buf.writeVarInt(smeltingTime)
+        this.ingredient.write(ctx, buf)
+        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.result)
+        buf.writeFloat(this.experience.toFloat())
+        buf.writeVarInt(this.smeltingTime)
     }
 }

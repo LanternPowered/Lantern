@@ -17,6 +17,8 @@ object NetworkRecipeTypes {
     const val BLASTING = "minecraft:blasting"
     const val SMOKING = "minecraft:smoking"
     const val CAMPFIRE_COOKING = "minecraft:campfire_cooking"
+    const val STONECUTTING = "minecraft:stonecutting"
+    const val SMITHING = "minecraft:smithing"
 
     // Special cases
     const val ARMOR_DYE = "minecraft:crafting_special_armordye"

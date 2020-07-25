@@ -14,7 +14,7 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.packet.codec.Codec;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutMultiBlockChange;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -27,9 +27,9 @@ public final class CodecPlayOutMultiBlockChange implements Codec<PacketPlayOutMu
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeInteger(packet.getChunkX());
         buf.writeInteger(packet.getChunkZ());
-        Collection<PacketPlayOutBlockChange> changes = packet.getChanges();
+        Collection<BlockChangePacket> changes = packet.getChanges();
         buf.writeVarInt(changes.size());
-        for (PacketPlayOutBlockChange change : changes) {
+        for (BlockChangePacket change : changes) {
             Vector3i position = change.getPosition();
             buf.writeByte((byte) ((position.getX() & 0xf) << 4 | position.getZ() & 0xf));
             buf.writeByte((byte) position.getY());

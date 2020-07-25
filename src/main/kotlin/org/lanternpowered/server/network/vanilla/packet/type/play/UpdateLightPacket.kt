@@ -16,6 +16,7 @@ import org.lanternpowered.server.network.packet.Packet
 class UpdateLightPacket(
         val chunkX: Int,
         val chunkZ: Int,
+        val trustEdges: Boolean,
         val skyLight: Array<ByteArray?>,
         val blockLight: Array<ByteArray?>
 ) : Packet {

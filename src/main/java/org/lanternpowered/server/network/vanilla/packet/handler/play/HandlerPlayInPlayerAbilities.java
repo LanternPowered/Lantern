@@ -17,7 +17,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFlyingStatePacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityVelocityPacket;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -34,7 +34,7 @@ public class HandlerPlayInPlayerAbilities implements Handler<ClientFlyingStatePa
         } else {
             // TODO: Just set velocity once it's implemented
             if (player.get(LanternKeys.SUPER_STEVE).orElse(false)) {
-                context.getSession().send(new PacketPlayOutEntityVelocity(player.getNetworkId(), 0, 1.0, 0));
+                context.getSession().send(new EntityVelocityPacket(player.getNetworkId(), 0, 1.0, 0));
                 player.offer(Keys.IS_ELYTRA_FLYING, true);
             } else if (player.get(LanternKeys.CAN_WALL_JUMP).orElse(false)) {
                 final Location location = player.getLocation();
@@ -54,7 +54,7 @@ public class HandlerPlayInPlayerAbilities implements Handler<ClientFlyingStatePa
                     // against a wall
                     final Vector3d pushBack = direction.asBlockOffset().toDouble().mul(-0.1);
                     // Push the player up
-                    context.getSession().send(new PacketPlayOutEntityVelocity(player.getNetworkId(), pushBack.getX(), 0.8, pushBack.getZ()));
+                    context.getSession().send(new EntityVelocityPacket(player.getNetworkId(), pushBack.getX(), 0.8, pushBack.getZ()));
                 } else {
                     // Now we try if the player can jump away from the wall
 
@@ -71,7 +71,7 @@ public class HandlerPlayInPlayerAbilities implements Handler<ClientFlyingStatePa
                                 .mul(0.25).mul(1, 0, 1).add(0, 0.65, 0).add(player.getDirectionVector().mul(0.4, 0.25, 0.4));
 
                         // Push the player forward and up
-                        context.getSession().send(new PacketPlayOutEntityVelocity(
+                        context.getSession().send(new EntityVelocityPacket(
                                 player.getNetworkId(), vector.getX(), vector.getY(), vector.getZ()));
                     }
                 }

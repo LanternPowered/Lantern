@@ -19,9 +19,9 @@ public final class PacketPlayOutMultiBlockChange implements Packet {
     private final int chunkX;
     private final int chunkZ;
 
-    private final Collection<PacketPlayOutBlockChange> changes;
+    private final Collection<BlockChangePacket> changes;
 
-    public PacketPlayOutMultiBlockChange(int chunkX, int chunkZ, Collection<PacketPlayOutBlockChange> changes) {
+    public PacketPlayOutMultiBlockChange(int chunkX, int chunkZ, Collection<BlockChangePacket> changes) {
         this.changes = changes;
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -35,7 +35,7 @@ public final class PacketPlayOutMultiBlockChange implements Packet {
         return this.chunkZ;
     }
 
-    public Collection<PacketPlayOutBlockChange> getChanges() {
+    public Collection<BlockChangePacket> getChanges() {
         return this.changes;
     }
 }

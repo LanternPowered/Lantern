@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityTeleport;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityTeleportPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnPaintingPacket;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.Art;
@@ -74,7 +74,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
             this.lastArt = art;
         } else if (!blockPos.equals(this.lastBlockPos)) {
             update0(context);
-            context.sendToAll(() -> new PacketPlayOutEntityTeleport(getRootEntityId(), pos, (byte) 0, (byte) 0, true));
+            context.sendToAll(() -> new EntityTeleportPacket(getRootEntityId(), pos, (byte) 0, (byte) 0, true));
             this.lastBlockPos = blockPos;
         }
     }

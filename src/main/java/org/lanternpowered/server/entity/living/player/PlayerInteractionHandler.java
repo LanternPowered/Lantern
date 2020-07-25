@@ -36,10 +36,10 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientBlockPla
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDiggingPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerSwingArmPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerUseItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientUseItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockBreakAnimationPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityAnimation;
+import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityAnimationPacket;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -287,10 +287,10 @@ public final class PlayerInteractionHandler {
         // Send some updates to the client
         Vector3i position = message.getPosition();
         final World world = this.player.getWorld();
-        this.player.getConnection().send(new PacketPlayOutBlockChange(position,
+        this.player.getConnection().send(new BlockChangePacket(position,
                 BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
         position = position.add(message.getFace().asBlockOffset());
-        this.player.getConnection().send(new PacketPlayOutBlockChange(position,
+        this.player.getConnection().send(new BlockChangePacket(position,
                 BlockRegistryModule.get().getStateInternalId(world.getBlock(position))));
     }
 
@@ -465,7 +465,7 @@ public final class PlayerInteractionHandler {
         resetItemUseTime();
     }
 
-    public void handleItemInteraction(ClientPlayerUseItemPacket message) {
+    public void handleItemInteraction(ClientUseItemPacket message) {
         // Prevent duplicate messages
         final long time = System.currentTimeMillis();
         if (this.lastInteractionTime != -1L && time - this.lastInteractionTime < 40) {
@@ -501,7 +501,7 @@ public final class PlayerInteractionHandler {
                         return;
                     }
                     */
-                        this.player.getConnection().send(new PacketPlayOutEntityAnimation(this.player.getNetworkId(), 3));
+                        this.player.getConnection().send(new EntityAnimationPacket(this.player.getNetworkId(), 3));
                         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.OFF_HAND));
                     /*
                     final CooldownTracker cooldownTracker = this.player.getCooldownTracker();

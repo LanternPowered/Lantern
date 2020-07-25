@@ -17,14 +17,17 @@ import org.spongepowered.math.vector.Vector3d
 sealed class ClientUseEntityPacket : Packet {
 
     abstract val entityId: Int
+    abstract val isSneaking: Boolean
 
     data class Attack(
-            override val entityId: Int
+            override val entityId: Int,
+            override val isSneaking: Boolean
     ) : ClientUseEntityPacket()
 
     data class Interact(
             override val entityId: Int,
             val handType: HandType,
-            val position: Vector3d?
+            val position: Vector3d?,
+            override val isSneaking: Boolean
     ) : ClientUseEntityPacket()
 }

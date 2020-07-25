@@ -13,18 +13,18 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import io.netty.handler.codec.EncoderException
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEffect
+import org.lanternpowered.server.network.vanilla.packet.type.play.EffectPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket
 import org.lanternpowered.server.registry.type.data.MusicDiscRegistry
 
-class CodecPlayOutEffect : Codec<Packet> {
+object CodecPlayOutEffect : PacketEncoder<Packet> {
 
     override fun encode(context: CodecContext, packet: Packet): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {
             when (packet) {
-                is PacketPlayOutEffect -> {
+                is EffectPacket -> {
                     writeInt(packet.type)
                     writePosition(packet.position)
                     writeInt(packet.data)

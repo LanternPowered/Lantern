@@ -26,11 +26,11 @@ import org.lanternpowered.server.network.block.BlockEntityProtocolHelper;
 import org.lanternpowered.server.network.block.BlockEntityProtocolUpdateContext;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockActionPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutMultiBlockChange;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutUnloadChunk;
+import org.lanternpowered.server.network.vanilla.packet.type.play.UnloadChunkPacket;
 import org.lanternpowered.api.util.palette.Palette;
 import org.lanternpowered.api.util.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
@@ -284,11 +284,11 @@ public final class ObservedChunkManager implements WorldEventListener {
                                 this.coords.getX(), this.coords.getY(), changes.stream().map(coords -> {
                             final int x = coords.getX() & 0xf;
                             final int z = coords.getZ() & 0xf;
-                            return new PacketPlayOutBlockChange(new Vector3i(x, coords.getY(), z), getStateId(chunk, coords));
+                            return new BlockChangePacket(new Vector3i(x, coords.getY(), z), getStateId(chunk, coords));
                         }).collect(Collectors.toList())));
                     } else {
                         dirtyBlock = changes.iterator().next();
-                        packets.add(new PacketPlayOutBlockChange(dirtyBlock, getStateId(chunk, dirtyBlock)));
+                        packets.add(new BlockChangePacket(dirtyBlock, getStateId(chunk, dirtyBlock)));
                     }
                     final BlockEntityUpdateContext initContext = new BlockEntityUpdateContext(packets);
                     mappedTileEntities = getMappedTileEntities(chunk);
@@ -363,7 +363,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             for (LanternPlayer observer : this.observers) {
                 if (this.clientObservers.remove(observer)) {
                     if (packet == null) {
-                        packet = new PacketPlayOutUnloadChunk(this.coords.getX(), this.coords.getY());
+                        packet = new UnloadChunkPacket(this.coords.getX(), this.coords.getY());
                     }
                     observer.getConnection().send(packet);
                 }
@@ -440,7 +440,7 @@ public final class ObservedChunkManager implements WorldEventListener {
         public void removeObserver(LanternPlayer observer, boolean updateClient) {
             if (this.observers.remove(observer) &&
                     this.clientObservers.remove(observer) && updateClient) {
-                observer.getConnection().send(new PacketPlayOutUnloadChunk(this.coords.getX(), this.coords.getY()));
+                observer.getConnection().send(new UnloadChunkPacket(this.coords.getX(), this.coords.getY()));
             }
             // Clear the dirty states, since no one will still want to see them
             if (this.clientObservers.isEmpty()) {

@@ -31,14 +31,14 @@ import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityCollectItem;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityHeadLook;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLook;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityLookAndRelativeMove;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityMetadata;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityRelativeMove;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityTeleport;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityVelocity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityCollectItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityHeadLookPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookAndRelativeMovePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityRelativeMovePacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityTeleportPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityVelocityPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetEntityPassengersPacket;
 import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;
@@ -121,13 +121,13 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final ParameterList parameterList = new DefaultParameterList();
         spawn(parameterList);
         if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new PacketPlayOutEntityMetadata(getRootEntityId(), parameterList));
+            context.sendToAll(() -> new EntityMetadataPacket(getRootEntityId(), parameterList));
         }
     }
 
     protected void spawnWithEquipment(EntityProtocolUpdateContext context) {
         if (this.entity.isOnGround()) {
-            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityRelativeMove(getRootEntityId(), 0, 0, 0, true));
+            context.sendToAllExceptSelf(() -> new EntityRelativeMovePacket(getRootEntityId(), 0, 0, 0, true));
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
@@ -186,16 +186,16 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             if (!passenger) {
                 if (Math.abs(dxu) <= Short.MAX_VALUE && Math.abs(dyu) <= Short.MAX_VALUE && Math.abs(dzu) <= Short.MAX_VALUE) {
                     if (dirtyRot) {
-                        context.sendToAllExceptSelf(new PacketPlayOutEntityLookAndRelativeMove(entityId,
+                        context.sendToAllExceptSelf(new EntityLookAndRelativeMovePacket(entityId,
                                 (int) dxu, (int) dyu, (int) dzu, yaw, pitch, onGround));
                         // The rotation is already send
                         dirtyRot = false;
                     } else {
-                        context.sendToAllExceptSelf(new PacketPlayOutEntityRelativeMove(entityId,
+                        context.sendToAllExceptSelf(new EntityRelativeMovePacket(entityId,
                                 (int) dxu, (int) dyu, (int) dzu, onGround));
                     }
                 } else {
-                    context.sendToAllExceptSelf(new PacketPlayOutEntityTeleport(entityId,
+                    context.sendToAllExceptSelf(new EntityTeleportPacket(entityId,
                             pos, yaw, pitch, onGround));
                     // The rotation is already send
                     dirtyRot = false;
@@ -203,12 +203,12 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             }
         }
         if (dirtyRot) {
-            context.sendToAllExceptSelf(() -> new PacketPlayOutEntityLook(entityId, yaw, pitch, onGround));
+            context.sendToAllExceptSelf(() -> new EntityLookPacket(entityId, yaw, pitch, onGround));
         } else if (!passenger) {
             if (headRot != null) {
                 final byte headYaw = wrapAngle(headRot.getY());
                 if (headYaw != this.lastHeadYaw) {
-                    context.sendToAllExceptSelf(() -> new PacketPlayOutEntityHeadLook(entityId, headYaw));
+                    context.sendToAllExceptSelf(() -> new EntityHeadLookPacket(entityId, headYaw));
                     this.lastHeadYaw = headYaw;
                 }
             }
@@ -218,7 +218,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final double vy = velocity.getY();
         final double vz = velocity.getZ();
         if (vx != this.lastVelX || vy != this.lastVelY || vz != this.lastVelZ) {
-            context.sendToAll(() -> new PacketPlayOutEntityVelocity(entityId, vx, vy, vz));
+            context.sendToAll(() -> new EntityVelocityPacket(entityId, vx, vy, vz));
             this.lastVelX = vx;
             this.lastVelY = vy;
             this.lastVelZ = vz;
@@ -228,7 +228,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         update(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new PacketPlayOutEntityMetadata(entityId, parameterList));
+            context.sendToAll(() -> new EntityMetadataPacket(entityId, parameterList));
         }
         if (hasEquipment() && this.entity instanceof Carrier) {
             final IInventory inventory = (IInventory) ((Carrier) this.entity).getInventory();
@@ -254,7 +254,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         updateTranslations(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new PacketPlayOutEntityMetadata(getRootEntityId(), parameterList));
+            context.sendToAll(() -> new EntityMetadataPacket(getRootEntityId(), parameterList));
         }
     }
 
@@ -274,7 +274,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             final LanternLiving collector = (LanternLiving) ((CollectEntityEvent) event).getCollector();
             context.getId(collector).ifPresent(id -> {
                 final int count = ((CollectEntityEvent) event).getCollectedItemsCount();
-                context.sendToAll(() -> new PacketPlayOutEntityCollectItem(id, getRootEntityId(), count));
+                context.sendToAll(() -> new EntityCollectItemPacket(id, getRootEntityId(), count));
             });
         } else {
             super.handleEvent(context, event);

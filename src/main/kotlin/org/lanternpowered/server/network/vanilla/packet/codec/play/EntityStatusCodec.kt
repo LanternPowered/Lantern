@@ -16,8 +16,8 @@ import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityStatus
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetOpLevel
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityStatusPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetOpLevelPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket
 
 object EntityStatusCodec : PacketEncoder<Packet> {
@@ -32,11 +32,11 @@ object EntityStatusCodec : PacketEncoder<Packet> {
                 entityId = context.channel.attr(PlayerJoinCodec.PLAYER_ENTITY_ID).get()
                 action = if (packet.isReduced) 22 else 23
             }
-            is PacketPlayOutSetOpLevel -> {
+            is SetOpLevelPacket -> {
                 entityId = context.channel.attr(PlayerJoinCodec.PLAYER_ENTITY_ID).get()
                 action = 24 + packet.opLevel.coerceIn(0..4)
             }
-            is PacketPlayOutEntityStatus -> {
+            is EntityStatusPacket -> {
                 entityId = packet.entityId
                 action = packet.status
             }

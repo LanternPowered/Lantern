@@ -26,10 +26,10 @@ import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.packet.processor.Processor;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEffect;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityMetadata;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutEntityStatus;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EffectPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.EntityStatusPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ParticleEffectPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnObjectPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnParticlePacket;
 import org.lanternpowered.server.registry.type.data.NotePitchRegistryKt;
@@ -62,7 +62,7 @@ import java.util.concurrent.TimeUnit;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
-public final class ProcessorPlayOutParticleEffect implements Processor<PacketPlayOutParticleEffect> {
+public final class ProcessorPlayOutParticleEffect implements Processor<ParticleEffectPacket> {
 
     /**
      * Using a cache to bring the amount of operations down for spawning particles.
@@ -161,7 +161,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<PacketPla
                 final DefaultParameterList parameterList = new DefaultParameterList();
                 parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
 
-                return new CachedFireworksMessage(new PacketPlayOutEntityMetadata(CachedFireworksMessage.ENTITY_ID, parameterList));
+                return new CachedFireworksMessage(new EntityMetadataPacket(CachedFireworksMessage.ENTITY_ID, parameterList));
             } else if (type == ParticleTypes.FERTILIZER.get()) {
                 final int quantity = effect.getOptionOrDefault(ParticleOptions.QUANTITY).get();
                 return new CachedEffectMessage(2005, quantity, false);
@@ -330,7 +330,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<PacketPla
     }
 
     @Override
-    public void process(CodecContext context, PacketPlayOutParticleEffect message, List<Packet> output) throws CodecException {
+    public void process(CodecContext context, ParticleEffectPacket message, List<Packet> output) throws CodecException {
         final ICachedMessage cached = this.cache.get(message.getParticleEffect());
         cached.process(message.getPosition(), output);
     }
@@ -351,7 +351,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<PacketPla
         private static final UUID UNIQUE_ID;
 
         private static final PacketPlayOutDestroyEntities DESTROY_ENTITY;
-        private static final PacketPlayOutEntityStatus TRIGGER_EFFECT;
+        private static final EntityStatusPacket TRIGGER_EFFECT;
 
         static {
             ENTITY_ID = EntityProtocolManager.acquireEntityId();
@@ -359,12 +359,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<PacketPla
 
             DESTROY_ENTITY = new PacketPlayOutDestroyEntities(ENTITY_ID);
             // The status index that is used to trigger the fireworks effect
-            TRIGGER_EFFECT = new PacketPlayOutEntityStatus(ENTITY_ID, 17);
+            TRIGGER_EFFECT = new EntityStatusPacket(ENTITY_ID, 17);
         }
 
-        private final PacketPlayOutEntityMetadata entityMetadataMessage;
+        private final EntityMetadataPacket entityMetadataMessage;
 
-        private CachedFireworksMessage(PacketPlayOutEntityMetadata entityMetadataMessage) {
+        private CachedFireworksMessage(EntityMetadataPacket entityMetadataMessage) {
             this.entityMetadataMessage = entityMetadataMessage;
         }
 
@@ -462,7 +462,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<PacketPla
 
         @Override
         public void process(Vector3d position, List<Packet> output) {
-            output.add(new PacketPlayOutEffect(position.round().toInt(), this.type, this.data, this.broadcast));
+            output.add(new EffectPacket(position.round().toInt(), this.type, this.data, this.broadcast));
         }
     }
 

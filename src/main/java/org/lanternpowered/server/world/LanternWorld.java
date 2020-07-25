@@ -45,7 +45,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.packet.Packet;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ParticleEffectPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
 import org.lanternpowered.server.text.chat.LanternChatType;
@@ -1063,7 +1063,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
         if (!players.hasNext()) {
             return;
         }
-        final PacketPlayOutParticleEffect message = new PacketPlayOutParticleEffect(position, particleEffect);
+        final ParticleEffectPacket message = new ParticleEffectPacket(position, particleEffect);
         while (players.hasNext()) {
             players.next().getConnection().send(message);
         }

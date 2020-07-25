@@ -84,43 +84,17 @@ private class ScheduledDispatcherService(private val dispatcher: CoroutineDispat
         return ScheduledDeferredFuture(deferred, millis)
     }
 
-    override fun <T> submit(task: Callable<T>): CompletableFuture<T> {
-        val future = CompletableFuture<T>()
-        execute {
-            try {
-                future.complete(task.call())
-            } catch (ex: Throwable) {
-                future.completeExceptionally(ex)
-            }
-        }
-        return future
-    }
+    override fun <T> submit(task: Callable<T>): CompletableFuture<T> =
+            GlobalScope.async(this.dispatcher) { task.call() }.asCompletableFuture()
 
-    override fun <T> submit(task: Runnable, result: T): CompletableFuture<T> {
-        val future = CompletableFuture<T>()
-        execute {
-            try {
+    override fun <T> submit(task: Runnable, result: T): CompletableFuture<T> =
+            GlobalScope.async(this.dispatcher) {
                 task.run()
-                future.complete(result)
-            } catch (ex: Throwable) {
-                future.completeExceptionally(ex)
-            }
-        }
-        return future
-    }
+                result
+            }.asCompletableFuture()
 
-    override fun submit(task: Runnable): CompletableFuture<Unit> {
-        val future = CompletableFuture<Unit>()
-        execute {
-            try {
-                task.run()
-                future.complete(Unit)
-            } catch (ex: Throwable) {
-                future.completeExceptionally(ex)
-            }
-        }
-        return future
-    }
+    override fun submit(task: Runnable): CompletableFuture<Unit> =
+            GlobalScope.async(this.dispatcher) { task.run() }.asCompletableFuture()
 
     override fun <T> invokeAny(tasks: Collection<Callable<T>>): T =
             runBlocking(this.dispatcher) {
@@ -154,21 +128,17 @@ private class ScheduledDispatcherService(private val dispatcher: CoroutineDispat
         val initialStart = System.currentTimeMillis()
         val periodMillis = unit.toMillis(period)
         val deferred = GlobalScope.async(this.dispatcher) {
-            try {
-                delayCoroutine(initialDelayMillis - (System.currentTimeMillis() - initialStart))
-                var start = System.currentTimeMillis()
-                while (true) {
-                    command.run()
-                    val end = System.currentTimeMillis()
-                    // Reduce the delay by the millis it took to execute the command
-                    val delayMillis = periodMillis - (end - start)
-                    delayCoroutine(delayMillis)
-                    start = end
-                }
-            } catch (ex: Throwable) {
-
+            delayCoroutine(initialDelayMillis - (System.currentTimeMillis() - initialStart))
+            var start = System.currentTimeMillis()
+            while (true) {
+                command.run()
+                val end = System.currentTimeMillis()
+                // Reduce the delay by the millis it took to execute the command
+                val delayMillis = periodMillis - (end - start)
+                delayCoroutine(delayMillis)
+                start = end
             }
-        }
+    }
         return ScheduledDeferredFuture(deferred, initialDelayMillis)
     }
 

@@ -13,6 +13,7 @@ package org.lanternpowered.server.util.executor
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Future
 import java.util.concurrent.ScheduledExecutorService
 
 interface LanternExecutorService : ExecutorService {
@@ -43,29 +44,40 @@ fun ExecutorService.asLanternExecutorService(): LanternExecutorService =
 fun ScheduledExecutorService.asLanternExecutorService(): LanternScheduledExecutorService =
         if (this is LanternScheduledExecutorService) this else LanternScheduledExecutorServiceImpl(this)
 
+private class LanternCompletableFuture<T> : CompletableFuture<T>() {
+
+    lateinit var future: Future<*>
+
+    override fun cancel(mayInterruptIfRunning: Boolean): Boolean {
+        if (this.future.cancel(mayInterruptIfRunning))
+            return super.cancel(mayInterruptIfRunning)
+        return false
+    }
+}
+
 private fun <T> ExecutorService.submitCompletable(task: Callable<T>): CompletableFuture<T> {
-    val future = CompletableFuture<T>()
-    execute {
+    val completableFuture = LanternCompletableFuture<T>()
+    completableFuture.future = this.submit {
         try {
-            future.complete(task.call())
+            completableFuture.complete(task.call())
         } catch (ex: Throwable) {
-            future.completeExceptionally(ex)
+            completableFuture.completeExceptionally(ex)
         }
     }
-    return future
+    return completableFuture
 }
 
 private fun <T> ExecutorService.submitCompletable(task: Runnable, result: T): CompletableFuture<T> {
-    val future = CompletableFuture<T>()
-    execute {
+    val completableFuture = LanternCompletableFuture<T>()
+    completableFuture.future = this.submit {
         try {
             task.run()
-            future.complete(result)
+            completableFuture.complete(result)
         } catch (ex: Throwable) {
-            future.completeExceptionally(ex)
+            completableFuture.completeExceptionally(ex)
         }
     }
-    return future
+    return completableFuture
 }
 
 private class LanternExecutorServiceImpl(private val service: ExecutorService) :

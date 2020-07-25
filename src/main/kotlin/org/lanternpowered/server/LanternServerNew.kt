@@ -73,7 +73,6 @@ import java.time.Instant
 import java.util.Optional
 import java.util.UUID
 import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
@@ -174,10 +173,9 @@ class LanternServerNew : Server {
 
         this.syncExecutor = mainExecutor.asLanternExecutorService()
         this.syncExecutor.submit { LanternCauseStackManager.setCurrentCauseStack(LanternCauseStack()) }
+        this.syncScheduler = LanternScheduler(mainExecutor)
 
         this.ioExecutor = Dispatchers.IO.asScheduledExecutorService()
-
-        this.syncScheduler = LanternScheduler(this.syncExecutor)
 
         this.worldManager = LanternWorldManager(this, this.ioExecutor, worldStorageService)
         this.worldManager.init()

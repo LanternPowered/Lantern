@@ -19,7 +19,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.EffectPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPacket
 import org.lanternpowered.server.registry.type.data.MusicDiscRegistry
 
-object CodecPlayOutEffect : PacketEncoder<Packet> {
+object EffectCodec : PacketEncoder<Packet> {
 
     override fun encode(context: CodecContext, packet: Packet): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {

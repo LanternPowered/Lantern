@@ -11,7 +11,6 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
@@ -20,7 +19,6 @@ import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
-import org.lanternpowered.server.text.translation.TranslationContext
 
 object TeamCodec : PacketEncoder<TeamPacket> {
 
@@ -55,14 +53,8 @@ object TeamCodec : PacketEncoder<TeamPacket> {
         }
         if (packet is TeamPacket.Members) {
             buf.writeVarInt(packet.members.size)
-            // TODO: Use translation context properly
-            TranslationContext.enter()
-                    .locale(context.session.locale)
-                    .enableForcedTranslations()
-                    .use {
-                        for (member in packet.members)
-                            buf.writeString(LegacyComponentSerializer.legacy().serialize(member))
-                    }
+            for (member in packet.members)
+                context.write(buf, ContextualValueTypes.LEGACY_TEXT, member)
         }
         return buf
     }

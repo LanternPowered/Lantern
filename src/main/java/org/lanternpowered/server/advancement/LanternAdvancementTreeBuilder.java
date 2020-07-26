@@ -16,7 +16,6 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.api.registry.MutableCatalogTypeRegistry;
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder;
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementTree;

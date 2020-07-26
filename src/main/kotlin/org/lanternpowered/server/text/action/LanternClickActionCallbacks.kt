@@ -13,7 +13,6 @@ package org.lanternpowered.server.text.action
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.spongepowered.api.command.CommandCause
-import org.spongepowered.api.text.action.TextActions
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer

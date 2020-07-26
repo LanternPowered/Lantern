@@ -14,7 +14,6 @@ import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionB
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
 

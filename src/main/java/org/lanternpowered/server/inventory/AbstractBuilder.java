@@ -19,7 +19,6 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;

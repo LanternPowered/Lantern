@@ -84,7 +84,6 @@ import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;

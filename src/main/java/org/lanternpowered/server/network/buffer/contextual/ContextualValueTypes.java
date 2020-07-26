@@ -33,6 +33,14 @@ public final class ContextualValueTypes {
     public static final ContextualValueType<Component> TEXT = new TextContextualValueType();
 
     /**
+     * A serializer for legacy text objects,
+     * NULL {@code null} values are NOT SUPPORTED.
+     * <p>
+     * Text -> Legacy -> UTF-8 encoded string prefixed by the length as a var-int.
+     */
+    public static final ContextualValueType<Component> LEGACY_TEXT = new TextContextualValueType(); // TODO
+
+    /**
      * A serializer for {@link ItemStack} objects,
      * NULL {@code null} values are SUPPORTED.
      */

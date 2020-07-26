@@ -61,7 +61,7 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientConfirm
 import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateJigsawBlockMessageCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientUseEntityCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.AddPotionEffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutAdvancements;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.AdvancementsCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockActionCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockBreakAnimationCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockChangeCodec;
@@ -74,7 +74,7 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCommandsCo
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetRecipesCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutDisplayRecipe;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutEffect;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EffectCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityAnimationCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityCollectItemCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityEquipmentCodec;
@@ -513,7 +513,7 @@ final class ProtocolPlay extends ProtocolBase {
         final CodecRegistration<ChunkPacket, ChunkCodec> codecPlayOutChunkData = outbound.bind(ChunkCodec.class);
         codecPlayOutChunkData.bind(ChunkPacket.Init.class);
         codecPlayOutChunkData.bind(ChunkPacket.Update.class);
-        final CodecRegistration<Packet, CodecPlayOutEffect> codecPlayOutEntityEffect = outbound.bind(CodecPlayOutEffect.class);
+        final CodecRegistration<Packet, EffectCodec> codecPlayOutEntityEffect = outbound.bind(EffectCodec.class);
         codecPlayOutEntityEffect.bind(EffectPacket.class);
         codecPlayOutEntityEffect.bind(SetMusicDiscPacket.class);
         outbound.bind(SpawnParticleCodec.class, SpawnParticlePacket.class);
@@ -600,7 +600,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutDataResponse.class, PacketPlayOutDataResponse.class);
         outbound.bind(EntityCollectItemCodec.class, EntityCollectItemPacket.class);
         outbound.bind(EntityTeleportCodec.class, EntityTeleportPacket.class);
-        outbound.bind(CodecPlayOutAdvancements.class, AdvancementsPacket.class);
+        outbound.bind(AdvancementsCodec.class, AdvancementsPacket.class);
         outbound.bind(); // TODO: Entity Properties
         outbound.bind(AddPotionEffectCodec.class, AddPotionEffectPacket.class);
         outbound.bind(SetRecipesCodec.class, SetRecipesPacket.class);

@@ -28,7 +28,7 @@ import java.net.InetAddress
  * save you a few seconds of precious time.
  */
 @Plugin("lan-broadcast")
-class LANBroadcastPlugin {
+object LANBroadcastPlugin {
 
     private val logger: Logger = inject()
     private val server: Server = inject()

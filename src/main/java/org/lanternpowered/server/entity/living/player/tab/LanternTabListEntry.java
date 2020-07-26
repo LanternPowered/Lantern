@@ -13,7 +13,6 @@ package org.lanternpowered.server.entity.living.player.tab;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
-import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.profile.GameProfile;

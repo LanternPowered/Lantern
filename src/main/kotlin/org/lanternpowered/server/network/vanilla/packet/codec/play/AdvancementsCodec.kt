@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.AdvancementsPacket
 
-object CodecPlayOutAdvancements : PacketEncoder<AdvancementsPacket> {
+object AdvancementsCodec : PacketEncoder<AdvancementsPacket> {
 
     override fun encode(context: CodecContext, packet: AdvancementsPacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()
@@ -27,7 +27,8 @@ object CodecPlayOutAdvancements : PacketEncoder<AdvancementsPacket> {
             context.write(buf, ContextualValueTypes.ADVANCEMENT, advancement)
         val removed = packet.removed
         buf.writeVarInt(removed.size)
-        removed.forEach { data: String? -> buf.writeString(data) }
+        for (data in removed)
+            buf.writeString(data)
         val progress = packet.progress
         buf.writeVarInt(progress.size)
         for ((key, value) in progress) {

@@ -16,7 +16,6 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleShiftClickBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.EmptyInventory;

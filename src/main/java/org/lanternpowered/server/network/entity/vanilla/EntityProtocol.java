@@ -40,7 +40,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.EntityRelative
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityTeleportPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityVelocityPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetEntityPassengersPacket;
-import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.item.inventory.Carrier;

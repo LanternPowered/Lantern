@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.server
 
-import com.google.common.collect.Iterables
 import joptsimple.OptionSet
 import kotlinx.coroutines.Dispatchers
 import org.apache.logging.log4j.Logger
@@ -154,7 +153,7 @@ class LanternServerNew : Server {
         this.console = LanternConsole(this)
         this.console.init()
 
-        this.audiences = Iterables.concat(this.unsafePlayers, listOf(this.console))
+        this.audiences = (this.unsafePlayers.asSequence() + sequenceOf<Audience>(this.console)).asIterable()
 
         this.asyncExecutor = Dispatchers.Default.asScheduledExecutorService()
         this.asyncScheduler = LanternScheduler(this.asyncExecutor)
@@ -202,7 +201,7 @@ class LanternServerNew : Server {
 
         this.syncExecutor.scheduleAtFixedRate({
             try {
-                update();
+                update()
             } catch (e: Exception) {
                 this.logger.error("Error while updating main loop", e)
             }

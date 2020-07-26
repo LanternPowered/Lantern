@@ -208,7 +208,6 @@ import org.lanternpowered.server.text.action.ShowTextHoverActionBuilder;
 import org.lanternpowered.server.text.action.SuggestCommandClickActionBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
-import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.LocaleCache;
 import org.lanternpowered.server.util.graph.CyclicGraphException;
 import org.lanternpowered.server.util.graph.DirectedGraph;

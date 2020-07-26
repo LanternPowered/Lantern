@@ -10,13 +10,9 @@
  */
 package org.lanternpowered.server.game.registry.type.text
 
-import org.lanternpowered.api.ext.*
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.registry.EarlyRegistration
 import org.lanternpowered.server.game.registry.RegistryModule
-import org.lanternpowered.server.text.translation.CombinedTranslationManager
-import org.lanternpowered.server.text.translation.LanternTranslationManager
-import org.lanternpowered.server.text.translation.MinecraftTranslationManager
 import org.spongepowered.api.registry.RegistryModule
 import org.spongepowered.api.text.translation.locale.Locales
 

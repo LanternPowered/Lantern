@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListHeaderAndFooter;
-import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.text.Text;

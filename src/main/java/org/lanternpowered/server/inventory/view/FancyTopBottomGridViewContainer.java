@@ -22,7 +22,6 @@ import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.TopContainerPart;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryConstants;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;

@@ -24,7 +24,6 @@ import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.query.LanternQueryOperation;
 import org.lanternpowered.server.item.predicate.ItemPredicate;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.data.property.provider.PropertyProvider;
 import org.spongepowered.api.entity.living.player.Player;

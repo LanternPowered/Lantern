@@ -11,13 +11,13 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.vanilla.packet.codec.handshake.HandshakeCodec;
-import org.lanternpowered.server.network.vanilla.packet.handler.handshake.HandlerHandshakeIn;
+import org.lanternpowered.server.network.vanilla.packet.handler.handshake.HandshakeHandler;
 import org.lanternpowered.server.network.vanilla.packet.type.handshake.HandshakePacket;
 
 final class ProtocolHandshake extends ProtocolBase {
 
     ProtocolHandshake() {
         inbound().bind(HandshakeCodec.class, HandshakePacket.class)
-                .bindHandler(new HandlerHandshakeIn());
+                .bindHandler(new HandshakeHandler());
     }
 }

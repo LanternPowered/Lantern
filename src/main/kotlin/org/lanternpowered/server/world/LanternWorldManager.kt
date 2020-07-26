@@ -351,7 +351,7 @@ class LanternWorldManager(
             // Start collecting tasks
             val tasks = mutableListOf<() -> Unit>()
             for (entry in locked) {
-                val world = entry.world as LanternWorldNew
+                val world = entry.world!!
                 val regionManager = world.regionManager
                 regionManager.update { tasks.add(it) }
             }

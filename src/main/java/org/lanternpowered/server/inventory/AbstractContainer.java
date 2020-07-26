@@ -18,7 +18,6 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
-import org.lanternpowered.server.text.translation.TextTranslation;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.EmptyInventory;

@@ -21,7 +21,6 @@ import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueType;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.text.translation.TranslationContext;
-import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;

@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.inventory
 
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalDataHolderHelper
@@ -27,14 +29,13 @@ import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
-import org.spongepowered.api.text.translation.Translation
 import java.util.function.Consumer
 
 class LanternItemStack private constructor(
         private val itemType: ItemType,
         private var quantity: Int,
         override val keyRegistry: LocalKeyRegistry<LanternItemStack>
-) : ItemStack, SerializableLocalMutableDataHolder {
+) : ItemStack, SerializableLocalMutableDataHolder, TextRepresentable {
 
     /**
      * Gets whether this item stack is filled. (non empty)
@@ -80,9 +81,7 @@ class LanternItemStack private constructor(
             .set(DataQueries.ITEM_TYPE, this.type)
             .set(DataQueries.QUANTITY, this.quantity)
 
-    override fun getTranslation(): Translation {
-        return (this.type as LanternItemType).nameFunction(this)
-    }
+    override fun asComponent(): Text = (this.type as LanternItemType).nameFunction(this)
 
     override fun getType(): ItemType = if (this.quantity == 0) ItemTypes.AIR.get() else this.itemType
 

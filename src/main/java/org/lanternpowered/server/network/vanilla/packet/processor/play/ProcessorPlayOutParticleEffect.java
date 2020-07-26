@@ -330,9 +330,9 @@ public final class ProcessorPlayOutParticleEffect implements Processor<ParticleE
     }
 
     @Override
-    public void process(CodecContext context, ParticleEffectPacket message, List<Packet> output) throws CodecException {
-        final ICachedMessage cached = this.cache.get(message.getParticleEffect());
-        cached.process(message.getPosition(), output);
+    public void process(CodecContext context, ParticleEffectPacket packet, List<Packet> output) throws CodecException {
+        final ICachedMessage cached = this.cache.get(packet.getParticleEffect());
+        cached.process(packet.getPosition(), output);
     }
 
     private static final class EmptyCachedMessage implements ICachedMessage {

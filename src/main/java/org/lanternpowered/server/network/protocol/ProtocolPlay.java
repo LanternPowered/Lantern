@@ -123,8 +123,8 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnThunderb
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutStatistics;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.StopSoundsCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTabComplete;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTabListEntries;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTabListHeaderAndFooter;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TabListCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TabListHeaderAndFooterCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutTags;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.TitleCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowTradeOffersCodec;
@@ -174,7 +174,7 @@ import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientUseEn
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientUseEntityInteractHandler;
 import org.lanternpowered.server.network.vanilla.packet.processor.play.ProcessorPlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.packet.processor.play.SetGameModeProcessor;
-import org.lanternpowered.server.network.vanilla.packet.processor.play.ProcessorPlayOutTabListEntries;
+import org.lanternpowered.server.network.vanilla.packet.processor.play.TabListProcessor;
 import org.lanternpowered.server.network.vanilla.packet.processor.play.TheEndMessageProcessor;
 import org.lanternpowered.server.network.vanilla.packet.processor.play.UpdateWorldSkyProcessor;
 import org.lanternpowered.server.network.vanilla.packet.type.KeepAlivePacket;
@@ -301,8 +301,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnThunderbo
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutStatistics;
 import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabComplete;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListHeaderAndFooter;
+import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.TabListHeaderAndFooterPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTags;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TheEndPacket;
@@ -332,7 +332,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bindProcessor(ParticleEffectPacket.class, new ProcessorPlayOutParticleEffect());
         outbound.bindProcessor(SetGameModePacket.class, new SetGameModeProcessor());
         outbound.bindProcessor(UpdateWorldSkyPacket.class, new UpdateWorldSkyProcessor());
-        outbound.bindProcessor(PacketPlayOutTabListEntries.class, new ProcessorPlayOutTabListEntries());
+        outbound.bindProcessor(TabListPacket.class, new TabListProcessor());
 
         // Register the codecs and handlers of the default messages
         inbound.bind(ClientConfirmTeleportCodec.class, ClientConfirmTeleportPacket.class); // TODO: Handler
@@ -532,7 +532,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CodecPlayOutDisplayRecipe.class, PacketPlayOutDisplayRecipe.class);
         outbound.bind(PlayerAbilitiesCodec.class, PlayerAbilitiesPacket.class);
         outbound.bind(); // TODO: Combat Event
-        outbound.bind(CodecPlayOutTabListEntries.class, PacketPlayOutTabListEntries.class);
+        outbound.bind(TabListCodec.class, TabListPacket.class);
         final CodecRegistration<PacketPlayOutFaceAt, CodecPlayOutFaceAt> codecPlayOutFaceAt =
                 outbound.bind(CodecPlayOutFaceAt.class);
         codecPlayOutFaceAt.bind(PacketPlayOutFaceAt.Entity.class);
@@ -596,7 +596,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(EntitySoundEffectCodec.class, EntitySoundEffectPacket.class);
         outbound.bind(SoundEffectCodec.class, SoundEffectPacket.class);
         outbound.bind(StopSoundsCodec.class, StopSoundsPacket.class);
-        outbound.bind(CodecPlayOutTabListHeaderAndFooter.class, PacketPlayOutTabListHeaderAndFooter.class);
+        outbound.bind(TabListHeaderAndFooterCodec.class, TabListHeaderAndFooterPacket.class);
         outbound.bind(CodecPlayOutDataResponse.class, PacketPlayOutDataResponse.class);
         outbound.bind(EntityCollectItemCodec.class, EntityCollectItemPacket.class);
         outbound.bind(EntityTeleportCodec.class, EntityTeleportPacket.class);

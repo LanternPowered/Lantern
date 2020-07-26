@@ -11,6 +11,7 @@
 package org.lanternpowered.server.plugin
 
 import com.google.inject.Guice
+import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withCause
@@ -93,7 +94,7 @@ class LanternPluginManager(
     }
 
     private fun findCandidates(languageServices: List<PluginLanguageService<out PluginContainer>>) {
-        this.pluginEnvironment = PluginEnvironment()
+        this.pluginEnvironment = PluginEnvironment(LogManager.getLogger("plugin-manager"))
         this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.BASE_DIRECTORY) { this.baseDirectory }
         this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.PLUGIN_DIRECTORIES) { listOf(this.pluginsDirectory) }
 

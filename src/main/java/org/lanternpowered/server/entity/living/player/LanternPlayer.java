@@ -101,6 +101,7 @@ import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
@@ -156,7 +157,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternPlayer extends AbstractUser implements ServerPlayer, AbstractViewer, NetworkIdHolder {
+public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer, NetworkIdHolder {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = LanternLiving.DEFAULT_EFFECT_COLLECTION.toBuilder()
             // Override the fall sound
@@ -567,7 +568,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Abstrac
             this.tabList.clear();
             this.inventoryContainer.release();
             // Remove this player from the global tab list
-            GlobalTabList.getInstance().get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
+            GlobalTabList.instance.get(getProfile()).ifPresent(GlobalTabListEntry::removeEntry);
         }
     }
 

@@ -124,16 +124,16 @@ public class LanternLiving extends LanternEntity implements Living, AbstractProj
     public void registerKeys() {
         super.registerKeys();
         final LocalKeyRegistry<LanternLiving> c = getKeyRegistry().forHolder(LanternLiving.class);
-        c.register(Keys.MAX_AIR, 300).minimum(0).maximum(Integer.MAX_VALUE);
-        c.register(Keys.REMAINING_AIR, 300).minimum(0).maximum(Keys.MAX_AIR);
-        c.register(Keys.MAX_HEALTH, 20.0).minimum(0.0).maximum(1024.0);
-        c.register(Keys.HEALTH, 20.0).minimum(0.0).maximum(Keys.MAX_HEALTH)
+        c.registerBounded(Keys.MAX_AIR, 300).minimum(0).maximum(Integer.MAX_VALUE);
+        c.registerBounded(Keys.REMAINING_AIR, 300).minimum(0).maximum(Keys.MAX_AIR);
+        c.registerBounded(Keys.MAX_HEALTH, 20.0).minimum(0.0).maximum(1024.0);
+        c.registerBounded(Keys.HEALTH, 20.0).minimum(0.0).maximum(Keys.MAX_HEALTH)
                 .addChangeListener((living, oldElement, newElement) -> {
                     if (newElement <= 0) {
                         living.handleDeath();
                     }
                 });
-        c.register(Keys.ABSORPTION, 0.0).minimum(0.0).maximum(1024.0);
+        c.registerBounded(Keys.ABSORPTION, 0.0).minimum(0.0).maximum(1024.0);
         c.register(Keys.POTION_EFFECTS, new ArrayList<>());
         c.register(Keys.LAST_ATTACKER);
         c.registerProvider(Keys.IS_SNEAKING, builder -> {

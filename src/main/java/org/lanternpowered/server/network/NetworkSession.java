@@ -240,7 +240,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
             if (this.gameProfile != null) {
                 // Update the global tab list
                 messageReceived(new HandlerPacket<UnknownPacket>(UnknownPacket.INSTANCE, (context, initMessage) ->
-                        GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(this.latency))));
+                        GlobalTabList.instance.get(this.gameProfile).ifPresent(entry -> entry.setLatency(this.latency))));
             }
         }
     }

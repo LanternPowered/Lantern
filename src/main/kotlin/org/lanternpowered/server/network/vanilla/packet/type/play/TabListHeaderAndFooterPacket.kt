@@ -8,5 +8,9 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.entity.living.player.tab;
+package org.lanternpowered.server.network.vanilla.packet.type.play
+
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.server.network.packet.Packet
+
+data class TabListHeaderAndFooterPacket(val header: Text?, val footer: Text?) : Packet

@@ -19,7 +19,7 @@ import org.lanternpowered.launch.dependencies.Dependency;
 import org.lanternpowered.launch.dependencies.Repository;
 import org.lanternpowered.launch.transformer.ClassTransformer;
 import org.lanternpowered.launch.transformer.Exclusion;
-import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.LanternServerNew;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -67,7 +67,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * A {@link ClassLoader} that gives complete control over all the libraries used by
- * {@link LanternServer}. Mainly designed for Java 9+, the System ClassLoader no longer
+ * {@link LanternServerNew}. Mainly designed for Java 9+, the System ClassLoader no longer
  * extends {@link URLClassLoader}. This {@link ClassLoader} should be used instead.
  * <p>
  * All {@link Class#forName(String)} operations will be delegated through this

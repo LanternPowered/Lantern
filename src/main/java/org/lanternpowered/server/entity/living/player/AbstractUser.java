@@ -116,7 +116,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
                     // Not really worth the trouble right now
                     // TODO: Differentiate the 'global tab list entry' and the entry to update
                     // TODO: these kind of settings to avoid possible 'strange' behavior.
-                    GlobalTabList.getInstance().get(getProfile()).ifPresent(e -> e.setGameMode(newElement));
+                    GlobalTabList.instance.get(getProfile()).ifPresent(e -> e.setGameMode(newElement));
                 });
         c.register(Keys.DOMINANT_HAND, HandPreferences.RIGHT);
         c.register(Keys.IS_ELYTRA_FLYING, false);

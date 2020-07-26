@@ -13,26 +13,26 @@ package org.lanternpowered.server.network.vanilla.packet.processor.play
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.packet.processor.Processor
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabListEntries
+import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
 
 /**
  * This processor will separate the entries with different types and put them
  * into a new message, this is required because the vanilla codec can only use
  * one entry type for one message.
  */
-class ProcessorPlayOutTabListEntries : Processor<PacketPlayOutTabListEntries> {
+class TabListProcessor : Processor<TabListPacket> {
 
-    override fun process(context: CodecContext, message: PacketPlayOutTabListEntries, output: MutableList<Packet>) {
-        if (message.entries.isEmpty())
+    override fun process(context: CodecContext, packet: TabListPacket, output: MutableList<Packet>) {
+        if (packet.entries.isEmpty())
             return
 
-        val mapped = message.entries
+        val mapped = packet.entries
                 .groupBy { entry -> entry.javaClass }
         if (mapped.size == 1) {
-            output.add(message)
+            output.add(packet)
         } else {
             for ((_, value) in mapped)
-                output.add(PacketPlayOutTabListEntries(value))
+                output.add(TabListPacket(value))
         }
     }
 }

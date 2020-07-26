@@ -13,6 +13,7 @@
 
 package org.lanternpowered.api.text
 
+import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.text.format.TextDecoration
@@ -82,6 +83,11 @@ inline fun String.toText(): LiteralText = LiteralText.of(this)
  * Gets this [TextRepresentable] as a [Text] representation.
  */
 inline fun TextRepresentable.toText(): Text = asComponent()
+
+/**
+ * Gets this [ItemStack] as a [Text] representation.
+ */
+inline fun ItemStack.toText(): Text = (this as TextRepresentable).toText()
 
 fun Text.italic(): Text = decorate(TextDecoration.ITALIC)
 fun Text.bold(): Text = decorate(TextDecoration.BOLD)

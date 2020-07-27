@@ -18,9 +18,6 @@ import org.lanternpowered.launch.LanternClassLoader
 import org.lanternpowered.launch.transformer.Exclusion
 import org.lanternpowered.server.plugin.LanternPluginManager
 import org.lanternpowered.server.util.SyncLanternThread
-import org.lanternpowered.server.util.executor.LanternScheduledExecutorService
-import org.lanternpowered.server.util.executor.asLanternExecutorService
-import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 
@@ -62,7 +59,7 @@ object LanternServerLaunch {
 
         this.mainExecutor = Executors.newSingleThreadScheduledExecutor { SyncLanternThread(it, "main") }
 
-        val server = LanternServerNew()
+        val server = LanternServer()
         server.launch(options, this.mainExecutor)
     }
 }

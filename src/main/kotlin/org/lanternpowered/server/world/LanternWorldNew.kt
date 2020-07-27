@@ -14,7 +14,7 @@ import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
-import org.lanternpowered.server.LanternServerNew
+import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.network.entity.EntityProtocolManager
 import org.lanternpowered.server.world.chunk.ChunkManager
 import org.lanternpowered.server.world.storage.SpongeWorldStorage
@@ -23,7 +23,6 @@ import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.entity.BlockEntity
-import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
@@ -68,7 +67,7 @@ import java.util.function.Supplier
 
 // TODO: Rename world
 class LanternWorldNew(
-        private val server: LanternServerNew,
+        private val server: LanternServer,
         private val properties: LanternWorldProperties,
         private val storage: WorldStorage,
         private val ioExecutor: ExecutorService

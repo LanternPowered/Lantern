@@ -20,7 +20,7 @@ import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.text.toText
 import org.lanternpowered.api.text.translatableTextOf
-import org.lanternpowered.server.LanternServerNew
+import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.network.NetworkSession
@@ -34,7 +34,7 @@ import java.nio.charset.StandardCharsets
 
 class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboundHandlerAdapter() {
 
-    private val server: LanternServerNew
+    private val server: LanternServer
         get() = this.session.server
 
     private val logger: Logger

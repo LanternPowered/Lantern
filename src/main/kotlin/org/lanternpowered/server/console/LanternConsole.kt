@@ -21,7 +21,7 @@ import org.lanternpowered.api.audience.Audience
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.LanternGame
-import org.lanternpowered.server.LanternServerNew
+import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.cause.LanternCauseStack
 import org.lanternpowered.server.permission.ProxySubject
 import org.lanternpowered.server.util.PrettyPrinter
@@ -37,7 +37,7 @@ import java.nio.file.Path
 import java.time.Duration
 
 class LanternConsole(
-        val server: LanternServerNew
+        val server: LanternServer
 ) : SimpleTerminalConsole(), ProxySubject, SystemSubject {
 
     companion object {

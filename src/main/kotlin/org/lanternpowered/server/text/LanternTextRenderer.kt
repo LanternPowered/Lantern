@@ -122,11 +122,12 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
     }
 
     override fun renderTranslatable(text: TranslatableText, context: C): Text {
-        val format = translate(context, text.key())
+        val format = translate(text.key(), context)
         if (format == null) {
-            if (!isChildRenderNeeded(text))
+            if (!isChildRenderNeeded(text) && text.args().isEmpty())
                 return text
             return TranslatableText.builder(text.key())
+                    .args(text.args().map { arg -> render(arg, context) })
                     .applyStyleAndChildren(text, context)
                     .build()
         }
@@ -164,5 +165,5 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
      * @param key a translation key
      * @return a message format or `null` to skip translation
      */
-    protected abstract fun translate(context: C, key: String): MessageFormat?
+    protected abstract fun translate(key: String, context: C): MessageFormat?
 }

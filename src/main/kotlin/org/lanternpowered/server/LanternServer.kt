@@ -77,7 +77,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.system.exitProcess
 
-class LanternServerNew : Server {
+class LanternServer : Server {
 
     private val startTime = Instant.now()
     private val game: LanternGame = LanternGame
@@ -310,7 +310,7 @@ class LanternServerNew : Server {
             }
         } else {
             try {
-                LanternServerNew::class.java.getResourceAsStream("/data/lantern/icon/favicon.png").use { inputStream ->
+                LanternServer::class.java.getResourceAsStream("/data/lantern/icon/favicon.png").use { inputStream ->
                     this.favicon = Favicon.load(inputStream)
                 }
             } catch (e: IOException) {
@@ -352,6 +352,12 @@ class LanternServerNew : Server {
         // Don't shut down twice
         if (!this.shuttingDown.compareAndSet(false, true))
             return
+        // Kick all the online players
+        for (player in this.unsafePlayers)
+            player.connection.close(kickMessage)
+
+        // TODO: Wait for players to be disconnected so all events are called
+
         this.eventManager.post(LanternStoppingServerEvent(this.game, this))
 
         this.ioExecutor.shutdown()
@@ -363,9 +369,26 @@ class LanternServerNew : Server {
         // Stop the async scheduler
         this.asyncExecutor.shutdown()
 
-        for (service in this.game.serviceProvider.registrations.map { it.service() }.distinct()) {
-            if (service is Closeable)
-                service.close()
+        for (registration in this.game.serviceProvider.registrations.distinctBy { it.service() }) {
+            val service = registration.service()
+            if (service is Closeable) {
+                try {
+                    service.close()
+                } catch (ex: Exception) {
+                    this.logger.error("A error occurred while closing the ${registration.serviceClass().simpleName}.", ex)
+                }
+            }
+        }
+
+        // Shutdown the game profile manager
+
+        val gameProfileCache = this.gameProfileManager.cache
+        if (gameProfileCache is Closeable) {
+            try {
+                gameProfileCache.close()
+            } catch (ex: Exception) {
+                this.logger.error("A error occurred while closing the GameProfileCache.", ex)
+            }
         }
 
         // Wait for a while and terminate any rogue threads
@@ -410,6 +433,27 @@ class LanternServerNew : Server {
 
     override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].optional()
     override fun getPlayer(name: String): Optional<Player> = this.playersByName[name].optional()
+
+
+    /**
+     * Adds a [Player] to the online players lookups.
+     *
+     * @param player The player
+     */
+    fun addPlayer(player: LanternPlayer) {
+        this.playersByName[player.name] = player
+        this.playersByUniqueId[player.uniqueId] = player
+    }
+
+    /**
+     * Removes a [Player] from the online players lookups.
+     *
+     * @param player The player
+     */
+    fun removePlayer(player: LanternPlayer) {
+        this.playersByName.remove(player.name)
+        this.playersByUniqueId.remove(player.uniqueId)
+    }
 
     override fun getGameProfileManager(): GameProfileManager {
         TODO("Not yet implemented")

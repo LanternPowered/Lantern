@@ -72,13 +72,13 @@ class LanternLiteralTextRenderer(
                     .applyStyleAndChildren(text, context).build()
 
     override fun renderTranslatable(text: TranslatableText, context: FormattedTextRenderContext): Text {
-        val format = translate(context, text.key())
+        val format = translate(text.key(), context)
         if (format != null)
             return super.renderTranslatable(text, context)
         return LiteralText.builder("[${text.key()}](${text.args().joinToString(", ")})")
                 .applyStyleAndChildren(text, context).build()
     }
 
-    override fun translate(context: FormattedTextRenderContext, key: String): MessageFormat? =
+    override fun translate(key: String, context: FormattedTextRenderContext): MessageFormat? =
             this.translationRegistry.translate(key, context.locale)
 }

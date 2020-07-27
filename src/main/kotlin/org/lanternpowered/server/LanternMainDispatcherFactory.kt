@@ -25,7 +25,7 @@ import kotlin.coroutines.CoroutineContext
 @InternalCoroutinesApi
 internal class LanternMainDispatcherFactory : MainDispatcherFactory {
 
-    override val loadPriority: Int = Int.MAX_VALUE
+    override val loadPriority: Int = Int.MAX_VALUE // Highest priority, we need to win this!
 
     override fun createDispatcher(allFactories: List<MainDispatcherFactory>): MainCoroutineDispatcher =
             LanternMainCoroutineDispatcher(LanternServerLaunch.mainExecutor.asCoroutineDispatcher())

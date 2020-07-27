@@ -124,6 +124,18 @@ inline fun <reified T : Any> Cause.noneOf(): List<Any> = noneOf(T::class)
  */
 fun Cause.noneOf(target: KClass<*>): List<Any> = noneOf(target.java)
 
+/**
+ * Gets the value for the given context key, if present.
+ */
+operator fun <T> Cause.get(key: Supplier<out CauseContextKey<T>>): T? =
+        this.context.get(key).orNull()
+
+/**
+ * Gets the value for the given context key, if present.
+ */
+operator fun <T> Cause.get(key: CauseContextKey<T>): T? =
+        this.context.get(key).orNull()
+
 private val emptyCause = Cause.of(CauseContext.empty(), emptyList())
 
 /**

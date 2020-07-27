@@ -16,6 +16,7 @@ import org.lanternpowered.api.plugin.PluginManager
 import org.lanternpowered.api.registry.GameRegistry
 import org.lanternpowered.api.service.ServiceProvider
 import org.lanternpowered.api.world.WorldManager
+import org.spongepowered.api.SystemSubject
 import org.spongepowered.api.command.manager.CommandManager
 import org.spongepowered.api.scheduler.Scheduler
 
@@ -32,4 +33,5 @@ object Lantern {
     @JvmStatic inline val serviceProvider: ServiceProvider get() = Sponge.getServiceProvider() as ServiceProvider
     @JvmStatic inline val worldManager: WorldManager get() = this.server.worldManager
     @JvmStatic inline val commandManager: CommandManager get() = this.game.commandManager
+    @JvmStatic inline val systemSubject: SystemSubject get() = this.game.systemSubject
 }

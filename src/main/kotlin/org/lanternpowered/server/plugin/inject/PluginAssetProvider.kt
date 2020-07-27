@@ -13,7 +13,7 @@ package org.lanternpowered.server.plugin.inject
 import com.google.inject.Inject
 import com.google.inject.Provider
 import org.lanternpowered.api.util.optional.orNull
-import org.lanternpowered.server.inject.InjectionPoint
+import org.lanternpowered.server.util.guice.InjectionPoint
 import org.spongepowered.api.asset.Asset
 import org.spongepowered.api.asset.AssetId
 import org.spongepowered.api.asset.AssetManager

@@ -34,7 +34,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.LanternServerNew;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -126,7 +125,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
     public static final AttributeKey<Boolean> FML_MARKER = AttributeKey.valueOf("fml-marker");
 
     private final NetworkManager networkManager;
-    private final LanternServerNew server;
+    private final LanternServer server;
     private final Channel channel;
 
     /**
@@ -215,7 +214,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
      */
     private boolean firstClientSettingsMessage;
 
-    public NetworkSession(Channel channel, LanternServerNew server, NetworkManager networkManager) {
+    public NetworkSession(Channel channel, LanternServer server, NetworkManager networkManager) {
         this.networkManager = networkManager;
         this.channel = channel;
         this.server = server;
@@ -538,7 +537,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
      *
      * @return The server
      */
-    public LanternServerNew getServer() {
+    public LanternServer getServer() {
         return this.server;
     }
 

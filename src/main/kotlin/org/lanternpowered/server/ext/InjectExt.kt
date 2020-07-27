@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.ext
 
-import org.lanternpowered.server.inject.property.DefaultInjectedProperty
-import org.lanternpowered.server.inject.property.LazyInjectedProperty
+import org.lanternpowered.server.util.guice.inject.property.DefaultInjectedProperty
+import org.lanternpowered.server.util.guice.inject.property.LazyInjectedProperty
 
 inline fun <reified T> injectLazily() = LazyInjectedProperty<T>()
 inline fun <reified T> inject() = DefaultInjectedProperty<T>()

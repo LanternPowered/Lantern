@@ -21,7 +21,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.LanternServerNew;
 import org.lanternpowered.server.network.buffer.LanternByteBufferAllocator;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.packet.codec.SimpleCodecContext;
@@ -51,11 +50,11 @@ public final class NetworkManager extends AbstractServer {
     private EventLoopGroup workerGroup;
 
     private final Set<NetworkSession> sessions = Sets.newConcurrentHashSet();
-    private final LanternServerNew server;
+    private final LanternServer server;
 
     @Nullable private InetSocketAddress address;
 
-    public NetworkManager(LanternServerNew server) {
+    public NetworkManager(LanternServer server) {
         this.server = server;
         ProtocolState.init();
     }
@@ -74,7 +73,7 @@ public final class NetworkManager extends AbstractServer {
      * 
      * @return The server
      */
-    public LanternServerNew getServer() {
+    public LanternServer getServer() {
         return this.server;
     }
 

@@ -18,7 +18,7 @@ import org.lanternpowered.api.plugin.PluginManager
 import org.lanternpowered.api.registry.GameRegistry
 import org.lanternpowered.api.service.ServiceProvider
 import org.lanternpowered.server.LanternGame
-import org.lanternpowered.server.inject.InjectionPointProvider
+import org.lanternpowered.server.util.guice.InjectionPointProvider
 import org.lanternpowered.server.util.guice.GuiceModule
 import java.io.File
 import java.nio.file.Path

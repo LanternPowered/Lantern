@@ -24,6 +24,11 @@ private val formatRegex = "%(\\d+\\$)?([-#+ 0,(<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-
 object StringFormat {
 
     /**
+     * Creates a [MessageFormat] from a [String.format] format.
+     */
+    fun toMessageFormat(format: String): MessageFormat = toMessageFormat(format, Locales.DEFAULT)
+
+    /**
      * Creates a [MessageFormat] from a [String.format] format and the given locale.
      */
     fun toMessageFormat(format: String, locale: Locale): MessageFormat {
@@ -67,11 +72,17 @@ object StringFormat {
 
 private class StringFormatArgument(private val format: String) : Format() {
 
-    override fun format(obj: Any?, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer {
+    override fun format(obj: Any?, toAppendTo: StringBuffer, pos: FieldPosition?): StringBuffer {
         val args = if (obj is Array<*>) obj else arrayOf(obj)
         val formatted = formatter.format(this.format, obj, *args)
         return toAppendTo.append(formatted)
     }
 
-    override fun parseObject(source: String, pos: ParsePosition): Any = source
+    override fun parseObject(source: String, pos: ParsePosition?): Any {
+        if (pos != null) {
+            pos.index = 0
+            pos.errorIndex = -1
+        }
+        return source
+    }
 }

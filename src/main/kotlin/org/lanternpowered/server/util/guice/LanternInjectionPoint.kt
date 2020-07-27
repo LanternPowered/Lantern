@@ -8,13 +8,12 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inject
+package org.lanternpowered.server.util.guice
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.uncheckedCast
 import java.lang.reflect.Executable
-import java.util.Arrays
 
 internal abstract class LanternInjectionPoint(
         override val source: TypeToken<*>,
@@ -25,14 +24,14 @@ internal abstract class LanternInjectionPoint(
     override fun <A : Annotation> getAnnotation(annotationClass: Class<A>): A? =
             this.annotations.firstOrNull { annotationClass.isInstance(it) }.uncheckedCast()
 
-    override fun getAnnotations(): Array<Annotation> = Arrays.copyOf(this.annotations, this.annotations.size)
+    override fun getAnnotations(): Array<Annotation> = this.annotations.copyOf()
     override fun getDeclaredAnnotations(): Array<Annotation> = getAnnotations()
 
     override fun toString(): String {
         return ToStringHelper("InjectionPoint")
                 .add("source", this.source)
                 .add("type", this.type)
-                .add("annotations", Arrays.toString(this.annotations))
+                .add("annotations", this.annotations.contentToString())
                 .toString()
     }
 

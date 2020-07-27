@@ -25,7 +25,7 @@ import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.api.world.WorldProperties
-import org.lanternpowered.server.LanternServerNew
+import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.util.SyncLanternThread
 import java.util.Optional
 import java.util.UUID
@@ -43,7 +43,7 @@ import kotlin.concurrent.withLock
 import kotlin.math.max
 
 class LanternWorldManager(
-        val server: LanternServerNew,
+        val server: LanternServer,
         val ioExecutor: ExecutorService,
         val worldStorageService: WorldStorageService
 ) : WorldManager {

@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inject
+package org.lanternpowered.server.util.guice
 
 import com.google.inject.Binder
 import com.google.inject.Binding

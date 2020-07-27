@@ -79,7 +79,7 @@ object LanternGame : Game {
     private lateinit var sqlManager: LanternSqlManager
     private lateinit var serviceProvider: LanternServiceProvider
     private lateinit var configManager: LanternConfigManager
-    private lateinit var server: LanternServerNew
+    private lateinit var server: LanternServer
     private lateinit var metricsConfigManager: LanternMetricsConfigManager
     private lateinit var gameDirectory: Path
     private lateinit var console: LanternConsole
@@ -196,7 +196,7 @@ object LanternGame : Game {
     /**
      * Sets the server instance.
      */
-    fun setServer(server: LanternServerNew) { this.server = server }
+    fun setServer(server: LanternServer) { this.server = server }
 
     /**
      * Initializes the permission service.
@@ -209,7 +209,7 @@ object LanternGame : Game {
     }
 
     override fun getMetricsConfigManager(): LanternMetricsConfigManager = this.metricsConfigManager
-    override fun getServer(): LanternServerNew = this.server
+    override fun getServer(): LanternServer = this.server
     override fun getRegistry(): GameRegistry = this.registry
     override fun getPluginManager(): PluginManager = this.pluginManager
     override fun getPlatform(): Platform = this.platform

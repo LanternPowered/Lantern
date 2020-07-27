@@ -12,7 +12,6 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandResult;

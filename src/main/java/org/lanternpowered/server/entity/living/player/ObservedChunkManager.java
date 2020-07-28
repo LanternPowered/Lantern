@@ -20,7 +20,7 @@ import org.lanternpowered.api.util.palette.GlobalPalette;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.network.block.AbstractBlockEntityProtocol;
+import org.lanternpowered.server.network.block.BlockEntityProtocol;
 import org.lanternpowered.server.network.block.BlockEntityChunkProtocolData;
 import org.lanternpowered.server.network.block.BlockEntityProtocolHelper;
 import org.lanternpowered.server.network.block.BlockEntityProtocolUpdateContext;
@@ -295,7 +295,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                     for (Vector3i pos : changes) {
                         final LanternBlockEntity tileEntity = mappedTileEntities.remove(pos);
                         if (tileEntity != null) {
-                            final AbstractBlockEntityProtocol protocol = tileEntity.getProtocol();
+                            final BlockEntityProtocol protocol = tileEntity.getProtocol();
                             if (protocol != null) {
                                 BlockEntityProtocolHelper.init(protocol, initContext);
                             }
@@ -309,7 +309,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
             final BlockEntityUpdateContext updateContext = new BlockEntityUpdateContext(packets);
             for (Map.Entry<Vector3i, LanternBlockEntity> entry : mappedTileEntities.entrySet()) {
-                final AbstractBlockEntityProtocol protocol = entry.getValue().getProtocol();
+                final BlockEntityProtocol protocol = entry.getValue().getProtocol();
                 if (protocol != null) {
                     BlockEntityProtocolHelper.update(protocol, updateContext, 1);
                 }
@@ -397,7 +397,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                             continue;
                         }
                         initContext.currentIndex = tileEntityEntry.getShortKey();
-                        final AbstractBlockEntityProtocol protocol = tileEntityEntry.getValue().getProtocol();
+                        final BlockEntityProtocol protocol = tileEntityEntry.getValue().getProtocol();
                         if (protocol != null) {
                             BlockEntityProtocolHelper.init(protocol, initContext);
                         }

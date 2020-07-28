@@ -8,20 +8,18 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.network.block;
+package org.lanternpowered.server.network.block
 
-import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
-import org.lanternpowered.server.network.packet.Packet;
-import org.spongepowered.api.data.persistence.DataView;
-
-import java.util.List;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
+import org.lanternpowered.server.network.packet.Packet
+import org.spongepowered.api.data.persistence.DataView
 
 /**
  * Represents the blockEntity entity data to send for a specific chunk section.
  */
-public interface BlockEntityChunkProtocolData {
+interface BlockEntityChunkProtocolData {
 
-    Short2ObjectMap<DataView> getInitData();
+    val initData: Short2ObjectMap<DataView>
 
-    List<Packet> getPackets();
+    val packets: List<Packet>
 }

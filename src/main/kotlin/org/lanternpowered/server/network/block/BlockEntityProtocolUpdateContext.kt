@@ -8,16 +8,16 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.network.block;
+package org.lanternpowered.server.network.block
 
-import org.lanternpowered.server.network.packet.Packet;
+import org.lanternpowered.server.network.packet.Packet
 
-public interface BlockEntityProtocolUpdateContext {
+interface BlockEntityProtocolUpdateContext {
 
     /**
-     * Sends a {@link Packet} to all the trackers.
+     * Sends a [Packet] to all the trackers.
      *
-     * @param packet The message
+     * @param packet The packet
      */
-    void send(Packet packet);
+    fun send(packet: Packet)
 }

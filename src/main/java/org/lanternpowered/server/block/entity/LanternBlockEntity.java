@@ -18,7 +18,7 @@ import org.lanternpowered.server.data.LocalMutableDataHolder;
 import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
-import org.lanternpowered.server.network.block.AbstractBlockEntityProtocol;
+import org.lanternpowered.server.network.block.BlockEntityProtocol;
 import org.lanternpowered.server.network.block.BlockEntityProtocolType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.entity.BlockEntity;
@@ -46,7 +46,7 @@ public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDat
     @Nullable volatile BlockState blockState;
     private volatile boolean valid;
     @Nullable private BlockEntityProtocolType<?> protocolType;
-    @Nullable private AbstractBlockEntityProtocol<?> protocol;
+    @Nullable private BlockEntityProtocol<?> protocol;
 
     protected LanternBlockEntity() {
         registerKeys();
@@ -176,8 +176,8 @@ public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDat
     public void setProtocolType(@Nullable BlockEntityProtocolType<?> protocolType) {
         this.protocolType = protocolType;
         if (protocolType != null) {
-            this.protocol = (AbstractBlockEntityProtocol<?>) ((Function)
-                    protocolType.getSupplier()).apply(this);
+            this.protocol = (BlockEntityProtocol<?>) ((Function)
+                    protocolType.supplier).apply(this);
         } else {
             this.protocol = null;
         }
@@ -189,7 +189,7 @@ public abstract class LanternBlockEntity implements BlockEntity, LocalMutableDat
     }
 
     @Nullable
-    public AbstractBlockEntityProtocol<?> getProtocol() {
+    public BlockEntityProtocol<?> getProtocol() {
         return this.protocol;
     }
 }

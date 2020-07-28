@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.util.guice
 
-import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.uncheckedCast
 import java.lang.reflect.Executable
 
@@ -27,13 +27,11 @@ internal abstract class LanternInjectionPoint(
     override fun getAnnotations(): Array<Annotation> = this.annotations.copyOf()
     override fun getDeclaredAnnotations(): Array<Annotation> = getAnnotations()
 
-    override fun toString(): String {
-        return ToStringHelper("InjectionPoint")
-                .add("source", this.source)
-                .add("type", this.type)
-                .add("annotations", this.annotations.contentToString())
-                .toString()
-    }
+    override fun toString(): String = ToStringHelper("InjectionPoint")
+            .add("source", this.source)
+            .add("type", this.type)
+            .add("annotations", this.annotations.contentToString())
+            .toString()
 
     internal class Field(
             source: TypeToken<*>,

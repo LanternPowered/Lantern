@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.block
 
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity
+import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateBlockEntityPacket
 import org.spongepowered.api.block.entity.BlockEntity
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
@@ -28,14 +28,14 @@ abstract class VanillaBlockEntityProtocol<T : BlockEntity>(blockEntity: T) : Blo
     override fun init(context: BlockEntityProtocolUpdateContext) {
         val dataView: DataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
         populateInitData(dataView)
-        context.send(PacketPlayOutBlockEntity(this.type, this.blockEntity.serverLocation.blockPosition, dataView))
+        context.send(UpdateBlockEntityPacket(this.type, this.blockEntity.serverLocation.blockPosition, dataView))
     }
 
     override fun update(context: BlockEntityProtocolUpdateContext) {
         val lazyDataView = LazyDataView()
         populateUpdateData(lazyDataView)
         if (lazyDataView.dataView != null)
-            context.send(PacketPlayOutBlockEntity(this.type, this.blockEntity.serverLocation.blockPosition, lazyDataView.dataView))
+            context.send(UpdateBlockEntityPacket(this.type, this.blockEntity.serverLocation.blockPosition, lazyDataView.dataView))
     }
 
     internal class LazyDataView : () -> DataView {

@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.GenerateJigsawStructurePacket
 
-class GenerateJigsawStructureCodec : Codec<GenerateJigsawStructurePacket> {
+object GenerateJigsawStructureCodec : PacketDecoder<GenerateJigsawStructurePacket> {
 
     override fun decode(context: CodecContext, buf: ByteBuffer): GenerateJigsawStructurePacket {
         return buf.run {

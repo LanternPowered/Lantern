@@ -22,7 +22,6 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.LocalKeyRegistry;
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffect;
@@ -76,7 +75,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SetDifficultyP
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTags;
+import org.lanternpowered.server.network.vanilla.packet.type.play.TagsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnlockRecipesPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewDistancePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewPositionPacket;
@@ -477,8 +476,8 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
                 // occasions, for example when clicking a furnace fuel slot.
                 // It's not used for anything else, so there aren't any arguments.
                 // Two messages, because only one does not work, it crashes the client...
-                this.session.send(new PacketPlayOutTags());
-                this.session.send(new PacketPlayOutTags());
+                this.session.send(new TagsPacket());
+                this.session.send(new TagsPacket());
                 // Send the player list
                 final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
                 final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);

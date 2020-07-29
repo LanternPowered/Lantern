@@ -11,7 +11,7 @@
 package org.lanternpowered.server.world;
 
 import org.lanternpowered.server.data.type.MoonPhase;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutWorldTime;
+import org.lanternpowered.server.network.vanilla.packet.type.play.WorldTimePacket;
 import org.spongepowered.api.world.gamerule.GameRules;
 
 public class TimeUniverse {
@@ -47,12 +47,12 @@ public class TimeUniverse {
             this.lastDoDaylightCycle = doDaylightCycle;
             this.lastMoonPhase = moonPhase;
             final long time1 = time;
-            this.world.broadcast(() -> new PacketPlayOutWorldTime(moonPhase, this.timeData.getAge(), (int) time1, doDaylightCycle));
+            this.world.broadcast(() -> new WorldTimePacket(moonPhase, this.timeData.getAge(), (int) time1, doDaylightCycle));
         }
     }
 
-    public PacketPlayOutWorldTime createUpdateTimeMessage() {
-        return new PacketPlayOutWorldTime(this.timeData.getMoonPhase(), this.timeData.getAge(), (int) this.timeData.getDayTime(),
+    public WorldTimePacket createUpdateTimeMessage() {
+        return new WorldTimePacket(this.timeData.getMoonPhase(), this.timeData.getAge(), (int) this.timeData.getDayTime(),
                 this.world.getGameRule(GameRules.DO_DAYLIGHT_CYCLE));
     }
 }

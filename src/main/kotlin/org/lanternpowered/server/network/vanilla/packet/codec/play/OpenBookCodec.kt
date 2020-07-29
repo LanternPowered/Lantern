@@ -11,12 +11,12 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenBookPacket
 import org.spongepowered.api.data.type.HandTypes
 
-class OpenBookCodec : Codec<OpenBookPacket> {
+object OpenBookCodec : PacketEncoder<OpenBookPacket> {
 
     override fun encode(context: CodecContext, packet: OpenBookPacket): ByteBuffer =
             context.byteBufAlloc().buffer().writeVarInt(if (packet.handType === HandTypes.MAIN_HAND) 0 else 1)

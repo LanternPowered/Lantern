@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientLockDifficultyPacket
 
-class ClientLocksDifficultyCodec : Codec<ClientLockDifficultyPacket> {
+object ClientLocksDifficultyCodec : PacketDecoder<ClientLockDifficultyPacket> {
 
     override fun decode(context: CodecContext, buf: ByteBuffer): ClientLockDifficultyPacket =
             ClientLockDifficultyPacket(buf.readBoolean())

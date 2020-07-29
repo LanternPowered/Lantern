@@ -10,31 +10,47 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
+import org.lanternpowered.api.data.persistence.DataView
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.network.packet.Packet
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
-import org.spongepowered.api.world.dimension.DimensionType
 
 /**
  * @property gameMode The game mode of the player
- * @property dimensionType The dimension type of the world this player is currently in
+ * @property worldName The world this player is currently in
  * @property entityId The entity id of the player
  * @property playerListSize The size of the player list
- * @property reducedDebug Whether less debug info should be displayed in the debug screen
+ * @property hasReducedDebug Whether less debug info should be displayed in the debug screen
  * @property isHardcore Whether the hardcore mode is enabled
- * @property lowHorizon Whether the world has a lower horizon, e.g. in a flat world
+ * @property isFlat Whether the world has a lower horizon, e.g. in a flat world
  * @property viewDistance The view distance, in chunks
  * @property enableRespawnScreen Whether the respawn screen is shown when the player dies
  * @property seed The seed of the world
  */
 data class PlayerJoinPacket(
+        val dimension: NamespacedKey,
+        val worldName: NamespacedKey,
         val gameMode: GameMode,
-        val dimensionType: DimensionType,
+        val previousGameMode: GameMode,
+        val dimensionRegistry: List<DimensionRegistryEntry>,
+        val biomeRegistry: List<BiomeRegistryEntry>,
         val entityId: Int,
         val playerListSize: Int,
-        val reducedDebug: Boolean,
+        val hasReducedDebug: Boolean,
         val isHardcore: Boolean,
-        val lowHorizon: Boolean,
+        val isFlat: Boolean,
+        val isDebug: Boolean,
         val viewDistance: Int,
         val enableRespawnScreen: Boolean,
         val seed: Long
 ) : Packet
+
+data class DimensionRegistryEntry(
+        val key: NamespacedKey,
+        val data: DataView
+)
+
+data class BiomeRegistryEntry(
+        val key: NamespacedKey,
+        val data: DataView
+)

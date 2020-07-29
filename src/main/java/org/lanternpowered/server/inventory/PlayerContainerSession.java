@@ -23,17 +23,17 @@ import org.lanternpowered.server.inventory.client.PlayerClientContainer;
 import org.lanternpowered.server.inventory.client.TradingClientContainer;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientAcceptBeaconEffectsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientItemRenamePacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeTradeOfferPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientChangeTradeOfferPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickRecipePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWindowPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientCreativeWindowActionPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInDisplayedRecipe;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSetDisplayedRecipePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDropHeldItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEnchantItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.CloseWindowPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerHeldItemChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPickItemPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDisplayRecipe;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetActiveRecipePacket;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -227,7 +227,7 @@ public class PlayerContainerSession {
         applyIfContainerMatches(message.getWindowId(), () -> {
             // Just display the recipe for now, all the other behavior will be implemented later,
             // this requires recipes to be added first
-            this.player.getConnection().send(new PacketPlayOutDisplayRecipe(message.getWindowId(), message.getRecipeId()));
+            this.player.getConnection().send(new SetActiveRecipePacket(message.getWindowId(), message.getRecipeId()));
         });
     }
 
@@ -271,7 +271,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleDisplayedRecipe(PacketPlayInDisplayedRecipe message) {
+    public void handleDisplayedRecipe(ClientSetDisplayedRecipePacket message) {
         if (this.openContainer == null) {
             openPlayerContainer();
         }
@@ -304,7 +304,7 @@ public class PlayerContainerSession {
         }
     }
 
-    public void handleOfferChange(ChangeTradeOfferPacket message) {
+    public void handleOfferChange(ClientChangeTradeOfferPacket message) {
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof TradingClientContainer) {
             ((TradingClientContainer) clientContainer).handleSelectOffer(message.getIndex());

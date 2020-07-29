@@ -1358,5 +1358,85 @@
     {
         "version": 714,
         "name": "20w18a"
+    },
+    {
+        "version": 715,
+        "name": "20w19a"
+    },
+    {
+        "version": 716,
+        "name": "20w20a"
+    },
+    {
+        "version": 717,
+        "name": "20w20b"
+    },
+    {
+        "version": 718,
+        "name": "20w21a"
+    },
+    {
+        "version": 719,
+        "name": "20w22a"
+    },
+    {
+        "version": 721,
+        "name": "1.16-pre1"
+    },
+    {
+        "version": 722,
+        "name": "1.16-pre2"
+    },
+    {
+        "version": 725,
+        "name": "1.16-pre3"
+    },
+    {
+        "version": 727,
+        "name": "1.16-pre4"
+    },
+    {
+        "version": 729,
+        "name": "1.16-pre5"
+    },
+    {
+        "version": 730,
+        "name": "1.16-pre6"
+    },
+    {
+        "version": 732,
+        "name": "1.16-pre7"
+    },
+    {
+        "version": 733,
+        "name": "1.16-pre8"
+    },
+    {
+        "version": 734,
+        "name": "1.16-rc1"
+    },
+    {
+        "version": 735,
+        "name": "1.16"
+    },
+    {
+        "version": 736,
+        "name": "1.16.1"
+    },
+    {
+        "version": 738,
+        "name": "20w27a"
+    },
+    {
+        "version": 740,
+        "name": "20w28a"
+    },
+    {
+        "version": 741,
+        "name": "20w29a"
+    },
+    {
+        "version": 743,
+        "name": "20w30a"
     }
 ]

@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.packet.Packet;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutWorldBorder;
+import org.lanternpowered.server.network.vanilla.packet.type.play.WorldBorderPacket;
 import org.spongepowered.api.util.TemporalUnits;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.math.vector.Vector3d;
@@ -56,7 +56,7 @@ public final class LanternWorldBorder implements WorldBorder {
 
     public void addPlayer(LanternPlayer player) {
         if (this.players.add(player)) {
-            player.getConnection().send(new PacketPlayOutWorldBorder.Initialize(this.centerX, this.centerZ, getDiameter(),
+            player.getConnection().send(new WorldBorderPacket.Initialize(this.centerX, this.centerZ, getDiameter(),
                     getNewDiameter(), getTimeRemainingMillis(), BOUNDARY, getRoundedWarningDistance(), getWarningTimeSeconds()));
         }
     }
@@ -136,12 +136,12 @@ public final class LanternWorldBorder implements WorldBorder {
             this.diameterStart = endDiameter;
             this.diameterEnd = endDiameter;
             updateCurrentTime(0);
-            broadcast(() -> new PacketPlayOutWorldBorder.UpdateDiameter(endDiameter));
+            broadcast(() -> new WorldBorderPacket.UpdateDiameter(endDiameter));
         } else {
             this.diameterStart = startDiameter;
             this.diameterEnd = endDiameter;
             updateCurrentTime(millis);
-            broadcast(() -> new PacketPlayOutWorldBorder.UpdateLerpedDiameter(startDiameter, endDiameter, millis));
+            broadcast(() -> new WorldBorderPacket.UpdateLerpedDiameter(startDiameter, endDiameter, millis));
         }
     }
 
@@ -161,7 +161,7 @@ public final class LanternWorldBorder implements WorldBorder {
     public void setCenter(double x, double z) {
         this.centerX = x;
         this.centerZ = z;
-        broadcast(() -> new PacketPlayOutWorldBorder.UpdateCenter(this.centerX, this.centerZ));
+        broadcast(() -> new WorldBorderPacket.UpdateCenter(this.centerX, this.centerZ));
     }
 
     @Override
@@ -181,7 +181,7 @@ public final class LanternWorldBorder implements WorldBorder {
     @Override
     public void setWarningTime(Duration time) {
         this.warningTime = time;
-        broadcast(() -> new PacketPlayOutWorldBorder.UpdateWarningTime((int) time.get(TemporalUnits.SECONDS)));
+        broadcast(() -> new WorldBorderPacket.UpdateWarningTime((int) time.get(TemporalUnits.SECONDS)));
     }
 
     @Override
@@ -192,7 +192,7 @@ public final class LanternWorldBorder implements WorldBorder {
     @Override
     public void setWarningDistance(double distance) {
         this.warningDistance = distance;
-        broadcast(() -> new PacketPlayOutWorldBorder.UpdateWarningDistance((int) Math.round(distance)));
+        broadcast(() -> new WorldBorderPacket.UpdateWarningDistance((int) Math.round(distance)));
     }
 
     @Override

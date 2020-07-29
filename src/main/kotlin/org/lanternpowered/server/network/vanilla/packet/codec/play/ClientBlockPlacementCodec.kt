@@ -11,14 +11,14 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecUtils.decodeDirection
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientBlockPlacementPacket
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.math.vector.Vector3d
 
-class ClientBlockPlacementCodec : Codec<ClientBlockPlacementPacket> {
+object ClientBlockPlacementCodec : PacketDecoder<ClientBlockPlacementPacket> {
 
     override fun decode(context: CodecContext, buf: ByteBuffer): ClientBlockPlacementPacket {
         val hand = if (buf.readVarInt() == 0) HandTypes.MAIN_HAND.get() else HandTypes.OFF_HAND.get()

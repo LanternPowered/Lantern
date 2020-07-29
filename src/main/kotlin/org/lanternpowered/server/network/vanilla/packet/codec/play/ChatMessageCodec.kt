@@ -22,6 +22,12 @@ object ChatMessageCodec : PacketEncoder<ChatMessagePacket> {
         val buf = context.byteBufAlloc().buffer()
         context.write(buf, ContextualValueTypes.TEXT, packet.message)
         buf.writeByte(packet.type.ordinal.toByte())
+        if (packet.sender != null) {
+            buf.writeUniqueId(packet.sender)
+        } else {
+            buf.writeLong(0L)
+            buf.writeLong(0L)
+        }
         return buf
     }
 }

@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.NamedSoundEffectPacket
 
-class NamedSoundEffectCodec : Codec<NamedSoundEffectPacket> {
+object NamedSoundEffectCodec : PacketEncoder<NamedSoundEffectPacket> {
 
     override fun encode(context: CodecContext, packet: NamedSoundEffectPacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()

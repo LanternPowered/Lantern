@@ -19,7 +19,7 @@ import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginSuccessPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.SetCompressionPacket
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutRegisterChannels
+import org.lanternpowered.server.network.vanilla.packet.type.play.RegisterChannelsPacket
 import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.Platform
 import org.spongepowered.api.Sponge
@@ -54,7 +54,7 @@ class LoginFinishHandler : Handler<LoginFinishPacket> {
                     val channels = Sponge.getChannelRegistrar().getRegisteredChannels(Platform.Type.SERVER)
                             .stream().map { obj: NamespacedKey -> obj.toString() }.collect(Collectors.toSet())
                     if (channels.isNotEmpty())
-                        session.send(PacketPlayInOutRegisterChannels(channels))
+                        session.send(RegisterChannelsPacket(channels))
                     session.initPlayer()
                 }
     }

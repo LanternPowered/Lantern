@@ -15,17 +15,19 @@ import org.lanternpowered.server.network.packet.codec.Codec
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerRespawnPacket
 import org.lanternpowered.server.registry.type.data.GameModeRegistry
-import org.lanternpowered.server.world.dimension.LanternDimensionType
 
 class PlayerRespawnCodec : Codec<PlayerRespawnPacket> {
 
     override fun encode(context: CodecContext, packet: PlayerRespawnPacket): ByteBuffer {
-        return context.byteBufAlloc().buffer().apply {
-            writeInt((packet.dimensionType as LanternDimensionType<*>).internalId)
-            writeLong(packet.seed)
-            writeByte(GameModeRegistry.getId(packet.gameMode).toByte())
-            writeString(if (packet.lowHorizon) "flat" else "default")
-            writeBoolean(packet.copyMetadata)
-        }
+        val buf = context.byteBufAlloc().buffer()
+        buf.writeResourceKey(packet.dimension)
+        buf.writeResourceKey(packet.worldName)
+        buf.writeLong(packet.seed)
+        buf.writeByte(GameModeRegistry.getId(packet.gameMode).toByte())
+        buf.writeByte(GameModeRegistry.getId(packet.previousGameMode).toByte())
+        buf.writeBoolean(packet.isFlat)
+        buf.writeBoolean(packet.isDebug)
+        buf.writeBoolean(packet.copyMetadata)
+        return buf
     }
 }

@@ -33,6 +33,7 @@ import org.lanternpowered.server.game.LanternPlatform
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.game.version.MinecraftVersionCache
 import org.lanternpowered.server.network.protocol.Protocol
+import org.lanternpowered.server.permission.Permissions
 import org.lanternpowered.server.plugin.LanternPluginManager
 import org.lanternpowered.server.registry.LanternGameRegistry
 import org.lanternpowered.server.scheduler.LanternScheduler
@@ -54,8 +55,10 @@ import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.service.economy.EconomyService
 import org.spongepowered.api.service.pagination.PaginationService
 import org.spongepowered.api.service.permission.PermissionService
+import org.spongepowered.api.service.permission.SubjectData
 import org.spongepowered.api.service.whitelist.WhitelistService
 import org.spongepowered.api.sql.SqlManager
+import org.spongepowered.api.util.Tristate
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.Locale
@@ -72,7 +75,7 @@ object LanternGame : Game {
      */
     val logger: Logger = LogManager.getLogger("lantern")
 
-    private lateinit var platform: Platform
+    private lateinit var platform: LanternPlatform
     private lateinit var pluginManager: LanternPluginManager
     private lateinit var registry: LanternGameRegistry
     private lateinit var eventManager: LanternEventManager
@@ -143,12 +146,6 @@ object LanternGame : Game {
         this.pluginManager = LanternPluginManager(this, this.logger, this.eventManager, this.gameDirectory, pluginsDirectory)
         this.pluginManager.findCandidates()
 
-        this.platform = LanternPlatform(mapOf(
-                PlatformComponent.API to this.spongeApiPlugin,
-                PlatformComponent.GAME to this.minecraftPlugin,
-                PlatformComponent.IMPLEMENTATION to this.lanternPlugin
-        ))
-
         this.minecraftVersionCache = MinecraftVersionCache()
         this.minecraftVersionCache.init()
 
@@ -158,6 +155,12 @@ object LanternGame : Game {
         val versionCacheEntry = this.minecraftVersionCache.getVersionOrUnknown(Protocol.CURRENT_VERSION, false)
         check(versionCacheEntry == this.minecraftVersion) {
             "The current version and version in the cache don't match: $minecraftVersion != $versionCacheEntry" }
+
+        this.platform = LanternPlatform(mapOf(
+                PlatformComponent.API to this.spongeApiPlugin,
+                PlatformComponent.GAME to this.minecraftPlugin,
+                PlatformComponent.IMPLEMENTATION to this.lanternPlugin
+        ), this.minecraftVersion)
 
         // Instantiate plugins and call construct lifecycle events
         this.pluginManager.instantiate()
@@ -202,17 +205,27 @@ object LanternGame : Game {
      * Initializes the permission service.
      */
     private fun initPermissionService() {
-        val permissionService = this.serviceProvider.register<PermissionService> {
+        val service = this.serviceProvider.register<PermissionService> {
             this.lanternPlugin to LanternPermissionService()
         }
-        permissionService.registerContextCalculator(LanternContextCalculator())
+        service.registerContextCalculator(LanternContextCalculator())
+        if (service is LanternPermissionService) {
+            fun applyDefault(opLevel: Int, permission: String, state: Tristate = Tristate.TRUE) = service
+                    .getGroupForOpLevel(opLevel).subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, permission, state)
+
+            applyDefault(Permissions.SELECTOR_LEVEL, Permissions.SELECTOR_PERMISSION)
+            applyDefault(Permissions.COMMAND_BLOCK_LEVEL, Permissions.COMMAND_BLOCK_PERMISSION)
+            applyDefault(Permissions.Login.BYPASS_PLAYER_LIMIT_LEVEL, Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION, Tristate.FALSE)
+            applyDefault(Permissions.Login.BYPASS_WHITELIST_LEVEL, Permissions.Login.BYPASS_WHITELIST_PERMISSION)
+            applyDefault(Permissions.Chat.FORMAT_URLS_LEVEL, Permissions.Chat.FORMAT_URLS)
+        }
     }
 
     override fun getMetricsConfigManager(): LanternMetricsConfigManager = this.metricsConfigManager
     override fun getServer(): LanternServer = this.server
     override fun getRegistry(): GameRegistry = this.registry
     override fun getPluginManager(): PluginManager = this.pluginManager
-    override fun getPlatform(): Platform = this.platform
+    override fun getPlatform(): LanternPlatform = this.platform
     override fun getSqlManager(): SqlManager = this.sqlManager
     override fun getEventManager(): EventManager = this.eventManager
     override fun getConfigManager(): ConfigManager = this.configManager

@@ -13,17 +13,17 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayInOutRegisterChannels;
+import org.lanternpowered.server.network.vanilla.packet.type.play.RegisterChannelsPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.Set;
 
-public final class HandlerPlayInRegisterChannels implements Handler<PacketPlayInOutRegisterChannels> {
+public final class HandlerPlayInRegisterChannels implements Handler<RegisterChannelsPacket> {
 
     @Override
-    public void handle(NetworkContext context, PacketPlayInOutRegisterChannels packet) {
+    public void handle(NetworkContext context, RegisterChannelsPacket packet) {
         final Set<String> channels = packet.getChannels();
         final Set<String> registeredChannels = context.getSession().getRegisteredChannels();
 

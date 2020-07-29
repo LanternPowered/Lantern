@@ -12,12 +12,16 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.data.persistence.MemoryDataContainer
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket
 import org.spongepowered.api.data.persistence.DataQuery
 
-class ChunkCodec : Codec<ChunkPacket> {
+object ChunkCodec : PacketEncoder<ChunkPacket> {
+
+    private val X = DataQuery.of("x")
+    private val Y = DataQuery.of("y")
+    private val Z = DataQuery.of("z")
 
     override fun encode(context: CodecContext, packet: ChunkPacket): ByteBuffer {
         val sections = packet.sections
@@ -28,7 +32,8 @@ class ChunkCodec : Codec<ChunkPacket> {
 
         buf.writeInt(packet.x)
         buf.writeInt(packet.z)
-        buf.writeBoolean(packet is ChunkPacket.Init)
+        buf.writeBoolean(packet is ChunkPacket.Initialize)
+        buf.writeBoolean(packet.retainLighting)
 
         var sectionBitmask = 0
         val dataBuf = context.byteBufAlloc().buffer()
@@ -75,12 +80,11 @@ class ChunkCodec : Codec<ChunkPacket> {
         buf.writeVarInt(sectionBitmask)
         buf.writeDataView(MemoryDataContainer())
 
-        if (packet is ChunkPacket.Init) {
+        if (packet is ChunkPacket.Initialize) {
             val biomes = packet.biomes
             buf.ensureWritable(biomes.size * Int.SIZE_BYTES)
-            for (value in biomes) {
+            for (value in biomes)
                 buf.writeInt(value)
-            }
         }
 
         buf.writeVarInt(dataBuf.writerIndex())
@@ -99,11 +103,5 @@ class ChunkCodec : Codec<ChunkPacket> {
             }
         }
         return buf
-    }
-
-    companion object {
-        private val X = DataQuery.of("x")
-        private val Y = DataQuery.of("y")
-        private val Z = DataQuery.of("z")
     }
 }

@@ -15,7 +15,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientTabCompletePacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutTabComplete;
+import org.lanternpowered.server.network.vanilla.packet.type.play.TabCompletePacket;
 import org.spongepowered.api.text.Text;
 
 public final class HandlerPlayInTabComplete implements Handler<ClientTabCompletePacket> {
@@ -25,10 +25,10 @@ public final class HandlerPlayInTabComplete implements Handler<ClientTabComplete
         final String text = packet.getInput();
         final LanternPlayer player = context.getSession().getPlayer();
         player.sendMessage(Text.of("Received tab completion (" + packet.getId() + "): " + text));
-        player.getConnection().send(new PacketPlayOutTabComplete(Lists.newArrayList(
-                new PacketPlayOutTabComplete.Match("Avalue", null),
-                new PacketPlayOutTabComplete.Match("Btest", null),
-                new PacketPlayOutTabComplete.Match("Cwhy", null)), packet.getId(), 0, 20));
+        player.getConnection().send(new TabCompletePacket(Lists.newArrayList(
+                new TabCompletePacket.Match("Avalue", null),
+                new TabCompletePacket.Match("Btest", null),
+                new TabCompletePacket.Match("Cwhy", null)), packet.getId(), 0, 20));
 
         /*
         // The content with normalized spaces, the spaces are trimmed

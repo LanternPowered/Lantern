@@ -13,11 +13,11 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import org.lanternpowered.api.boss.BossBarFlag
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.BossBarPacket
 
-class BossBarCodec : Codec<BossBarPacket> {
+object BossBarCodec : PacketEncoder<BossBarPacket> {
 
     override fun encode(context: CodecContext, packet: BossBarPacket): ByteBuffer {
         return context.byteBufAlloc().buffer().apply {

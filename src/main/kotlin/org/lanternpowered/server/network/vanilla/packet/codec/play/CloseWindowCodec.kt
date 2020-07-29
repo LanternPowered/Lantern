@@ -15,7 +15,7 @@ import org.lanternpowered.server.network.packet.codec.Codec
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.CloseWindowPacket
 
-class CloseWindowCodec : Codec<CloseWindowPacket> {
+object CloseWindowCodec : Codec<CloseWindowPacket> {
 
     override fun encode(context: CodecContext, packet: CloseWindowPacket): ByteBuffer =
             context.byteBufAlloc().buffer(1).writeByte(packet.window.toByte())

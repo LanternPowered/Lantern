@@ -18,12 +18,13 @@ import org.spongepowered.api.data.persistence.DataView
 sealed class ChunkPacket(
         val x: Int,
         val z: Int,
+        val retainLighting: Boolean,
         val sections: Array<Section?>
 ) : Packet {
 
-    class Init(x: Int, z: Int, sections: Array<Section?>, val biomes: IntArray) : ChunkPacket(x, z, sections)
+    class Initialize(x: Int, z: Int, sections: Array<Section?>, val biomes: IntArray) : ChunkPacket(x, z, true, sections)
 
-    class Update(x: Int, z: Int, sections: Array<Section?>) : ChunkPacket(x, z, sections)
+    class Update(x: Int, z: Int, retainLighting: Boolean, sections: Array<Section?>) : ChunkPacket(x, z, retainLighting, sections)
 
     /**
      * Represents the data of chunk section.

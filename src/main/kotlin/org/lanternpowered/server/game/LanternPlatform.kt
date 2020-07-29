@@ -17,7 +17,8 @@ import org.spongepowered.plugin.PluginContainer
 import java.util.HashMap
 
 class LanternPlatform(
-        private val containers: Map<Platform.Component, PluginContainer>
+        private val containers: Map<Platform.Component, PluginContainer>,
+        private val minecraftVersion: LanternMinecraftVersion
 ) : Platform {
 
     private val platformMap: MutableMap<String, Any> = object : HashMap<String, Any>() {
@@ -41,7 +42,7 @@ class LanternPlatform(
     override fun getType(): Platform.Type = Platform.Type.SERVER
     override fun getExecutionType(): Platform.Type = Platform.Type.SERVER
     override fun asMap(): Map<String, Any> = this.platformMap
-    override fun getMinecraftVersion(): LanternMinecraftVersion = LanternMinecraftVersion.CURRENT
+    override fun getMinecraftVersion(): LanternMinecraftVersion = this.minecraftVersion
 
     override fun getContainer(component: Platform.Component): PluginContainer =
             this.containers[Platform.Component.API] ?: error("No ${component.name.toLowerCase()} container.")

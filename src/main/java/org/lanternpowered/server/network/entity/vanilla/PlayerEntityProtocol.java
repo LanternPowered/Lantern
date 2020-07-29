@@ -25,7 +25,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityHeadLookPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket;
@@ -146,7 +146,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     private void removePassengerStack(EntityProtocolUpdateContext context) {
-        context.sendToAll(() -> new PacketPlayOutDestroyEntities(this.passengerStack));
+        context.sendToAll(() -> new DestroyEntitiesPacket(this.passengerStack));
     }
 
     private void sendHat(EntityProtocolUpdateContext context, TopHat hat) {
@@ -326,7 +326,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final boolean elytraSpeedBoost = this.entity.get(LanternKeys.ELYTRA_SPEED_BOOST).orElse(false);
         if (this.lastElytraFlying != elytraFlying || this.lastElytraSpeedBoost != elytraSpeedBoost) {
             if (this.lastElytraFlying && this.lastElytraSpeedBoost) {
-                context.sendToAll(() -> new PacketPlayOutDestroyEntities(this.elytraRocketId));
+                context.sendToAll(() -> new DestroyEntitiesPacket(this.elytraRocketId));
             } else if (elytraFlying && elytraSpeedBoost) {
                 // Create the fireworks data item
                 final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORK_ROCKET.get());

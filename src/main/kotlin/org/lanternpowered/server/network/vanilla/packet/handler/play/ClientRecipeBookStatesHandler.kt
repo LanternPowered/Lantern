@@ -13,11 +13,11 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.handler.Handler
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientRecipeBookStatesPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientRecipeBookStatePacket
 
-class ClientRecipeBookStatesHandler : Handler<ClientRecipeBookStatesPacket> {
+class ClientRecipeBookStatesHandler : Handler<ClientRecipeBookStatePacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientRecipeBookStatesPacket) {
+    override fun handle(context: NetworkContext, packet: ClientRecipeBookStatePacket) {
         val player = context.session.player
         player.offer(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, packet.craftingRecipeBookState)
         player.offer(LanternKeys.SMELTING_RECIPE_BOOK_STATE, packet.smeltingRecipeBookState)

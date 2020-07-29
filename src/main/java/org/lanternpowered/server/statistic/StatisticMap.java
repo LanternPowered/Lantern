@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutStatistics;
+import org.lanternpowered.server.network.vanilla.packet.type.play.StatisticsPacket;
 import org.spongepowered.api.statistic.Statistic;
 
 import java.io.BufferedReader;
@@ -68,10 +68,10 @@ public final class StatisticMap {
                 id -> new StatisticEntry((LanternStatistic) StatisticRegistryModule.get().getByInternalId(statistic).orElse(null)));
     }
 
-    public PacketPlayOutStatistics createStatisticsMessage() {
-        return new PacketPlayOutStatistics(this.statisticEntries.entrySet().stream()
+    public StatisticsPacket createStatisticsMessage() {
+        return new StatisticsPacket(this.statisticEntries.entrySet().stream()
                 .filter(entry -> entry.getValue().isDirty(true))
-                .map(entry -> new PacketPlayOutStatistics.Entry(entry.getKey(), (int) entry.getValue().get()))
+                .map(entry -> new StatisticsPacket.Entry(entry.getKey(), (int) entry.getValue().get()))
                 .collect(Collectors.toSet()));
     }
 

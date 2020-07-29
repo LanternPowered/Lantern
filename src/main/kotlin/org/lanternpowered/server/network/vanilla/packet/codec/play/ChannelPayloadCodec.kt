@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.BrandPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket
 
-class ChannelPayloadCodec : AbstractCodecPlayInOutCustomPayload() {
+object ChannelPayloadCodec : AbstractCustomPayloadCodec() {
 
     override fun encode0(context: CodecContext, packet: Packet): MessageResult {
         if (packet is BrandPacket) {

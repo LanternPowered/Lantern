@@ -11,6 +11,8 @@
 package org.lanternpowered.server.network
 
 import io.netty.channel.Channel
+import org.lanternpowered.server.LanternGame
+import org.lanternpowered.server.LanternServer
 
 interface NetworkContext {
 
@@ -24,4 +26,9 @@ interface NetworkContext {
      */
     val channel: Channel
 
+    val server: LanternServer
+        get() = this.session.server
+
+    val game: LanternGame
+        get() = this.session.server.game
 }

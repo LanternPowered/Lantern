@@ -30,7 +30,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityCollectItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityHeadLookPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookPacket;
@@ -113,7 +113,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void destroy(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new PacketPlayOutDestroyEntities(getRootEntityId()));
+        context.sendToAllExceptSelf(new DestroyEntitiesPacket(getRootEntityId()));
     }
 
     protected void spawnWithMetadata(EntityProtocolUpdateContext context) {

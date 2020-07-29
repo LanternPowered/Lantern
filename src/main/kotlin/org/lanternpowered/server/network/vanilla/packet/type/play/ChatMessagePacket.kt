@@ -13,8 +13,10 @@ package org.lanternpowered.server.network.vanilla.packet.type.play
 import org.lanternpowered.api.audience.MessageType
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.network.packet.Packet
+import java.util.UUID
 
 data class ChatMessagePacket(
         val message: Text,
-        val type: MessageType
+        val type: MessageType,
+        val sender: UUID? = null
 ) : Packet

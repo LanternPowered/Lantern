@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientItemRenamePacket
 
-class ClientItemRenameCodec : Codec<ClientItemRenamePacket> {
+object ClientItemRenameCodec : PacketDecoder<ClientItemRenamePacket> {
 
     override fun decode(context: CodecContext, buf: ByteBuffer): ClientItemRenamePacket =
             ClientItemRenamePacket(buf.readString())

@@ -27,7 +27,7 @@ import org.lanternpowered.server.network.block.BlockEntityProtocolUpdateContext;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockActionPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutBlockEntity;
+import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateBlockEntityPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnloadChunkPacket;
@@ -420,9 +420,9 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             if (biomesArray != null) {
-                packets.add(0, new ChunkPacket.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
+                packets.add(0, new ChunkPacket.Initialize(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
             } else {
-                packets.add(0, new ChunkPacket.Update(this.coords.getX(), this.coords.getY(), msgSections));
+                packets.add(0, new ChunkPacket.Update(this.coords.getX(), this.coords.getY(), true, msgSections));
             }
 
             return packets;
@@ -513,8 +513,8 @@ public final class ObservedChunkManager implements WorldEventListener {
 
         @Override
         public void send(Packet packet) {
-            if (packet instanceof PacketPlayOutBlockEntity) {
-                final PacketPlayOutBlockEntity tileUpdateMessage = (PacketPlayOutBlockEntity) packet;
+            if (packet instanceof UpdateBlockEntityPacket) {
+                final UpdateBlockEntityPacket tileUpdateMessage = (UpdateBlockEntityPacket) packet;
                 final Vector3i pos = tileUpdateMessage.getPosition();
                 final int chunkX = pos.getX() >> 4;
                 final int chunkY = pos.getY() >> 4;
@@ -523,7 +523,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                     final short index = (short) LanternChunk.ChunkSection.index(
                             pos.getX() & 0xf, pos.getY() & 0xf, pos.getZ() & 0xf);
                     if (index == this.currentIndex &&
-                            this.initData.putIfAbsent(index, tileUpdateMessage.getTileData()) == null) {
+                            this.initData.putIfAbsent(index, tileUpdateMessage.getData()) == null) {
                         return;
                     }
                 }

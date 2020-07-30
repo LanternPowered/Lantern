@@ -37,7 +37,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager
 import org.lanternpowered.server.registry.LanternGameRegistry
 import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.service.LanternServiceProvider
-import org.lanternpowered.server.service.permission.LanternContextCalculator
+import org.lanternpowered.server.service.context.LanternContextCalculator
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.lanternpowered.server.sql.LanternSqlManager
 import org.lanternpowered.server.util.LocaleCache
@@ -51,6 +51,8 @@ import org.spongepowered.api.config.ConfigManager
 import org.spongepowered.api.data.DataManager
 import org.spongepowered.api.network.channel.ChannelRegistry
 import org.spongepowered.api.service.ban.BanService
+import org.spongepowered.api.service.context.Contextual
+import org.spongepowered.api.service.context.ContextualService
 import org.spongepowered.api.service.economy.EconomyService
 import org.spongepowered.api.service.pagination.PaginationService
 import org.spongepowered.api.service.permission.PermissionService
@@ -136,8 +138,15 @@ object LanternGame : Game {
         this.eventManager = LanternEventManager
         this.configManager = LanternConfigManager(this.logger, this.configDirectory)
         this.sqlManager = LanternSqlManager(this.configManager)
-        this.serviceProvider = LanternServiceProvider(this)
         this.metricsConfigManager = LanternMetricsConfigManager(this.config)
+
+        val contextCalculator = LanternContextCalculator<Contextual>(this)
+        this.serviceProvider = LanternServiceProvider(this)
+        this.serviceProvider.onRegister { registration ->
+            val service = registration.service()
+            @Suppress("UNCHECKED_CAST")
+            (service as? ContextualService<Contextual>)?.registerContextCalculator(contextCalculator)
+        }
 
         val pluginsDirectory = this.gameDirectory.resolve(options.valueOf(LaunchOptions.PLUGINS_DIRECTORY) ?: "plugins")
 
@@ -207,7 +216,6 @@ object LanternGame : Game {
         val service = this.serviceProvider.register<PermissionService> {
             this.lanternPlugin to LanternPermissionService()
         }
-        service.registerContextCalculator(LanternContextCalculator(this))
         if (service is LanternPermissionService) {
             fun applyDefault(opLevel: Int, permission: String, state: Tristate = Tristate.TRUE) = service
                     .getGroupForOpLevel(opLevel).subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, permission, state)

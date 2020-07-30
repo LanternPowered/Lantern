@@ -50,7 +50,7 @@ import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceProvider;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
-import org.lanternpowered.server.service.permission.LanternContextCalculator;
+import org.lanternpowered.server.service.context.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.sql.LanternSqlManager;
 import org.lanternpowered.server.service.user.LanternUserStorageService;

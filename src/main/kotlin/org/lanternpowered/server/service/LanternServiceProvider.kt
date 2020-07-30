@@ -29,6 +29,11 @@ import kotlin.reflect.KClass
 class LanternServiceProvider(private val game: Game) : ServiceProvider {
 
     private val registrationMap = mutableMapOf<Class<*>, ServiceRegistration<*>>()
+    private val onRegister = mutableListOf<(ServiceRegistration<*>) -> Unit>()
+
+    fun onRegister(fn: (ServiceRegistration<*>) -> Unit) {
+        this.onRegister += fn
+    }
 
     inline fun <reified T : Any> register(): T? = register(T::class)
     inline fun <reified T : Any> register(noinline default: () -> Pair<PluginContainer, T>): T = register(T::class, default)
@@ -57,7 +62,10 @@ class LanternServiceProvider(private val game: Game) : ServiceProvider {
         if (supplier == null)
             return null
         val (plugin, service) = supplier!!()
-        this.registrationMap[serviceClass] = LanternServiceRegistration(serviceClass, service, plugin)
+        val registration = LanternServiceRegistration(serviceClass, service, plugin)
+        this.registrationMap[serviceClass] = registration
+        for (onRegister in this.onRegister)
+            onRegister(registration)
         return service
     }
 

@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.service.permission
+package org.lanternpowered.server.service.context
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.LoadingCache
@@ -17,19 +17,20 @@ import org.lanternpowered.api.util.collections.immutableSetBuilderOf
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Locatable
 import org.lanternpowered.server.LanternGame
+import org.lanternpowered.server.service.permission.UserSubject
 import org.spongepowered.api.network.RemoteConnection
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.context.ContextCalculator
-import org.spongepowered.api.service.permission.Subject
+import org.spongepowered.api.service.context.Contextual
 import java.net.InetAddress
 import java.util.UUID
 
 /**
  * A context calculator handling world contexts.
  */
-class LanternContextCalculator(
+class LanternContextCalculator<C : Contextual>(
         private val game: LanternGame
-) : ContextCalculator<Subject> {
+) : ContextCalculator<C> {
 
     private val ipCache: LoadingCache<RemoteConnection, IpAddressCacheEntry> =
             Caffeine.newBuilder()
@@ -55,7 +56,7 @@ class LanternContextCalculator(
             val remote: Set<Context>
     )
 
-    private fun Subject.getSourceSubject(): Subject? {
+    private fun Contextual.getSource(): Contextual? {
         if (this is UserSubject)
             return game.server.getPlayer(this.uniqueId).orNull()
         val identifier = this.identifier
@@ -71,8 +72,8 @@ class LanternContextCalculator(
         }
     }
 
-    override fun accumulateContexts(subject: Subject, accumulator: MutableSet<Context>) {
-        val source = subject.getSourceSubject() ?: return
+    override fun accumulateContexts(contextual: C, accumulator: MutableSet<Context>) {
+        val source = contextual.getSource() ?: return
         if (source is Locatable) {
             val world = source.serverLocation.world
             accumulator.add(world.dimension.type.context)
@@ -92,8 +93,8 @@ class LanternContextCalculator(
         }
     }
 
-    override fun matches(context: Context, subject: Subject): Boolean {
-        val source = subject.getSourceSubject() ?: return false
+    override fun matches(context: Context, contextual: C): Boolean {
+        val source = contextual.getSource() ?: return false
         if (source is Locatable) {
             val world = source.serverLocation.world
             if (context.key == Context.WORLD_KEY)
@@ -114,10 +115,10 @@ class LanternContextCalculator(
             val isLocalIp = context.key == Context.LOCAL_IP_KEY
             if (isLocalIp || context.key == Context.REMOTE_IP_KEY) {
                 val ipEntry = this.ipCache.get(connection)!!
-                if (isLocalIp) {
-                    return ipEntry.local.contains(context)
+                return if (isLocalIp) {
+                    ipEntry.local.contains(context)
                 } else {
-                    return ipEntry.remote.contains(context)
+                    ipEntry.remote.contains(context)
                 }
             }
         }

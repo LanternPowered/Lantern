@@ -12,7 +12,6 @@ package org.lanternpowered.server.network.packet;
 
 import org.lanternpowered.server.network.packet.codec.Codec;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.packet.processor.Processor;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,8 +26,8 @@ public final class MessageRegistration<M extends Packet> {
     private final Class<M> messageType;
     Optional<CodecRegistration<? super M, Codec<? super M>>> codecRegistration = Optional.empty();
     private Optional<Handler<? super M>> handler = Optional.empty();
-    private List<Processor<? super M>> processors = new ArrayList<>();
-    private List<Processor<? super M>> unmodifiableProcessors = Collections.unmodifiableList(this.processors);
+    private List<PacketProcessor<? super M>> processors = new ArrayList<>();
+    private List<PacketProcessor<? super M>> unmodifiableProcessors = Collections.unmodifiableList(this.processors);
 
     MessageRegistration(Class<M> messageType) {
         this.messageType = messageType;
@@ -64,11 +63,11 @@ public final class MessageRegistration<M extends Packet> {
     }
 
     /**
-     * Gets the {@link Processor}s that are bound to this message registration.
+     * Gets the {@link PacketProcessor}s that are bound to this message registration.
      *
      * @return The processors
      */
-    public List<Processor<? super M>> getProcessors() {
+    public List<PacketProcessor<? super M>> getProcessors() {
         return this.unmodifiableProcessors;
     }
 
@@ -89,7 +88,7 @@ public final class MessageRegistration<M extends Packet> {
      * @param processor The processor
      * @return This message registration, for chaining
      */
-    public MessageRegistration<M> bindProcessor(Processor<? super M> processor) {
+    public MessageRegistration<M> bindProcessor(PacketProcessor<? super M> processor) {
         this.processors.add(processor);
         return this;
     }
@@ -101,7 +100,7 @@ public final class MessageRegistration<M extends Packet> {
      * @param processor The processor
      * @return This message registration, for chaining
      */
-    public MessageRegistration<M> bindProcessor(int index, Processor<? super M> processor) {
+    public MessageRegistration<M> bindProcessor(int index, PacketProcessor<? super M> processor) {
         if (index >= this.processors.size()) {
             this.processors.add(processor);
         } else {

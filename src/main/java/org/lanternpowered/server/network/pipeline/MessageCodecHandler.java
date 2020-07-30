@@ -33,7 +33,7 @@ import org.lanternpowered.server.network.packet.UnknownPacket;
 import org.lanternpowered.server.network.packet.codec.Codec;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.packet.processor.Processor;
+import org.lanternpowered.server.network.packet.PacketProcessor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 
@@ -131,10 +131,10 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Pa
         final MessageRegistration messageRegistration = protocol.inbound()
                 .findByMessageType(packet.getClass()).orElseThrow(() -> new DecoderException(
                         "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
-        final List<Processor> processors = messageRegistration.getProcessors();
+        final List<PacketProcessor> processors = messageRegistration.getProcessors();
         // Only process if there are processors found
         if (!processors.isEmpty()) {
-            for (Processor processor : processors) {
+            for (PacketProcessor processor : processors) {
                 // The processor should handle the output messages
                 processor.process(context, packet, output);
             }

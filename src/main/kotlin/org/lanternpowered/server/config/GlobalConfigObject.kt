@@ -13,6 +13,7 @@ package org.lanternpowered.server.config
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.util.Tristate
 import org.lanternpowered.server.network.ProxyType
+import org.lanternpowered.server.util.IpSet
 
 class GlobalConfigObject : ConfigObject() {
 
@@ -100,6 +101,10 @@ class ServerConfigObject : ConfigObject() {
 
     var defaultResourcePack by setting(default = "", name = "default-resource-pack",
             description = "The default resource pack. Leave this empty to disable the default resource pack.")
+
+    var ipBasedContexts by setting(default = mapOf<String, List<IpSet>>(), name = "ip-based-contexts",
+            description = "Configuration for ip based permission contexts.")
+    // TODO: Expand explanation of ip based contexts
 
     val proxy by ProxyConfigObject.with(name = "proxy")
 

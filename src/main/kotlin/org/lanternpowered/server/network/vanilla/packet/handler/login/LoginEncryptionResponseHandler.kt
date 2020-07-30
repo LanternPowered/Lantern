@@ -25,7 +25,7 @@ import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.WrappedServerSideConnection
 import org.lanternpowered.server.network.packet.handler.Handler
-import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler
+import org.lanternpowered.server.network.pipeline.PacketEncryptionHandler
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginEncryptionResponsePacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.profile.LanternGameProfile
@@ -82,7 +82,7 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
                     if (profile == null)
                         return@thenAsync
                     session.channel.pipeline().replace(NetworkSession.ENCRYPTION, NetworkSession.ENCRYPTION,
-                            MessageEncryptionHandler(secretKey))
+                            PacketEncryptionHandler(secretKey))
                     session.queueReceivedMessage(LoginFinishPacket(profile))
                 }
     }

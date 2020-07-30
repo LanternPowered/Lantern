@@ -64,8 +64,7 @@ object HandshakeHandler : Handler<HandshakePacket> {
                 if (split.size == 3 || split.size == 4) {
                     virtualAddress = InetSocketAddress(split[1], packet.port)
                     val uniqueId = UUIDHelper.fromFlatString(split[2])
-                    val properties: Multimap<String, ProfileProperty>
-                    properties = if (split.size == 4) {
+                    val properties = if (split.size == 4) {
                         try {
                             LanternProfileProperty.createPropertiesMapFromJson(gson.fromJson(split[3], JsonArray::class.java))
                         } catch (e: Exception) {
@@ -82,38 +81,40 @@ object HandshakeHandler : Handler<HandshakePacket> {
                     return
                 }
             }
-            ProxyType.LILY_PAD -> virtualAddress = try {
-                val jsonObject = gson.fromJson(hostname, JsonObject::class.java)
-                val securityKey = context.game.config.server.proxy.securityKey
-                // Validate the security key
-                if (securityKey.isNotEmpty() && jsonObject["s"].asString != securityKey) {
-                    session.close(textOf("Proxy security key mismatch"))
-                    Lantern.getLogger().warn("Proxy security key mismatch for the player {}", jsonObject["n"].asString)
-                    return
-                }
-                val name = jsonObject["n"].asString
-                val uniqueId = UUIDHelper.fromFlatString(jsonObject["u"].asString)
-                val properties: Multimap<String, ProfileProperty> = LinkedHashMultimap.create()
-                if (jsonObject.has("p")) {
-                    val jsonArray = jsonObject.getAsJsonArray("p")
-                    var i = 0
-                    while (i < jsonArray.size()) {
-                        val property = jsonArray[i].asJsonObject
-                        val propertyName = property["n"].asString
-                        val propertyValue = property["v"].asString
-                        val propertySignature = if (property.has("s")) property["s"].asString else null
-                        properties.put(propertyName, LanternProfileProperty(propertyName, propertyValue, propertySignature))
-                        i++
+            ProxyType.LILY_PAD -> {
+                virtualAddress = try {
+                    val jsonObject = gson.fromJson(hostname, JsonObject::class.java)
+                    val securityKey = context.game.config.server.proxy.securityKey
+                    // Validate the security key
+                    if (securityKey.isNotEmpty() && jsonObject["s"].asString != securityKey) {
+                        session.close(textOf("Proxy security key mismatch"))
+                        Lantern.getLogger().warn("Proxy security key mismatch for the player {}", jsonObject["n"].asString)
+                        return
                     }
+                    val name = jsonObject["n"].asString
+                    val uniqueId = UUIDHelper.fromFlatString(jsonObject["u"].asString)
+                    val properties: Multimap<String, ProfileProperty> = LinkedHashMultimap.create()
+                    if (jsonObject.has("p")) {
+                        val jsonArray = jsonObject.getAsJsonArray("p")
+                        var i = 0
+                        while (i < jsonArray.size()) {
+                            val property = jsonArray[i].asJsonObject
+                            val propertyName = property["n"].asString
+                            val propertyValue = property["v"].asString
+                            val propertySignature = if (property.has("s")) property["s"].asString else null
+                            properties.put(propertyName, LanternProfileProperty(propertyName, propertyValue, propertySignature))
+                            i++
+                        }
+                    }
+                    session.channel.attr(LoginStartHandler.SPOOFED_GAME_PROFILE).set(LanternGameProfile(uniqueId, name, properties))
+                    session.channel.attr(NetworkSession.FML_MARKER).set(false)
+                    val port = jsonObject["rP"].asInt
+                    val host = jsonObject["h"].asString
+                    InetSocketAddress(host, port)
+                } catch (e: Exception) {
+                    session.close(textOf("Invalid ${proxyType.displayName} proxy data format."))
+                    throw CodecException(e)
                 }
-                session.channel.attr(LoginStartHandler.SPOOFED_GAME_PROFILE).set(LanternGameProfile(uniqueId, name, properties))
-                session.channel.attr(NetworkSession.FML_MARKER).set(false)
-                val port = jsonObject["rP"].asInt
-                val host = jsonObject["h"].asString
-                InetSocketAddress(host, port)
-            } catch (e: Exception) {
-                session.close(textOf("Invalid ${proxyType.displayName} proxy data format."))
-                throw CodecException(e)
             }
             ProxyType.NONE -> {
                 val index = hostname.indexOf(this.fmlMarker)

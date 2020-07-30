@@ -12,11 +12,11 @@ package org.lanternpowered.server.network.vanilla.packet.processor.play
 
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.packet.processor.Processor
+import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.TheEndPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket
 
-class TheEndMessageProcessor : Processor<TheEndPacket> {
+class TheEndMessageProcessor : PacketProcessor<TheEndPacket> {
 
     override fun process(context: CodecContext, packet: TheEndPacket, output: MutableList<Packet>) {
         output.add(ChangeGameStatePacket(4, if (packet.playCredits) 1f else 0f))

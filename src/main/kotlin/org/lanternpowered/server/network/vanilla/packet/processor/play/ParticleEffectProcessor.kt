@@ -21,7 +21,7 @@ import org.lanternpowered.server.network.entity.parameter.DefaultParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.packet.processor.Processor
+import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EffectPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket
@@ -54,7 +54,7 @@ import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 
-object ParticleEffectProcessor : Processor<ParticleEffectPacket> {
+object ParticleEffectProcessor : PacketProcessor<ParticleEffectPacket> {
 
     /**
      * Using a cache to bring the amount of operations down for spawning particles.

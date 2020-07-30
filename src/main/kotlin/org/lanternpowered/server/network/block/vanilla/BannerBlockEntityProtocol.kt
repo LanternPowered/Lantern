@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.server.network.block.vanilla
 
-import org.lanternpowered.server.block.entity.LanternBlockEntity
 import org.lanternpowered.server.network.block.VanillaBlockEntityProtocol
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry

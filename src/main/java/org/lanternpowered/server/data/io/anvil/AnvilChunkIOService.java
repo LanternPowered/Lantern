@@ -55,7 +55,6 @@ import org.lanternpowered.server.game.DirectoryKeys;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.UncheckedThrowables;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
-import org.lanternpowered.server.world.LanternLocation;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
@@ -67,7 +66,6 @@ import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -211,7 +209,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         final DataView spongeDataView = levelDataView.getView(DataQueries.SPONGE_DATA).orElse(null);
         final List<DataView> trackerDataViews = spongeDataView == null ? null : levelDataView.getViewList(TRACKER_DATA_TABLE).orElse(null);
 
-        final Short2ObjectMap<LanternChunk.TrackerData>[] trackerData = chunk.getTrackerData().getRawObjects();
+        final Short2ObjectMap<LanternChunk.TrackerData>[] trackerData = chunk.getTrackerData().getObjects();
 
         if (trackerDataViews != null) {
             for (DataView dataView : trackerDataViews) {
@@ -336,7 +334,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         levelDataView.set(SECTIONS, sectionDataViews);
         levelDataView.set(HEIGHT_MAP, chunk.getHeightMap());
 
-        final Short2ObjectMap<LanternChunk.TrackerData>[] trackerData = chunk.getTrackerData().getRawObjects();
+        final Short2ObjectMap<LanternChunk.TrackerData>[] trackerData = chunk.getTrackerData().getObjects();
         final List<DataView> trackerDataViews = new ArrayList<>();
 
         for (int i = 0; i < trackerData.length; i++) {

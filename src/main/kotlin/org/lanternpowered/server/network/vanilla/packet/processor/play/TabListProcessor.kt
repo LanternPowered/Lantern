@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.processor.play
 
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.packet.processor.Processor
+import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
 
 /**
@@ -20,7 +20,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
  * into a new message, this is required because the vanilla codec can only use
  * one entry type for one message.
  */
-object TabListProcessor : Processor<TabListPacket> {
+object TabListProcessor : PacketProcessor<TabListPacket> {
 
     override fun process(context: CodecContext, packet: TabListPacket, output: MutableList<Packet>) {
         if (packet.entries.isEmpty())

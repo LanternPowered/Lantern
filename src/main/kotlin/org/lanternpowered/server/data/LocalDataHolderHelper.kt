@@ -30,9 +30,8 @@ object LocalDataHolderHelper {
         val keyRegistryB = dataHolderB.keyRegistry
 
         // The same keys have to be present in both of the containers
-        if (keyRegistryA.keys.size != keyRegistryB.keys.size) {
+        if (keyRegistryA.keys.size != keyRegistryB.keys.size)
             return false
-        }
 
         for (registrationA in keyRegistryA.registrations) {
             val registrationB = keyRegistryB[registrationA.key.uncheckedCast<Key<Value<Any>>>()] ?: return false
@@ -40,9 +39,8 @@ object LocalDataHolderHelper {
             // Get the values from both of the containers and match them
             val valueA = registrationA.anyDataProvider().get(dataHolderA).orNull()
             val valueB = registrationB.anyDataProvider().get(dataHolderB).orNull()
-            if (valueA != valueB) {
+            if (valueA != valueB)
                 return false
-            }
         }
 
         return true

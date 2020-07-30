@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.inventory
 
+import net.kyori.adventure.text.Component
+import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalDataHolderHelper
@@ -21,12 +23,12 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 
 class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack) :
-        MutableBackedSerializableLocalImmutableDataHolder<ItemStackSnapshot, LanternItemStack>(itemStack), ItemStackSnapshot {
+        MutableBackedSerializableLocalImmutableDataHolder<ItemStackSnapshot, LanternItemStack>(itemStack), ItemStackSnapshot, TextRepresentable {
 
     override fun getType(): ItemType = this.backingDataHolder.type
     override fun getQuantity(): Int = this.backingDataHolder.quantity
-    override fun isEmpty() = this.backingDataHolder.isEmpty
-    override fun getTranslation() = this.backingDataHolder.translation
+    override fun isEmpty(): Boolean = this.backingDataHolder.isEmpty
+    override fun asComponent(): Component = this.backingDataHolder.asComponent()
 
     override fun createStack() = this.backingDataHolder.copy()
 

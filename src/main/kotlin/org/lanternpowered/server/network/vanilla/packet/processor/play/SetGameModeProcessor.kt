@@ -12,12 +12,12 @@ package org.lanternpowered.server.network.vanilla.packet.processor.play
 
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.packet.processor.Processor
+import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetGameModePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket
 import org.lanternpowered.server.registry.type.data.GameModeRegistry
 
-class SetGameModeProcessor : Processor<SetGameModePacket> {
+class SetGameModeProcessor : PacketProcessor<SetGameModePacket> {
 
     override fun process(context: CodecContext, packet: SetGameModePacket, output: MutableList<Packet>) {
         output.add(ChangeGameStatePacket(3, GameModeRegistry.getId(packet.gameMode).toFloat()))

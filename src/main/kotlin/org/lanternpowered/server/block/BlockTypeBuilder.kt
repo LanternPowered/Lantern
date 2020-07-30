@@ -12,6 +12,8 @@ package org.lanternpowered.server.block
 
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.namespacedKey
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.TranslatableText
 import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.util.AABB
@@ -77,7 +79,7 @@ annotation class BlockTypeBuilderDsl
 interface BlockTypeBuilder {
 
     fun name(name: String)
-    fun name(name: Translation)
+    fun name(name: Text)
 
     /**
      * Adds a single [StateProperty].

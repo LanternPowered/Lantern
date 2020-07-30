@@ -41,6 +41,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
+import org.lanternpowered.server.util.ConcurrentObjectArray;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.collect.array.NibbleArray;
 import org.lanternpowered.server.world.LanternWorld;
@@ -468,10 +469,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return;
         }
         for (int y = 0; y < CHUNK_SECTIONS; y++) {
-            ChunkSection section = this.chunkSections.getRawObjects()[y];
+            ChunkSection section = this.chunkSections.getObjects()[y];
             if (section != null) {
                 // Just fill the light array for now
-                this.chunkSections.getRawObjects()[y].lightFromSky.fill((byte) 15);
+                this.chunkSections.getObjects()[y].lightFromSky.fill((byte) 15);
             }
         }
         this.lightPopulated = true;

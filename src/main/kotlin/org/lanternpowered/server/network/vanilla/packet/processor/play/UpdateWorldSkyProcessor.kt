@@ -12,11 +12,11 @@ package org.lanternpowered.server.network.vanilla.packet.processor.play
 
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.packet.processor.Processor
+import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateWorldSkyPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket
 
-class UpdateWorldSkyProcessor : Processor<UpdateWorldSkyPacket> {
+class UpdateWorldSkyProcessor : PacketProcessor<UpdateWorldSkyPacket> {
 
     override fun process(context: CodecContext, packet: UpdateWorldSkyPacket, output: MutableList<Packet>) {
         var rain = packet.rainStrength

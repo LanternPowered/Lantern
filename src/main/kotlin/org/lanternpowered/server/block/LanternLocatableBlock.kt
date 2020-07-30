@@ -38,7 +38,7 @@ data class LanternLocatableBlock internal constructor(
     override fun toContainer(): DataContainer {
         val blockPos = this.location.position.toInt()
         return super.toContainer()
-                .set(Queries.WORLD_ID, this.location.worldUniqueId)
+                .set(Queries.WORLD_KEY, this.location.worldKey)
                 .set(Queries.POSITION_X, blockPos.x)
                 .set(Queries.POSITION_Y, blockPos.y)
                 .set(Queries.POSITION_Z, blockPos.z)

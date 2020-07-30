@@ -14,7 +14,7 @@ import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.packet.handler.Handler
-import org.lanternpowered.server.network.pipeline.MessageCompressionHandler
+import org.lanternpowered.server.network.pipeline.PacketCompressionHandler
 import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginSuccessPacket
@@ -34,7 +34,7 @@ class LoginFinishHandler : Handler<LoginFinishPacket> {
         if (compressionThreshold != -1) {
             session.sendWithFuture(SetCompressionPacket(compressionThreshold)).addListener {
                 context.channel.pipeline().replace(NetworkSession.COMPRESSION, NetworkSession.COMPRESSION,
-                        MessageCompressionHandler(compressionThreshold))
+                        PacketCompressionHandler(compressionThreshold))
             }
         } else {
             // Remove the compression handler placeholder

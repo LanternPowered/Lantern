@@ -17,6 +17,7 @@ import org.lanternpowered.api.event.Order
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.id
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.collections.contentToString
 import org.lanternpowered.server.util.TypeTokenHelper
 
 class RegisteredListener<T : Event>(
@@ -60,14 +61,14 @@ class RegisteredListener<T : Event>(
     private fun isGenericTypeApplicable(type: EventType<*>): Boolean {
         if (!this.eventType.isGeneric || this.eventType.genericParameter == null)
             return true
-        return TypeTokenHelper.isAssignable(type.genericParameter, this.eventType.genericParameter)
+        return TypeTokenHelper.isAssignable(type.genericParameter!!, this.eventType.genericParameter)
     }
 
     override fun toString(): String = ToStringHelper(this)
             .add("plugin", this.plugin.id)
             .add("eventType", this.eventType)
             .add("order", this.order)
-            .add("includedTypes", if (this.includedTypes == null) null else Iterables.toString(this.includedTypes))
-            .add("excludedTypes", if (this.excludedTypes == null) null else Iterables.toString(this.excludedTypes))
+            .add("includedTypes", if (this.includedTypes == null) null else this.includedTypes.contentToString())
+            .add("excludedTypes", if (this.excludedTypes == null) null else this.excludedTypes.contentToString())
             .toString()
 }

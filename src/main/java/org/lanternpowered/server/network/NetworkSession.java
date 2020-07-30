@@ -307,7 +307,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
         if (packet instanceof KeepAlivePacket) { // Special case
             handleKeepAlive((KeepAlivePacket) packet);
         } else if (packet instanceof BulkPacket) {
-            ((BulkPacket) packet).getPackets().forEach(this::messageReceived);
+            ((BulkPacket) packet).packets.forEach(this::messageReceived);
         } else if (packet instanceof HandlerPacket) {
             final HandlerPacket handlerMessage = (HandlerPacket) packet;
             if (handlerMessage.getHandleThread() == HandlerPacket.HandleThread.NETTY) {

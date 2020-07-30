@@ -10,6 +10,9 @@
  */
 package org.lanternpowered.server.block
 
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.world.Location
+import org.lanternpowered.api.world.World
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.world.WeakWorldReference
 import org.spongepowered.api.Sponge
@@ -19,12 +22,8 @@ import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.persistence.InvalidDataException
 import org.spongepowered.api.data.persistence.Queries
 import org.spongepowered.api.world.LocatableBlock
-import org.spongepowered.api.world.Location
-import org.spongepowered.api.world.World
 import org.spongepowered.math.vector.Vector3i
-
 import java.util.Optional
-import java.util.UUID
 
 class LanternLocatableBlockBuilder : AbstractDataBuilder<LocatableBlock>(LocatableBlock::class.java, 1), LocatableBlock.Builder {
 
@@ -54,7 +53,7 @@ class LanternLocatableBlockBuilder : AbstractDataBuilder<LocatableBlock>(Locatab
         this.location = null
     }
 
-    override fun world(world: World<*>) = apply {
+    override fun world(world: World) = apply {
         this.worldReference = WeakWorldReference(world)
         this.location = null
     }
@@ -96,7 +95,7 @@ class LanternLocatableBlockBuilder : AbstractDataBuilder<LocatableBlock>(Locatab
                 .orElseThrow { InvalidDataException("Could not locate an \"z\" coordinate in the container!") }
         val blockState = container.getCatalogType(DataQueries.BLOCK_STATE, BlockState::class.java)
                 .orElseThrow { InvalidDataException("Could not locate a BlockState") }
-        val worldId = container.getObject(Queries.WORLD_ID, UUID::class.java)
+        val worldId = container.getObject(Queries.WORLD_KEY, NamespacedKey::class.java)
                 .orElseThrow { InvalidDataException("Could not locate a UUID") }
         return Sponge.getServer().worldManager.getWorld(worldId)
                 .map { world ->

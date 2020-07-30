@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.network.vanilla.advancement
 
-import com.google.common.collect.Iterables
 import org.lanternpowered.api.util.ToStringHelper
+import org.lanternpowered.api.util.collections.contentToString
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
@@ -45,6 +45,6 @@ class NetworkAdvancement(
             .add("id", this.id)
             .add("parentId", this.parentId)
             .add("display", this.display)
-            .add("criteria", Iterables.toString(this.criteria))
+            .add("criteria", this.criteria.contentToString())
             .toString()
 }

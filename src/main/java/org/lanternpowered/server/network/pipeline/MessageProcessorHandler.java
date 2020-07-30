@@ -19,7 +19,7 @@ import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.packet.MessageRegistration;
 import org.lanternpowered.server.network.packet.UnknownPacket;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
-import org.lanternpowered.server.network.packet.processor.Processor;
+import org.lanternpowered.server.network.packet.PacketProcessor;
 import org.lanternpowered.server.network.protocol.Protocol;
 
 import java.util.ArrayList;
@@ -52,13 +52,13 @@ public class MessageProcessorHandler extends ChannelOutboundHandlerAdapter {
                     msg.getClass().getName(), this.codecContext.getSession().getProtocolState().name()));
         }
 
-        final List<Processor> processors = registration.getProcessors();
+        final List<PacketProcessor> processors = registration.getProcessors();
         if (processors.isEmpty()) {
             // Just forward the message
             ctx.write(msg, promise);
         } else {
             final List<Object> messages = new ArrayList<>();
-            for (Processor processor : processors) {
+            for (PacketProcessor processor : processors) {
                 // The processor should handle the output messages
                 processor.process(this.codecContext, msg, messages);
             }

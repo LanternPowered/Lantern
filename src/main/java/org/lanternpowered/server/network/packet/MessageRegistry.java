@@ -16,7 +16,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.network.packet.codec.Codec;
 import org.lanternpowered.server.network.packet.handler.Handler;
-import org.lanternpowered.server.network.packet.processor.Processor;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -180,7 +179,7 @@ public final class MessageRegistry {
 
     /**
      * Binds a {@link Packet} type to this registry and
-     * attaches the {@link Processor} to it.
+     * attaches the {@link PacketProcessor} to it.
      *
      * @param messageType The message type
      * @param processor The processor
@@ -188,7 +187,7 @@ public final class MessageRegistry {
      * @param <P> The type of the processor
      * @return The registration
      */
-    public <M extends Packet, P extends Processor<? super M>> MessageRegistration<M> bindProcessor(Class<M> messageType, P processor) {
+    public <M extends Packet, P extends PacketProcessor<? super M>> MessageRegistration<M> bindProcessor(Class<M> messageType, P processor) {
         final MessageRegistration<M> registration = bindMessage(messageType);
         registration.bindProcessor(processor);
         return registration;

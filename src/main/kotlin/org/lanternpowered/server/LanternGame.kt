@@ -15,7 +15,6 @@ import joptsimple.OptionSet
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.Game
-import org.lanternpowered.api.Platform
 import org.lanternpowered.api.PlatformComponent
 import org.lanternpowered.api.Sponge
 import org.lanternpowered.api.event.EventManager
@@ -208,7 +207,7 @@ object LanternGame : Game {
         val service = this.serviceProvider.register<PermissionService> {
             this.lanternPlugin to LanternPermissionService()
         }
-        service.registerContextCalculator(LanternContextCalculator())
+        service.registerContextCalculator(LanternContextCalculator(this))
         if (service is LanternPermissionService) {
             fun applyDefault(opLevel: Int, permission: String, state: Tristate = Tristate.TRUE) = service
                     .getGroupForOpLevel(opLevel).subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, permission, state)

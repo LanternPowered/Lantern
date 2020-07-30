@@ -91,7 +91,7 @@ class LanternConsole(
 
     override fun buildReader(builder: LineReaderBuilder): LineReader {
         builder.appName(this.game.lanternPlugin.name)
-        builder.completer(ConsoleCommandCompleter(this.game, this))
+        builder.completer(ConsoleCommandCompleter(this))
 
         val lineReader = super.buildReader(builder).also { this.lineReader = it }
         lineReader.setVariable(LineReader.HISTORY_FILE, this.consoleHistoryFile)

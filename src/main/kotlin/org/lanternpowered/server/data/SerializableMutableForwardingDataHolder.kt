@@ -13,7 +13,7 @@ package org.lanternpowered.server.data
 import org.spongepowered.api.data.SerializableDataHolder
 import org.spongepowered.api.data.persistence.DataView
 
-interface SerializableMutableForwardingDataHolder : SerializableForwardingDataHolder, SerializableDataHolder.Mutable {
+interface SerializableMutableForwardingDataHolder : MutableForwardingDataHolder, SerializableForwardingDataHolder, SerializableDataHolder.Mutable {
 
     override val delegateDataHolder: SerializableDataHolder.Mutable
 

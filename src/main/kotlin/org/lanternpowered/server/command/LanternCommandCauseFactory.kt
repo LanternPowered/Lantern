@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.command
 
-import net.kyori.adventure.audience.Audience
-import net.kyori.adventure.text.Component
 import org.lanternpowered.api.Lantern
+import org.lanternpowered.api.audience.Audience
 import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.cause.get
 import org.lanternpowered.api.entity.Entity
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.optional.optional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Locatable
@@ -65,7 +65,7 @@ private class LanternCommandCause(private val cause: Cause) : CommandCause {
         return this.cause.first<BlockSnapshot>().optional()
     }
 
-    override fun sendMessage(message: Component) {
+    override fun sendMessage(message: Text) {
         this.audience.sendMessage(message)
     }
 

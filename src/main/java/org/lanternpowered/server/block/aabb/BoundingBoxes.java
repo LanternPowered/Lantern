@@ -51,7 +51,7 @@ public class BoundingBoxes {
     }
 
     public static AABB pressurePlate(BlockState blockState) {
-        return blockState.get(Keys.POWERED).orElse(false) || blockState.get(Keys.POWER).orElse(0) > 0 ?
+        return blockState.get(Keys.IS_POWERED).orElse(false) || blockState.get(Keys.POWER).orElse(0) > 0 ?
                 PressurePlate.PRESSED : PressurePlate.UNPRESSED;
     }
 

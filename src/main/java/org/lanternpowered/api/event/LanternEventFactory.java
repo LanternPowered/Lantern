@@ -10,21 +10,27 @@
  */
 package org.lanternpowered.api.event;
 
+import com.google.common.reflect.TypeToken;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.block.entity.Sign;
+import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
+import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.type.SkinPart;
-import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.block.entity.ChangeSignEvent;
+import org.spongepowered.api.event.advancement.AdvancementEvent;
+import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
@@ -34,7 +40,6 @@ import org.spongepowered.api.event.entity.living.player.PlayerChangeClientSettin
 import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
-import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
@@ -51,9 +56,11 @@ import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 
 import java.net.InetSocketAddress;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 
@@ -216,5 +223,86 @@ public class LanternEventFactory {
             int size) {
         return SpongeEventFactory.createQueryServerEventFull(cause, address, customValuesMap, gameId, gameType,
                 map, motd, players, plugins, version, maxPlayerCount, maxSize, playerCount, size);
+    }
+
+    public static AdvancementEvent.Grant createAdvancementEventGrant(
+            @NonNull Cause cause,
+            @NonNull Audience originalAudience,
+            @Nullable Audience audience,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
+            @NonNull Advancement advancement,
+            @NonNull ServerPlayer player,
+            @NonNull Instant time,
+            boolean messageCancelled) {
+        return SpongeEventFactory.createAdvancementEventGrant(cause, originalAudience, Optional.ofNullable(audience), originalMessage,
+                message, advancement, player, time, messageCancelled);
+    }
+
+    public static CriterionEvent.Grant createCriterionEventGrant(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull AdvancementCriterion criterion,
+            @NonNull ServerPlayer player,
+            @NonNull Instant time) {
+        return SpongeEventFactory.createCriterionEventGrant(cause, advancement, criterion, player, time);
+    }
+
+    public static CriterionEvent.Score.Grant createCriterionEventScoreGrant(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull ScoreAdvancementCriterion criterion,
+            @NonNull ServerPlayer player,
+            @NonNull Instant time,
+            int newScore,
+            int previousScore) {
+        return SpongeEventFactory.createCriterionEventScoreGrant(cause, advancement, criterion, player, time, newScore, previousScore);
+    }
+
+    public static AdvancementEvent.Revoke createAdvancementEventRevoke(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull ServerPlayer player) {
+        return SpongeEventFactory.createAdvancementEventRevoke(cause, advancement, player);
+    }
+
+    public static CriterionEvent.Revoke createCriterionEventRevoke(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull AdvancementCriterion criterion,
+            @NonNull ServerPlayer player) {
+        return SpongeEventFactory.createCriterionEventRevoke(cause, advancement, criterion, player);
+    }
+
+    public static CriterionEvent.Score.Revoke createCriterionEventScoreRevoke(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull ScoreAdvancementCriterion criterion,
+            @NonNull ServerPlayer player,
+            int newScore,
+            int previousScore) {
+        return SpongeEventFactory.createCriterionEventScoreRevoke(cause, advancement, criterion, player, newScore, previousScore);
+    }
+
+    public static CriterionEvent.Score.Change createCriterionEventScoreChange(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull ScoreAdvancementCriterion criterion,
+            @NonNull ServerPlayer player,
+            int newScore,
+            int previousScore) {
+        return SpongeEventFactory.createCriterionEventScoreChange(cause, advancement, criterion, player, newScore, previousScore);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <@NonNull C extends FilteredTriggerConfiguration> CriterionEvent.Trigger<C> createCriterionEventTrigger(
+            @NonNull Cause cause,
+            @NonNull Advancement advancement,
+            @NonNull AdvancementCriterion criterion,
+            @NonNull ServerPlayer player,
+            @NonNull FilteredTrigger<C> trigger,
+            boolean result) {
+        return SpongeEventFactory.createCriterionEventTrigger(cause, advancement, criterion,
+                TypeToken.of(trigger.getType().getConfigurationType()), player, trigger, result);
     }
 }

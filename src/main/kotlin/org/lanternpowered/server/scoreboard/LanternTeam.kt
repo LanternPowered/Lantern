@@ -15,7 +15,7 @@ import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket.AddMembers
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket.RemoveMembers
@@ -186,7 +186,7 @@ class LanternTeam internal constructor(
         return failedMembers
     }
 
-    override fun getScoreboard(): Optional<Scoreboard> = this.scoreboard.optional()
+    override fun getScoreboard(): Optional<Scoreboard> = this.scoreboard.asOptional()
 
     override fun unregister(): Boolean {
         val scoreboard = this.scoreboard ?: return false

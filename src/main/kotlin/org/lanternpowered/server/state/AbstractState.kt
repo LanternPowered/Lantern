@@ -15,7 +15,7 @@ import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.catalog.AbstractCatalogType
 import org.lanternpowered.server.data.SerializableImmutableDataHolder
@@ -68,17 +68,17 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
     }
 
     override fun <T : Comparable<T>> getStateProperty(stateProperty: StateProperty<T>): Optional<T> {
-        return (this.stateValues[stateProperty] as? T).optional()
+        return (this.stateValues[stateProperty] as? T).asOptional()
     }
 
     override fun <T : Comparable<T>, V : T> withStateProperty(stateProperty: StateProperty<T>, value: V): Optional<S> {
-        return this.propertyValueTable.row(stateProperty)?.get(value).optional()
+        return this.propertyValueTable.row(stateProperty)?.get(value).asOptional()
     }
 
     override fun getStatePropertyByName(statePropertyId: String): Optional<StateProperty<*>> {
         for ((property, _) in this.stateValues) {
             if (property.getName() == statePropertyId) {
-                return property.optional()
+                return property.asOptional()
             }
         }
         return emptyOptional()
@@ -97,7 +97,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
                 next = (last as Cycleable<*>).cycleNext() as T
                 if (next === value) {
                     // We cycled completely, abort
-                    return (this as S).optional()
+                    return (this as S).asOptional()
                 }
                 // Check if the next value is actually supported
                 if (stateProperty.predicate.test(next)) {
@@ -120,7 +120,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
             }
         }
 
-        return (this.propertyValueTable.row(stateProperty)[value] as S).optional()
+        return (this.propertyValueTable.row(stateProperty)[value] as S).asOptional()
     }
 
     override fun <T : Cycleable<T>> cycleValue(key: Key<out Value<T>>): Optional<S> {
@@ -132,7 +132,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
             next = (last as Cycleable<*>).cycleNext() as T
             if (next === value) {
                 // We cycled completely, abort
-                return (this as S).optional()
+                return (this as S).asOptional()
             }
             // Check if the next value is actually supported
             val state = with(key, next)
@@ -184,11 +184,11 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
             property: AbstractStateProperty<*, *>, currentStateValue: Comparable<*>?, stateValue: Comparable<*>
     ): Optional<S> {
         if (stateValue == currentStateValue) {
-            return (this as S).optional()
+            return (this as S).asOptional()
         } else if ((property.getPredicate() as Predicate<Comparable<*>>).test(stateValue)) {
             return emptyOptional()
         }
-        return (this.propertyValueTable.row(property)[stateValue] as S).optional()
+        return (this.propertyValueTable.row(property)[stateValue] as S).asOptional()
     }
 
     override fun with(value: Value<*>) = with(value.key as Key<Value<Any>>, value.get())
@@ -215,7 +215,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
         val currentStateValue = this.stateValues[property]
         val currentKeyValue = transformer.toKeyValue(currentStateValue as Comparable<Any>)
 
-        return currentKeyValue.optional()
+        return currentKeyValue.asOptional()
     }
 
     override fun supports(key: Key<*>): Boolean {

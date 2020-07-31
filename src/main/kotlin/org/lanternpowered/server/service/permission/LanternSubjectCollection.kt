@@ -12,7 +12,7 @@ package org.lanternpowered.server.service.permission
 
 import org.lanternpowered.api.util.collections.asUnmodifiableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.permission.Subject
 import org.spongepowered.api.service.permission.SubjectCollection
@@ -37,7 +37,7 @@ abstract class LanternSubjectCollection protected constructor(
             this.service.newSubjectReference(this.getIdentifier(), subjectIdentifier)
 
     override fun getSubject(identifier: String): Optional<Subject> =
-            this[identifier].optional()
+            this[identifier].asOptional()
 
     override fun loadSubject(identifier: String): CompletableFuture<Subject> =
             CompletableFuture.completedFuture(this[identifier])

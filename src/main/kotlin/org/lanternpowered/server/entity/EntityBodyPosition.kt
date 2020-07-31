@@ -10,6 +10,10 @@
  */
 package org.lanternpowered.server.entity
 
+/**
+ * Represents a specific position type of an entity. Will fallback
+ * to [CENTER] if the position isn't supported by the entity.
+ */
 enum class EntityBodyPosition {
     /**
      * The head position.
@@ -17,8 +21,14 @@ enum class EntityBodyPosition {
     HEAD,
 
     /**
-     * The feet position, this is usually the
+     * The bottom or feet position, this is the
      * lowest possible position of the entity.
      */
-    FEET
+    BOTTOM,
+
+    /**
+     * The center position (of the collision box)
+     * of the entity.
+     */
+    CENTER
 }

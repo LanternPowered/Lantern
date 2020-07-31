@@ -15,11 +15,16 @@ import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.handler.Handler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientRecipeBookStatePacket
 
-class ClientRecipeBookStatesHandler : Handler<ClientRecipeBookStatePacket> {
+object ClientRecipeBookStatesHandler : Handler<ClientRecipeBookStatePacket> {
 
     override fun handle(context: NetworkContext, packet: ClientRecipeBookStatePacket) {
         val player = context.session.player
-        player.offer(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, packet.craftingRecipeBookState)
-        player.offer(LanternKeys.SMELTING_RECIPE_BOOK_STATE, packet.smeltingRecipeBookState)
+        val key = when (packet.type) {
+            ClientRecipeBookStatePacket.Type.CRAFTING -> LanternKeys.CRAFTING_RECIPE_BOOK_STATE
+            ClientRecipeBookStatePacket.Type.FURNACE -> LanternKeys.FURNACE_RECIPE_BOOK_STATE
+            ClientRecipeBookStatePacket.Type.BLAST_FURNACE -> LanternKeys.BLAST_FURNACE_RECIPE_BOOK_STATE
+            ClientRecipeBookStatePacket.Type.SMOKER -> LanternKeys.SMOKER_RECIPE_BOOK_STATE
+        }
+        player.offer(key, packet.state)
     }
 }

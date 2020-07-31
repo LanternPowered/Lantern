@@ -13,7 +13,7 @@ package org.lanternpowered.server.service.permission
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.service.permission.OpLevelCollection.OpLevelSubject
 import org.spongepowered.api.service.context.ContextCalculator
 import org.spongepowered.api.service.permission.PermissionDescription
@@ -81,7 +81,7 @@ class LanternPermissionService : PermissionService {
     override fun loadCollection(identifier: String): CompletableFuture<SubjectCollection> =
             CompletableFuture.completedFuture(this[identifier])
 
-    override fun getCollection(identifier: String): Optional<SubjectCollection> = this[identifier].optional()
+    override fun getCollection(identifier: String): Optional<SubjectCollection> = this[identifier].asOptional()
 
     override fun hasCollection(identifier: String): CompletableFuture<Boolean> =
             CompletableFuture.completedFuture(this.subjects.containsKey(identifier))
@@ -100,7 +100,7 @@ class LanternPermissionService : PermissionService {
     }
 
     override fun getDescription(permissionId: String): Optional<PermissionDescription> =
-            this.descriptionMap[permissionId.toLowerCase()].optional()
+            this.descriptionMap[permissionId.toLowerCase()].asOptional()
 
     override fun getDescriptions(): Collection<PermissionDescription> {
         var descriptions = this.descriptions

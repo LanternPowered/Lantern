@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.advancement.criteria.progress
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.advancement.LanternAdvancementProgress
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion
@@ -27,7 +27,7 @@ abstract class LanternCriterionProgressBase<T : AbstractCriterion>(
     private var attached = false
 
     override fun achieved(): Boolean = this.achievingTime != null
-    override fun get(): Optional<Instant> = this.achievingTime.optional()
+    override fun get(): Optional<Instant> = this.achievingTime.asOptional()
 
     override fun attachTrigger() {
         val trigger = this.criterion.trigger.orNull() ?: return

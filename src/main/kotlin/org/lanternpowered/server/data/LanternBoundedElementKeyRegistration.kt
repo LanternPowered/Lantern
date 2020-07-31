@@ -25,6 +25,9 @@ internal class LanternBoundedElementKeyRegistration<V : Value<E>, E : Any, H : D
 
     private var minimum: (H.() -> E?)? = null
     private var maximum: (H.() -> E?)? = null
+    private var coerceInBounds = false
+
+    override fun coerceInBounds(): BoundedElementKeyRegistration<V, E, H> = apply { this.coerceInBounds = true }
 
     override fun <V : Value<E>, E : Comparable<E>, H : DataHolder> BoundedElementKeyRegistration<V, E, H>
             .range(range: ClosedRange<E>) = apply {
@@ -69,7 +72,28 @@ internal class LanternBoundedElementKeyRegistration<V : Value<E>, E : Any, H : D
         this.maximum = { get(maximum).orNull() }
     }
 
+    override fun transform(holder: H, element: E): E {
+        if (!this.coerceInBounds)
+            return super.transform(holder, element)
+
+        val key = this.key as ValueKey<V, E>
+        val comparator = key.elementComparator
+
+        val minimum = this.minimum?.invoke(holder)
+        if (minimum != null && comparator.compare(element, minimum) < 0)
+            return minimum
+
+        val maximum = this.maximum?.invoke(holder)
+        if (maximum != null && comparator.compare(element, maximum) > 0)
+            return maximum
+
+        return super.transform(holder, element)
+    }
+
     override fun validate(holder: H, element: E): Boolean {
+        if (this.coerceInBounds)
+            return super.validate(holder, element)
+
         val key = this.key as ValueKey<V, E>
         val comparator = key.elementComparator
 

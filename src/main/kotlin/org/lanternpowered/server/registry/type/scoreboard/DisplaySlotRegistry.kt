@@ -16,7 +16,7 @@ import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.api.text.format.TextColor
 import org.lanternpowered.api.util.index.requireKey
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot
@@ -55,7 +55,7 @@ private class LanternDisplaySlot(
 ) : DefaultCatalogType(key), DisplaySlot {
 
     override fun withTeamColor(color: NamedTextColor?) = this.withTeamColor?.invoke(color) ?: this
-    override fun getTeamColor() = this.teamColor.optional()
+    override fun getTeamColor() = this.teamColor.asOptional()
     override fun toStringHelper() = super.toStringHelper()
             .omitNullValues()
             .add("teamColor", this.teamColor)

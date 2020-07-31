@@ -109,6 +109,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.effect.sound.music.MusicDisc;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -514,7 +515,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
                 }*/
                 this.session.send(new UnlockRecipesPacket.Add(
                         get(LanternKeys.CRAFTING_RECIPE_BOOK_STATE).get(),
-                        get(LanternKeys.SMELTING_RECIPE_BOOK_STATE).get(),
+                        get(LanternKeys.FURNACE_RECIPE_BOOK_STATE).get(),
                         new ArrayList<>()));
             } else {
                 if (oldWorld != world) {

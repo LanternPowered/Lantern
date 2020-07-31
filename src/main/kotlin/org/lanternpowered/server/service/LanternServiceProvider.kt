@@ -20,7 +20,7 @@ import org.lanternpowered.api.event.lifecycle.ProvideServiceEvent
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.service.ServiceProvider
 import org.lanternpowered.api.util.collections.toImmutableList
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.service.ServiceRegistration
 import java.util.Optional
 import java.util.function.Supplier
@@ -73,10 +73,10 @@ class LanternServiceProvider(private val game: Game) : ServiceProvider {
         get() = this.registrationMap.values.toImmutableList()
 
     override fun <T : Any> provide(serviceClass: KClass<T>): T? = provideNullable(serviceClass.java)
-    override fun <T : Any> provide(serviceClass: Class<T>): Optional<T> = provideNullable(serviceClass).optional()
+    override fun <T : Any> provide(serviceClass: Class<T>): Optional<T> = provideNullable(serviceClass).asOptional()
 
     override fun <T : Any> getRegistration(serviceClass: Class<T>): Optional<ServiceRegistration<T>> =
-            getNullableRegistration(serviceClass).optional()
+            getNullableRegistration(serviceClass).asOptional()
 
     private fun <T : Any> provideNullable(serviceClass: Class<T>): T? =
             getNullableRegistration(serviceClass)?.service()

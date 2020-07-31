@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.plugin
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.plugin.inject.PluginGuiceModule
 import org.lanternpowered.server.util.guice.getInstance
 import org.spongepowered.api.config.ConfigManager
@@ -41,5 +41,5 @@ class LanternPluginLanguageService : JVMPluginLanguageService<LanternPluginConta
     }
 
     override fun createPluginContainer(candidate: PluginCandidate, environment: PluginEnvironment): Optional<LanternPluginContainer> =
-            LanternPluginContainer(candidate).optional()
+            LanternPluginContainer(candidate).asOptional()
 }

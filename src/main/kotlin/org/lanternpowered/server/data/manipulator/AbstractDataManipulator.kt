@@ -13,7 +13,7 @@ package org.lanternpowered.server.data.manipulator
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.ValueContainerBase
 import org.lanternpowered.server.data.value.ValueFactory
@@ -26,11 +26,11 @@ abstract class AbstractDataManipulator(
         protected val map: MutableMap<Key<*>, Any>
 ) : ValueContainerBase, DataManipulator {
 
-    override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> = this.map[key].uncheckedCast<E?>().optional()
+    override fun <E : Any> get(key: Key<out Value<E>>): Optional<E> = this.map[key].uncheckedCast<E?>().asOptional()
 
     override fun <E : Any, V : Value<E>> getValue(key: Key<V>): Optional<V> {
         val element = this.map[key].uncheckedCast<E?>()
-        return if (element == null) emptyOptional() else ValueFactory.mutableOf(key, element).optional()
+        return if (element == null) emptyOptional() else ValueFactory.mutableOf(key, element).asOptional()
     }
 
     override fun getKeys() = this.map.keys.toImmutableSet()

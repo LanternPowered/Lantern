@@ -12,7 +12,7 @@ package org.lanternpowered.server.xevent
 
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.google.common.collect.HashMultimap
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.type.typeToken
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.xevent.Xevent
@@ -139,7 +139,7 @@ class LanternXeventBus : XeventBus {
             event = supplier()
             post(event, handlers)
         }
-        return event.optional()
+        return event.asOptional()
     }
 
     private fun post(event: Xevent, handlers: List<InternalHandler>) {

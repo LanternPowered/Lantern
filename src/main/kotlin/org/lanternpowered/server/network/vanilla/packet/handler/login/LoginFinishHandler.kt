@@ -19,11 +19,6 @@ import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginSuccessPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.SetCompressionPacket
-import org.lanternpowered.server.network.vanilla.packet.type.play.RegisterChannelsPacket
-import org.lanternpowered.api.key.NamespacedKey
-import org.spongepowered.api.Platform
-import org.spongepowered.api.Sponge
-import java.util.stream.Collectors
 
 class LoginFinishHandler : Handler<LoginFinishPacket> {
 
@@ -51,10 +46,7 @@ class LoginFinishHandler : Handler<LoginFinishPacket> {
                 .addListener {
                     session.setGameProfile(gameProfile)
                     session.protocolState = ProtocolState.PLAY
-                    val channels = Sponge.getChannelRegistrar().getRegisteredChannels(Platform.Type.SERVER)
-                            .stream().map { obj: NamespacedKey -> obj.toString() }.collect(Collectors.toSet())
-                    if (channels.isNotEmpty())
-                        session.send(RegisterChannelsPacket(channels))
+                    // TODO: Send custom channel registrations
                     session.initPlayer()
                 }
     }

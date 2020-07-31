@@ -11,7 +11,7 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
@@ -36,7 +36,7 @@ interface LocalImmutableDataHolder<I : DataHolder.Immutable<I>> : LocalDataHolde
         if (valueCache != null) {
             var value = valueCache.values[key.uncheckedCast()]
             if (value != null) {
-                return if (value == ValueCache.None) emptyOptional() else value.uncheckedCast<V>().optional()
+                return if (value == ValueCache.None) emptyOptional() else value.uncheckedCast<V>().asOptional()
             }
             value = super<LocalDataHolder>.getValue(key).map { it.asImmutable().uncheckedCast<V>() }
             valueCache.values[key] = value.uncheckedCast<Optional<Any>>().orElse(ValueCache.None)

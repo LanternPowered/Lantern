@@ -12,7 +12,7 @@ package org.lanternpowered.server.advancement.criteria.progress
 
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.advancement.LanternAdvancementProgress
 import org.lanternpowered.server.advancement.criteria.AbstractOperatorCriterion
 import java.time.Instant
@@ -27,7 +27,7 @@ abstract class AbstractOperatorCriterionProgress<T : AbstractOperatorCriterion> 
 
     override fun get(): Optional<Instant> {
         if (this.cachedAchievedState == null) {
-            this.cachedAchievedState = get0().optional()
+            this.cachedAchievedState = get0().asOptional()
         }
         return this.cachedAchievedState!!
     }
@@ -51,7 +51,7 @@ abstract class AbstractOperatorCriterionProgress<T : AbstractOperatorCriterion> 
         return if (time === Instant.MAX) {
             // Somebody prevented a criterion to be granted
             emptyOptional()
-        } else time.optional()
+        } else time.asOptional()
     }
 
     override fun revoke(invalidator: () -> Unit): Optional<Instant> {

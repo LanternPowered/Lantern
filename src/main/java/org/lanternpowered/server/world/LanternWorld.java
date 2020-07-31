@@ -1381,7 +1381,7 @@ public class LanternWorld implements AbstractExtent, AbstractViewer, ServerWorld
         for (LanternEntity entity : new ArrayList<>(this.entitiesByUniqueId.values())) {
             if (entity.isRemoved()) {
                 final Vector3i lastChunk = entity.getLastChunkSectionCoords();
-                if (lastChunk != null && entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                if (lastChunk != null && entity.getRemoveState() == LanternEntity.UnloadState.REMOVED) {
                     final LanternChunk chunk = this.chunkManager.getChunkIfLoaded(lastChunk.getX(), lastChunk.getZ());
                     if (chunk != null) {
                         chunk.removeEntity(entity, lastChunk.getY());

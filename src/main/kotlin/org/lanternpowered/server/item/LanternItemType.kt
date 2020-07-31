@@ -15,7 +15,7 @@ import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
 import org.lanternpowered.server.catalog.DefaultCatalogType
@@ -38,7 +38,7 @@ class LanternItemType(
     private val name by lazy { this.nameFunction(ItemStack.of(this)) }
 
     override fun asComponent(): Text = this.name
-    override fun getBlock() = this.blockType.optional()
+    override fun getBlock() = this.blockType.asOptional()
     override fun getMaxStackQuantity() = this.maxStackQuantity
 
     override fun getContainer(): Optional<ItemType> {

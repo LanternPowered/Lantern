@@ -12,7 +12,7 @@ package org.lanternpowered.server.service.permission
 
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.ToStringHelper
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.service.permission.PermissionDescription
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.Subject
@@ -35,7 +35,7 @@ internal class LanternPermissionDescription private constructor(
 ) : PermissionDescription {
 
     override fun getId(): String = this.id
-    override fun getDescription(): Optional<Text> = this.description.optional()
+    override fun getDescription(): Optional<Text> = this.description.asOptional()
 
     override fun getAssignedSubjects(identifier: String): Map<Subject, Boolean> {
         val subjects = this.permissionService[identifier]
@@ -47,7 +47,7 @@ internal class LanternPermissionDescription private constructor(
         return subjects.getAllWithPermission(this.id)
     }
 
-    override fun getOwner(): Optional<PluginContainer> = this.owner.optional()
+    override fun getOwner(): Optional<PluginContainer> = this.owner.asOptional()
     override fun hashCode(): Int = this.id.hashCode()
 
     override fun equals(other: Any?): Boolean {

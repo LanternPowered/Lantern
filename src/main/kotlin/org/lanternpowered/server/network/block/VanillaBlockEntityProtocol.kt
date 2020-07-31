@@ -34,18 +34,19 @@ abstract class VanillaBlockEntityProtocol<T : BlockEntity>(blockEntity: T) : Blo
     override fun update(context: BlockEntityProtocolUpdateContext) {
         val lazyDataView = LazyDataView()
         populateUpdateData(lazyDataView)
-        if (lazyDataView.dataView != null)
-            context.send(UpdateBlockEntityPacket(this.type, this.blockEntity.serverLocation.blockPosition, lazyDataView.dataView))
+        val dataView = lazyDataView.dataView
+        if (dataView != null)
+            context.send(UpdateBlockEntityPacket(this.type, this.blockEntity.serverLocation.blockPosition, dataView))
     }
 
     internal class LazyDataView : () -> DataView {
         var dataView: DataView? = null
 
         override fun invoke(): DataView {
-            if (dataView == null) {
-                dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
+            if (this.dataView == null) {
+                this.dataView = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
             }
-            return dataView!!
+            return this.dataView!!
         }
     }
 

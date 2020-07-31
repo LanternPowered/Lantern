@@ -30,31 +30,47 @@ internal class LanternLocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHo
     // Unchecked casts here, is needed to prevent weird kotlin issue
 
     override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.remove(
+            handler: H.() -> Unit) = apply {
+        removeFastAnd {
+            handler(this)
+            true
+        }
+    }
+
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.removeAnd(
             handler: H.() -> DataTransactionResult) = apply {
         this@LanternLocalDataProviderBuilder.removeHandler = handler.uncheckedCast()
     }
 
-    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.removeFast(
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.removeFastAnd(
             handler: H.() -> Boolean) = apply {
         this@LanternLocalDataProviderBuilder.removeFastHandler = handler.uncheckedCast()
     }
 
-    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offer(
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.set(
+            handler: H.(element: E) -> Unit) = apply {
+        setFastAnd { element ->
+            handler(this, element)
+            true
+        }
+    }
+
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setAnd(
             handler: H.(element: E) -> DataTransactionResult) = apply {
         this@LanternLocalDataProviderBuilder.offerHandler = handler.uncheckedCast()
     }
 
-    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offerFast(
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setFastAnd(
             handler: H.(element: E) -> Boolean) = apply {
         this@LanternLocalDataProviderBuilder.offerFastHandler = handler.uncheckedCast()
     }
 
-    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offerValue(
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setValueAnd(
             handler: H.(value: V) -> DataTransactionResult) = apply {
         this@LanternLocalDataProviderBuilder.offerValueHandler = handler.uncheckedCast()
     }
 
-    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offerValueFast(
+    override fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setValueFastAnd(
             handler: H.(value: V) -> Boolean) = apply {
         this@LanternLocalDataProviderBuilder.offerValueFastHandler = handler.uncheckedCast()
     }

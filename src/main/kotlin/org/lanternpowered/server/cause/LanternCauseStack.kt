@@ -14,7 +14,7 @@ import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseContext
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.SystemProperties
@@ -73,9 +73,9 @@ class LanternCauseStack : CauseStack {
     override fun peekCause(): Any = this.cause.peek()
 
     override fun <T : Any> first(target: KClass<T>): T? = firstIn(this.cause.iterator(), target.java)
-    override fun <T : Any> first(target: Class<T>): Optional<T> = firstIn(this.cause.iterator(), target).optional()
+    override fun <T : Any> first(target: Class<T>): Optional<T> = firstIn(this.cause.iterator(), target).asOptional()
     override fun <T : Any> last(target: KClass<T>): T? = firstIn(this.cause.descendingIterator(), target.java)
-    override fun <T : Any> last(target: Class<T>): Optional<T> = firstIn(this.cause.descendingIterator(), target).optional()
+    override fun <T : Any> last(target: Class<T>): Optional<T> = firstIn(this.cause.descendingIterator(), target).asOptional()
 
     override fun containsType(target: KClass<*>): Boolean = containsType(target.java)
     override fun containsType(target: Class<*>): Boolean = this.cause.any { cause -> target.isInstance(cause) }
@@ -210,7 +210,7 @@ class LanternCauseStack : CauseStack {
 
     override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): CauseStack = apply { set(key, value) }
 
-    override fun <T : Any> getContext(key: CauseContextKey<T>): Optional<T> = get(key).optional()
+    override fun <T : Any> getContext(key: CauseContextKey<T>): Optional<T> = get(key).asOptional()
 
     override fun <T : Any> removeContext(key: CauseContextKey<T>): Optional<T> {
         this.cachedCtx = null
@@ -222,7 +222,7 @@ class LanternCauseStack : CauseStack {
                 frame.store(key, existing)
             }
         }
-        return existing.optional()
+        return existing.asOptional()
     }
 
     private class CauseStackFrameImpl internal constructor(

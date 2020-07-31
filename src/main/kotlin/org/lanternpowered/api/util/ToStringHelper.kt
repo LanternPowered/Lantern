@@ -13,8 +13,7 @@ package org.lanternpowered.api.util
 import kotlin.reflect.KClass
 
 /**
- * A helper class to build [String]s for
- * classes with properties, etc.
+ * A helper class to build [String]s for classes with properties, etc.
  *
  * @param className The name of the class
  * @param brackets The brackets that should be added around the joined entries

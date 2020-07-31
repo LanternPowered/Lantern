@@ -13,7 +13,7 @@ package org.lanternpowered.server.resourcepack
 import com.google.common.hash.Hashing
 import com.google.common.io.ByteStreams
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.util.PathUtils
 import org.spongepowered.api.resourcepack.ResourcePack
 import java.io.FileNotFoundException
@@ -70,7 +70,7 @@ object LanternResourcePackFactory : ResourcePack.Factory {
         return resourcePack
     }
 
-    fun getById(id: String) = this.resourcePacks[id].optional()
+    fun getById(id: String) = this.resourcePacks[id].asOptional()
 
     override fun fromUri(uri: URI) = fromUri(uri, false)
     override fun fromUriUnchecked(uri: URI) = fromUri(uri, true)
@@ -85,5 +85,5 @@ private data class LanternResourcePack(
     override fun getUri() = this.uri
     override fun getName() = this.name
     override fun getId() = this.id
-    override fun getHash() = this.hash.optional()
+    override fun getHash() = this.hash.asOptional()
 }

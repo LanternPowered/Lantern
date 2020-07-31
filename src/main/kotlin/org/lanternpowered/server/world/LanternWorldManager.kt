@@ -20,7 +20,7 @@ import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldManager
@@ -89,7 +89,7 @@ class LanternWorldManager(
             this.entryByKey.entries.firstOrNull()?.key ?: namespacedKey("lantern", "unknown")
 
     override fun getDefaultProperties(): Optional<WorldProperties> =
-            this.entryByKey[this.defaultPropertiesKey]?.properties.optional()
+            this.entryByKey[this.defaultPropertiesKey]?.properties.asOptional()
 
     private fun onDiscover(storage: WorldStorage) {
         // Just load the new entry
@@ -137,7 +137,7 @@ class LanternWorldManager(
                 ?: return emptyOptional() // Copying the world failed for some reason
         // TODO: Disable saving for the source world, if it's loaded
         val newEntry = loadEntry(newStorage)
-        return newEntry.properties.optional()
+        return newEntry.properties.asOptional()
     }
 
     override fun renameWorld(oldKey: NamespacedKey, newValue: String): CompletableFuture<Optional<WorldProperties>> =
@@ -157,7 +157,7 @@ class LanternWorldManager(
             val newStorage = this.worldStorageService.move(oldKey, newKey)
                     ?: return emptyOptional() // Moving failed
             val newEntry = loadEntry(newStorage)
-            return newEntry.properties.optional()
+            return newEntry.properties.asOptional()
         }
     }
 
@@ -198,7 +198,7 @@ class LanternWorldManager(
     }
 
     override fun loadWorld(key: NamespacedKey): CompletableFuture<Optional<World>> =
-            CompletableFuture.supplyAsync(Supplier { loadWorld0(key).optional() }, this.ioExecutor)
+            CompletableFuture.supplyAsync(Supplier { loadWorld0(key).asOptional() }, this.ioExecutor)
 
     private fun loadWorld0(key: NamespacedKey): World? {
         val entry = this.entryByKey[key]
@@ -207,7 +207,7 @@ class LanternWorldManager(
     }
 
     override fun loadWorld(properties: WorldProperties): CompletableFuture<Optional<World>> =
-            CompletableFuture.supplyAsync(Supplier { loadWorld0(properties).optional() }, this.ioExecutor)
+            CompletableFuture.supplyAsync(Supplier { loadWorld0(properties).asOptional() }, this.ioExecutor)
 
     private fun loadWorld0(properties: WorldProperties): World? {
         val entry = this.entryByUniqueId[properties.uniqueId]
@@ -275,7 +275,7 @@ class LanternWorldManager(
             // Write the world data
             storage.save(WorldPropertiesSerializer.serialize(properties))
         }
-        return properties.optional()
+        return properties.asOptional()
     }
 
     override fun saveProperties(properties: WorldProperties): CompletableFuture<Boolean> =
@@ -303,10 +303,10 @@ class LanternWorldManager(
                     .toImmutableList()
 
     override fun getProperties(key: NamespacedKey): Optional<WorldProperties> =
-            this.entryByKey[key]?.properties.optional()
+            this.entryByKey[key]?.properties.asOptional()
 
     fun getProperties(uniqueId: UUID): Optional<WorldProperties> =
-            this.entryByUniqueId[uniqueId]?.properties.optional()
+            this.entryByUniqueId[uniqueId]?.properties.asOptional()
 
     override fun getWorlds(): Collection<World> =
             this.entryByKey.values.asSequence()
@@ -315,10 +315,10 @@ class LanternWorldManager(
                     .toImmutableList()
 
     override fun getWorld(key: NamespacedKey): Optional<World> =
-            this.entryByKey[key]?.world.optional()
+            this.entryByKey[key]?.world.asOptional()
 
     fun getWorld(uniqueId: UUID): Optional<World> =
-            this.entryByUniqueId[uniqueId]?.world.optional()
+            this.entryByUniqueId[uniqueId]?.world.asOptional()
 
     /**
      * Runs all the world updates.

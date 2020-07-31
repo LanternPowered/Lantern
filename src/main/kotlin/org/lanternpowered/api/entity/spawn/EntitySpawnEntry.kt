@@ -16,6 +16,7 @@ import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.util.Transform
 import java.util.function.Consumer
+import java.util.function.Supplier
 
 /**
  * Represents a spawning entry that can be spawned through the [EntitySpawner].
@@ -29,6 +30,18 @@ class EntitySpawnEntry<T : Entity> @JvmOverloads constructor(
         val transform: Transform,
         val populator: T.() -> Unit = {}
 ) {
+
+    constructor(
+            entityType: Supplier<out EntityType<T>>,
+            transform: Transform,
+            entityConsumer: T.() -> Unit = {}
+    ) : this(entityType.get(), transform, entityConsumer)
+
+    constructor(
+            entityType: Supplier<out EntityType<T>>,
+            transform: Transform,
+            entityConsumer: Consumer<T>
+    ) : this(entityType.get(), transform, entityConsumer::accept)
 
     constructor(
             entityType: EntityType<T>,

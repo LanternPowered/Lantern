@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
@@ -52,10 +52,10 @@ internal open class LanternDataProvider<V : Value<E>, E : Any>(
             this.allowAsyncAccess(container)
 
     override fun get(container: DataHolder) =
-            this.getHandler(container).optional()
+            this.getHandler(container).asOptional()
 
     override fun getValue(container: DataHolder) =
-            this.getValueHandler(container).optional()
+            this.getValueHandler(container).asOptional()
 
     override fun isSupported(container: DataHolder) =
             this.supportedByTester(container)
@@ -67,11 +67,11 @@ internal open class LanternDataProvider<V : Value<E>, E : Any>(
             this.removeFastHandler(container)
 
     override fun <I : DataHolder.Immutable<I>> with(immutable: I, element: E) =
-            this.withHandler(immutable, element).uncheckedCast<I>().optional()
+            this.withHandler(immutable, element).uncheckedCast<I>().asOptional()
 
     override fun <I : DataHolder.Immutable<I>> withValue(immutable: I, value: V) =
-            this.withValueHandler(immutable, value).uncheckedCast<I>().optional()
+            this.withValueHandler(immutable, value).uncheckedCast<I>().asOptional()
 
     override fun <I : DataHolder.Immutable<I>> without(immutable: I) =
-            this.withoutHandler(immutable).uncheckedCast<I>().optional()
+            this.withoutHandler(immutable).uncheckedCast<I>().asOptional()
 }

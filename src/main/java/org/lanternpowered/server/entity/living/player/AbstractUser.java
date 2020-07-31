@@ -44,7 +44,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -88,7 +87,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
         super.registerKeys();
         final LocalKeyRegistry<AbstractUser> c = getKeyRegistry().forHolder(AbstractUser.class);
         c.register(LanternKeys.TOP_HAT);
-        c.registerBounded(LanternKeys.MAX_EXHAUSTION).minimum(0.0).maximum(Double.MAX_VALUE);
+        c.registerBounded(LanternKeys.MAX_EXHAUSTION, 4.0).minimum(0.0).maximum(Double.MAX_VALUE);
         c.registerBounded(Keys.EXHAUSTION, DEFAULT_EXHAUSTION).minimum(0.0).maximum(LanternKeys.MAX_EXHAUSTION);
         c.registerBounded(LanternKeys.MAX_FOOD_LEVEL, 20).minimum(0).maximum(Integer.MAX_VALUE);
         c.registerBounded(Keys.FOOD_LEVEL, 20).minimum(0).maximum(LanternKeys.MAX_FOOD_LEVEL);
@@ -127,7 +126,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
         c.register(LanternKeys.CAN_DUAL_WIELD, false);
         c.register(LanternKeys.SCORE, 0);
         c.register(LanternKeys.ACTIVE_HAND);
-        c.register(LanternKeys.SMELTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
+        c.register(LanternKeys.FURNACE_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
         c.register(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT);
         c.register(LanternKeys.OPEN_ADVANCEMENT_TREE);
         c.register(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>());

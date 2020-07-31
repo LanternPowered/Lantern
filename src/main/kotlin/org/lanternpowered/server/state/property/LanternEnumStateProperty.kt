@@ -13,7 +13,7 @@ package org.lanternpowered.server.state.property
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.state.identityStateKeyValueTransformer
 import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.Key
@@ -30,7 +30,7 @@ internal class LanternEnumStateProperty<E : Enum<E>>(
     override fun parseValue(value: String): Optional<E> {
         for (enumValue in valueClass.enumConstants) {
             if (enumValue.name.equals(value, ignoreCase = true)) {
-                return enumValue.optional()
+                return enumValue.asOptional()
             }
         }
         return emptyOptional()

@@ -1298,7 +1298,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 final LanternEntity entity = iterator.next();
                 // Only remove the entities that are "destroyed",
                 // the other ones can be resurrected after chunk loading
-                if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                if (entity.getRemoveState() == LanternEntity.UnloadState.REMOVED) {
                     iterator.remove();
                 } else {
                     final Optional<AABB> aabb = entity.getBoundingBox();
@@ -1357,7 +1357,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             final LanternEntity entity = iterator.next();
             // Only remove the entities that are "destroyed",
             // the other ones can be resurrected after chunk loading
-            if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+            if (entity.getRemoveState() == LanternEntity.UnloadState.REMOVED) {
                 iterator.remove();
             } else {
                 consumer.accept(entity);
@@ -1384,7 +1384,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * temporarily "disabled" (chunk being unloaded).
      */
     void buryEntities() {
-        forEachEntity(entity -> entity.remove(LanternEntity.RemoveState.CHUNK_UNLOAD));
+        forEachEntity(entity -> entity.unload(LanternEntity.UnloadState.CHUNK_UNLOAD));
     }
 
     public void addEntity(LanternEntity entity, int section) {

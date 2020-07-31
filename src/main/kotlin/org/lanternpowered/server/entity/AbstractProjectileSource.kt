@@ -20,8 +20,8 @@ import java.util.*
 interface AbstractProjectileSource : Locatable, ProjectileSource {
 
     @JvmDefault
-    override fun <T : Projectile> launchToTarget(projectileClass: Class<T>, target: Entity): Optional<T> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun <T : Projectile> launchProjectileTo(projectileClass: Class<T>, target: Entity): Optional<T> {
+        TODO("Not yet implemented")
     }
 
     @JvmDefault

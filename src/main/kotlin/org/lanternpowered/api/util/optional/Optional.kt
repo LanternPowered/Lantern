@@ -46,60 +46,60 @@ inline fun <T> Optional<T>.orNull(): T? = orElse(null)
 /**
  * Wraps the boolean value into an [Optional].
  */
-inline fun Boolean.optional(): Optional<Boolean> = OptBool.of(this)
+inline fun Boolean.asOptional(): Optional<Boolean> = OptBool.of(this)
 
 /**
  * Wraps the nullable boolean value into an [Optional].
  */
-inline fun Boolean?.optional(): Optional<Boolean> = OptBool.of(this)
+inline fun Boolean?.asOptional(): Optional<Boolean> = OptBool.of(this)
 
 /**
  * Wraps the value into an [Optional].
  */
 @JvmName("optionalOf")
-inline fun <T : Any> T.optional(): Optional<T> = Optional.of(this)
+inline fun <T : Any> T.asOptional(): Optional<T> = Optional.of(this)
 
 /**
  * Wraps the nullable value into an [Optional].
  */
 @JvmName("optionalOfNullable")
-inline fun <T : Any> T?.optional(): Optional<T> = Optional.ofNullable(this)
+inline fun <T : Any> T?.asOptional(): Optional<T> = Optional.ofNullable(this)
 
 /**
  * Wraps the int into an [OptionalInt].
  */
 @JvmName("optionalOf")
-inline fun Int.optionalInt(): OptionalInt = OptionalInt.of(this)
+inline fun Int.asOptionalInt(): OptionalInt = OptionalInt.of(this)
 
 /**
  * Wraps the int into an [OptionalInt].
  */
 @JvmName("optionalOfNullable")
-inline fun Int?.optionalInt(): OptionalInt = if (this == null) OptionalInt.empty() else OptionalInt.of(this)
+inline fun Int?.asOptionalInt(): OptionalInt = if (this == null) OptionalInt.empty() else OptionalInt.of(this)
 
 /**
  * Wraps the double into an [OptionalDouble].
  */
 @JvmName("optionalOf")
-inline fun Double.optionalDouble(): OptionalDouble = OptionalDouble.of(this)
+inline fun Double.asOptionalDouble(): OptionalDouble = OptionalDouble.of(this)
 
 /**
  * Wraps the double into an [OptionalDouble].
  */
 @JvmName("optionalOfNullable")
-inline fun Double?.optionalDouble(): OptionalDouble = if (this == null) OptionalDouble.empty() else OptionalDouble.of(this)
+inline fun Double?.asOptionalDouble(): OptionalDouble = if (this == null) OptionalDouble.empty() else OptionalDouble.of(this)
 
 /**
  * Wraps the long into an [OptionalLong].
  */
 @JvmName("optionalOf")
-inline fun Long.optionalLong(): OptionalLong = OptionalLong.of(this)
+inline fun Long.asOptionalLong(): OptionalLong = OptionalLong.of(this)
 
 /**
  * Wraps the long into an [OptionalLong].
  */
 @JvmName("optionalOfNullable")
-inline fun Long?.optionalLong(): OptionalLong = if (this == null) OptionalLong.empty() else OptionalLong.of(this)
+inline fun Long?.asOptionalLong(): OptionalLong = if (this == null) OptionalLong.empty() else OptionalLong.of(this)
 
 /**
  * Transforms this [Optional] into a [OptionalInt].

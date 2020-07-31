@@ -36,7 +36,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     private lateinit var difficulty: Difficulty
     private lateinit var portalAgentType: LanternPortalAgentType<*>
     private lateinit var serializationBehavior: SerializationBehavior
-    private lateinit var dimensionType: LanternDimensionType<*>
+    private lateinit var dimensionType: LanternDimensionType
 
     // If not specified, fall back to dimension default
     private var generatorType: GeneratorType? = null
@@ -110,7 +110,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
     override fun randomSeed() = apply { this.seedProvider = SeedProvider.Random }
     override fun gameMode(gameMode: GameMode) = apply { this.gameMode = gameMode }
     override fun generatorType(type: GeneratorType) = apply { this.generatorType = type }
-    override fun dimensionType(type: DimensionType) = apply { this.dimensionType = type as LanternDimensionType<*> }
+    override fun dimensionType(type: DimensionType) = apply { this.dimensionType = type as LanternDimensionType }
     override fun difficulty(difficulty: Difficulty) = apply { this.difficulty = difficulty }
     override fun generateStructures(state: Boolean) = apply { this.generateStructures = state }
     override fun hardcore(enabled: Boolean) = apply { this.hardcore = enabled }
@@ -165,7 +165,7 @@ class LanternWorldArchetypeBuilder : AbstractCatalogBuilder<WorldArchetype, Worl
         this.enabled = true
         this.generateStructures = true
         this.commandEnabled = true
-        this.dimensionType = DimensionTypes.OVERWORLD.get() as LanternDimensionType<*>
+        this.dimensionType = DimensionTypes.OVERWORLD.get() as LanternDimensionType
         this.seedProvider = SeedProvider.Random
         this.generatorType = null
         this.generatorSettings = null

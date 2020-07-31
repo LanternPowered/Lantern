@@ -15,7 +15,7 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.advancement.LanternAdvancementProgress
 import org.lanternpowered.server.advancement.criteria.AbstractCriterion
 import java.time.Instant
@@ -27,7 +27,7 @@ class LanternCriterionProgress(
 
     override fun grant(invalidator: () -> Unit): Optional<Instant> {
         if (this.achievingTime != null)
-            return this.achievingTime.optional()
+            return this.achievingTime.asOptional()
         val cause = CauseStack.current().currentCause
         val advancement = this.advancementProgress.advancement
         val event = LanternEventFactory.createCriterionEventGrant(
@@ -38,7 +38,7 @@ class LanternCriterionProgress(
         this.achievingTime = event.time
         detachTrigger()
         invalidator()
-        return this.achievingTime.optional()
+        return this.achievingTime.asOptional()
     }
 
     override fun revoke(invalidator: () -> Unit): Optional<Instant> {
@@ -55,7 +55,7 @@ class LanternCriterionProgress(
         this.achievingTime = null
         attachTrigger()
         invalidator()
-        return achievingTime.optional()
+        return achievingTime.asOptional()
     }
 
     override fun fillProgress(progress: Object2LongMap<String>) {

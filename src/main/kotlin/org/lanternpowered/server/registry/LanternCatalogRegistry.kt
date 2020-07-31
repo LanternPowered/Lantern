@@ -18,7 +18,7 @@ import org.lanternpowered.api.registry.CatalogTypeProvider
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.DuplicateRegistrationException
 import org.lanternpowered.api.registry.UnknownTypeException
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import java.util.Optional
 import java.util.stream.Stream
 import kotlin.reflect.KClass
@@ -71,7 +71,7 @@ object LanternCatalogRegistry : CatalogRegistry {
             requireRegistry(catalogClass).provide(suggestedId) as CatalogTypeProvider<E>
 
     override fun <T : CatalogType> get(typeClass: KClass<T>, key: NamespacedKey): T? = getNullable(typeClass.java, key)
-    override fun <T : CatalogType> get(typeClass: Class<T>, key: AdventureKey): Optional<T> = getNullable(typeClass, key.asNamespacedKey()).optional()
+    override fun <T : CatalogType> get(typeClass: Class<T>, key: AdventureKey): Optional<T> = getNullable(typeClass, key.asNamespacedKey()).asOptional()
 
     private fun <T : CatalogType> getNullable(typeClass: Class<T>, key: NamespacedKey): T? = getRegistry(typeClass)?.get(key)
 

@@ -11,7 +11,7 @@
 package org.lanternpowered.api.service
 
 import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.service.economy.EconomyService
 import org.spongepowered.api.service.pagination.PaginationService
@@ -55,7 +55,7 @@ interface ServiceProvider : org.spongepowered.api.service.ServiceProvider {
 
     override fun paginationService(): PaginationService = provide() ?: error("Pagination service is unavailable.")
     override fun banService(): BanService = provide() ?: error("Ban service is unavailable.")
-    override fun economyService(): Optional<EconomyService> = provide<EconomyService>().optional()
+    override fun economyService(): Optional<EconomyService> = provide<EconomyService>().asOptional()
     override fun permissionService(): PermissionService = provide() ?: error("Permission service is unavailable.")
     override fun whitelistService(): WhitelistService = provide() ?: error("Whitelist service is unavailable.")
 

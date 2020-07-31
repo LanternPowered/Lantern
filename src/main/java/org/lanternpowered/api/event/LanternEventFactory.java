@@ -16,6 +16,7 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
@@ -26,14 +27,19 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.advancement.AdvancementEvent;
 import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.HarvestEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.player.CooldownEvent;
 import org.spongepowered.api.event.entity.living.player.PlayerChangeClientSettingsEvent;
@@ -304,5 +310,60 @@ public class LanternEventFactory {
             boolean result) {
         return SpongeEventFactory.createCriterionEventTrigger(cause, advancement, criterion,
                 TypeToken.of(trigger.getType().getConfigurationType()), player, trigger, result);
+    }
+
+    public static @NonNull DamageEntityEvent createDamageEntityEvent(
+            @NonNull Cause cause,
+            @NonNull Entity entity,
+            @NonNull List<@NonNull DamageFunction> originalFunctions,
+            double originalDamage) {
+        return SpongeEventFactory.createDamageEntityEvent(cause, entity, originalFunctions, originalDamage);
+    }
+
+    public static DestructEntityEvent createDestructEntityEvent(
+            @NonNull Cause cause,
+            @NonNull Audience originalAudience,
+            @Nullable Audience audience,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
+            @NonNull Entity entity,
+            boolean messageCancelled) {
+        return SpongeEventFactory.createDestructEntityEvent(cause, originalAudience,
+                Optional.ofNullable(audience), originalMessage, message, entity, messageCancelled);
+    }
+
+    // TODO: Fix keepInventory vs keepsInventory naming inconsistencies
+
+    public static DestructEntityEvent.@NonNull Death createDestructEntityEventDeath(
+            @NonNull Cause cause,
+            @NonNull Audience originalAudience,
+            @Nullable Audience audience,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
+            @NonNull Living entity,
+            boolean keepInventory,
+            boolean messageCancelled) {
+        return SpongeEventFactory.createDestructEntityEventDeath(cause, originalAudience, Optional.ofNullable(audience),
+                originalMessage, message, entity, keepInventory, messageCancelled);
+    }
+
+    public static @NonNull HarvestEntityEvent createHarvestEntityEvent(
+            @NonNull Cause cause,
+            int originalExperience,
+            int experience,
+            @NonNull Entity entity) {
+        return SpongeEventFactory.createHarvestEntityEvent(cause, originalExperience, experience, entity);
+    }
+
+    public static HarvestEntityEvent.@NonNull TargetPlayer createHarvestEntityEventTargetPlayer(
+            @NonNull Cause cause,
+            int originalExperience,
+            int experience,
+            @NonNull ServerPlayer entity,
+            boolean keepsInventory,
+            boolean keepsLevel,
+            int level) {
+        return SpongeEventFactory.createHarvestEntityEventTargetPlayer(cause, originalExperience,
+                experience, entity, keepsInventory, keepsLevel, level);
     }
 }

@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.world
 
+import org.lanternpowered.api.entity.spawn.EntitySpawner
 import org.lanternpowered.api.world.weather.WeatherUniverse
 import org.spongepowered.api.world.server.ServerWorld
 import org.spongepowered.api.world.World as SpongeWorld
@@ -49,6 +50,12 @@ val World.weatherUniverse: WeatherUniverse?
     get() = (this as ExtendedWorld).weatherUniverse
 
 /**
+ * The entity spawner of the world.
+ */
+val World.entitySpawner: EntitySpawner
+    get() = (this as ExtendedWorld).entitySpawner
+
+/**
  * World extensions.
  */
 interface ExtendedWorld : ServerWorld {
@@ -57,4 +64,6 @@ interface ExtendedWorld : ServerWorld {
      * The weather universe of the world, if it exists.
      */
     val weatherUniverse: WeatherUniverse?
+
+    val entitySpawner: EntitySpawner
 }

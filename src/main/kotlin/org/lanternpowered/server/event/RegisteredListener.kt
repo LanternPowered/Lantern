@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.server.event
 
-import com.google.common.collect.Iterables
 import org.lanternpowered.api.event.Event
 import org.lanternpowered.api.event.EventListener
 import org.lanternpowered.api.event.Order

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.data
 
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.data.value.CopyHelper
 import org.lanternpowered.server.data.value.ValueFactory
@@ -73,25 +73,27 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
         return ValueFactory.immutableOf(this.key, element).asImmutable()
     }
 
+    protected open fun transform(holder: H, element: E): E = element
+
     override val dataProvider: IDataProvider<V, E> = object : IDataProvider<V, E> {
 
         override fun allowsAsynchronousAccess(container: DataHolder): Boolean = false // TODO
 
         override fun offer(container: DataHolder.Mutable, element: E): DataTransactionResult {
             container as H
-            if (!validate(container, element)) {
+            if (!validate(container, element))
                 return DataTransactionResult.failResult(immutableValueOf(container, element))
-            }
             val replacedElement = backing
-            backing = element
+            val transformed = transform(container, element)
+            backing = transformed
             changeListeners?.also { listeners ->
-                if (element != replacedElement) {
-                    listeners.forEach { listener -> listener(container.uncheckedCast(), element, replacedElement) }
+                if (transformed != replacedElement) {
+                    listeners.forEach { listener -> listener(container.uncheckedCast(), transformed, replacedElement) }
                 }
             }
-            val successful = immutableValueOf(container, element).asImmutable()
+            val successful = immutableValueOf(container, transformed).asImmutable()
             return if (replacedElement != null) {
-                val replaced = immutableValueOf(container, element)
+                val replaced = immutableValueOf(container, transformed)
                 DataTransactionResult.successReplaceResult(successful, replaced)
             } else {
                 DataTransactionResult.successResult(successful)
@@ -99,16 +101,17 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
         }
 
         override fun offerFast(container: DataHolder.Mutable, element: E): Boolean {
-            if (!validate(container.uncheckedCast(), element)) {
+            container as H
+            if (!validate(container.uncheckedCast(), element))
                 return false
-            }
+            val transformed = transform(container, element)
             val replacedElement = backing
             changeListeners?.also { listeners ->
-                if (element != replacedElement) {
-                    listeners.forEach { listener -> listener(container.uncheckedCast(), element, replacedElement) }
+                if (transformed != replacedElement) {
+                    listeners.forEach { listener -> listener(container.uncheckedCast(), transformed, replacedElement) }
                 }
             }
-            backing = element
+            backing = transformed
             return true
         }
 
@@ -119,14 +122,14 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
         override fun offerValue(container: DataHolder.Mutable, value: V): DataTransactionResult {
             container as H
             val element = value.get()
-            if (!validate(container, element)) {
+            if (!validate(container, element))
                 return DataTransactionResult.failResult(value.asImmutable())
-            }
+            val transformed = transform(container, element)
             val replacedElement = backing
-            backing = element
+            backing = transformed
             changeListeners?.also { listeners ->
-                if (element != replacedElement) {
-                    listeners.forEach { listener -> listener(container, element, replacedElement) }
+                if (transformed != replacedElement) {
+                    listeners.forEach { listener -> listener(container, transformed, replacedElement) }
                 }
             }
             return if (replacedElement != null) {
@@ -138,7 +141,7 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
         }
 
         override fun get(container: DataHolder): Optional<E> {
-            return backing.optional()
+            return backing.asOptional()
         }
 
         override fun getKey() = this@LanternElementKeyRegistration.key

@@ -12,7 +12,7 @@
 
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.data.CopyableDataHolder
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
@@ -30,21 +30,21 @@ abstract class MutableBackedCopyableLocalImmutableDataHolder<I, M : CopyableLoca
     override fun with(value: Value<*>): Optional<I> {
         val copy = this.backingDataHolder.copy() as M
         return if (copy.offerFast(value)) {
-            withBacking(copy).optional()
+            withBacking(copy).asOptional()
         } else super.with(value)
     }
 
     override fun <E : Any> with(key: Key<out Value<E>>, value: E): Optional<I> {
         val copy = this.backingDataHolder.copy() as M
         return if (copy.offerFast(key, value)) {
-            withBacking(copy).optional()
+            withBacking(copy).asOptional()
         } else super.with(key, value)
     }
 
     override fun without(key: Key<*>): Optional<I> {
         val copy = this.backingDataHolder.copy() as M
         return if (copy.removeFast(key)) {
-            withBacking(copy).optional()
+            withBacking(copy).asOptional()
         } else super.without(key)
     }
 

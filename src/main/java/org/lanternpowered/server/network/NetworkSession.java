@@ -864,7 +864,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Packet> im
             // Remove the proxy user from the player and save the player data
             this.player.getProxyUser().setInternalUser(null);
             // Destroy the player entity
-            this.player.remove(LanternEntity.RemoveState.DESTROYED);
+            this.player.unload(LanternEntity.UnloadState.REMOVED);
             // Detach the player from the world
             this.player.setWorld(null);
             // Release the players entity id

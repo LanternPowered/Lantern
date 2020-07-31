@@ -15,7 +15,7 @@ import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.FinishUsingItemPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityStatusPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetOpLevelPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket
@@ -40,7 +40,7 @@ object EntityStatusCodec : PacketEncoder<Packet> {
                 entityId = packet.entityId
                 action = packet.status
             }
-            is ClientFinishUsingItemPacket -> {
+            is FinishUsingItemPacket -> {
                 entityId = context.channel.attr(PlayerJoinCodec.PLAYER_ENTITY_ID).get()
                 action = 9
             }

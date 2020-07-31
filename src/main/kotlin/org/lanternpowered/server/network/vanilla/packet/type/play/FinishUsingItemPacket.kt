@@ -16,4 +16,4 @@ import org.lanternpowered.server.network.packet.Packet
  * When a [Player] stops using a [ItemStack], this will only be send
  * for items that have a action that takes some time, like drawing a bow, eating consumable.
  */
-object ClientFinishUsingItemPacket : Packet
+object FinishUsingItemPacket : Packet

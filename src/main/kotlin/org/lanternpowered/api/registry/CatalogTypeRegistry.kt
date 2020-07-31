@@ -12,7 +12,7 @@ package org.lanternpowered.api.registry
 
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import java.util.Optional
@@ -74,7 +74,7 @@ interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
     /**
      * Attempts to get a type for the given [key].
      */
-    fun getOptional(key: NamespacedKey): Optional<T> = get(key).optional()
+    fun getOptional(key: NamespacedKey): Optional<T> = get(key).asOptional()
 
     /**
      * Attempts to get a type for the given [key]. Throws an

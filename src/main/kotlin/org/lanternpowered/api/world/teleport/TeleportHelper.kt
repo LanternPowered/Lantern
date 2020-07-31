@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.world.teleport
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.Location
 import org.spongepowered.api.entity.Entity
 import java.util.Optional
@@ -21,7 +21,7 @@ interface TeleportHelper : org.spongepowered.api.world.TeleportHelper {
 
     override fun getSafeLocation(location: Location, height: Int, width: Int, floorDistance: Int,
             filter: TeleportHelperFilter, vararg additionalFilters: TeleportHelperFilter): Optional<Location> {
-        return getSafeLocation(location, height, width, floorDistance, listOf(filter) + additionalFilters.asList()).optional()
+        return getSafeLocation(location, height, width, floorDistance, listOf(filter) + additionalFilters.asList()).asOptional()
     }
 
     /**

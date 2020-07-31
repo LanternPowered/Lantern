@@ -31,10 +31,9 @@ class LanternShulkerBox : ContainerBlockEntity<ChestInventory>() {
         keyRegistry {
             register(Keys.DISPLAY_NAME)
             registerProvider(LanternKeys.INVENTORY_SNAPSHOT) {
-                offerFast { element ->
+                set { element ->
                     this.inventory.clear()
                     element.offerTo(this.inventory)
-                    true
                 }
                 get {
                     InventorySnapshot.ofInventory(this.inventory)

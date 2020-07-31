@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
@@ -41,16 +41,16 @@ internal class LanternDirectionalDataProvider<V : Value<E>, E : Any>(
 ), IDirectionalDataProvider<V, E> {
 
     override fun get(container: DataHolder): Optional<E> =
-            this.getHandler(container).optional()
+            this.getHandler(container).asOptional()
 
     override fun getValue(container: DataHolder): Optional<V> =
-            this.getValueHandler(container).optional()
+            this.getValueHandler(container).asOptional()
 
     override fun get(dataHolder: DataHolder, direction: Direction): Optional<E> =
-            this.getDirectionalHandler(dataHolder, direction).optional()
+            this.getDirectionalHandler(dataHolder, direction).asOptional()
 
     override fun getValue(dataHolder: DataHolder, direction: Direction): Optional<V> =
-            this.getValueDirectionalHandler(dataHolder, direction).optional()
+            this.getValueDirectionalHandler(dataHolder, direction).asOptional()
 
     override fun isSupported(container: DataHolder): Boolean =
             this.supportedByTester(container)

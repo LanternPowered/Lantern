@@ -12,7 +12,7 @@ package org.lanternpowered.server.entity.living.player
 
 import com.google.common.base.Objects
 import org.lanternpowered.api.entity.player.Player
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.data.MutableForwardingDataHolder
 import org.lanternpowered.server.data.io.UserIO
 import org.lanternpowered.server.game.Lantern
@@ -99,7 +99,7 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
     override fun getEquipped(type: EquipmentType): Optional<ItemStack> = resolveUser().getEquipped(type)
     override fun equip(type: EquipmentType, equipment: ItemStack): Boolean = resolveUser().equip(type, equipment)
     override fun isOnline(): Boolean = resolveUser().isOnline
-    override fun getPlayer(): Optional<Player> = (resolveUser() as? Player).optional()
+    override fun getPlayer(): Optional<Player> = (resolveUser() as? Player).asOptional()
     override fun getPosition(): Vector3d = resolveUser().position
     override fun getWorldUniqueId(): Optional<UUID> = resolveUser().worldUniqueId
     override fun setLocation(position: Vector3d, world: UUID): Boolean = resolveUser().setLocation(position, world)

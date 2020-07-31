@@ -17,7 +17,7 @@ import org.lanternpowered.api.util.collections.immutableSetBuilderOf
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetActiveScoreboardObjectivePacket
@@ -90,8 +90,8 @@ class LanternScoreboard : Scoreboard {
 
     fun getObjectivesInSlot(): Map<DisplaySlot, ScoreboardObjective> = this.objectivesInSlot.toImmutableMap()
 
-    override fun getObjective(name: String): Optional<ScoreboardObjective> = this.objectives[name].optional()
-    override fun getObjective(slot: DisplaySlot): Optional<ScoreboardObjective> = this.objectivesInSlot[slot].optional()
+    override fun getObjective(name: String): Optional<ScoreboardObjective> = this.objectives[name].asOptional()
+    override fun getObjective(slot: DisplaySlot): Optional<ScoreboardObjective> = this.objectivesInSlot[slot].asOptional()
 
     override fun addObjective(objective: ScoreboardObjective) {
         check(!this.objectives.containsKey(objective.name)) { "A score with the name ${objective.name} already exists!" }
@@ -160,7 +160,7 @@ class LanternScoreboard : Scoreboard {
             objective.removeScore(name)
     }
 
-    override fun getTeam(teamName: String): Optional<Team> = this.teams[teamName].optional()
+    override fun getTeam(teamName: String): Optional<Team> = this.teams[teamName].asOptional()
 
     override fun registerTeam(team: Team) {
         check(!this.teams.containsKey(team.name)) { "A team with the name ${team.name} already exists!" }
@@ -176,7 +176,7 @@ class LanternScoreboard : Scoreboard {
     override fun getMemberTeam(member: Text): Optional<Team> {
         for (team in this.teams.values) {
             if ((team as LanternTeam).hasMember(member)) {
-                return team.optional()
+                return team.asOptional()
             }
         }
         return emptyOptional()

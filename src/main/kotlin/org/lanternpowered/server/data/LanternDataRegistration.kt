@@ -12,7 +12,7 @@ package org.lanternpowered.server.data
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.api.key.NamespacedKey
@@ -37,14 +37,14 @@ class LanternDataRegistration(
     override fun <V : Value<E>, E : Any> getProviderFor(key: Key<V>): Optional<DataProvider<V, E>> {
         val provider = this.providers[key]
         if (provider != null) {
-            return provider.uncheckedCast<DataProvider<V, E>>().optional()
+            return provider.uncheckedCast<DataProvider<V, E>>().asOptional()
         }
         if (key !in this.keys) throw UnregisteredKeyException()
         return emptyOptional()
     }
 
     override fun getDataStore(token: TypeToken<out DataHolder>) =
-            this.dataStores.first { store -> token.isSubtypeOf(store.supportedToken) }.optional()
+            this.dataStores.first { store -> token.isSubtypeOf(store.supportedToken) }.asOptional()
 
     override fun getKeys() = this.keys
     override fun getPluginContainer() = this.pluginContainer

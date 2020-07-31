@@ -12,7 +12,7 @@ package org.lanternpowered.server.registry
 
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.registry.CatalogTypeRegistry
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf
 import java.util.Optional
@@ -62,7 +62,7 @@ interface InternalCatalogTypeRegistry<T : CatalogType> : CatalogTypeRegistry<T> 
     /**
      * Attempts to get a type for the given [id].
      */
-    fun getOptional(id: Int): Optional<T> = get(id).optional()
+    fun getOptional(id: Int): Optional<T> = get(id).asOptional()
 
     /**
      * Attempts to get a type for the given [id]. Throws an

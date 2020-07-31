@@ -201,7 +201,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.BrandPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.CloseWindowPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ConfirmWindowTransactionPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.FinishUsingItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerHeldItemChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.RegisterChannelsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnregisterChannelsPacket;
@@ -430,7 +430,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInPlayerDigging());
         inbound.bindMessage(ClientDropHeldItemPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleItemDrop));
-        inbound.bindMessage(ClientFinishUsingItemPacket.class)
+        inbound.bindMessage(FinishUsingItemPacket.class)
                 .bindHandler(new HandlerPlayInFinishUsingItem());
         inbound.bindMessage(ClientSwapHandItemsPacket.class)
                 .bindHandler(new HandlerPlayInSwapHandItems());
@@ -503,7 +503,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutEntityStatus.bind(EntityStatusPacket.class);
         codecPlayOutEntityStatus.bind(SetOpLevelPacket.class);
         codecPlayOutEntityStatus.bind(SetReducedDebugPacket.class);
-        codecPlayOutEntityStatus.bind(ClientFinishUsingItemPacket.class);
+        codecPlayOutEntityStatus.bind(FinishUsingItemPacket.class);
         outbound.bind(); // TODO: Explosion
         outbound.bind(UnloadChunkCodec.class, UnloadChunkPacket.class);
         outbound.bind(ChangeGameStateCodec.class, ChangeGameStatePacket.class);

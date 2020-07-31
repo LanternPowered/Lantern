@@ -24,6 +24,14 @@ interface BoundedElementKeyRegistration<V : Value<E>, E : Any, H : DataHolder> :
     operator fun invoke(fn: BoundedElementKeyRegistration<V, E, H>.() -> Unit) = apply(fn)
 
     /**
+     * When enabled, coerces offered values automatically within the bounds of the
+     * registration. Instead of failing when the value is outside the bounds.
+     *
+     * @return This registration, for chaining
+     */
+    fun coerceInBounds(): BoundedElementKeyRegistration<V, E, H>
+
+    /**
      * Sets the value range of this key registration.
      *
      * @param range The value range

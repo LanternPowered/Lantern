@@ -12,7 +12,7 @@ package org.lanternpowered.server.world.storage
 
 import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.service.world.WorldStorage
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.spongepowered.api.world.storage.ChunkDataStream
@@ -37,7 +37,7 @@ class SpongeWorldStorage(
             Supplier { this.worldStorage.chunks.exists(ChunkPosition(chunkCoords.x, chunkCoords.z)) }, this.executorService)
 
     override fun getChunkData(chunkCoords: Vector3i): CompletableFuture<Optional<DataContainer>> = CompletableFuture.supplyAsync(
-            Supplier { this.worldStorage.chunks.load(ChunkPosition(chunkCoords.x, chunkCoords.z)).optional() }, this.executorService)
+            Supplier { this.worldStorage.chunks.load(ChunkPosition(chunkCoords.x, chunkCoords.z)).asOptional() }, this.executorService)
 
     override fun getGeneratedChunks(): ChunkDataStream = SpongeChunkDataStream(this.worldStorage.chunks)
 }

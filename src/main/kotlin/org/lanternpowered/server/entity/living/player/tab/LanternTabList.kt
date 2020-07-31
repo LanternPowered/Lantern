@@ -13,7 +13,7 @@ package org.lanternpowered.server.entity.living.player.tab
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListHeaderAndFooterPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
@@ -69,14 +69,14 @@ class LanternTabList(private val player: LanternPlayer) : TabList {
 
     override fun getPlayer(): LanternPlayer = this.player
 
-    override fun getHeader(): Optional<Text> = this.header.optional()
+    override fun getHeader(): Optional<Text> = this.header.asOptional()
 
     override fun setHeader(header: Text?): LanternTabList = apply {
         this.header = header
         sendHeaderAndFooterUpdate()
     }
 
-    override fun getFooter(): Optional<Text> = this.footer.optional()
+    override fun getFooter(): Optional<Text> = this.footer.asOptional()
 
     override fun setFooter(footer: Text?): LanternTabList = apply {
         this.footer = footer
@@ -91,7 +91,7 @@ class LanternTabList(private val player: LanternPlayer) : TabList {
 
     override fun getEntries(): Collection<TabListEntry> = this.tabListEntries.values.toImmutableList()
 
-    override fun getEntry(uniqueId: UUID): Optional<TabListEntry> = this.tabListEntries[uniqueId].optional()
+    override fun getEntry(uniqueId: UUID): Optional<TabListEntry> = this.tabListEntries[uniqueId].asOptional()
 
     override fun addEntry(entry: TabListEntry): TabList {
         val uniqueId = entry.profile.uniqueId
@@ -117,6 +117,6 @@ class LanternTabList(private val player: LanternPlayer) : TabList {
             this.player.connection.send(TabListPacket(TabListPacket.Entry.Remove(entry.profile)))
             entry.globalEntry.removeEntry(entry)
         }
-        return entry.optional()
+        return entry.asOptional()
     }
 }

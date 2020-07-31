@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.status
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.MinecraftVersion
 import org.spongepowered.api.network.status.StatusClient
 import java.net.InetSocketAddress
@@ -23,5 +23,5 @@ data class LanternStatusClient(
 
     override fun getAddress() = this.address
     override fun getVersion() = this.version
-    override fun getVirtualHost() = this.virtualHost.optional()
+    override fun getVirtualHost() = this.virtualHost.asOptional()
 }

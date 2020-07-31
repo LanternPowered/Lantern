@@ -167,7 +167,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             recipeBook.set(CRAFTING_RECIPE_BOOK_GUI_OPEN,
                     (byte) (recipeBookState.isCurrentlyOpen() ? 1 : 0));
         }
-        recipeBookState = valueContainer.remove(LanternKeys.SMELTING_RECIPE_BOOK_STATE).orElse(null);
+        recipeBookState = valueContainer.remove(LanternKeys.FURNACE_RECIPE_BOOK_STATE).orElse(null);
         if (recipeBookState != null) {
             recipeBook.set(SMELTING_RECIPE_BOOK_FILTER_ACTIVE,
                     (byte) (recipeBookState.isFilterActive() ? 1 : 0));
@@ -243,7 +243,7 @@ public class UserStore<T extends AbstractUser> extends LivingStore<T> {
             valueContainer.set(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, new RecipeBookState(currentlyOpen, filterActive));
             filterActive = view.getInt(SMELTING_RECIPE_BOOK_FILTER_ACTIVE).orElse(0) > 0;
             currentlyOpen = view.getInt(SMELTING_RECIPE_BOOK_GUI_OPEN).orElse(0) > 0;
-            valueContainer.set(LanternKeys.SMELTING_RECIPE_BOOK_STATE, new RecipeBookState(currentlyOpen, filterActive));
+            valueContainer.set(LanternKeys.FURNACE_RECIPE_BOOK_STATE, new RecipeBookState(currentlyOpen, filterActive));
         });
         dataView.getString(OPEN_ADVANCEMENT_TREE).ifPresent(id -> valueContainer
                 .set(LanternKeys.OPEN_ADVANCEMENT_TREE, AdvancementTreeRegistryModule.get().get(ResourceKey.resolve(id))));

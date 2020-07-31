@@ -44,7 +44,6 @@ import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.plugin.version
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.world.WorldManager
-import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.SimpleRemoteConnection
 import org.lanternpowered.server.util.future.thenAsync
 import org.spongepowered.api.Platform
@@ -123,8 +122,7 @@ internal class QueryHandler(
     }
 
     private fun createBasicEvent(channel: Channel): QueryServerEvent.Basic {
-        val game = this.queryServer.game
-        val server = game.server
+        val server = this.queryServer.server
         val connection = SimpleRemoteConnection.of(channel)
         val cause = causeOf(connection)
         val address = channel.localAddress() as InetSocketAddress
@@ -160,7 +158,7 @@ internal class QueryHandler(
     }
 
     private fun createFullEvent(channel: Channel): QueryServerEvent.Full {
-        val game = this.queryServer.game
+        val game = this.queryServer.server.game
         val server = game.server
         val platform: Platform = game.platform
         val api = platform.getContainer(Platform.Component.API)

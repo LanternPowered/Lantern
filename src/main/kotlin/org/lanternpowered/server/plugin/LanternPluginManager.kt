@@ -20,7 +20,7 @@ import org.lanternpowered.api.plugin.PluginManager
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.getAndRemoveAll
 import org.lanternpowered.api.util.collections.toImmutableList
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.launch.LanternClassLoader
 import org.lanternpowered.server.LanternGame
@@ -209,11 +209,11 @@ class LanternPluginManager(
             this.byId.containsKey(id)
 
     override fun getPlugin(id: String): Optional<PluginContainer> =
-            this.byId[id].optional()
+            this.byId[id].asOptional()
 
     override fun getPlugins(): Collection<PluginContainer> =
             this.byId.values.toImmutableList()
 
     override fun fromInstance(instance: Any): Optional<PluginContainer> =
-            if (instance is PluginContainer) instance.optional() else this.byInstance[instance].optional()
+            if (instance is PluginContainer) instance.asOptional() else this.byInstance[instance].asOptional()
 }

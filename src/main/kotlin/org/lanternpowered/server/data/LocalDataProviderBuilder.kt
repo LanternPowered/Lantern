@@ -43,6 +43,16 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @return This builder, for chaining
      */
     fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.remove(
+            handler: H.() -> Unit): LocalDataProviderBuilder<V, E, H>
+
+    /**
+     * Sets the remove handler of this value processor, it will be called when someone attempts
+     * to remove a value from the [DataHolder].
+     *
+     * @param handler The remove handler
+     * @return This builder, for chaining
+     */
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.removeAnd(
             handler: H.() -> DataTransactionResult): LocalDataProviderBuilder<V, E, H>
 
     /**
@@ -53,7 +63,7 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @return This builder, for chaining
      */
     // TODO: Rename to "remove" -> https://youtrack.jetbrains.com/issue/KT-22119
-    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.removeFast(
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.removeFastAnd(
             handler: H.() -> Boolean): LocalDataProviderBuilder<V, E, H>
 
     /**
@@ -63,7 +73,7 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @param handler The offer handler
      * @return This builder, for chaining
      */
-    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offerValue(
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setValueAnd(
             handler: H.(value: V) -> DataTransactionResult): LocalDataProviderBuilder<V, E, H>
 
     /**
@@ -75,7 +85,7 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @return This builder, for chaining
      */
     // TODO: Rename to "offerValue" -> https://youtrack.jetbrains.com/issue/KT-22119
-    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offerValueFast(
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setValueFastAnd(
             handler: H.(value: V) -> Boolean): LocalDataProviderBuilder<V, E, H>
 
     /**
@@ -85,7 +95,17 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @param handler The offer handler
      * @return This builder, for chaining
      */
-    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offer(
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.set(
+            handler: H.(element: E) -> Unit): LocalDataProviderBuilder<V, E, H>
+
+    /**
+     * Sets the offer handler of this value processor, it will be called when someone attempts
+     * to add or update a value to the mutable [DataHolder].
+     *
+     * @param handler The offer handler
+     * @return This builder, for chaining
+     */
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setAnd(
             handler: H.(element: E) -> DataTransactionResult): LocalDataProviderBuilder<V, E, H>
 
     /**
@@ -96,7 +116,7 @@ interface LocalDataProviderBuilder<V : Value<E>, E : Any, H : DataHolder> {
      * @return This builder, for chaining
      */
     // TODO: Rename to "offer" -> https://youtrack.jetbrains.com/issue/KT-22119
-    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.offerFast(
+    fun <H : DataHolder.Mutable> LocalDataProviderBuilder<V, E, H>.setFastAnd(
             handler: H.(element: E) -> Boolean): LocalDataProviderBuilder<V, E, H>
 
     /**

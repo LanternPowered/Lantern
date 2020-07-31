@@ -365,7 +365,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
         final List<DataView> entityViews = new ArrayList<>();
         for (LanternEntity entity : entities) {
-            if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+            if (entity.getRemoveState() == LanternEntity.UnloadState.REMOVED) {
                 continue;
             }
             final DataView entityView = entitySerializer.serialize(entity);

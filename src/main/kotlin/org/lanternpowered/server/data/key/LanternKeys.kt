@@ -179,9 +179,19 @@ object LanternKeys {
     @JvmField val CRAFTING_RECIPE_BOOK_STATE = valueKeyOf<Value<RecipeBookState>>(lanternKey("crafting_recipe_book_state"))
 
     /**
-     * The smelting recipe book state.
+     * The furnace recipe book state.
      */
-    @JvmField val SMELTING_RECIPE_BOOK_STATE: Key<Value<RecipeBookState>> = valueKeyOf(lanternKey("smelting_recipe_book_state"))
+    @JvmField val FURNACE_RECIPE_BOOK_STATE: Key<Value<RecipeBookState>> = valueKeyOf(lanternKey("furnace_recipe_book_state"))
+
+    /**
+     * The blast furnace recipe book state.
+     */
+    @JvmField val BLAST_FURNACE_RECIPE_BOOK_STATE: Key<Value<RecipeBookState>> = valueKeyOf(lanternKey("blast_furnace_recipe_book_state"))
+
+    /**
+     * The smoker recipe book state.
+     */
+    @JvmField val SMOKER_RECIPE_BOOK_STATE: Key<Value<RecipeBookState>> = valueKeyOf(lanternKey("smoker_recipe_book_state"))
 
     @JvmField val TOP_HAT: Key<Value<TopHat>> = valueKeyOf(lanternKey("top_hat"))
 

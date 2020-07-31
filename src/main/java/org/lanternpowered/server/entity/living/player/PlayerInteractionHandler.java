@@ -33,7 +33,7 @@ import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.FinishUsingItemBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientBlockPlacementPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFinishUsingItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.FinishUsingItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDiggingPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerSwingArmPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientUseItemPacket;
@@ -395,7 +395,7 @@ public final class PlayerInteractionHandler {
         this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
     }
 
-    public void handleFinishItemInteraction(ClientFinishUsingItemPacket message) {
+    public void handleFinishItemInteraction(FinishUsingItemPacket message) {
         final Optional<HandType> activeHand = this.player.get(LanternKeys.ACTIVE_HAND);
         // The player is already interacting
         if (!activeHand.isPresent() || this.activeHandStartTime == -1L) {

@@ -12,7 +12,7 @@ package org.lanternpowered.server.plugin
 
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.plugin.PluginContainer
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.plugin.metadata.PluginMetadata
 import java.net.URL
 import java.nio.file.Path
@@ -33,7 +33,7 @@ class InternalPluginContainer(
     override fun locateResource(relative: URL): Optional<URL> {
         val classLoader = this.instance.javaClass.classLoader
         val resolved: URL? = classLoader.getResource(relative.path)
-        return resolved.optional()
+        return resolved.asOptional()
     }
 
     override fun toString(): String = this.metadata.toString()

@@ -13,9 +13,9 @@ package org.lanternpowered.server.data
 import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
 import org.lanternpowered.api.util.optional.emptyOptionalLong
-import org.lanternpowered.api.util.optional.optionalDouble
-import org.lanternpowered.api.util.optional.optionalInt
-import org.lanternpowered.api.util.optional.optionalLong
+import org.lanternpowered.api.util.optional.asOptionalDouble
+import org.lanternpowered.api.util.optional.asOptionalInt
+import org.lanternpowered.api.util.optional.asOptionalLong
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.data.value.ValueContainer
@@ -36,21 +36,21 @@ interface ValueContainerBase : ValueContainer {
 
     @JvmDefault
     override fun getInt(key: Key<out Value<Int>>): OptionalInt =
-            get(key).map { it.optionalInt() }.orElseGet { emptyOptionalInt() }
+            get(key).map { it.asOptionalInt() }.orElseGet { emptyOptionalInt() }
 
     @JvmDefault
     override fun getDouble(key: Supplier<out Key<out Value<Double>>>): OptionalDouble = getDouble(key.get())
 
     @JvmDefault
     override fun getDouble(key: Key<out Value<Double>>): OptionalDouble =
-            get(key).map { it.optionalDouble() }.orElseGet { emptyOptionalDouble() }
+            get(key).map { it.asOptionalDouble() }.orElseGet { emptyOptionalDouble() }
 
     @JvmDefault
     override fun getLong(key: Supplier<out Key<out Value<Long>>>): OptionalLong = getLong(key.get())
 
     @JvmDefault
     override fun getLong(key: Key<out Value<Long>>): OptionalLong =
-            get(key).map { it.optionalLong() }.orElseGet { emptyOptionalLong() }
+            get(key).map { it.asOptionalLong() }.orElseGet { emptyOptionalLong() }
 
     @JvmDefault
     override fun <E : Any> get(key: Supplier<out Key<out Value<E>>>): Optional<E> = get(key.get())

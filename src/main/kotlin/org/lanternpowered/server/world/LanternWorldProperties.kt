@@ -14,7 +14,7 @@ import net.kyori.adventure.key.KeyedValue
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldProperties
@@ -64,11 +64,11 @@ class LanternWorldProperties(
     private var spawnPosition = Vector3i.ZERO // TODO: Calculate based on generated terrain
     private var portalAgentType: LanternPortalAgentType<*> = PortalAgentTypes.DEFAULT.get() as LanternPortalAgentType<*>
     private var generatorType = GeneratorTypes.DEFAULT.get()
-    private var dimensionType: LanternDimensionType<*> = DimensionTypes.OVERWORLD.get() as LanternDimensionType<*>
+    private var dimensionType: LanternDimensionType = DimensionTypes.OVERWORLD.get() as LanternDimensionType
 
     // TODO: Move some things to game rules?
 
-    override fun getWorld(): Optional<World> = this.world.optional()
+    override fun getWorld(): Optional<World> = this.world.asOptional()
 
     /**
      * Sets the world instance attached to these
@@ -177,7 +177,7 @@ class LanternWorldProperties(
         // TODO: Send update to players
     }
 
-    override fun getDimensionType(): LanternDimensionType<*> = this.dimensionType
+    override fun getDimensionType(): LanternDimensionType = this.dimensionType
 
     override fun getGeneratorType(): GeneratorType = this.generatorType
 

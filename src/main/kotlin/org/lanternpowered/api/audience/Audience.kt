@@ -14,3 +14,5 @@ typealias Audience = net.kyori.adventure.audience.Audience
 typealias Audiences = org.spongepowered.api.adventure.Audiences
 typealias ForwardingAudience = net.kyori.adventure.audience.ForwardingAudience
 typealias MessageType = net.kyori.adventure.audience.MessageType
+
+fun emptyAudience(): Audience = Audience.empty()

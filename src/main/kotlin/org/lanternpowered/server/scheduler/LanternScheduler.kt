@@ -14,7 +14,7 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.collections.toImmutableSet
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.api.scheduler.ScheduledTask
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.scheduler.Task
@@ -44,7 +44,7 @@ class LanternScheduler(val service: ScheduledExecutorService) : Scheduler {
         }
     }
 
-    override fun getTaskById(id: UUID): Optional<ScheduledTask> = this.tasksByUniqueId[id].optional()
+    override fun getTaskById(id: UUID): Optional<ScheduledTask> = this.tasksByUniqueId[id].asOptional()
 
     override fun getTasksByName(pattern: String): Set<ScheduledTask> {
         val searchPattern = Pattern.compile(pattern)

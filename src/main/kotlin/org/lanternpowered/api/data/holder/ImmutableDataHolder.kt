@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.data.immutable
+package org.lanternpowered.api.data.holder
 
 import org.lanternpowered.api.data.Key
 import org.spongepowered.api.data.DataHolder

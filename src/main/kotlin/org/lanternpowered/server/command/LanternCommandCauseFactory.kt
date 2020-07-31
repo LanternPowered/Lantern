@@ -18,7 +18,7 @@ import org.lanternpowered.api.cause.first
 import org.lanternpowered.api.cause.get
 import org.lanternpowered.api.entity.Entity
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Locatable
 import org.spongepowered.api.block.BlockSnapshot
@@ -44,25 +44,25 @@ private class LanternCommandCause(private val cause: Cause) : CommandCause {
     override fun getLocation(): Optional<ServerLocation> {
         var location = this.cause[CauseContextKeys.LOCATION]
         if (location != null)
-            return location.optional()
+            return location.asOptional()
         location = this.targetBlock.orNull()?.location?.orNull()
         if (location != null)
-            return location.optional()
-        return this.cause.first<Locatable>()?.serverLocation.optional()
+            return location.asOptional()
+        return this.cause.first<Locatable>()?.serverLocation.asOptional()
     }
 
     override fun getRotation(): Optional<Vector3d> {
         val rotation = this.cause[CauseContextKeys.ROTATION]
         if (rotation != null)
-            return rotation.optional()
-        return this.cause.first<Entity>()?.rotation.optional()
+            return rotation.asOptional()
+        return this.cause.first<Entity>()?.rotation.asOptional()
     }
 
     override fun getTargetBlock(): Optional<BlockSnapshot> {
         val target = this.cause[CauseContextKeys.BLOCK_TARGET]
         if (target != null)
-            return target.optional()
-        return this.cause.first<BlockSnapshot>().optional()
+            return target.asOptional()
+        return this.cause.first<BlockSnapshot>().asOptional()
     }
 
     override fun sendMessage(message: Text) {

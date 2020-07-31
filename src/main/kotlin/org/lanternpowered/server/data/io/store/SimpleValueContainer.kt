@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data.io.store
 
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
@@ -26,7 +26,7 @@ class SimpleValueContainer(val values: MutableMap<Key<*>, Any>) {
      * @return The value if present
      */
     operator fun <E : Any> get(key: Key<out Value<E>>): Optional<E> {
-        return this.values[key].uncheckedCast<E?>().optional()
+        return this.values[key].uncheckedCast<E?>().asOptional()
     }
 
     /**
@@ -45,7 +45,7 @@ class SimpleValueContainer(val values: MutableMap<Key<*>, Any>) {
      * @return The value if present
      */
     operator fun <E : Any> set(key: Key<out Value<E>>, value: E): Optional<E> {
-        return this.values.put(key, value).uncheckedCast<E?>().optional()
+        return this.values.put(key, value).uncheckedCast<E?>().asOptional()
     }
 
     /**
@@ -65,7 +65,7 @@ class SimpleValueContainer(val values: MutableMap<Key<*>, Any>) {
      * @return The value if present
      */
     fun <E : Any> remove(key: Key<out Value<E>>): Optional<E> {
-        return this.values.remove(key).uncheckedCast<E?>().optional()
+        return this.values.remove(key).uncheckedCast<E?>().asOptional()
     }
 
     /**

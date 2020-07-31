@@ -404,7 +404,7 @@ private fun BitSet.allocateChunkSector(sector: ChunkSector) {
     if (!sector.exists)
         return
     val (index, size) = sector
-    clear(index, index + size - 1)
+    set(index, index + size - 1)
 }
 
 /**

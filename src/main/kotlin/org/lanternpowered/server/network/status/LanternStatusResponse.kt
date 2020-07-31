@@ -14,7 +14,7 @@ import org.lanternpowered.api.MinecraftVersion
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.spongepowered.api.event.server.ClientPingServerEvent
 import org.spongepowered.api.network.status.Favicon
@@ -54,8 +54,8 @@ class LanternStatusResponse(
 
     override fun getDescription() = this.description
     override fun getVersion() = this.version
-    override fun getFavicon() = this.favicon.optional()
-    override fun getPlayers() = if (this.hidePlayers) emptyOptional() else this.players.optional()
+    override fun getFavicon() = this.favicon.asOptional()
+    override fun getPlayers() = if (this.hidePlayers) emptyOptional() else this.players.asOptional()
 
     override fun setDescription(description: Text) = run { this.description = description }
     override fun setHidePlayers(hide: Boolean) = run { this.hidePlayers = hide }

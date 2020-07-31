@@ -16,8 +16,8 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
-import org.lanternpowered.api.util.optional.optionalDouble
-import org.lanternpowered.api.util.optional.optionalInt
+import org.lanternpowered.api.util.optional.asOptionalDouble
+import org.lanternpowered.api.util.optional.asOptionalInt
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.game.LanternGame
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetCooldownPacket
@@ -37,7 +37,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
         if (time <= 0 && cooldown <= 0) {
             return false
         }
-        val optionalStartCooldown = if (time <= 0) emptyOptionalInt() else time.toInt().optionalInt()
+        val optionalStartCooldown = if (time <= 0) emptyOptionalInt() else time.toInt().asOptionalInt()
         val event = LanternEventFactory.createCooldownEventSet(CauseStack.current().currentCause,
                 cooldown, cooldown, itemType, this.player, optionalStartCooldown)
         EventManager.post(event)
@@ -69,7 +69,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
         if (time != -1L) {
             val current = LanternGame.currentTimeTicks()
             if (time > current) {
-                return (time - current).toInt().optionalInt()
+                return (time - current).toInt().asOptionalInt()
             }
         }
         return emptyOptionalInt()
@@ -88,7 +88,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
 
     override fun getFractionRemaining(type: ItemType): OptionalDouble {
         // TODO: Properly implement this
-        return if (hasCooldown(type)) 1.0.optionalDouble() else emptyOptionalDouble()
+        return if (hasCooldown(type)) 1.0.asOptionalDouble() else emptyOptionalDouble()
     }
 
     fun process() {

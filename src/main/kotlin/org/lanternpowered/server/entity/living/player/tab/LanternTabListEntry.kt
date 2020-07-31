@@ -11,7 +11,7 @@
 package org.lanternpowered.server.entity.living.player.tab
 
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.player.tab.TabListEntry
@@ -31,7 +31,7 @@ class LanternTabListEntry internal constructor(
 
     override fun getList(): LanternTabList = this.tabList
     override fun getProfile(): GameProfile = this.globalEntry.profile
-    override fun getDisplayName(): Optional<Text> = this.displayName.optional()
+    override fun getDisplayName(): Optional<Text> = this.displayName.asOptional()
     override fun getLatency(): Int = this.latency
     override fun getGameMode(): GameMode = this.gameMode
 

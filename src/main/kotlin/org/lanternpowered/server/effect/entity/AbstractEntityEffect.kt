@@ -17,7 +17,7 @@ import org.spongepowered.math.vector.Vector3d
 import kotlin.random.Random
 
 abstract class AbstractEntityEffect protected constructor(
-        private val position: EntityBodyPosition = EntityBodyPosition.FEET
+        private val position: EntityBodyPosition = EntityBodyPosition.BOTTOM
 ) : EntityEffect {
 
     override fun play(entity: LanternEntity) {

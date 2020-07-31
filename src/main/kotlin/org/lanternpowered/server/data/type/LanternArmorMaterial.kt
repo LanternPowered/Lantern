@@ -11,7 +11,7 @@
 package org.lanternpowered.server.data.type
 
 import org.lanternpowered.api.key.NamespacedKey
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.data.type.ArmorMaterial
 import org.spongepowered.api.item.recipe.crafting.Ingredient
@@ -21,5 +21,5 @@ class LanternArmorMaterial @JvmOverloads constructor(key: NamespacedKey, repairI
 
     private val ingredient by lazy { repairIngredient?.invoke() }
 
-    override fun getRepairIngredient() = this.ingredient.optional()
+    override fun getRepairIngredient() = this.ingredient.asOptional()
 }

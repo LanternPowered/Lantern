@@ -12,7 +12,7 @@ package org.lanternpowered.server.state.property
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableSet
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.state.StateKeyValueTransformer
 import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.Key
@@ -25,5 +25,5 @@ internal class LanternIntStateProperty<V>(
 
     override var sortedPossibleValues: List<Int> = ImmutableList.sortedCopyOf(this.possibleValues)
 
-    override fun parseValue(value: String) = value.toIntOrNull().optional()
+    override fun parseValue(value: String) = value.toIntOrNull().asOptional()
 }

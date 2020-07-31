@@ -21,7 +21,7 @@ import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.api.text.format.TextDecoration
 import org.spongepowered.api.adventure.AdventureRegistry
 import java.util.Optional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 
 object LanternAdventureRegistry : AdventureRegistry {
 
@@ -45,7 +45,7 @@ object LanternAdventureRegistry : AdventureRegistry {
 
     private class ForIndex<T : Any>(private val registry: Index<String, T>) : AdventureRegistry.OfType<T> {
         override fun getKey(value: T): String = this.registry.key(value)!!
-        override fun getValue(key: String): Optional<T> = this.registry.value(key).optional()
+        override fun getValue(key: String): Optional<T> = this.registry.value(key).asOptional()
         override fun keys(): Set<String> = this.registry.keys()
     }
 }

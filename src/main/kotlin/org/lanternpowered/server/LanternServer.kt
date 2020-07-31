@@ -26,7 +26,7 @@ import org.lanternpowered.api.util.collections.asUnmodifiableCollection
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.server.cause.LanternCauseStack
 import org.lanternpowered.server.cause.LanternCauseStackManager
@@ -335,7 +335,7 @@ class LanternServer : Server {
         this.worldManager.update()
     }
 
-    override fun getBoundAddress(): Optional<InetSocketAddress> = this.networkManager.address.optional()
+    override fun getBoundAddress(): Optional<InetSocketAddress> = this.networkManager.address.asOptional()
 
     /**
      * Get the socket address to bind to for a specified service.
@@ -398,7 +398,7 @@ class LanternServer : Server {
     override fun isDedicatedServer(): Boolean = true
     override fun getGame(): LanternGame = this.game
     override fun getWorldManager(): WorldManager = this.worldManager
-    override fun getDefaultResourcePack(): Optional<ResourcePack> = this.defaultResourcePack.optional()
+    override fun getDefaultResourcePack(): Optional<ResourcePack> = this.defaultResourcePack.asOptional()
     override fun getTeleportHelper(): TeleportHelper = LanternTeleportHelper
     override fun getScheduler(): Scheduler = this.syncScheduler
 
@@ -431,8 +431,8 @@ class LanternServer : Server {
     override fun getServerScoreboard(): Optional<Scoreboard> = emptyOptional()
     override fun getCauseStackManager(): CauseStackManager = LanternCauseStackManager
 
-    override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].optional()
-    override fun getPlayer(name: String): Optional<Player> = this.playersByName[name].optional()
+    override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].asOptional()
+    override fun getPlayer(name: String): Optional<Player> = this.playersByName[name].asOptional()
 
 
     /**

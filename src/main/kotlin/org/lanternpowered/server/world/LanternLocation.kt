@@ -14,7 +14,7 @@ import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.math.minus
 import org.lanternpowered.api.util.math.plus
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
@@ -94,7 +94,7 @@ class LanternLocation : Location {
 
     override fun getWorld(): World = this.worldRef.world ?: error("The world is unavailable.")
     override fun getWorldKey(): NamespacedKey = this.worldRef.key
-    override fun getWorldIfAvailable(): Optional<World> = this.worldRef.world.optional()
+    override fun getWorldIfAvailable(): Optional<World> = this.worldRef.world.asOptional()
     override fun inWorld(world: World): Boolean = this.world == world
 
     override fun asLocatableBlock(): LocatableBlock = LanternLocatableBlock(this, this.block)

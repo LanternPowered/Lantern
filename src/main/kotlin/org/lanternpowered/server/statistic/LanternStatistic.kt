@@ -12,7 +12,7 @@ package org.lanternpowered.server.statistic
 
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.api.util.optional.optional
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.scoreboard.criteria.Criterion
 import org.spongepowered.api.statistic.Statistic
@@ -33,6 +33,6 @@ open class LanternStatistic(
             .add("category", this.type.key)
             .add("criterion", this.criterion?.key)
 
-    override fun getCriterion() = this.criterion.optional()
+    override fun getCriterion() = this.criterion.asOptional()
     override fun getFormat() = this.format
 }

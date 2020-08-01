@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.registry.type.effect.entity
 
-import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.effect.entity.EntityEffectType
 import org.lanternpowered.server.effect.entity.EntityEffectTypes
@@ -18,6 +18,6 @@ import org.lanternpowered.server.effect.entity.entityEffectTypeOf
 
 val EntityEffectTypeRegistry = catalogTypeRegistry<EntityEffectType> {
     processSuggestions(EntityEffectTypes::class) { suggestedId, _ ->
-        register(entityEffectTypeOf(NamespacedKey.minecraft(suggestedId)))
+        register(entityEffectTypeOf(minecraftKey(suggestedId)))
     }
 }

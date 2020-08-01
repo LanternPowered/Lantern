@@ -35,7 +35,7 @@ import org.spongepowered.api.world.BlockChangeFlags
 import kotlin.time.Duration
 import kotlin.time.seconds
 
-class LanternLightning(creationData: EntityCreationData) : LanternEntity(creationData), LightningBolt {
+class LanternLightningBolt(creationData: EntityCreationData) : LanternEntity(creationData), LightningBolt {
 
     companion object {
 
@@ -46,7 +46,7 @@ class LanternLightning(creationData: EntityCreationData) : LanternEntity(creatio
         /**
          * The region that the [LightningBolt] will damage [Entity]s.
          */
-        private val ENTITY_STRIKE_REGION = AABB((-3).toDouble(), (-3).toDouble(), (-3).toDouble(), 3.0, 9.0, 3.0)
+        private val ENTITY_STRIKE_REGION = AABB(-3.0, -3.0, -3.0, 3.0, 9.0, 3.0)
     }
 
     /**
@@ -106,7 +106,7 @@ class LanternLightning(creationData: EntityCreationData) : LanternEntity(creatio
                     this.world.getIntersectingEntities(strikeRegion) { entity -> entity != this }.toMutableList()
                 }
 
-                val blockChanges: MutableList<Transaction<BlockSnapshot>> = mutableListOf()
+                val blockChanges = mutableListOf<Transaction<BlockSnapshot>>()
                 val event = LanternEventFactory.createLightningEventStrike(
                         frame.currentCause, entities, blockChanges.asNonNullList())
 

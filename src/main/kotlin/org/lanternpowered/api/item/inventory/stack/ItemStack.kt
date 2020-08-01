@@ -34,7 +34,7 @@ inline infix fun ItemStack.isSimilarTo(other: ItemStackSnapshot): Boolean {
 
 inline infix fun ItemStackSnapshot.isSimilarTo(other: ItemStack): Boolean {
     contract {
-        returns() implies (this@isSimilarTo is ExtendedItemStack)
+        returns() implies (this@isSimilarTo is ExtendedItemStackSnapshot)
     }
     return (this as ExtendedItemStackSnapshot).isSimilarTo(other)
 }

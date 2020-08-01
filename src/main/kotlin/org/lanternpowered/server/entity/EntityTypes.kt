@@ -11,18 +11,8 @@
 package org.lanternpowered.server.entity
 
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.text.Text
 import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.text.translation.Translation
-import java.util.UUID
 
-fun <E : Entity> entityTypeOf(key: NamespacedKey, translation: Translation, entityClass: Class<E>, entityConstructor: (UUID) -> E) =
-        LanternEntityType(key, translation, entityClass, entityConstructor)
-
-fun <E : Entity> entityTypeOf(key: NamespacedKey, translation: String, entityClass: Class<E>, entityConstructor: (UUID) -> E) =
-        LanternEntityType(key, translation, entityClass, entityConstructor)
-
-inline fun <reified E : Entity> entityTypeOf(key: NamespacedKey, translation: Translation, noinline entityConstructor: (UUID) -> E) =
-        entityTypeOf(key, translation, E::class.java, entityConstructor)
-
-inline fun <reified E : Entity> entityTypeOf(key: NamespacedKey, translation: String, noinline entityConstructor: (UUID) -> E) =
-        entityTypeOf(key, translation, E::class.java, entityConstructor)
+fun <E : Entity> entityTypeOf(key: NamespacedKey, translation: Text, entityConstructor: (EntityCreationData) -> E) =
+        LanternEntityType(key, translation, entityConstructor)

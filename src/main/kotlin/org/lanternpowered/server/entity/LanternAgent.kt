@@ -17,7 +17,7 @@ import org.spongepowered.api.entity.ai.goal.GoalExecutorType
 import org.spongepowered.api.entity.living.Agent
 import java.util.Optional
 
-class LanternAgent(creationData: EntityCreationData) : LanternLiving(creationData), Agent {
+open class LanternAgent(creationData: EntityCreationData) : LanternLiving(creationData), Agent {
 
     override fun registerKeys() {
         super.registerKeys()

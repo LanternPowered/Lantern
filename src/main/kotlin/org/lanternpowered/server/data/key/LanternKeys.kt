@@ -30,6 +30,7 @@ import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.item.inventory.Carrier
 import org.spongepowered.api.item.inventory.type.CarriedInventory
+import kotlin.time.Duration
 
 object LanternKeys {
 
@@ -224,4 +225,7 @@ object LanternKeys {
     @JvmField val CONNECTED_WEST: Key<Value<Boolean>> = valueKeyOf(lanternKey("connected_west"))
 
     @JvmField val POSE: Key<Value<Pose>> = valueKeyOf(lanternKey("pose"))
+
+    @JvmField val PICKUP_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("pickup_delay"))
+    @JvmField val DESPAWN_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("despawn_delay"))
 }

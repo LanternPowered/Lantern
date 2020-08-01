@@ -18,7 +18,7 @@ import org.spongepowered.api.data.type.HandPreferences;
 
 public abstract class InsentientEntityProtocol<E extends LanternEntity> extends CreatureEntityProtocol<E> {
 
-    private HandPreference lastDominantHand = HandPreferences.RIGHT;
+    private HandPreference lastDominantHand = HandPreferences.RIGHT.get();
 
     protected InsentientEntityProtocol(E entity) {
         super(entity);
@@ -29,16 +29,16 @@ public abstract class InsentientEntityProtocol<E extends LanternEntity> extends 
         super.spawn(parameterList);
         // Ignore the NoAI tag, isn't used on the client
         parameterList.add(EntityParameters.Insentient.FLAGS,
-                (byte) (this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT) == HandPreferences.LEFT ? 0x2 : 0));
+                (byte) (this.entity.get(Keys.DOMINANT_HAND).orElseGet(HandPreferences.RIGHT) == HandPreferences.LEFT.get() ? 0x2 : 0));
     }
 
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final HandPreference dominantHand = this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT);
+        final HandPreference dominantHand = this.entity.get(Keys.DOMINANT_HAND).orElseGet(HandPreferences.RIGHT);
         if (dominantHand != this.lastDominantHand) {
             // Ignore the NoAI tag, isn't used on the client
-            parameterList.add(EntityParameters.Insentient.FLAGS, (byte) (dominantHand == HandPreferences.LEFT ? 0x2 : 0));
+            parameterList.add(EntityParameters.Insentient.FLAGS, (byte) (dominantHand == HandPreferences.LEFT.get() ? 0x2 : 0));
             this.lastDominantHand = dominantHand;
         }
     }

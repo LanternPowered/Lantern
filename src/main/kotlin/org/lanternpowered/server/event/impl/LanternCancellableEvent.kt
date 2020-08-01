@@ -10,9 +10,13 @@
  */
 package org.lanternpowered.server.event.impl
 
-import org.spongepowered.api.event.Cancellable
+import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.event.Cancellable
+import org.lanternpowered.api.event.Event
 
-abstract class CancellableEvent : Cancellable {
+abstract class CancellableEvent(private val cause: Cause) : Event, Cancellable {
+
+    override fun getCause(): Cause = this.cause
 
     private var cancelled = false
 

@@ -8,10 +8,9 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.weather;
+package org.lanternpowered.api.util.duration
 
-import org.spongepowered.api.entity.weather.LightningBolt;
+import kotlin.time.Duration
 
-public interface AbstractLightning extends AbstractWeatherEffect, LightningBolt {
-
-}
+fun max(a: Duration, b: Duration): Duration =
+        if (a > b) a else b

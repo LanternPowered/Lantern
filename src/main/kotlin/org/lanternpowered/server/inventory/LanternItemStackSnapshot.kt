@@ -11,19 +11,22 @@
 package org.lanternpowered.server.inventory
 
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.HoverEvent
+import org.lanternpowered.api.item.inventory.ExtendedItemStackSnapshot
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
-import org.lanternpowered.server.data.LocalDataHolderHelper
 import org.lanternpowered.server.data.MutableBackedSerializableLocalImmutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import java.util.function.UnaryOperator
 
 class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack) :
-        MutableBackedSerializableLocalImmutableDataHolder<ItemStackSnapshot, LanternItemStack>(itemStack), ItemStackSnapshot, TextRepresentable {
+        MutableBackedSerializableLocalImmutableDataHolder<ItemStackSnapshot, LanternItemStack>(itemStack),
+        ExtendedItemStackSnapshot, TextRepresentable {
 
     override fun getType(): ItemType = this.backingDataHolder.type
     override fun getQuantity(): Int = this.backingDataHolder.quantity
@@ -51,12 +54,10 @@ class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack)
      * to this [ItemStackSnapshot]. The [ItemType] and all
      * the applied data must match.
      *
-     * @param that The other snapshot
+     * @param other The other snapshot
      * @return Is similar
      */
-    fun similarTo(that: ItemStackSnapshot): Boolean {
-        return similarTo((that as LanternItemStackSnapshot).backingDataHolder)
-    }
+    override fun isSimilarTo(other: ItemStackSnapshot): Boolean = this.isSimilarTo((other as LanternItemStackSnapshot).backingDataHolder)
 
     /**
      *
@@ -64,12 +65,10 @@ class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack)
      * to this [ItemStackSnapshot]. The [ItemType] and all
      * the applied data must match.
      *
-     * @param that The other snapshot
+     * @param other The other snapshot
      * @return Is similar
      */
-    fun similarTo(that: ItemStack): Boolean {
-        return type === that.type && LocalDataHolderHelper.matchContents(this.backingDataHolder, that as LanternItemStack)
-    }
+    override fun isSimilarTo(other: ItemStack): Boolean = this.backingDataHolder.isSimilarTo(other)
 
     /**
      * Gets the internal [LanternItemStack],
@@ -79,6 +78,10 @@ class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack)
      * @return The internal stack
      */
     fun unwrap() = this.backingDataHolder
+
+    override fun asHoverEvent(op: UnaryOperator<HoverEvent.ShowItem>): HoverEvent<HoverEvent.ShowItem> {
+        TODO("Not yet implemented")
+    }
 
     companion object {
 

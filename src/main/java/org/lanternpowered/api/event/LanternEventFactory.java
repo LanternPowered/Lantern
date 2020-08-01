@@ -16,21 +16,24 @@ import net.kyori.adventure.text.Component;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTriggerConfiguration;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.event.advancement.AdvancementEvent;
 import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
@@ -39,11 +42,14 @@ import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.ExpireEntityEvent;
 import org.spongepowered.api.event.entity.HarvestEntityEvent;
+import org.spongepowered.api.event.entity.ItemMergeWithItemEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.living.player.CooldownEvent;
 import org.spongepowered.api.event.entity.living.player.PlayerChangeClientSettingsEvent;
 import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
@@ -51,7 +57,9 @@ import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.event.server.query.QueryServerEvent;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.network.RconConnection;
 import org.spongepowered.api.network.ServerSideConnection;
 import org.spongepowered.api.network.status.StatusClient;
@@ -365,5 +373,37 @@ public class LanternEventFactory {
             int level) {
         return SpongeEventFactory.createHarvestEntityEventTargetPlayer(cause, originalExperience,
                 experience, entity, keepsInventory, keepsLevel, level);
+    }
+
+    public static @NonNull ExpireEntityEvent createExpireEntityEvent(
+            @NonNull Cause cause,
+            @NonNull Entity entity) {
+        return SpongeEventFactory.createExpireEntityEvent(cause, entity);
+    }
+
+    public static LightningEvent.@NonNull Post createLightningEventPost(
+            @NonNull Cause cause) {
+        return SpongeEventFactory.createLightningEventPost(cause);
+    }
+
+    public static LightningEvent.@NonNull Strike createLightningEventStrike(
+            @NonNull Cause cause,
+            @NonNull List<@NonNull Entity> entities,
+            @NonNull List<@NonNull Transaction<@NonNull BlockSnapshot>> transactions) {
+        return SpongeEventFactory.createLightningEventStrike(cause, entities, transactions);
+    }
+
+    public static @NonNull ItemMergeWithItemEvent createItemMergeWithItemEvent(
+            @NonNull Cause cause,
+            @NonNull Item item,
+            @NonNull Item itemToMerge) {
+        return SpongeEventFactory.createItemMergeWithItemEvent(cause, item, itemToMerge);
+    }
+
+    public static ChangeInventoryEvent.@NonNull Pickup createChangeInventoryEventPickup(
+            @NonNull Cause cause,
+            @NonNull Inventory inventory,
+            @NonNull List<@NonNull SlotTransaction> transactions) {
+        return SpongeEventFactory.createChangeInventoryEventPickup(cause, inventory, transactions);
     }
 }

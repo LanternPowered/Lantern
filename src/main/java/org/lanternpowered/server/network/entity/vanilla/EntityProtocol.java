@@ -162,10 +162,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         boolean dirtyRot = yaw != this.lastYaw || pitch != this.lastPitch;
 
         // TODO: On ground state
-        boolean onGround = this.entity.isOnGround();
+        boolean onGround = this.entity.getOnGround();
 
         final int entityId = getRootEntityId();
-        final boolean passenger = this.entity.getVehicle().isPresent();
+        final boolean passenger = this.entity.getVehicle() != null;
 
         if (dirtyRot) {
             this.lastYaw = yaw;

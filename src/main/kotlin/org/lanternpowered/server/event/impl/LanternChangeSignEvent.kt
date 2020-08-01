@@ -17,14 +17,13 @@ import org.spongepowered.api.data.value.ListValue
 import org.spongepowered.api.event.block.entity.ChangeSignEvent
 
 class LanternChangeSignEvent(
-        private val cause: Cause,
+        cause: Cause,
         private val originalText: ListValue.Immutable<Text>,
         private val text: ListValue.Mutable<Text>,
         private val sign: Sign
-) : CancellableEvent(), ChangeSignEvent {
+) : CancellableEvent(cause), ChangeSignEvent {
 
     override fun getOriginalText(): ListValue.Immutable<Text> = this.originalText
-    override fun getCause(): Cause = this.cause
     override fun getText(): ListValue.Mutable<Text> = this.text
     override fun getSign(): Sign = this.sign
 }

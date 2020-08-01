@@ -26,10 +26,9 @@ interface EventManager : org.spongepowered.api.event.EventManager {
     /**
      * Registers an event listener for a specific event class.
      *
-     * <p>Normally, the annotation-based way in
-     * {@link #registerListeners(PluginContainer, Object)} should be preferred over this way. This
-     * method exists primarily to support dynamic event registration like needed
-     * in scripting plugins.</p>
+     * Normally, the annotation-based way in [registerListeners] should be preferred
+     * over this way. This method exists primarily to support dynamic event registration
+     * like needed in scripting plugins.
      *
      * @param plugin The plugin instance
      * @param eventClass The event to listen to
@@ -45,7 +44,7 @@ interface EventManager : org.spongepowered.api.event.EventManager {
     )
     override fun <T : Event> registerListener(
             plugin: PluginContainer, eventType: TypeToken<T>, order: Order, beforeModifications: Boolean, listener: EventListener<in T>) {
-        registerListener(plugin, eventType, order, listener)
+        this.registerListener(plugin, eventType, order, listener)
     }
 
     @Deprecated(
@@ -55,7 +54,7 @@ interface EventManager : org.spongepowered.api.event.EventManager {
     )
     override fun <T : Event> registerListener(
             plugin: PluginContainer, eventClass: Class<T>, order: Order, beforeModifications: Boolean, listener: EventListener<in T>) {
-        registerListener(plugin, eventClass, order, listener)
+        this.registerListener(plugin, eventClass, order, listener)
     }
 
     /**

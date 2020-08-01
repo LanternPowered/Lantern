@@ -18,6 +18,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 typealias ItemStack = org.spongepowered.api.item.inventory.ItemStack
+typealias ItemStackSnapshot = org.spongepowered.api.item.inventory.ItemStackSnapshot
 typealias ItemStackBuilder = org.spongepowered.api.item.inventory.ItemStack.Builder
 
 /**
@@ -75,4 +76,18 @@ inline fun itemStackOf(type: ItemType, quantity: Int = 1, block: ItemStackBuilde
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return ItemStack.builder().itemType(type).quantity(quantity).apply(block).build()
+}
+
+interface ExtendedItemStack : ItemStack {
+
+    fun isSimilarTo(other: ItemStack): Boolean
+
+    fun isSimilarTo(other: ItemStackSnapshot): Boolean
+}
+
+interface ExtendedItemStackSnapshot : ItemStackSnapshot {
+
+    fun isSimilarTo(other: ItemStack): Boolean
+
+    fun isSimilarTo(other: ItemStackSnapshot): Boolean
 }

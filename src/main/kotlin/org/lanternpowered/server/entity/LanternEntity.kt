@@ -133,6 +133,10 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
             register(Keys.CREATOR)
             register(Keys.NOTIFIER)
             register(LanternKeys.PORTAL_COOLDOWN_TICKS, 0)
+
+            registerProvider(Keys.ON_GROUND) {
+                get { this.onGround }
+            }
         }
         this.registerPassengerKeys()
         this.registerDamageKeys()
@@ -393,9 +397,6 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
 
     private fun registerPassengerKeys() {
         keyRegistry {
-            registerProvider(Keys.ON_GROUND) {
-                get { this.onGround }
-            }
             registerProvider(Keys.BASE_VEHICLE) {
                 get { this.baseVehicle }
             }

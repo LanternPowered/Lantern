@@ -19,43 +19,47 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 interface AbstractArmorEquipable : AbstractEquipable, ArmorEquipable {
 
     @JvmDefault
-    override fun getHelmet(): ItemStack = getEquipped(EquipmentTypes.HEADWEAR).orElseGet { ItemStack.empty() }
+    override fun getHead(): ItemStack =
+            this.getEquipped(EquipmentTypes.HEAD).orElseGet { ItemStack.empty() }
 
     @JvmDefault
-    override fun setHelmet(helmet: ItemStack) {
-        equip(EquipmentTypes.HEADWEAR, helmet)
+    override fun setHead(helmet: ItemStack) {
+        this.equip(EquipmentTypes.HEAD, helmet)
     }
 
     @JvmDefault
-    override fun getChestplate(): ItemStack = getEquipped(EquipmentTypes.CHESTPLATE).orElseGet { ItemStack.empty() }
+    override fun getChest(): ItemStack =
+            this.getEquipped(EquipmentTypes.CHEST).orElseGet { ItemStack.empty() }
 
     @JvmDefault
-    override fun setChestplate(chestplate: ItemStack) {
-        equip(EquipmentTypes.CHESTPLATE, chestplate)
+    override fun setChest(chestplate: ItemStack) {
+        this.equip(EquipmentTypes.CHEST, chestplate)
     }
 
     @JvmDefault
-    override fun getLeggings(): ItemStack = getEquipped(EquipmentTypes.LEGGINGS).orElseGet { ItemStack.empty() }
+    override fun getLegs(): ItemStack =
+            this.getEquipped(EquipmentTypes.LEGS).orElseGet { ItemStack.empty() }
 
     @JvmDefault
-    override fun setLeggings(leggings: ItemStack) {
-        equip(EquipmentTypes.LEGGINGS, leggings)
+    override fun setLegs(leggings: ItemStack) {
+        this.equip(EquipmentTypes.LEGS, leggings)
     }
 
     @JvmDefault
-    override fun getBoots(): ItemStack = getEquipped(EquipmentTypes.BOOTS).orElseGet { ItemStack.empty() }
+    override fun getFeet(): ItemStack =
+            this.getEquipped(EquipmentTypes.FEET).orElseGet { ItemStack.empty() }
 
     @JvmDefault
-    override fun setBoots(boots: ItemStack) {
-        equip(EquipmentTypes.BOOTS, boots)
+    override fun setFeet(boots: ItemStack) {
+        this.equip(EquipmentTypes.FEET, boots)
     }
 
     @JvmDefault
     override fun getItemInHand(handType: HandType): ItemStack =
-            getEquipped(handType.getEquipmentType()).orElseGet { ItemStack.empty() }
+            this.getEquipped(handType.getEquipmentType()).orElseGet { ItemStack.empty() }
 
     @JvmDefault
     override fun setItemInHand(handType: HandType, itemInHand: ItemStack) {
-        equip(handType.getEquipmentType(), itemInHand)
+        this.equip(handType.getEquipmentType(), itemInHand)
     }
 }

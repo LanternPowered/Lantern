@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.entity.living.player
 
-import com.google.common.base.Objects
 import org.lanternpowered.api.entity.player.Player
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.data.MutableForwardingDataHolder
 import org.lanternpowered.server.data.io.UserIO
@@ -60,9 +60,8 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
             this.gameProfile = user.profile
             check(this.uniqueId == this.gameProfile.uniqueId)
             // Reinitialize the subject
-            if (!Objects.equal(oldProfile.name.orElse(null), this.gameProfile.name.orElse(null))) {
-                resolveSubject()
-            }
+            if (oldProfile.name.orElse(null) != this.gameProfile.name.orElse(null))
+                this.resolveSubject()
             try {
                 UserIO.load(Lantern.getGame().savesDirectory, this.user)
             } catch (e: IOException) {
@@ -85,7 +84,7 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
     }
 
     override val delegateDataHolder: DataHolder.Mutable
-        get() = resolveUser()
+        get() = this.resolveUser()
 
     override val subjectCollectionIdentifier: String
         get() = PermissionService.SUBJECTS_USER
@@ -93,27 +92,27 @@ internal class ProxyUser(private var gameProfile: GameProfile) : AbstractProxySu
     override fun getUniqueId(): UUID = this.uniqueId
     override fun getProfile(): GameProfile = this.gameProfile
     override fun getPermissionDefault(permission: String): Tristate = Tristate.FALSE
-    override fun getInventory(): UserInventory = resolveUser().inventory
-    override fun canEquip(type: EquipmentType): Boolean = resolveUser().canEquip(type)
-    override fun canEquip(type: EquipmentType, equipment: ItemStack): Boolean = resolveUser().canEquip(type, equipment)
-    override fun getEquipped(type: EquipmentType): Optional<ItemStack> = resolveUser().getEquipped(type)
-    override fun equip(type: EquipmentType, equipment: ItemStack): Boolean = resolveUser().equip(type, equipment)
-    override fun isOnline(): Boolean = resolveUser().isOnline
-    override fun getPlayer(): Optional<Player> = (resolveUser() as? Player).asOptional()
-    override fun getPosition(): Vector3d = resolveUser().position
-    override fun getWorldUniqueId(): Optional<UUID> = resolveUser().worldUniqueId
-    override fun setLocation(position: Vector3d, world: UUID): Boolean = resolveUser().setLocation(position, world)
-    override fun setRotation(rotation: Vector3d) { resolveUser().rotation = rotation }
-    override fun getRotation(): Vector3d = resolveUser().rotation
-    override fun getEnderChestInventory(): Inventory = resolveUser().enderChestInventory
-    override fun getHelmet(): ItemStack = resolveUser().helmet
-    override fun setHelmet(helmet: ItemStack) { resolveUser().helmet = helmet }
-    override fun getChestplate(): ItemStack = resolveUser().chestplate
-    override fun setChestplate(chestplate: ItemStack) { resolveUser().chestplate = chestplate }
-    override fun getLeggings(): ItemStack = resolveUser().leggings
-    override fun setLeggings(leggings: ItemStack) { resolveUser().leggings = leggings }
-    override fun getBoots(): ItemStack = resolveUser().boots
-    override fun setBoots(boots: ItemStack) { resolveUser().boots = boots }
-    override fun getItemInHand(handType: HandType): ItemStack = resolveUser().getItemInHand(handType)
-    override fun setItemInHand(hand: HandType, itemInHand: ItemStack) { resolveUser().setItemInHand(hand, itemInHand) }
+    override fun getInventory(): UserInventory = this.resolveUser().inventory
+    override fun canEquip(type: EquipmentType): Boolean = this.resolveUser().canEquip(type)
+    override fun canEquip(type: EquipmentType, equipment: ItemStack): Boolean = this.resolveUser().canEquip(type, equipment)
+    override fun getEquipped(type: EquipmentType): Optional<ItemStack> = this.resolveUser().getEquipped(type)
+    override fun equip(type: EquipmentType, equipment: ItemStack): Boolean = this.resolveUser().equip(type, equipment)
+    override fun isOnline(): Boolean = this.resolveUser().isOnline
+    override fun getPlayer(): Optional<Player> = (this.resolveUser() as? Player).asOptional()
+    override fun getPosition(): Vector3d = this.resolveUser().position
+    override fun getWorldKey(): NamespacedKey = this.resolveUser().worldKey
+    override fun setLocation(world: NamespacedKey, position: Vector3d): Boolean = this.resolveUser().setLocation(world, position)
+    override fun setRotation(rotation: Vector3d) { this.resolveUser().rotation = rotation }
+    override fun getRotation(): Vector3d = this.resolveUser().rotation
+    override fun getEnderChestInventory(): Inventory = this.resolveUser().enderChestInventory
+    override fun getHead(): ItemStack = this.resolveUser().head
+    override fun setHead(head: ItemStack) { this.resolveUser().head = head }
+    override fun getChest(): ItemStack = this.resolveUser().chest
+    override fun setChest(chestplate: ItemStack) { this.resolveUser().chest = chestplate }
+    override fun getLegs(): ItemStack = this.resolveUser().legs
+    override fun setLegs(legs: ItemStack) { this.resolveUser().legs = legs }
+    override fun getFeet(): ItemStack = this.resolveUser().feet
+    override fun setFeet(feet: ItemStack) { this.resolveUser().feet = feet }
+    override fun getItemInHand(handType: HandType): ItemStack = this.resolveUser().getItemInHand(handType)
+    override fun setItemInHand(hand: HandType, itemInHand: ItemStack) { this.resolveUser().setItemInHand(hand, itemInHand) }
 }

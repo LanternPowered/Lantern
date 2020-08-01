@@ -405,13 +405,14 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
             this.foodUpdateTimer = Duration.ZERO
         }
 
-        // Peaceful health regeneration
+        // Peaceful health and food regeneration
 
         this.peacefulHealthUpdateTimer += deltaTime
+        this.peacefulFoodUpdateTimer += deltaTime
         if (naturalRegeneration && difficulty == Difficulties.PEACEFUL.get()) {
             if (this.peacefulHealthUpdateTimer >= 1.seconds) {
                 this.heal(1.0, HealingSources.MAGIC)
-                this.peacefulFoodUpdateTimer -= 1.seconds
+                this.peacefulHealthUpdateTimer -= 1.seconds
             }
             if (this.peacefulFoodUpdateTimer >= 0.5.seconds) {
                 if (food < maxFood)

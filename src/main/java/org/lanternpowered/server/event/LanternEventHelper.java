@@ -11,6 +11,7 @@
 package org.lanternpowered.server.event;
 
 import com.google.common.collect.Streams;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.world.EntitySpawningEntry;
 import org.lanternpowered.server.world.LanternWorld;
@@ -47,7 +48,7 @@ public final class LanternEventHelper {
         return Streams.stream(entries)
                 .map(tuple -> new EntitySpawningEntry(EntityTypes.ITEM, tuple.getSecond(), entity -> {
                     entity.offer(Keys.ITEM_STACK_SNAPSHOT, tuple.getFirst());
-                    entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
+                    entity.offer(LanternKeys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
                 }))
                 .collect(Collectors.toList());
     }
@@ -55,14 +56,14 @@ public final class LanternEventHelper {
     public static Optional<Entity> handlePreDroppedItemSpawning(Transform transform, ItemStackSnapshot snapshot) {
         return LanternWorld.handlePreEntitySpawning(EntityTypes.ITEM, transform, entity -> {
             entity.offer(Keys.ITEM_STACK_SNAPSHOT, snapshot);
-            entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
+            entity.offer(LanternKeys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
         });
     }
 
     public static void handleDroppedItemSpawning(Transform transform, ItemStackSnapshot snapshot) {
         LanternWorld.handleEntitySpawning(EntityTypes.ITEM, transform, entity -> {
             entity.offer(Keys.ITEM_STACK_SNAPSHOT, snapshot);
-            entity.offer(Keys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
+            entity.offer(LanternKeys.PICKUP_DELAY, LanternItem.DROPPED_PICKUP_DELAY);
         }, SpongeEventFactory::createDropItemEventDispense);
     }
 }

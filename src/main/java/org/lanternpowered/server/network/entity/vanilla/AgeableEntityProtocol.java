@@ -25,7 +25,7 @@ public abstract class AgeableEntityProtocol<E extends LanternEntity> extends Ins
 
     private boolean isBaby() {
         return this.entity.get(LanternKeys.IS_BABY)
-                .orElseGet(() -> this.entity.get(Keys.AGEABLE_AGE).orElse(0) < 0);
+                .orElseGet(() -> this.entity.get(Keys.AGE).orElse(0) < 0);
     }
 
     @Override

@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.inventory
 
+import org.lanternpowered.api.item.inventory.ExtendedItemStack
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
@@ -35,7 +36,7 @@ class LanternItemStack private constructor(
         private val itemType: ItemType,
         private var quantity: Int,
         override val keyRegistry: LocalKeyRegistry<LanternItemStack>
-) : ItemStack, SerializableLocalMutableDataHolder, TextRepresentable {
+) : ExtendedItemStack, SerializableLocalMutableDataHolder, TextRepresentable {
 
     /**
      * Gets whether this item stack is filled. (non empty)
@@ -158,11 +159,11 @@ class LanternItemStack private constructor(
      * to this [ItemStack]. The [ItemType] and all
      * the applied data must match.
      *
-     * @param that The other snapshot
+     * @param other The other snapshot
      * @return Is similar
      */
-    fun isSimilarTo(that: ItemStackSnapshot): Boolean {
-        return isSimilarTo((that as LanternItemStackSnapshot).unwrap())
+    override fun isSimilarTo(other: ItemStackSnapshot): Boolean {
+        return isSimilarTo((other as LanternItemStackSnapshot).unwrap())
     }
 
     /**
@@ -171,15 +172,17 @@ class LanternItemStack private constructor(
      * to this [ItemStack]. The [ItemType] and all
      * the applied data must match.
      *
-     * @param that The other snapshot
+     * @param other The other snapshot
      * @return Is similar
      */
-    fun isSimilarTo(that: ItemStack): Boolean {
+    override fun isSimilarTo(other: ItemStack): Boolean {
         val emptyA = isEmpty
-        val emptyB = that.isEmpty
+        val emptyB = other.isEmpty
         return if (emptyA != emptyB) {
             emptyA && emptyB
-        } else type === that.type && LocalDataHolderHelper.matchContents(this, that as LanternItemStack)
+        } else {
+            type === other.type && LocalDataHolderHelper.matchContents(this, other as LanternItemStack)
+        }
     }
 
     override fun toString() = ToStringHelper(this)

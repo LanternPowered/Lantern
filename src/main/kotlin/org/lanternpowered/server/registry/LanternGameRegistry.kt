@@ -110,6 +110,7 @@ import org.lanternpowered.server.registry.type.data.WoodTypeRegistry
 import org.lanternpowered.server.registry.type.economy.TransactionTypeRegistry
 import org.lanternpowered.server.registry.type.effect.entity.EntityEffectTypeRegistry
 import org.lanternpowered.server.registry.type.effect.particle.ParticleOptionRegistry
+import org.lanternpowered.server.registry.type.effect.particle.ParticleTypeRegistry
 import org.lanternpowered.server.registry.type.effect.sound.SoundTypeRegistry
 import org.lanternpowered.server.registry.type.entity.EntityTypeRegistry
 import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
@@ -305,6 +306,7 @@ class LanternGameRegistry(
             register(EntityEffectTypeRegistry)
 
             register(ParticleOptionRegistry)
+            register(ParticleTypeRegistry)
 
             register(SoundTypeRegistry)
 

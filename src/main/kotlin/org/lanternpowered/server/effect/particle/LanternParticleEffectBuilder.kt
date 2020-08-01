@@ -66,7 +66,6 @@ class LanternParticleEffectBuilder : AbstractDataBuilder<ParticleEffect>(Particl
         this.options.clear()
     }
 
-    @Throws(IllegalArgumentException::class)
     override fun <V> option(option: ParticleOption<V>, value: V): ParticleEffect.Builder = apply {
         (option as LanternParticleOption<V>).valueValidator(value)
         var actualValue: Any = value as Any

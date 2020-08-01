@@ -29,13 +29,13 @@ val ParticleOptionRegistry: CatalogTypeRegistry<ParticleOption<*>> = catalogType
     register<BlockState>("block_state")
     register<Color>("color")
     register<Direction>("direction")
-    register<List<FireworkEffect>>("firework_effects") { value -> check(value.isEmpty()) { "The firework effects list may not be empty" } }
-    register<Int>("quantity") { value -> check(value < 1) { "Quantity must be at least 1" } }
+    register<List<FireworkEffect>>("firework_effects") { value -> check(value.isNotEmpty()) { "The firework effects list may not be empty" } }
+    register<Int>("quantity") { value -> check(value >= 1) { "Quantity must be at least 1" } }
     register<ItemStackSnapshot>("item_stack_snapshot")
     register<NotePitch>("note")
     register<Vector3d>("offset")
     register<PotionEffectType>("potion_effect_type")
-    register<Double>("scale") { value -> check(value < 0) { "Scale may not be negative" } }
+    register<Double>("scale") { value -> check(value >= 0) { "Scale may not be negative" } }
     register<Vector3d>("velocity")
     register<Boolean>("slow_horizontal_velocity")
 }

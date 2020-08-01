@@ -20,7 +20,7 @@ import java.util.Optional
 
 interface LocalImmutableDataHolder<I : DataHolder.Immutable<I>> : LocalDataHolder, DataHolder.Immutable<I>, ImmutableDataHolder<I> {
 
-    override val keyRegistry: LocalKeyRegistry<out LocalImmutableDataHolder<I>>
+    override val keyRegistry: LocalKeyRegistry<out DataHolder.Immutable<I>>
 
     /**
      * Gets a cache that can be used to cache the retrieved

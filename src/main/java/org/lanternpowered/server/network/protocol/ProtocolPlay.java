@@ -150,25 +150,25 @@ import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlay
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientBlockPlacementHandler;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerDigging;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerLook;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerMovement;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerMovementAndLook;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerMovementInput;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerOnGroundState;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerSneak;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerSprint;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerSwingArm;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerUseItem;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerVehicleMovement;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInRegisterChannels;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientDiggingHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientPlayerLookHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientPlayerMovementHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientPlayerMovementAndLookHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientMovementInputHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientPlayerOnGroundStateHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSneakStateHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSprintStateHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientPlayerSwingArmHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientUseItemHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientPlayerVehicleMovementHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.RegisterChannelsHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ResourcePackStatusHandler;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInSignBook;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInStartElytraFlying;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSignBookHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientStartElytraFlyingHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInSwapHandItems;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInTabComplete;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInUnregisterChannels;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.UnregisterChannelsHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientUseEntityAttackHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientUseEntityInteractHandler;
 import org.lanternpowered.server.network.vanilla.packet.processor.play.ParticleEffectProcessor;
@@ -361,15 +361,15 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(ClientLocksDifficultyCodec.class, ClientLockDifficultyPacket.class)
                 .bindHandler(new ClientLockDifficultyHandler());
         inbound.bind(ClientPlayerMovementCodec.class, ClientPlayerMovementPacket.class)
-                .bindHandler(new HandlerPlayInPlayerMovement());
+                .bindHandler(new ClientPlayerMovementHandler());
         inbound.bind(ClientPlayerMovementAndLookCodec.class, ClientPlayerMovementAndLookPacket.class)
-                .bindHandler(new HandlerPlayInPlayerMovementAndLook());
+                .bindHandler(new ClientPlayerMovementAndLookHandler());
         inbound.bind(ClientPlayerLookCodec.class, ClientPlayerLookPacket.class)
-                .bindHandler(new HandlerPlayInPlayerLook());
+                .bindHandler(new ClientPlayerLookHandler());
         inbound.bind(ClientPlayerOnGroundStateCodec.class, ClientPlayerOnGroundStatePacket.class)
-                .bindHandler(new HandlerPlayInPlayerOnGroundState());
+                .bindHandler(new ClientPlayerOnGroundStateHandler());
         inbound.bind(ClientPlayerVehicleMovementCodec.class, ClientPlayerVehicleMovementPacket.class)
-                .bindHandler(new HandlerPlayInPlayerVehicleMovement());
+                .bindHandler(new ClientPlayerVehicleMovementHandler());
         inbound.bind(); // TODO: Steer Boat
         inbound.bind(ClientPickItemCodec.class, ClientPickItemPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handlePickItem));
@@ -401,25 +401,25 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(ClientChangeSignCodec.class, ClientModifySignPacket.class)
                 .bindHandler(new ClientModifySignHandler());
         inbound.bind(ClientPlayerSwingArmCodec.class, ClientPlayerSwingArmPacket.class)
-                .bindHandler(new HandlerPlayInPlayerSwingArm());
+                .bindHandler(new ClientPlayerSwingArmHandler());
         inbound.bind(ClientSpectateCodec.class, ClientSpectatePacket.class); // TODO: Handler
         inbound.bind(ClientBlockPlacementCodec.class, ClientBlockPlacementPacket.class)
                 .bindHandler(new ClientBlockPlacementHandler());
         inbound.bind(ClientUseItemCodec.class, ClientUseItemPacket.class)
-                .bindHandler(new HandlerPlayInPlayerUseItem());
+                .bindHandler(new ClientUseItemHandler());
 
         // Provided by CodecPlayInOutCustomPayload
         inbound.bindMessage(BrandPacket.class); // TODO: Handler
         inbound.bindMessage(ClientModifyBookPacket.Edit.class)
                 .bindHandler(new HandlerPlayInEditBook());
         inbound.bindMessage(ClientModifyBookPacket.Sign.class)
-                .bindHandler(new HandlerPlayInSignBook());
+                .bindHandler(new ClientSignBookHandler());
         inbound.bindMessage(ChannelPayloadPacket.class)
                 .bindHandler(new HandlerPlayInChannelPayload());
         inbound.bindMessage(RegisterChannelsPacket.class)
-                .bindHandler(new HandlerPlayInRegisterChannels());
+                .bindHandler(new RegisterChannelsHandler());
         inbound.bindMessage(UnregisterChannelsPacket.class)
-                .bindHandler(new HandlerPlayInUnregisterChannels());
+                .bindHandler(new UnregisterChannelsHandler());
         // Provided by CodecPlayInUseEntity
         inbound.bindMessage(ClientUseEntityPacket.Attack.class)
                 .bindHandler(new ClientUseEntityAttackHandler());
@@ -427,7 +427,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new ClientUseEntityInteractHandler());
         // Provided by CodecPlayInPlayerDigging
         inbound.bindMessage(ClientDiggingPacket.class)
-                .bindHandler(new HandlerPlayInPlayerDigging());
+                .bindHandler(new ClientDiggingHandler());
         inbound.bindMessage(ClientDropHeldItemPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleItemDrop));
         inbound.bindMessage(FinishUsingItemPacket.class)
@@ -441,16 +441,16 @@ final class ProtocolPlay extends ProtocolBase {
         // Provided by CodecPlayInPlayerAction
         inbound.bindMessage(ClientLeaveBedPacket.class); // TODO: Handler
         inbound.bindMessage(ClientStartElytraFlyingPacket.class)
-                .bindHandler(new HandlerPlayInStartElytraFlying());
+                .bindHandler(new ClientStartElytraFlyingHandler());
         // Provided by CodecPlayInPlayerVehicleControls or CodecPlayInPlayerAction
         inbound.bindMessage(ClientSneakStatePacket.class)
-                .bindHandler(new HandlerPlayInPlayerSneak());
+                .bindHandler(new ClientSneakStateHandler());
         inbound.bindMessage(ClientSprintStatePacket.class)
-                .bindHandler(new HandlerPlayInPlayerSprint());
+                .bindHandler(new ClientSprintStateHandler());
         inbound.bindMessage(ClientVehicleJumpPacket.class); // TODO: Handler
         // Provided by CodecPlayInPlayerVehicleControls
         inbound.bindMessage(ClientMovementInputPacket.class)
-                .bindHandler(new HandlerPlayInPlayerMovementInput());
+                .bindHandler(new ClientMovementInputHandler());
         // Provided by CodecPlayInCraftingBookData
         inbound.bindMessage(ClientSetDisplayedRecipePacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleDisplayedRecipe));

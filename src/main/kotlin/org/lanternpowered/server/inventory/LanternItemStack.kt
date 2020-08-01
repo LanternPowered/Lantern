@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.inventory
 
+import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ExtendedItemStack
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
@@ -25,7 +26,6 @@ import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.entity.attribute.AttributeModifier
 import org.spongepowered.api.entity.attribute.type.AttributeType
-import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
@@ -35,7 +35,7 @@ import java.util.function.Consumer
 class LanternItemStack private constructor(
         private val itemType: ItemType,
         private var quantity: Int,
-        override val keyRegistry: LocalKeyRegistry<LanternItemStack>
+        override val keyRegistry: LocalKeyRegistry<ItemStack>
 ) : ExtendedItemStack, SerializableLocalMutableDataHolder, TextRepresentable {
 
     /**
@@ -53,7 +53,8 @@ class LanternItemStack private constructor(
      * @param quantity The quantity
      */
     @JvmOverloads
-    constructor(itemType: ItemType, quantity: Int = 1) : this(itemType, quantity, LocalKeyRegistry.of()) {
+    constructor(itemType: ItemType, quantity: Int = 1) :
+            this(itemType, quantity, (itemType as LanternItemType).stackKeyRegistry.copy()) {
         check(quantity >= 0) { "quantity may not be negative" }
         registerKeys(itemType)
     }
@@ -162,9 +163,8 @@ class LanternItemStack private constructor(
      * @param other The other snapshot
      * @return Is similar
      */
-    override fun isSimilarTo(other: ItemStackSnapshot): Boolean {
-        return isSimilarTo((other as LanternItemStackSnapshot).unwrap())
-    }
+    override fun isSimilarTo(other: ItemStackSnapshot): Boolean =
+            this.isSimilarTo((other as LanternItemStackSnapshot).unwrap())
 
     /**
      *
@@ -181,7 +181,7 @@ class LanternItemStack private constructor(
         return if (emptyA != emptyB) {
             emptyA && emptyB
         } else {
-            type === other.type && LocalDataHolderHelper.matchContents(this, other as LanternItemStack)
+            this.type == other.type && LocalDataHolderHelper.matchContents(this, other as LanternItemStack)
         }
     }
 

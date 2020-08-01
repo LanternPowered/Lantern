@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.ext
+package org.lanternpowered.server.util
 
 /**
  * Wraps the degree rotation value between 0 and 360 (exclusive).

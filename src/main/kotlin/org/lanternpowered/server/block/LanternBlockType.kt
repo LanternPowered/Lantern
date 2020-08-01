@@ -11,6 +11,8 @@
 package org.lanternpowered.server.block
 
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.server.behavior.Behavior
+import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
 import org.lanternpowered.server.data.property.LocalPropertyHolder
 import org.lanternpowered.server.data.property.PropertyRegistry
 import org.lanternpowered.server.state.AbstractStateContainer
@@ -32,7 +34,7 @@ class LanternBlockType(
         val blockEntityProvider: (() -> BlockEntity)?,
         stateProperties: Iterable<StateProperty<*>>,
         override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>
-) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalPropertyHolder {
+) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType {
 
     private val defaultSoundGroup: BlockSoundGroup = getProperty(BlockProperties.BLOCK_SOUND_GROUP).orElse(BlockSoundGroups.STONE)
 
@@ -51,4 +53,7 @@ class LanternBlockType(
 
     override fun getSoundGroup() = this.defaultSoundGroup
     override fun doesUpdateRandomly() = this.updateRandomly
+
+    val pipeline: BehaviorPipeline<Behavior>
+        get() = TODO()
 }

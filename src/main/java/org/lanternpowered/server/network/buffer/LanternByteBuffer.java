@@ -23,6 +23,7 @@ import org.lanternpowered.server.network.item.NetworkItemHelper;
 import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataView;
+import org.spongepowered.api.network.channel.ChannelBuf;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3f;
 import org.spongepowered.math.vector.Vector3i;
@@ -148,6 +149,11 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public LanternByteBuffer readSlice(int length) {
+        return new LanternByteBuffer(this.buf.readSlice(length));
+    }
+
+    @Override
     public boolean hasArray() {
         return this.buf.hasArray();
     }
@@ -260,6 +266,16 @@ public final class LanternByteBuffer implements ByteBuffer {
         final byte[] data = readByteArray();
         this.buf.readerIndex(oldIndex);
         return data;
+    }
+
+    @Override
+    public byte[] getByteArray(int index) {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getByteArray(int index, int limit) {
+        return new byte[0];
     }
 
     @Override
@@ -528,7 +544,7 @@ public final class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer setDoubleLE(int index, double data) {
         this.buf.setDoubleLE(index, data);
-        return null;
+        return this;
     }
 
     @Override
@@ -999,11 +1015,11 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public LanternByteBuffer writeResourceKey(ResourceKey ResourceKey) {
-        if (ResourceKey.getNamespace().equals(ResourceKey.MINECRAFT_NAMESPACE)) {
-            return writeString(ResourceKey.getValue());
+    public LanternByteBuffer writeResourceKey(ResourceKey resourcekey) {
+        if (resourcekey.getNamespace().equals(resourcekey.MINECRAFT_NAMESPACE)) {
+            return writeString(resourcekey.getValue());
         } else {
-            return writeString(ResourceKey.toString());
+            return writeString(resourcekey.toString());
         }
     }
 

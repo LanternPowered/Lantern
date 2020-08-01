@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.registry.type.recipe
 
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.registry.MutableCatalogTypeRegistry
 import org.lanternpowered.api.registry.RecipeRegistry
 import org.lanternpowered.api.registry.mutableCatalogTypeRegistry
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.World
-import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.Recipe

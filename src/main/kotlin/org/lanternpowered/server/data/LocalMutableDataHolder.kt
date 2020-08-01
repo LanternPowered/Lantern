@@ -22,15 +22,14 @@ import org.spongepowered.api.data.value.Value
  */
 interface LocalMutableDataHolder : LocalDataHolder, MutableDataHolder {
 
-    override val keyRegistry: LocalKeyRegistry<out LocalMutableDataHolder>
+    override val keyRegistry: LocalKeyRegistry<out DataHolder.Mutable>
 
     @JvmDefault
     override fun <E : Any> offerFastNoEvents(key: Key<out Value<E>>, element: E): Boolean {
         // Check the local key registration
         val localRegistration = this.keyRegistry[key]
-        if (localRegistration != null) {
+        if (localRegistration != null)
             return localRegistration.dataProvider<Value<E>, E>().offerFast(this, element)
-        }
 
         key as ValueKey<*,*>
         // Implicitly register the key locally if it doesn't require explicit

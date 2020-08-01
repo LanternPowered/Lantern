@@ -72,23 +72,20 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
         }
 
         val keyRegistry = LocalKeyRegistry.of<ItemType>()
-        for (fn in this.keysFunctions) {
+        for (fn in this.keysFunctions)
             keyRegistry.fn()
-        }
 
         // Already create the key registry, this can be copied
         // to every item stack later, instead of reapplying every function
         val stackKeyRegistry = LocalKeyRegistry.of<ItemStack>()
-        for (fn in this.stackKeysFunctions) {
+        for (fn in this.stackKeysFunctions)
             stackKeyRegistry.fn()
-        }
 
         val behaviorPipeline = MutableBehaviorPipelineImpl(Behavior::class.java, mutableListOf())
-        for (fn in this.behaviorsBuilderFunctions) {
+        for (fn in this.behaviorsBuilderFunctions)
             behaviorPipeline.fn()
-        }
 
         return LanternItemType(key, nameFunction, this.blockType, this.maxStackQuantity,
-                stackKeyRegistry, behaviorPipeline, keyRegistry.forHolderUnchecked())
+                keyRegistry, stackKeyRegistry, behaviorPipeline)
     }
 }

@@ -12,6 +12,7 @@ package org.lanternpowered.server.data
 
 import com.google.common.collect.ImmutableSet
 import org.lanternpowered.api.util.uncheckedCast
+import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
@@ -23,7 +24,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
      *
      * @return The key registry
      */
-    val keyRegistry: LocalKeyRegistry<out LocalDataHolder>
+    val keyRegistry: LocalKeyRegistry<out DataHolder>
 
     /**
      * A convenient extension that applies changes as the caller type.

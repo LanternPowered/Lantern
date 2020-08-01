@@ -22,7 +22,7 @@ import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.Slot
 import kotlin.streams.toList
 
-class HandlerPlayInSignBook : Handler<ClientModifyBookPacket.Sign> {
+object ClientSignBookHandler : Handler<ClientModifyBookPacket.Sign> {
 
     override fun handle(context: NetworkContext, packet: ClientModifyBookPacket.Sign) {
         val player = context.session.player

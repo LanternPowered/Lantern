@@ -205,8 +205,8 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
                     register(Keys.BANNER_PATTERN_LAYERS, listOf())
                 }
                 behaviors {
-                    val wallType = lazy { BlockTypeRegistry.require(minecraftKey("${dyeId}_wall_banner")) }
-                    val standingType = lazy { BlockTypeRegistry.require(minecraftKey("${dyeId}_banner")) }
+                    val wallType = { BlockTypeRegistry.require(minecraftKey("${dyeId}_wall_banner")) }
+                    val standingType = { BlockTypeRegistry.require(minecraftKey("${dyeId}_banner")) }
                     add(WallOrStandingPlacementBehavior.ofTypes(wallType, standingType))
                 }
             }

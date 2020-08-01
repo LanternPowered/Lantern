@@ -30,7 +30,6 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("ConstantConditions")
 public final class HandlerPlayInSwapHandItems implements Handler<ClientSwapHandItemsPacket> {
 
     @Override

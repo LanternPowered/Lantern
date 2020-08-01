@@ -27,8 +27,8 @@ public class HandlerPlayInEditBook implements Handler<ClientModifyBookPacket.Edi
         final AbstractSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
         final LanternItemStack itemStack = slot.peek();
-        if (itemStack.getType() == ItemTypes.WRITABLE_BOOK) {
-            itemStack.offer(Keys.PLAIN_BOOK_PAGES, packet.getPages());
+        if (itemStack.getType() == ItemTypes.WRITABLE_BOOK.get()) {
+            itemStack.offer(Keys.PLAIN_PAGES, packet.getPages());
             slot.set(itemStack);
         }
     }

@@ -29,8 +29,8 @@ class LanternItemType(
         val nameFunction: ItemStack.() -> Text,
         private val blockType: BlockType?,
         private val maxStackQuantity: Int,
-        private val stackKeyRegistry: LocalKeyRegistry<ItemStack>,
-        override val keyRegistry: LocalKeyRegistry<out LocalImmutableDataHolder<ItemType>>,
+        override val keyRegistry: LocalKeyRegistry<ItemType>,
+        val stackKeyRegistry: LocalKeyRegistry<ItemStack>,
         val behaviorPipeline: BehaviorPipeline<Behavior>,
         val appearance: ItemAppearance? = null // TODO: When custom item types get implemented,
 ) : DefaultCatalogType(key), ItemType, LocalImmutableDataHolder<ItemType> {

@@ -25,9 +25,9 @@ interface IState<S : State<S>> : State<S> {
     val stateContainer: StateContainer<S>
 
     /**
-     * The internal id (index) of the state.
+     * The index of the state within the [StateContainer].
      */
-    val internalId: Int
+    val index: Int
 
     /**
      * Gets whether the given [StateProperty] is supported by this state.

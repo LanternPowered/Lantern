@@ -11,7 +11,7 @@
 package org.lanternpowered.server.block
 
 import org.lanternpowered.api.world.Location
-import org.lanternpowered.server.registry.type.block.BlockRegistry
+import org.lanternpowered.server.registry.type.block.BlockTypeRegistry
 import org.lanternpowered.server.state.AbstractState
 import org.lanternpowered.server.state.AbstractStateContainer
 import org.lanternpowered.server.state.StateBuilder
@@ -96,6 +96,6 @@ class LanternBlockState(
          * @return The deserialized block state
          */
         fun deserialize(dataView: DataView): BlockState
-                = AbstractStateContainer.deserializeState(dataView, BlockRegistry)
+                = AbstractStateContainer.deserializeState(dataView, BlockTypeRegistry)
     }
 }

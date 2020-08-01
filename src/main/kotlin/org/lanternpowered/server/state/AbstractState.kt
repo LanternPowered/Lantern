@@ -47,8 +47,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
     // A lookup table to get a specific state when you would change a value
     internal lateinit var propertyValueTable: ImmutableTable<StateProperty<*>, Comparable<*>, S>
 
-    // The internal id of this state within the state container
-    final override val internalId: Int
+    // The index of this state within the state container
+    final override val index: Int
 
     // A list with all the values of this state
     private val values: ImmutableSet<Value.Immutable<*>>
@@ -62,7 +62,7 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
         this.key = builder.key
         this.stateValues = builder.stateValues
         this.stateContainer = builder.stateContainer as C
-        this.internalId = builder.internalId
+        this.index = builder.internalId
         this.dataContainer = builder.dataContainer
         this.values = builder.values
     }
@@ -77,9 +77,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
 
     override fun getStatePropertyByName(statePropertyId: String): Optional<StateProperty<*>> {
         for ((property, _) in this.stateValues) {
-            if (property.getName() == statePropertyId) {
+            if (property.getName() == statePropertyId)
                 return property.asOptional()
-            }
         }
         return emptyOptional()
     }
@@ -229,7 +228,8 @@ abstract class AbstractState<S : State<S>, C : StateContainer<S>>(builder: State
 
     override fun getValues(): Set<Value.Immutable<*>> {
         val values = super.getValues()
-        if (values.isEmpty()) return this.values
+        if (values.isEmpty())
+            return this.values
         return ImmutableSet.builderWithExpectedSize<Value.Immutable<*>>(values.size + this.values.size)
                 .addAll(values)
                 .addAll(this.values)

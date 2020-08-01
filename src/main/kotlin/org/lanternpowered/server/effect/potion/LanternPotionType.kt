@@ -13,6 +13,7 @@ package org.lanternpowered.server.effect.potion
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
+import org.lanternpowered.api.text.toText
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.InternalCatalogType
@@ -23,6 +24,11 @@ class LanternPotionType(
         key: NamespacedKey, translationPart: String, override val internalId: Int, private val effects: List<PotionEffect>
 ) : DefaultCatalogType(key), PotionType, InternalCatalogType,
         TextRepresentable by translatableTextOf("item.minecraft.potion.$translationPart") {
+
+    /**
+     * The [Text] when a item stack is a normal potion of this potion type.
+     */
+    val normalTranslation: Text = this.toText()
 
     /**
      * The [Text] when a item stack is a lingering potion of this potion type.

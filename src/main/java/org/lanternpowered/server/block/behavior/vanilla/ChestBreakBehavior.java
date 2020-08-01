@@ -18,7 +18,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.entity.vanilla.LanternChest;
 import org.lanternpowered.server.block.state.BlockStateProperties;
-import org.lanternpowered.server.data.type.LanternChestAttachment;
+import org.lanternpowered.server.data.type.LanternChestAttachmentType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Keys;
@@ -38,13 +38,13 @@ public class ChestBreakBehavior implements BreakBlockBehavior {
             if (relState.getType() == state.getType() &&
                     relState.getTraitValue(BlockStateProperties.HORIZONTAL_FACING).get() ==
                     state.getTraitValue(BlockStateProperties.HORIZONTAL_FACING).get()) {
-                final LanternChestAttachment relConnection = relState.getTraitValue(BlockStateProperties.CHEST_ATTACHMENT).get();
-                final LanternChestAttachment connection = state.getTraitValue(BlockStateProperties.CHEST_ATTACHMENT).get();
-                if ((relConnection == LanternChestAttachment.LEFT && connection == LanternChestAttachment.RIGHT) ||
-                        (relConnection == LanternChestAttachment.RIGHT && connection == LanternChestAttachment.LEFT)) {
+                final LanternChestAttachmentType relConnection = relState.getTraitValue(BlockStateProperties.CHEST_ATTACHMENT_TYPE).get();
+                final LanternChestAttachmentType connection = state.getTraitValue(BlockStateProperties.CHEST_ATTACHMENT_TYPE).get();
+                if ((relConnection == LanternChestAttachmentType.LEFT && connection == LanternChestAttachmentType.RIGHT) ||
+                        (relConnection == LanternChestAttachmentType.RIGHT && connection == LanternChestAttachmentType.LEFT)) {
                     context.addBlockChange(BlockSnapshot.builder()
                             .from(location)
-                            .add(Keys.CHEST_ATTACHMENT, LanternChestAttachment.SINGLE)
+                            .add(Keys.CHEST_ATTACHMENT, LanternChestAttachmentType.SINGLE)
                             .build());
                 }
             }

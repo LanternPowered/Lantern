@@ -11,7 +11,6 @@
 package org.lanternpowered.server.block.provider.property;
 
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
 import org.spongepowered.api.block.BlockState;
 
 import java.util.function.Function;

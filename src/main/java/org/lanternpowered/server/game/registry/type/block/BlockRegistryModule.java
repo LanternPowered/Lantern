@@ -52,7 +52,7 @@ import org.lanternpowered.server.block.provider.property.PropertyProviderCollect
 import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternBedPart;
-import org.lanternpowered.server.data.type.LanternChestAttachment;
+import org.lanternpowered.server.data.type.LanternChestAttachmentType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.data.type.LanternInstrumentType;
 import org.lanternpowered.server.data.type.LanternRailDirection;
@@ -1408,12 +1408,12 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     private BlockTypeBuilder chestBuilder() {
         return builder()
-                .traits(BlockStateProperties.CHEST_ATTACHMENT,
+                .traits(BlockStateProperties.CHEST_ATTACHMENT_TYPE,
                         BlockStateProperties.HORIZONTAL_FACING,
                         BlockStateProperties.WATERLOGGED)
                 .defaultState(state -> state
                         .withTrait(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).get()
-                        .withTrait(BlockStateProperties.CHEST_ATTACHMENT, LanternChestAttachment.SINGLE).get()
+                        .withTrait(BlockStateProperties.CHEST_ATTACHMENT_TYPE, LanternChestAttachmentType.SINGLE).get()
                         .withTrait(BlockStateProperties.WATERLOGGED, false).get())
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.CHEST)

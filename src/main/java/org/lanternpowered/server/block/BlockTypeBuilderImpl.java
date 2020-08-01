@@ -24,9 +24,7 @@ import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineI
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.entity.LanternBlockEntityType;
 import org.lanternpowered.server.block.provider.BlockObjectProvider;
-import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
-import org.lanternpowered.server.block.provider.ConstantObjectProvider;
-import org.lanternpowered.server.block.provider.SimpleObjectProvider;
+import org.lanternpowered.server.block.provider.ConstantBlockObjectProvider;
 import org.lanternpowered.server.block.provider.property.CachedPropertyObjectProvider;
 import org.lanternpowered.server.block.provider.property.ConstantPropertyProvider;
 import org.lanternpowered.server.block.provider.property.PropertyProvider;
@@ -83,7 +81,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     }
 
     private static final BlockObjectProvider<AABB> defaultCollisionBoxProvider =
-            new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
+            new ConstantBlockObjectProvider<>(BoundingBoxes.DEFAULT);
     private static final BlockObjectProvider<Collection<AABB>> defaultCollisionBoxesProvider =
             new SingleCollisionBoxProvider(defaultCollisionBoxProvider);
 
@@ -100,7 +98,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
     @Override
     public BlockTypeBuilder selectionBox(@Nullable AABB boundingBox) {
-        return selectionBox(boundingBox == null ? null : new ConstantObjectProvider<>(boundingBox));
+        return selectionBox(boundingBox == null ? null : new ConstantBlockObjectProvider<>(boundingBox));
     }
 
     @Override
@@ -116,7 +114,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
     @Override
     public BlockTypeBuilder collisionBox(@Nullable AABB collisionBox) {
-        return collisionBox(collisionBox == null ? null : new ConstantObjectProvider<>(collisionBox));
+        return collisionBox(collisionBox == null ? null : new ConstantBlockObjectProvider<>(collisionBox));
     }
 
     @Override
@@ -131,7 +129,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
     @Override
     public BlockTypeBuilder collisionBoxes(@Nullable Collection<AABB> collisionBoxes) {
-        return collisionBoxes(collisionBoxes == null ? null : new ConstantObjectProvider<>(collisionBoxes));
+        return collisionBoxes(collisionBoxes == null ? null : new ConstantBlockObjectProvider<>(collisionBoxes));
     }
 
     @Override
@@ -283,7 +281,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
         final PropertyProvider<Boolean> passableProvider = properties.build().get(BlockProperties.IS_PASSABLE).orElse(null);
         BlockObjectProvider<Collection<AABB>> collisionBoxesProvider0 = this.collisionBoxesProvider;
         if (collisionBoxesProvider0 == defaultCollisionBoxesProvider) {
-            if (passableProvider instanceof ConstantObjectProvider &&
+            if (passableProvider instanceof ConstantBlockObjectProvider &&
                     passableProvider.get(null, null, null)) {
                 collisionBoxesProvider0 = null;
             } else if (passableProvider instanceof SimpleObjectProvider) {
@@ -300,7 +298,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             collisionBoxesProvider = collisionBoxesProvider0;
         }
         if (solidCubeProvider == null) {
-            if (collisionBoxesProvider instanceof ConstantObjectProvider) {
+            if (collisionBoxesProvider instanceof ConstantBlockObjectProvider) {
                 final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(null, null, null);
                 final boolean isSolid = isSolid(collisionBoxes);
                 if (isSolid) {
@@ -339,7 +337,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                 } else if (flag2) {
                     properties.add(solidCube(false));
                 } else {
-                    properties.add(solidCube(((blockState, location, face) -> bitSet.get(((LanternBlockState) blockState).getInternalId()))));
+                    properties.add(solidCube(((blockState, location, face) -> bitSet.get(((LanternBlockState) blockState).getIndex()))));
                 }
                 if (!flag1) {
                     final BitSet[] solidSides = new BitSet[values.size()];
@@ -360,7 +358,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                             if (index == -1) {
                                 return false;
                             }
-                            final int state = ((LanternBlockState) blockState).getInternalId();
+                            final int state = ((LanternBlockState) blockState).getIndex();
                             return solidSides[state].get(index);
                         }));
                     }
@@ -385,10 +383,10 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             // A collision boxes provider is present, but no selection box,
             // so generate the selection box based on the collision boxes
             if (this.collisionBoxesProvider == defaultCollisionBoxesProvider) {
-                selectionBoxProvider = new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
-            } else if (collisionBoxesProvider instanceof ConstantObjectProvider) {
+                selectionBoxProvider = new ConstantBlockObjectProvider<>(BoundingBoxes.DEFAULT);
+            } else if (collisionBoxesProvider instanceof ConstantBlockObjectProvider) {
                 final Collection<AABB> collisionBoxes = collisionBoxesProvider.get(null, null, null);
-                selectionBoxProvider = new ConstantObjectProvider<>(unionAABB(collisionBoxes));
+                selectionBoxProvider = new ConstantBlockObjectProvider<>(unionAABB(collisionBoxes));
             } else if (collisionBoxesProvider instanceof CachedSimpleObjectProvider) {
                 final Function<BlockState, Collection<AABB>> provider = ((CachedSimpleObjectProvider) collisionBoxesProvider).getFunction();
                 selectionBoxProvider = new CachedSimpleObjectProvider<>(blockType, provider.andThen(BlockTypeBuilderImpl::unionAABB));
@@ -411,7 +409,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                 blockType.setSoundGroup(blockSoundGroup);
             }
         } else if (collisionBoxesProvider != null) {
-            if (passableProvider instanceof ConstantObjectProvider) {
+            if (passableProvider instanceof ConstantBlockObjectProvider) {
                 if (passableProvider.get(blockType.getDefaultState(), null, null)) {
                     properties.add(blockSoundGroup(null));
                 } else {

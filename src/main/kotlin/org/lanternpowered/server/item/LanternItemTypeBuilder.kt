@@ -10,20 +10,21 @@
  */
 package org.lanternpowered.server.item
 
+import org.lanternpowered.api.block.BlockType
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
-import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.textOf
+import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl
 import org.lanternpowered.server.data.LocalKeyRegistry
-import org.lanternpowered.server.text.translation.TranslationHelper.tr
-import org.spongepowered.api.block.BlockType
 
 class LanternItemTypeBuilder : ItemTypeBuilder {
 
-    private var nameFunction: (ItemStack.() -> Translation)? = null
+    private var nameFunction: (ItemStack.() -> Text)? = null
     private var maxStackQuantity = 64
     private val keysFunctions = mutableListOf<LocalKeyRegistry<ItemType>.() -> Unit>()
     private val stackKeysFunctions = mutableListOf<LocalKeyRegistry<ItemStack>.() -> Unit>()
@@ -34,15 +35,15 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
      */
     internal var blockType: BlockType? = null
 
-    override fun name(fn: ItemStack.() -> Translation) {
+    override fun name(fn: ItemStack.() -> Text) {
         this.nameFunction = fn
     }
 
     override fun name(name: String) {
-        name(FixedTranslation(name))
+        name(textOf(name))
     }
 
-    override fun name(name: Translation) {
+    override fun name(name: Text) {
         name { name }
     }
 
@@ -66,7 +67,7 @@ class LanternItemTypeBuilder : ItemTypeBuilder {
     fun build(key: NamespacedKey): ItemType {
         var nameFunction = this.nameFunction
         if (nameFunction == null) {
-            val def = tr("item.${key.namespace}.${key.value}")
+            val def = translatableTextOf("item.${key.namespace}.${key.value}")
             nameFunction = { def }
         }
 

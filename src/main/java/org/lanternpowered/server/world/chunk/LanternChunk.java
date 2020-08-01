@@ -32,9 +32,7 @@ import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetype;
 import org.lanternpowered.server.block.provider.BlockObjectProvider;
-import org.lanternpowered.server.block.provider.CachedSimpleObjectProvider;
-import org.lanternpowered.server.block.provider.ConstantObjectProvider;
-import org.lanternpowered.server.block.provider.SimpleObjectProvider;
+import org.lanternpowered.server.block.provider.ConstantBlockObjectProvider;
 import org.lanternpowered.server.data.property.DirectionRelativePropertyHolderBase;
 import org.lanternpowered.server.data.property.PropertyHolderBase;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -1171,7 +1169,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return Optional.empty();
         }
         final AABB aabb;
-        if (aabbObjectProvider instanceof ConstantObjectProvider
+        if (aabbObjectProvider instanceof ConstantBlockObjectProvider
                 || aabbObjectProvider instanceof CachedSimpleObjectProvider
                 || aabbObjectProvider instanceof SimpleObjectProvider) {
             aabb = aabbObjectProvider.get(block, null, null);
@@ -1192,7 +1190,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return Collections.emptySet();
         }
         final Collection<AABB> collisionBoxes;
-        if (aabbObjectProvider instanceof ConstantObjectProvider
+        if (aabbObjectProvider instanceof ConstantBlockObjectProvider
                 || aabbObjectProvider instanceof CachedSimpleObjectProvider
                 || aabbObjectProvider instanceof SimpleObjectProvider) {
             collisionBoxes = aabbObjectProvider.get(block, null, null);

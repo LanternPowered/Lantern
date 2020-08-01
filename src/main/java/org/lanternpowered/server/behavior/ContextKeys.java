@@ -22,6 +22,7 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 
 public final class ContextKeys {
 
@@ -43,13 +44,13 @@ public final class ContextKeys {
      * The exact point where for example a {@link Player} interacted
      * to place the block.
      */
-    public static final EventContextKey<Location> INTERACTION_LOCATION = createFor("INTERACTION_LOCATION");
+    public static final EventContextKey<ServerLocation> INTERACTION_LOCATION = createFor("INTERACTION_LOCATION");
 
     public static final EventContextKey<Direction> INTERACTION_FACE = createFor("INTERACTION_FACE");
 
     public static final EventContextKey<HandType> INTERACTION_HAND = createFor("INTERACTION_HAND");
 
-    public static final EventContextKey<Location> BLOCK_LOCATION = createFor("BLOCK_LOCATION");
+    public static final EventContextKey<ServerLocation> BLOCK_LOCATION = createFor("BLOCK_LOCATION");
 
     public static final EventContextKey<BlockType> BLOCK_TYPE = createFor("BLOCK_TYPE");
 

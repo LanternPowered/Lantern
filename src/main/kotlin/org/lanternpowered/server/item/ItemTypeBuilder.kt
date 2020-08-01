@@ -14,7 +14,7 @@ import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.data.Key
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
-import org.lanternpowered.api.text.translation.Translation
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
 import org.lanternpowered.server.data.LocalKeyRegistry
@@ -34,8 +34,8 @@ annotation class ItemTypeBuilderDsl
 interface ItemTypeBuilder {
 
     fun name(name: String)
-    fun name(name: Translation)
-    fun name(fn: @ItemTypeBuilderDsl ItemStack.() -> Translation)
+    fun name(name: Text)
+    fun name(fn: @ItemTypeBuilderDsl ItemStack.() -> Text)
 
     /**
      * Sets the maximum stack quantity.

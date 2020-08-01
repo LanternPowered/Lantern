@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.server.block.provider.property;
 
-import org.lanternpowered.server.block.provider.ConstantObjectProvider;
+import org.lanternpowered.server.block.provider.ConstantBlockObjectProvider;
 
-public class ConstantPropertyProvider<V> extends ConstantObjectProvider<V> implements PropertyProvider<V> {
+public class ConstantPropertyProvider<V> extends ConstantBlockObjectProvider<V> implements PropertyProvider<V> {
 
     public ConstantPropertyProvider(V value) {
         super(value);

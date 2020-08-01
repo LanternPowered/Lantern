@@ -12,7 +12,7 @@ package org.lanternpowered.server.block.state
 
 import org.lanternpowered.api.NamespacedKeys.minecraft
 import org.lanternpowered.server.data.key.LanternKeys
-import org.lanternpowered.server.data.type.LanternChestAttachment
+import org.lanternpowered.server.data.type.LanternChestAttachmentType
 import org.lanternpowered.server.data.type.LanternInstrumentType
 import org.lanternpowered.server.data.type.LanternPortionType
 import org.lanternpowered.server.data.type.LanternRailDirection
@@ -94,8 +94,8 @@ object BlockStateProperties {
             LanternRailDirection.ASCENDING_NORTH,
             LanternRailDirection.ASCENDING_SOUTH)
 
-    @JvmField val CHEST_ATTACHMENT = enumStatePropertyOf(minecraft("type"),
-            Keys.CHEST_ATTACHMENT as K<LanternChestAttachment>)
+    @JvmField val CHEST_ATTACHMENT_TYPE = enumStatePropertyOf(minecraft("type"),
+            Keys.CHEST_ATTACHMENT_TYPE as K<LanternChestAttachmentType>)
 
     @JvmField val RAIL_DIRECTION = enumStatePropertyOf(minecraft("shape"),
             Keys.RAIL_DIRECTION as K<LanternRailDirection>)

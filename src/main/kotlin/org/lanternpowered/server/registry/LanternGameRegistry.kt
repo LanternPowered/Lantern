@@ -117,6 +117,7 @@ import org.lanternpowered.server.registry.type.fluid.FluidTypeRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentGroupRegistry
 import org.lanternpowered.server.registry.type.inventory.EquipmentTypeRegistry
 import org.lanternpowered.server.registry.type.item.EnchantmentTypeRegistry
+import org.lanternpowered.server.registry.type.item.ItemTypeRegistry
 import org.lanternpowered.server.registry.type.network.BlockEntityProtocolTypeRegistry
 import org.lanternpowered.server.registry.type.persistence.DataFormatRegistry
 import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
@@ -318,6 +319,7 @@ class LanternGameRegistry(
             register(EquipmentTypeRegistry)
 
             register(EnchantmentTypeRegistry)
+            register(ItemTypeRegistry)
 
             register(BlockEntityProtocolTypeRegistry)
 

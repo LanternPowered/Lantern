@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.advancement.LanternAdvancementProgress
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion
 import org.spongepowered.api.advancement.criteria.ScoreCriterionProgress
@@ -64,7 +65,7 @@ class LanternScoreCriterionProgress(
             this.attachTrigger()
         }
         invalidator()
-        return Optional.ofNullable(achievingTime)
+        return this.achievingTime.asOptional()
     }
 
     override fun add(score: Int): Optional<Instant> {

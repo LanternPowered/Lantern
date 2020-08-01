@@ -11,7 +11,7 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.server.data.type.LanternBedPart
-import org.lanternpowered.server.data.type.LanternChestAttachment
+import org.lanternpowered.server.data.type.LanternChestAttachmentType
 import org.lanternpowered.server.data.type.LanternComparatorMode
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.LanternDyeColor
@@ -39,7 +39,7 @@ val BedPartRegistry: InternalCatalogTypeRegistry<LanternBedPart> =
         internalCatalogTypeRegistryOfArray { LanternBedPart.values() }
 
 val ChestAttachmentTypeRegistry: InternalCatalogTypeRegistry<ChestAttachmentType> =
-        internalCatalogTypeRegistryOfArray { LanternChestAttachment.values() }
+        internalCatalogTypeRegistryOfArray { LanternChestAttachmentType.values() }
 
 val ComparatorTypeRegistry: InternalCatalogTypeRegistry<ComparatorMode> =
         internalCatalogTypeRegistryOfArray { LanternComparatorMode.values() }

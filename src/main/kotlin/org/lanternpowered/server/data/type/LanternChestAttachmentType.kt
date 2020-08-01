@@ -15,7 +15,7 @@ import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.catalog.asString
 import org.spongepowered.api.data.type.ChestAttachmentType
 
-enum class LanternChestAttachment(id: String) : ChestAttachmentType, CatalogType by DefaultCatalogType.minecraft(id) {
+enum class LanternChestAttachmentType(id: String) : ChestAttachmentType, CatalogType by DefaultCatalogType.minecraft(id) {
 
     SINGLE      ("single"),
     LEFT        ("left"),

@@ -27,6 +27,7 @@ import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -68,10 +69,10 @@ public class WallOrStandingPlacementBehavior extends InteractWithBlockItemBaseBe
 
     @Override
     protected boolean place(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location loc = context.getContext(ContextKeys.BLOCK_LOCATION).get();
+        final ServerLocation loc = context.getContext(ContextKeys.BLOCK_LOCATION).get();
         final Direction face = context.getContext(ContextKeys.INTERACTION_FACE).orElse(Direction.UP);
-        final Location solidFaceLoc = loc.relativeToBlock(face.getOpposite());
-        final boolean isSolidMaterial = solidFaceLoc.getProperty(BlockProperties.IS_SOLID_MATERIAL).get();
+        final ServerLocation solidFaceLoc = loc.relativeToBlock(face.getOpposite());
+        final boolean isSolidMaterial = solidFaceLoc.get(Keys.IS_SOLID).get();
         if (!isSolidMaterial) {
             return false;
         }

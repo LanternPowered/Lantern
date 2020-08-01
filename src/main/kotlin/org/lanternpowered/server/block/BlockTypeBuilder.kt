@@ -10,43 +10,46 @@
  */
 package org.lanternpowered.server.block
 
+import org.lanternpowered.api.block.BlockState
+import org.lanternpowered.api.block.BlockType
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.namespacedKey
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.api.text.TranslatableText
-import org.lanternpowered.api.util.math.times
-import org.lanternpowered.api.text.translation.Translation
 import org.lanternpowered.api.util.AABB
+import org.lanternpowered.api.util.math.times
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline
+import org.lanternpowered.server.block.property.FlammableInfo
 import org.lanternpowered.server.block.state.BlockStateProperties
+import org.lanternpowered.server.data.LocalKeyRegistry
+import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.item.ItemTypeBuilder
-import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.entity.BlockEntity
 import org.spongepowered.api.block.entity.BlockEntityType
 import org.spongepowered.api.block.entity.BlockEntityTypes
+import org.spongepowered.api.data.Keys
 import org.spongepowered.api.state.StateProperty
 import org.spongepowered.math.vector.Vector3d
+import java.util.function.Supplier
 
 val testBlockType = blockTypeOf(namespacedKey("namespace", "value")) {
     name("Test Block")
     stateProperty(BlockStateProperties.IS_WET)
-    properties {
-        register(BlockProperties.BLOCK_SOUND_GROUP, BlockSoundGroups.GLASS)
-        register(BlockProperties.BLAST_RESISTANCE, 10.2)
-        forStates {
-            registerProvider(BlockProperties.FLAMMABLE_INFO) {
-                get {
-                    if (getStateProperty(BlockStateProperties.IS_WET).orElse(false)) {
-                        null
-                    } else {
-                        FlammableInfo(1, 1)
-                    }
-                }
-                get { direction ->
+    keys {
+        register(LanternKeys.BLOCK_SOUND_GROUP, BlockSoundGroups.GLASS)
+        register(Keys.BLAST_RESISTANCE, 10.2)
+    }
+    stateKeys {
+        registerProvider(LanternKeys.FLAMMABLE_INFO) {
+            get {
+                if (this.getStateProperty(BlockStateProperties.IS_WET).orElse(false)) {
+                    null
+                } else {
                     FlammableInfo(1, 1)
                 }
+            }
+            getDirectional {
+                FlammableInfo(1, 1)
             }
         }
     }
@@ -102,6 +105,11 @@ interface BlockTypeBuilder {
     fun blockEntity(blockEntityType: BlockEntityType)
 
     /**
+     * Applies a [BlockEntity] to the block type.
+     */
+    fun blockEntity(blockEntityType: Supplier<out BlockEntityType>) = blockEntity(blockEntityType.get())
+
+    /**
      * Applies the selection bounding box.
      */
     fun selectionBox(selectionBox: AABB?)
@@ -132,9 +140,14 @@ interface BlockTypeBuilder {
     fun collisionBoxes(fn: @BlockTypeBuilderDsl BlockState.() -> Collection<AABB>)
 
     /**
-     * Applies properties to the [BlockType].
+     * Applies keys to the [BlockType].
      */
-    fun properties(fn: BlockTypePropertyRegistryBuilder.() -> Unit)
+    fun keys(fn: @BlockTypeBuilderDsl LocalKeyRegistry<BlockType>.() -> Unit)
+
+    /**
+     * Applies keys to the [BlockState]. Overrides keys provided through [keys].
+     */
+    fun stateKeys(fn: @BlockTypeBuilderDsl LocalKeyRegistry<BlockState>.() -> Unit)
 
     /**
      * Applies behaviors to the [BlockType].
@@ -145,14 +158,5 @@ interface BlockTypeBuilder {
      * Enables a item type for the block type and allows the item type to be modified.
      */
     fun itemType(fn: @BlockTypeBuilderDsl ItemTypeBuilder.() -> Unit = {})
-}
 
-@BlockTypeBuilderDsl
-abstract class BlockTypePropertyRegistryBuilder : PropertyRegistry<BlockType>() {
-
-    /**
-     * Applies properties to a block state, applied properties here will
-     * override the default properties provided by [BlockType].
-     */
-    abstract fun forStates(fn: PropertyRegistry<BlockState>.() -> Unit)
 }

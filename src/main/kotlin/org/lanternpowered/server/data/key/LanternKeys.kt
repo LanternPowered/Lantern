@@ -13,6 +13,7 @@ package org.lanternpowered.server.data.key
 import org.lanternpowered.api.data.type.TopHat
 import org.lanternpowered.api.data.valueKeyOf
 import org.lanternpowered.api.key.lanternKey
+import org.lanternpowered.server.block.property.FlammableInfo
 import org.lanternpowered.server.data.type.LanternBedPart
 import org.lanternpowered.server.data.type.LanternDoorHalf
 import org.lanternpowered.server.data.type.LanternWireAttachmentType
@@ -20,6 +21,7 @@ import org.lanternpowered.server.entity.Pose
 import org.lanternpowered.server.inventory.InventorySnapshot
 import org.lanternpowered.server.item.recipe.RecipeBookState
 import org.spongepowered.api.advancement.AdvancementTree
+import org.spongepowered.api.block.BlockSoundGroup
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.type.HandType
@@ -228,4 +230,7 @@ object LanternKeys {
 
     @JvmField val PICKUP_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("pickup_delay"))
     @JvmField val DESPAWN_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("despawn_delay"))
+
+    @JvmField val BLOCK_SOUND_GROUP: Key<Value<BlockSoundGroup>> = valueKeyOf(lanternKey("block_sound_group"))
+    @JvmField val FLAMMABLE_INFO: Key<Value<FlammableInfo>> = valueKeyOf(lanternKey("flammable_info"))
 }

@@ -32,7 +32,7 @@ open class DefaultCatalogType(key: NamespacedKey) : AbstractCatalogType() {
 
         fun minecraft(id: String) = DefaultCatalogType(minecraftKey(id))
         fun minecraft(id: String, name: String) = Named(minecraftKey(id), name)
-        fun minecraft(id: String, name: (() -> String)) = Named(minecraftKey(id), name)
+        fun minecraft(id: String, name: () -> String) = Named(minecraftKey(id), name)
 
         fun sponge(id: String) = DefaultCatalogType(spongeKey(id))
         fun sponge(id: String, name: String): DefaultCatalogType = Named(spongeKey(id), name)

@@ -19,6 +19,11 @@ import org.lanternpowered.server.network.packet.handler.Handler
  * It can also be used to define whether a specific or [Handler]
  * method should be handled on the netty thread.
  */
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER, AnnotationTarget.FIELD)
+@Target(AnnotationTarget.FUNCTION,
+        AnnotationTarget.PROPERTY_GETTER,
+        AnnotationTarget.PROPERTY_SETTER,
+        AnnotationTarget.FIELD,
+        AnnotationTarget.PROPERTY
+)
 @Retention(AnnotationRetention.RUNTIME)
 annotation class NettyThreadOnly

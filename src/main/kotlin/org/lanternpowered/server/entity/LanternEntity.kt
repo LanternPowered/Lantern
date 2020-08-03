@@ -20,11 +20,13 @@ import org.lanternpowered.api.data.holder.transform
 import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.effect.sound.soundEffectOf
 import org.lanternpowered.api.entity.Entity
+import org.lanternpowered.api.entity.ExtendedEntity
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.text.emptyText
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.util.AABB
+import org.lanternpowered.api.util.math.quaternions.eulerAnglesToQuaternion
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.orNull
@@ -37,14 +39,12 @@ import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.data.SerializableLocalMutableDataHolder
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.effect.entity.EntityEffectCollection
-import org.lanternpowered.server.effect.entity.EntityEffectTypes
 import org.lanternpowered.server.entity.event.EntityEvent
 import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.event.LanternEventContextKeys
 import org.lanternpowered.server.event.message.sendMessage
 import org.lanternpowered.server.network.entity.EntityProtocolType
 import org.lanternpowered.server.util.LanternTransform
-import org.lanternpowered.server.util.Quaternions
 import org.lanternpowered.server.world.LanternLocation
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer
@@ -80,7 +80,7 @@ import kotlin.time.Duration
 import kotlin.time.milliseconds
 import kotlin.time.seconds
 
-abstract class LanternEntity(creationData: EntityCreationData) : SerializableLocalMutableDataHolder, Entity {
+abstract class LanternEntity(creationData: EntityCreationData) : SerializableLocalMutableDataHolder, ExtendedEntity {
 
     private val random = Random()
 
@@ -737,13 +737,13 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     fun getDirectionVector(): Vector3d {
         val rotation = this.get(Keys.HEAD_ROTATION).orElse(this.rotation)
         // Invert the x direction because west and east are swapped
-        return Quaternions.fromAxesAnglesDeg(rotation.mul(1f, -1f, 1f)).direction
+        return rotation.mul(1f, -1f, 1f).eulerAnglesToQuaternion().direction
     }
 
     fun getHorizontalDirectionVector(): Vector3d {
         val rotation = this.get(Keys.HEAD_ROTATION).orElse(this.rotation)
         // Invert the x direction because west and east are swapped
-        return Quaternions.fromAxesAnglesDeg(rotation.mul(0f, 1f, 0f)).direction.mul(-1f, 1f, 1f)
+        return rotation.mul(0f, 1f, 0f).eulerAnglesToQuaternion().direction.mul(-1f, 1f, 1f)
     }
 
     /**

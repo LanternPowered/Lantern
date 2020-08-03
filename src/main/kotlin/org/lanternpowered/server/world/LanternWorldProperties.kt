@@ -50,7 +50,7 @@ class LanternWorldProperties(
 
     private var world: World? = null
 
-    private val config: WorldConfigObject = TODO()
+    val config: WorldConfigObject = TODO()
 
     private var serializationBehavior = SerializationBehaviors.AUTOMATIC.get()
     private var generateBonusChest = false

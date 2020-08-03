@@ -39,7 +39,7 @@ class LanternBlockState(
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun <E : Any?> get(direction: Direction?, key: Key<out Value<E>>?): Optional<E> {
+    override fun <E : Any> get(direction: Direction, key: Key<out Value<E>>): Optional<E> {
         TODO("Not yet implemented")
     }
 

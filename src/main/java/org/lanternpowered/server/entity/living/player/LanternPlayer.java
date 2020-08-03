@@ -262,7 +262,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
      */
     @Nullable private Vector3i openedSignPosition;
 
-    public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
+    public LanternPlayer(GameProfile gameProfile, NetworkSession session) {
         super((ProxyUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
         this.gameProfile = gameProfile;
         this.interactionHandler = new PlayerInteractionHandler(this);

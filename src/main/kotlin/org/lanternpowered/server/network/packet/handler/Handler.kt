@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.packet.handler
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.Packet
 
-interface Handler<M : Packet> {
+interface Handler<P : Packet> {
 
     /**
      * Handles a [Packet] that was received.
@@ -21,6 +21,6 @@ interface Handler<M : Packet> {
      * @param context The context that received the message
      * @param packet The packet that was received
      */
-    fun handle(context: NetworkContext, packet: M)
+    fun handle(context: NetworkContext, packet: P)
 
 }

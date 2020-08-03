@@ -71,6 +71,12 @@ fun translatableTextOf(key: String, vararg args: TextRepresentable): Translatabl
 /**
  * Creates a new [TranslatableText].
  */
+fun translatableTextOf(key: String, vararg args: String): TranslatableText =
+        TranslatableText.of(key, args.map { it.toText() })
+
+/**
+ * Creates a new [TranslatableText].
+ */
 fun translatableTextOf(key: String, args: Iterable<TextRepresentable>): TranslatableText =
         TranslatableText.of(key, args.map { it.toText() })
 
@@ -82,37 +88,40 @@ inline fun String.toText(): LiteralText = LiteralText.of(this)
 /**
  * Gets this [TextRepresentable] as a [Text] representation.
  */
-inline fun TextRepresentable.toText(): Text = asComponent()
+inline fun TextRepresentable.toText(): Text = this.asComponent()
 
 /**
  * Gets this [ItemStack] as a [Text] representation.
  */
 inline fun ItemStack.toText(): Text = (this as TextRepresentable).toText()
 
-fun Text.italic(): Text = decorate(TextDecoration.ITALIC)
-fun Text.bold(): Text = decorate(TextDecoration.BOLD)
-fun Text.obfuscated(): Text = decorate(TextDecoration.OBFUSCATED)
-fun Text.strikethrough(): Text = decorate(TextDecoration.STRIKETHROUGH)
-fun Text.underlined(): Text = decorate(TextDecoration.UNDERLINED)
+fun Text.italic(): Text = this.decorate(TextDecoration.ITALIC)
+fun Text.bold(): Text = this.decorate(TextDecoration.BOLD)
+fun Text.obfuscated(): Text = this.decorate(TextDecoration.OBFUSCATED)
+fun Text.strikethrough(): Text = this.decorate(TextDecoration.STRIKETHROUGH)
+fun Text.underlined(): Text = this.decorate(TextDecoration.UNDERLINED)
 
-fun TextRepresentable.color(color: TextColor): Text = toText().color(color)
-fun TextRepresentable.italic(): Text = toText().italic()
-fun TextRepresentable.bold(): Text = toText().bold()
-fun TextRepresentable.obfuscated(): Text = toText().obfuscated()
-fun TextRepresentable.strikethrough(): Text = toText().strikethrough()
-fun TextRepresentable.underlined(): Text = toText().underlined()
+fun TextRepresentable.color(color: TextColor): Text = this.toText().color(color)
+fun TextRepresentable.italic(): Text = this.toText().italic()
+fun TextRepresentable.bold(): Text = this.toText().bold()
+fun TextRepresentable.obfuscated(): Text = this.toText().obfuscated()
+fun TextRepresentable.strikethrough(): Text = this.toText().strikethrough()
+fun TextRepresentable.underlined(): Text = this.toText().underlined()
 
 /**
  * Applies a callback as click action.
  */
-fun Text.onClick(callback: (CommandCause) -> Unit): Text = clickEvent(SpongeComponents.executeCallback(callback))
+fun Text.onClick(callback: (CommandCause) -> Unit): Text = this.clickEvent(SpongeComponents.executeCallback(callback))
 
 /**
  * Appends a text component to this text component.
  */
-inline operator fun Text.plus(other: Text): Text = append(other)
+inline operator fun Text.plus(other: Text): Text = this.append(other)
 
 /**
  * Appends literal text to this text component.
  */
-inline operator fun Text.plus(other: String): Text = append(other.toText())
+inline operator fun Text.plus(other: String): Text = this.append(other.toText())
+
+fun <B : TextBuilder<*, B>> B.appendNewline(): B =
+        this.append(LiteralText.newline())

@@ -31,6 +31,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.imaginary.Quaterniond;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -96,13 +97,13 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
     @Override
     public BehaviorResult tryBreak(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Location location = context.getContext(ContextKeys.BLOCK_LOCATION).get();
+        final ServerLocation location = context.getContext(ContextKeys.BLOCK_LOCATION).get();
 
         final BlockState baseState = location.getBlock();
         final LanternDoorHalf half = baseState.get(LanternKeys.DOOR_HALF).get();
 
         final BlockSnapshotBuilder builder = BlockSnapshotBuilder.create();
-        builder.blockState(BlockTypes.AIR.getDefaultState());
+        builder.blockState(BlockTypes.AIR.get().getDefaultState());
         context.populateBlockSnapshot(builder, BehaviorContext.PopulationFlags.CREATOR_AND_NOTIFIER);
 
         builder.location(location);
@@ -110,7 +111,7 @@ public class DoorBehavior implements PlaceBlockBehavior, BreakBlockBehavior {
 
         final Direction dir = half == LanternDoorHalf.LOWER ? Direction.UP : Direction.DOWN;
         final LanternDoorHalf other = half == LanternDoorHalf.LOWER ? LanternDoorHalf.UPPER : LanternDoorHalf.LOWER;
-        final Location loc = location.getBlockRelative(dir);
+        final ServerLocation loc = location.relativeToBlock(dir);
 
         BlockState otherState = loc.getBlock();
         if (otherState.get(LanternKeys.DOOR_HALF).orElse(null) == other &&

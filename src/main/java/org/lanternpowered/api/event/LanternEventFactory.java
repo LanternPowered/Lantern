@@ -30,6 +30,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -405,5 +406,46 @@ public class LanternEventFactory {
             @NonNull Inventory inventory,
             @NonNull List<@NonNull SlotTransaction> transactions) {
         return SpongeEventFactory.createChangeInventoryEventPickup(cause, inventory, transactions);
+    }
+
+    public static ServerSideConnectionEvent.@NonNull Login createServerSideConnectionEventLogin(
+            @NonNull Cause cause,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
+            @NonNull ServerLocation fromLocation,
+            @NonNull ServerLocation toLocation,
+            @NonNull Vector3d fromRotation,
+            @NonNull Vector3d toRotation,
+            @NonNull ServerSideConnection connection,
+            @NonNull User user,
+            boolean messageCancelled) {
+        return SpongeEventFactory.createServerSideConnectionEventLogin(cause, originalMessage, message, fromLocation,
+                toLocation, fromRotation, toRotation, connection, user, messageCancelled);
+    }
+
+    public static ServerSideConnectionEvent.Join createServerSideConnectionEventJoin(
+            @NonNull Cause cause,
+            @NonNull Audience originalAudience,
+            @Nullable Audience audience,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
+            @NonNull ServerSideConnection connection,
+            @NonNull ServerPlayer player,
+            boolean messageCancelled) {
+        return SpongeEventFactory.createServerSideConnectionEventJoin(cause, originalAudience, Optional.ofNullable(audience),
+                originalMessage, message, connection, player, messageCancelled);
+    }
+
+    public static ServerSideConnectionEvent.@NonNull Disconnect createServerSideConnectionEventDisconnect(
+            @NonNull Cause cause,
+            @NonNull Audience originalAudience,
+            @Nullable Audience audience,
+            @NonNull Component originalMessage,
+            @NonNull Component message,
+            @NonNull ServerSideConnection connection,
+            @NonNull ServerPlayer player,
+            boolean messageCancelled) {
+        return SpongeEventFactory.createServerSideConnectionEventDisconnect(cause, originalAudience, Optional.ofNullable(audience),
+                originalMessage, message, connection, player, messageCancelled);
     }
 }

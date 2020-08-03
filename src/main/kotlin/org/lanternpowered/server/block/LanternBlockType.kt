@@ -10,11 +10,14 @@
  */
 package org.lanternpowered.server.block
 
+import net.kyori.adventure.text.Component
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
-import org.lanternpowered.server.data.property.LocalPropertyHolder
-import org.lanternpowered.server.data.property.PropertyRegistry
+import org.lanternpowered.server.data.LocalImmutableDataHolder
+import org.lanternpowered.server.data.LocalKeyRegistry
+import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.state.AbstractStateContainer
 import org.spongepowered.api.block.BlockSoundGroup
 import org.spongepowered.api.block.BlockState
@@ -22,7 +25,6 @@ import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.entity.BlockEntity
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.state.StateProperty
-import org.spongepowered.api.text.translation.Translation
 import java.util.Optional
 
 /**
@@ -30,22 +32,18 @@ import java.util.Optional
  */
 class LanternBlockType(
         private val key: NamespacedKey,
-        private val translation: Translation,
+        private val name: Text,
         val blockEntityProvider: (() -> BlockEntity)?,
         stateProperties: Iterable<StateProperty<*>>,
-        override val propertyRegistry: PropertyRegistry<out LocalPropertyHolder>
-) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType {
+        override val keyRegistry: LocalKeyRegistry<BlockType>
+) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalImmutableDataHolder<BlockType> {
 
-    private val defaultSoundGroup: BlockSoundGroup = getProperty(BlockProperties.BLOCK_SOUND_GROUP).orElse(BlockSoundGroups.STONE)
+    private val defaultSoundGroup: BlockSoundGroup = this.get(LanternKeys.BLOCK_SOUND_GROUP).orElse(BlockSoundGroups.STONE)
 
     private var updateRandomly: Boolean = false
 
     override fun getKey() = this.key
-    override fun getTranslation() = this.translation
-
-    override fun getItem(): Optional<ItemType> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun asComponent(): Component = this.name
 
     override fun setUpdateRandomly(updateRandomly: Boolean) {
         this.updateRandomly = updateRandomly
@@ -53,6 +51,10 @@ class LanternBlockType(
 
     override fun getSoundGroup() = this.defaultSoundGroup
     override fun doesUpdateRandomly() = this.updateRandomly
+
+    override fun getItem(): Optional<ItemType> {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     val pipeline: BehaviorPipeline<Behavior>
         get() = TODO()

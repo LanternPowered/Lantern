@@ -176,7 +176,20 @@ fun causeContext(block: CauseContextBuilder.() -> Unit): CauseContext = CauseCon
 /**
  * Constructs a new [Cause].
  */
-fun Cause.withContext(context: CauseContext): Cause = Cause.of(context, all())
+fun Cause.withContext(context: CauseContext): Cause =
+        Cause.of(context, this.all())
+
+/**
+ * Constructs a new [Cause].
+ */
+fun Cause.withContext(block: CauseContextBuilder.() -> Unit): Cause =
+        Cause.of(CauseContext.builder().from(this.context).apply(block).build(), this.all())
+
+/**
+ * Constructs a new [Cause].
+ */
+fun <T> Cause.withContext(key: Supplier<out CauseContextKey<T>>, value: T): Cause =
+        Cause.of(CauseContext.builder().from(this.context).add(key, value).build(), this.all())
 
 /**
  * A builder to construct [Cause]s.

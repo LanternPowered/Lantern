@@ -28,6 +28,7 @@ import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.LanternWorldPropertiesOld;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
@@ -72,7 +73,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
      * world to spawn the player in. Used at {@link NetworkSession#initPlayer()} and
      * {@link UserStore}. Will also be used by {@link OfflineUser}s.
      */
-    @Nullable private LanternWorldPropertiesOld userWorld;
+    @Nullable private LanternWorldProperties userWorld;
 
     AbstractUser(ProxyUser user) {
         super(user.getUniqueId());
@@ -141,11 +142,11 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     }
 
     @Nullable
-    public LanternWorldPropertiesOld getUserWorld() {
+    public LanternWorldProperties getUserWorld() {
         return this.userWorld;
     }
 
-    public void setUserWorld(@Nullable LanternWorldPropertiesOld userWorld) {
+    public void setUserWorld(@Nullable LanternWorldProperties userWorld) {
         this.userWorld = userWorld;
     }
 

@@ -18,7 +18,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.state.BlockStateProperties;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.Direction;

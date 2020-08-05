@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.entity.player;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.api.cause.CauseStack;
@@ -41,6 +41,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.BlockBreakAnim
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityAnimationPacket;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldNew;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -58,6 +59,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -155,12 +157,11 @@ public final class PlayerInteractionHandler {
      * custom break times? Only allowed by faster breaking.
      */
     private void sendBreakUpdate(int breakState) {
-        final LanternWorld world = this.player.getWorld();
-        //noinspection ConstantConditions
+        final LanternWorldNew world = this.player.getNullableWorld();
         if (world == null) {
             return;
         }
-        final Set<LanternPlayer> players = this.player.getWorld().getRawPlayers();
+        final Collection<LanternPlayer> players = this.player.getWorld().getUnsafePlayers();
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {
             final BlockBreakAnimationPacket message = new BlockBreakAnimationPacket(

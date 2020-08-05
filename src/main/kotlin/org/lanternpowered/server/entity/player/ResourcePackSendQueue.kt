@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player
+package org.lanternpowered.server.entity.player
 
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetResourcePackPacket
 import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent.ResourcePackStatus
@@ -23,7 +23,7 @@ class ResourcePackSendQueue internal constructor(private val player: LanternPlay
     fun offer(resourcePack: ResourcePack) {
         synchronized(this.queue) {
             if (this.waitingForResponse == null) {
-                send(resourcePack)
+                this.send(resourcePack)
                 this.counter = 0
             } else {
                 this.queue.add(resourcePack)
@@ -41,7 +41,7 @@ class ResourcePackSendQueue internal constructor(private val player: LanternPlay
                 return resourcePack
             }
             if (this.queue.isNotEmpty()) {
-                send(this.queue.removeAt(0))
+                this.send(this.queue.removeAt(0))
                 this.counter = 0
             } else {
                 this.waitingForResponse = null
@@ -58,7 +58,7 @@ class ResourcePackSendQueue internal constructor(private val player: LanternPlay
             this.counter++
             this.counter %= RESEND_DELAY
             if (this.counter == 0)
-                send(waitingForResponse)
+                this.send(waitingForResponse)
         }
     }
 

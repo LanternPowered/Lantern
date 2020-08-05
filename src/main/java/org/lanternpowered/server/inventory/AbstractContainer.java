@@ -15,7 +15,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import net.kyori.adventure.text.Component;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.type.slot.LanternSlot;
 import org.spongepowered.api.entity.living.player.Player;
@@ -115,7 +116,7 @@ public abstract class AbstractContainer extends AbstractChildrenInventory implem
      *
      * @param name The name
      */
-    public void setName(Text name) {
+    public void setName(Component name) {
         super.setName(TextTranslation.of(name));
     }
 

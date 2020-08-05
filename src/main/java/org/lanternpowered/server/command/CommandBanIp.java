@@ -13,7 +13,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;

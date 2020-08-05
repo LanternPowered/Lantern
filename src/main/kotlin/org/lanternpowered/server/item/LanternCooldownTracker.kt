@@ -18,7 +18,7 @@ import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
 import org.lanternpowered.api.util.optional.asOptionalDouble
 import org.lanternpowered.api.util.optional.asOptionalInt
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.game.LanternGame
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetCooldownPacket
 import org.spongepowered.api.entity.living.player.CooldownTracker

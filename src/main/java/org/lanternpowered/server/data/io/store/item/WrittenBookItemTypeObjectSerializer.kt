@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.data.io.store.item
 
+import org.lanternpowered.api.text.book.Book
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.server.data.io.store.SimpleValueContainer
 import org.lanternpowered.server.text.LanternTexts.fromLegacy
@@ -19,7 +20,6 @@ import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.text.BookView
 import java.util.Locale
 
 class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer() {
@@ -67,13 +67,13 @@ class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer
         private val GENERATION = DataQuery.of("generation")
 
         @JvmStatic
-        fun writeBookData(dataView: DataView, bookView: BookView, locale: Locale?) {
+        fun writeBookData(dataView: DataView, bookView: Book, locale: Locale?) {
             TranslationContext.enter()
                     .locale(locale)
                     .enableForcedTranslations().use {
-                        dataView[AUTHOR] = toLegacy(bookView.author)
-                        dataView[TITLE] = toLegacy(bookView.title)
-                        dataView.set(PAGES, bookView.pages.map { page -> JsonTextSerializer.serialize(page) })
+                        dataView[AUTHOR] = toLegacy(bookView.author())
+                        dataView[TITLE] = toLegacy(bookView.title())
+                        dataView.set(PAGES, bookView.pages().map { page -> JsonTextSerializer.serialize(page) })
                     }
         }
     }

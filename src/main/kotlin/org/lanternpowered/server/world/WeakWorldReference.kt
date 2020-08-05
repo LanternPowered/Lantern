@@ -74,10 +74,10 @@ class WeakWorldReference {
     }
 
     fun toLocation(position: Vector3i): Location =
-            this.world?.let { world -> Location.of(world, position) } ?: Location.of(this.key, position)
+            this.world?.let { world -> LanternLocation(world, position) } ?: LanternLocation(this.key, position)
 
     fun toLocation(position: Vector3d): Location =
-            this.world?.let { world -> Location.of(world, position) } ?: Location.of(this.key, position)
+            this.world?.let { world -> LanternLocation(world, position) } ?: LanternLocation(this.key, position)
 
     override fun toString(): String = ToStringHelper(this)
             .omitNullValues()

@@ -49,7 +49,7 @@ class AnvilRegionFile(
 
         // Allocate the first two sector blocks for the offset and timestamp
         this.usedSectors.allocateChunkSector(offsetAndTimestamp)
-        growIfNeeded(offsetAndTimestamp)
+        this.growIfNeeded(offsetAndTimestamp)
 
         // Read the offset table
         this.file.seek(offsetAndTimestamp)
@@ -66,7 +66,7 @@ class AnvilRegionFile(
     val all: Collection<ChunkPosition>
         get() {
             synchronized(this.lock) {
-                return allUnsafe()
+                return this.allUnsafe()
             }
         }
 
@@ -74,7 +74,7 @@ class AnvilRegionFile(
         val list = mutableListOf<ChunkPosition>()
         for (index in this.sectors.indices) {
             val localPosition = LocalChunkPosition(index)
-            if (getChunkSector(localPosition).exists)
+            if (this.getChunkSector(localPosition).exists)
                 list += chunkPositionOf(this.position, localPosition)
         }
         return list
@@ -82,13 +82,13 @@ class AnvilRegionFile(
 
     fun delete(position: ChunkPosition): Boolean {
         synchronized(this.lock) {
-            return deleteUnsafe(position)
+            return this.deleteUnsafe(position)
         }
     }
 
     private fun deleteUnsafe(position: ChunkPosition): Boolean {
         val locationPosition = position.toLocal()
-        val sector = getChunkSector(locationPosition)
+        val sector = this.getChunkSector(locationPosition)
         if (!sector.exists)
             return false
         this.usedSectors.freeChunkSector(sector)
@@ -111,7 +111,7 @@ class AnvilRegionFile(
 
     private fun existsUnsafe(position: ChunkPosition): Boolean {
         val locationPosition = position.toLocal()
-        val sector = getChunkSector(locationPosition)
+        val sector = this.getChunkSector(locationPosition)
         return sector.exists
     }
 
@@ -121,7 +121,7 @@ class AnvilRegionFile(
      */
     fun getInputStream(position: ChunkPosition): InputStream? {
         synchronized(this.lock) {
-            return getInputStreamUnsafe(position)
+            return this.getInputStreamUnsafe(position)
         }
     }
 
@@ -145,7 +145,7 @@ class AnvilRegionFile(
     private fun getInputStreamUnsafe(position: ChunkPosition): InputStream? {
         val locationPosition = position.toLocal()
 
-        val sector = getChunkSector(locationPosition)
+        val sector = this.getChunkSector(locationPosition)
         // The chunk doesn't have data
         if (!sector.exists)
             return null
@@ -220,7 +220,7 @@ class AnvilRegionFile(
         val localPosition = position.toLocal()
 
         // The sector where the chunk data was previously written
-        val oldSector = getChunkSector(localPosition)
+        val oldSector = this.getChunkSector(localPosition)
 
         // Calculate the size of the sector
         val neededSectorSize = ceil((length + CHUNK_HEADER_SIZE).toDouble() / SECTOR_BLOCK_BYTES.toDouble()).toInt()
@@ -232,15 +232,15 @@ class AnvilRegionFile(
         if (neededSectorSize >= 256) {
             // Allocate one section to store the header
             sector = this.usedSectors.allocateChunkSector(1)
-            writeExternal(position, sector, format, data, length)
+            this.writeExternal(position, sector, format, data, length)
             cleanup = {}
         } else {
             sector = this.usedSectors.allocateChunkSector(neededSectorSize)
-            cleanup = writeLocal(position, sector, format, data, length)
+            cleanup = this.writeLocal(position, sector, format, data, length)
         }
 
-        setChunkSector(localPosition, sector)
-        setTimestamp(localPosition, getTimestamp())
+        this.setChunkSector(localPosition, sector)
+        this.setTimestamp(localPosition, getTimestamp())
 
         // Everything was successful, so cleanup
         cleanup()
@@ -251,14 +251,14 @@ class AnvilRegionFile(
      * Moves the file pointer to the given chunk sector.
      */
     private fun RandomAccessFile.seek(sector: ChunkSector) {
-        seek(sector.index * SECTOR_BLOCK_BYTES.toLong())
+        this.seek(sector.index * SECTOR_BLOCK_BYTES.toLong())
     }
 
     /**
      * Writes chunk data to an external file.
      */
     private fun writeExternal(position: ChunkPosition, chunkSector: ChunkSector, format: Int, data: ByteArray, length: Int) {
-        growIfNeeded(chunkSector)
+        this.growIfNeeded(chunkSector)
 
         this.file.seek(chunkSector)
         this.file.writeInt(1)
@@ -281,7 +281,7 @@ class AnvilRegionFile(
      * Writes chunk data at the given chunk sector.
      */
     private fun writeLocal(position: ChunkPosition, chunkSector: ChunkSector, format: Int, data: ByteArray, length: Int): () -> Unit {
-        growIfNeeded(chunkSector)
+        this.growIfNeeded(chunkSector)
 
         this.file.seek(chunkSector)
         this.file.writeInt(length + 1)
@@ -309,9 +309,8 @@ class AnvilRegionFile(
         // Grow the file, it's not big enough
         if (this.file.length() < endIndex) {
             this.file.seek(this.file.length())
-            while (this.file.length() < endIndex) {
+            while (this.file.length() < endIndex)
                 this.file.write(EMPTY_SECTOR_BLOCK)
-            }
 
             // If the file size is not a multiple of 4KB, grow it
             val length = this.file.length().toInt()
@@ -355,7 +354,7 @@ class AnvilRegionFile(
     fun close(fast: Boolean = false) {
         synchronized(this.lock) {
             if (!fast)
-                cleanup()
+                this.cleanup()
             this.file.channel.force(true)
             this.file.close()
         }

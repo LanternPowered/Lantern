@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.entity.player;
 
 import static org.lanternpowered.server.world.chunk.LanternChunk.ALL_SECTIONS_BIT_MASK;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
@@ -34,6 +34,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.UnloadChunkPac
 import org.lanternpowered.api.util.palette.Palette;
 import org.lanternpowered.api.util.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldNew;
 import org.lanternpowered.server.world.WorldEventListener;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -62,14 +63,14 @@ public final class ObservedChunkManager implements WorldEventListener {
     /**
      * The {@link World} attached to the observed chunk manager.
      */
-    private final LanternWorld world;
+    private final LanternWorldNew world;
 
     /**
      * All the chunks that are being observed.
      */
     private final Map<Long, ObservedChunk> observedChunks = new ConcurrentHashMap<>();
 
-    public ObservedChunkManager(LanternWorld world) {
+    public ObservedChunkManager(LanternWorldNew world) {
         this.world = world;
     }
 

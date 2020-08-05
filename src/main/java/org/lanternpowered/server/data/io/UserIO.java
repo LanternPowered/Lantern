@@ -14,7 +14,8 @@ import org.lanternpowered.server.data.DataQueries;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.entity.living.player.AbstractUser;
+import org.lanternpowered.server.entity.player.AbstractPlayer;
+import org.lanternpowered.server.entity.player.AbstractUser;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataView;
@@ -47,7 +48,7 @@ public final class UserIO {
         return Optional.empty();
     }
 
-    public static void load(Path dataFolder, AbstractUser player) throws IOException {
+    public static void load(Path dataFolder, AbstractPlayer player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
         // Search for the player data and load it
@@ -72,7 +73,7 @@ public final class UserIO {
         }
     }
 
-    public static void save(Path dataFolder, AbstractUser player) throws IOException {
+    public static void save(Path dataFolder, AbstractPlayer player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
         final DataContainer dataContainer = DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED);

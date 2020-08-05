@@ -11,7 +11,7 @@
 package org.lanternpowered.server.inventory;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.inventory.behavior.VanillaContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.lanternpowered.server.inventory.client.ClientContainerType;

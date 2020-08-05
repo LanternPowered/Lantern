@@ -185,4 +185,8 @@ class ChunkManager(
             }
         }
     }
+
+    fun getChunkIfLoaded(position: ChunkPosition): LanternChunk {
+        TODO()
+    }
 }

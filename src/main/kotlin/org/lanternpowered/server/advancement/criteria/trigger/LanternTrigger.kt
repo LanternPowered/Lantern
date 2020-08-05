@@ -24,7 +24,7 @@ import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements
 import org.lanternpowered.server.advancement.criteria.progress.AbstractCriterionProgress
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion
 import org.spongepowered.api.advancement.criteria.ScoreCriterionProgress
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger

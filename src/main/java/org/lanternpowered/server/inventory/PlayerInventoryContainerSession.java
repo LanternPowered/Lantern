@@ -13,7 +13,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventHelper;
 import org.lanternpowered.server.inventory.client.AnvilClientContainer;
 import org.lanternpowered.server.inventory.client.BeaconClientContainer;
@@ -60,7 +60,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * This will for example keep the cursor item until it
  * is placed or the session is finished.
  */
-public class PlayerContainerSession {
+public class PlayerInventoryContainerSession {
 
     private final LanternPlayer player;
 
@@ -69,7 +69,7 @@ public class PlayerContainerSession {
      */
     @Nullable private AbstractContainer openContainer;
 
-    public PlayerContainerSession(LanternPlayer player) {
+    public PlayerInventoryContainerSession(LanternPlayer player) {
         this.player = player;
     }
 

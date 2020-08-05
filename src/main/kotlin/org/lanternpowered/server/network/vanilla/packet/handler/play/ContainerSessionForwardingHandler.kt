@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.handler.play
 
-import org.lanternpowered.server.inventory.PlayerContainerSession
+import org.lanternpowered.server.inventory.PlayerInventoryContainerSession
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.handler.Handler
 
 class ContainerSessionForwardingHandler<P : Packet>(
-        private val function: (PlayerContainerSession, P) -> Unit
+        private val function: (PlayerInventoryContainerSession, P) -> Unit
 ) : Handler<P> {
 
     override fun handle(context: NetworkContext, packet: P) = this.function(context.session.player.containerSession, packet)

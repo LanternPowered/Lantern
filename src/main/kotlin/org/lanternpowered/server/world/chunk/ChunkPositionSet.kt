@@ -14,13 +14,16 @@ import it.unimi.dsi.fastutil.longs.LongIterator
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.longs.LongSet
 import org.lanternpowered.api.world.chunk.ChunkPosition
+import java.util.function.Consumer
 
 /**
  * Represents an iterator of [ChunkPosition]s.
  */
 interface ChunkPositionIterator : Iterator<ChunkPosition> {
 
-    override fun next(): ChunkPosition
+    override fun next(): ChunkPosition = this.nextPosition()
+
+    fun nextPosition(): ChunkPosition
 }
 
 /**
@@ -64,7 +67,7 @@ class MergedChunkPositionCollection(
     override fun iterator(): ChunkPositionIterator {
         val it = this.collections.flatten().distinct().iterator()
         return object : ChunkPositionIterator {
-            override fun next(): ChunkPosition = it.next()
+            override fun nextPosition(): ChunkPosition = it.next()
             override fun hasNext(): Boolean = it.hasNext()
         }
     }
@@ -110,7 +113,7 @@ class MinMaxChunkPositionCollection(
             }
         }.iterator()
         return object : ChunkPositionIterator {
-            override fun next(): ChunkPosition = it.next()
+            override fun nextPosition(): ChunkPosition = it.next()
             override fun hasNext(): Boolean = it.hasNext()
         }
     }
@@ -182,7 +185,7 @@ inline class ChunkPositionSet(val backing: LongSet = LongOpenHashSet()) : Mutabl
      */
     private class Iterator(val backing: LongIterator) : MutableChunkPositionIterator {
         override fun hasNext(): Boolean = this.backing.hasNext()
-        override fun next(): ChunkPosition = ChunkPosition(this.backing.nextLong())
+        override fun nextPosition(): ChunkPosition = ChunkPosition(this.backing.nextLong())
         override fun remove() = this.backing.remove()
     }
 }

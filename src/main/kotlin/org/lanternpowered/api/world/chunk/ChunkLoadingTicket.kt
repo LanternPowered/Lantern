@@ -52,6 +52,14 @@ interface ChunkLoadingTicket {
     fun release(position: ChunkPosition): Boolean
 
     /**
+     * Releases the chunk from the reference set of this ticket.
+     *
+     * @param positions The positions of the chunk to remove from force-loading
+     * @return Whether the chunk was removed
+     */
+    fun releaseAll(positions: Iterable<ChunkPosition>): Boolean
+
+    /**
      * Releases all the chunks from the reference set of this ticket.
      */
     fun releaseAll()

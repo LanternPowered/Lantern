@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player.tab
+package org.lanternpowered.server.entity.player.tab
 
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.optional.asOptional

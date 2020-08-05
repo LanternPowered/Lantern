@@ -8,13 +8,13 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player.tab
+package org.lanternpowered.server.entity.player.tab
 
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.asOptional
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListHeaderAndFooterPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
 import org.spongepowered.api.entity.living.player.tab.TabList

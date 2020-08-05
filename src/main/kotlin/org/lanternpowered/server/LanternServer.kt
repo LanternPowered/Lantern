@@ -20,19 +20,19 @@ import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.version
+import org.lanternpowered.api.scoreboard.Scoreboard
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.asUnmodifiableCollection
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
-import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.WorldManager
 import org.lanternpowered.server.cause.LanternCauseStack
 import org.lanternpowered.server.cause.LanternCauseStackManager
 import org.lanternpowered.server.config.GlobalConfigObject
 import org.lanternpowered.server.console.LanternConsole
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.event.lifecycle.LanternStartedServerEvent
 import org.lanternpowered.server.event.lifecycle.LanternStartingServerEvent
 import org.lanternpowered.server.event.lifecycle.LanternStoppingServerEvent
@@ -42,6 +42,7 @@ import org.lanternpowered.server.network.query.QueryServer
 import org.lanternpowered.server.network.rcon.EmptyRconService
 import org.lanternpowered.server.network.rcon.RconServer
 import org.lanternpowered.server.scheduler.LanternScheduler
+import org.lanternpowered.server.scoreboard.LanternScoreboard
 import org.lanternpowered.server.service.world.DefaultWorldStorageService
 import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.ShutdownMonitorThread
@@ -56,7 +57,6 @@ import org.spongepowered.api.network.status.Favicon
 import org.spongepowered.api.profile.GameProfileManager
 import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.scheduler.Scheduler
-import org.spongepowered.api.scoreboard.Scoreboard
 import org.spongepowered.api.service.rcon.RconService
 import org.spongepowered.api.user.UserManager
 import org.spongepowered.api.world.TeleportHelper
@@ -144,6 +144,8 @@ class LanternServer : Server {
     val eventManager: EventManager
         get() = this.game.eventManager
 
+    val scoreboard: LanternScoreboard = TODO()
+
     /**
      * Initializes the game and starts the server.
      */
@@ -161,7 +163,7 @@ class LanternServer : Server {
         this.game.init(options, this.console, this.asyncScheduler)
         this.game.server = this
 
-        showWelcome()
+        this.showWelcome()
 
         val config = this.game.config
 
@@ -188,7 +190,7 @@ class LanternServer : Server {
             this.logger.warn("disable the authentication and allow non registered usernames to be used.")
         }
 
-        tryBindServer()
+        this.tryBindServer()
 
         // Start the RCON server, if enabled
         this.game.serviceProvider.register { this.game.lanternPlugin to startRconServer() }
@@ -196,8 +198,8 @@ class LanternServer : Server {
         // Start the Query server, if enabled
         this.queryServer = startQueryServer()
 
-        loadFavicon()
-        loadDefaultResourcePack()
+        this.loadFavicon()
+        this.loadDefaultResourcePack()
 
         this.syncExecutor.scheduleAtFixedRate({
             try {
@@ -428,7 +430,7 @@ class LanternServer : Server {
         TODO("Not yet implemented")
     }
 
-    override fun getServerScoreboard(): Optional<Scoreboard> = emptyOptional()
+    override fun getServerScoreboard(): Optional<Scoreboard> = this.scoreboard.asOptional()
     override fun getCauseStackManager(): CauseStackManager = LanternCauseStackManager
 
     override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].asOptional()

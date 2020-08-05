@@ -22,6 +22,6 @@ class DefaultLivingSoundEffect(position: EntityBodyPosition, private val soundTy
     constructor(position: EntityBodyPosition, soundType: Supplier<out SoundType>) : this(position, soundType.get())
 
     override fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random) {
-        entity.playSound(this.soundType, relativePosition, this.getVolume(entity, random), this.getPitch(entity, random))
+        entity.makeSound(this.soundType, relativePosition, this.getVolume(entity, random), this.getPitch(entity, random))
     }
 }

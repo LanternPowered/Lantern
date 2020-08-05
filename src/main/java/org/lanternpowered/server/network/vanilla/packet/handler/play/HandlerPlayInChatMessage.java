@@ -21,7 +21,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.command.LanternCommandCause;
 import org.lanternpowered.server.config.GlobalConfig;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;

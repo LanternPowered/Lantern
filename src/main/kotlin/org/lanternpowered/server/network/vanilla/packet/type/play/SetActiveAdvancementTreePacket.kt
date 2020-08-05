@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.network.packet.Packet
 
-data class SetActiveAdvancementTreePacket(val id: String?) : Packet
+data class SetActiveAdvancementTreePacket(val key: NamespacedKey?) : Packet

@@ -28,31 +28,31 @@ class AnvilChunkStorage(worldDirectory: Path) : ChunkStorage {
     }
 
     override fun exists(position: ChunkPosition): Boolean {
-        checkOpen()
+        this.checkOpen()
         return this.anvilRegionFileCache.exists(position)
     }
 
     override fun delete(position: ChunkPosition): Boolean {
-        checkOpen()
+        this.checkOpen()
         return this.anvilRegionFileCache.delete(position)
     }
 
     override fun save(position: ChunkPosition, chunkData: DataView) {
-        checkOpen()
+        this.checkOpen()
         val output = this.anvilRegionFileCache.getOutputStream(position)
-        val data = fixSavedData(position, chunkData)
+        val data = this.fixSavedData(position, chunkData)
         NbtStreamUtils.write(data, output, false)
     }
 
     override fun load(position: ChunkPosition): DataContainer? {
-        checkOpen()
+        this.checkOpen()
         val input = this.anvilRegionFileCache.getInputStream(position) ?: return null
         val data = NbtStreamUtils.read(input, false)
-        return fixLoadedData(data)
+        return this.fixLoadedData(data)
     }
 
     override fun sequence(): Sequence<ChunkStorage.Entry> {
-        checkOpen()
+        this.checkOpen()
         return this.anvilRegionFileCache.sequence()
                 .flatMap { file ->
                     file.all.asSequence().map { position -> Entry(position) }

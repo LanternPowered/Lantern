@@ -11,7 +11,7 @@
 package org.lanternpowered.server.command;
 
 import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;

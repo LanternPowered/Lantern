@@ -57,10 +57,10 @@ interface ProxySubject : Subject {
                 // check if we're using the native Lantern impl
                 // we can skip some unnecessary instance creation this way.
                 reference = if (service is LanternPermissionService) {
-                    service.get(this.subjectCollectionIdentifier).get(this.identifier).asSubjectReference()
+                    service[this.subjectCollectionIdentifier][this.identifier].asSubjectReference()
                 } else {
                     // build a new subject reference using the permission service
-                    // this doesn't actually load the subject, so it will be lazily init'd when needed.
+                    // this doesn't actually load the subject, so it will be lazily initialized when needed.
                     service.newSubjectReference(this.subjectCollectionIdentifier, this.identifier)
                 }
                 this.internalSubject = reference
@@ -70,53 +70,53 @@ interface ProxySubject : Subject {
     }
 
     @JvmDefault
-    fun resolveSubject(): Subject = resolveNullableSubject() ?: throw IllegalStateException("No subject present for $identifier")
+    fun resolveSubject(): Subject = this.resolveNullableSubject() ?: throw IllegalStateException("No subject present for $identifier")
 
     // Delegated methods
 
     @JvmDefault override fun asSubjectReference() = checkNotNull(this.internalSubject) { "No internal subject reference is set" }
-    @JvmDefault override fun getContainingCollection(): SubjectCollection = resolveSubject().containingCollection
-    @JvmDefault override fun getSubjectData(): SubjectData = resolveSubject().subjectData
-    @JvmDefault override fun getTransientSubjectData(): SubjectData = resolveSubject().transientSubjectData
-    @JvmDefault override fun isSubjectDataPersisted(): Boolean = resolveNullableSubject()?.isSubjectDataPersisted ?: false
-    @JvmDefault override fun getFriendlyIdentifier(): Optional<String> = resolveNullableSubject()?.friendlyIdentifier ?: emptyOptional()
+    @JvmDefault override fun getContainingCollection(): SubjectCollection = this.resolveSubject().containingCollection
+    @JvmDefault override fun getSubjectData(): SubjectData = this.resolveSubject().subjectData
+    @JvmDefault override fun getTransientSubjectData(): SubjectData = this.resolveSubject().transientSubjectData
+    @JvmDefault override fun isSubjectDataPersisted(): Boolean = this.resolveNullableSubject()?.isSubjectDataPersisted ?: false
+    @JvmDefault override fun getFriendlyIdentifier(): Optional<String> = this.resolveNullableSubject()?.friendlyIdentifier ?: emptyOptional()
 
     @JvmDefault
     override fun hasPermission(contexts: Set<Context>, permission: String): Boolean {
-        val subject = resolveNullableSubject()
+        val subject = this.resolveNullableSubject()
         return if (subject == null) {
-            getPermissionDefault(permission).asBoolean()
+            this.getPermissionDefault(permission).asBoolean()
         } else {
-            when (val ret = getPermissionValue(contexts, permission)) {
-                Tristate.UNDEFINED -> getPermissionDefault(permission).asBoolean()
-                else -> ret.asBoolean()
+            when (val tristate = this.getPermissionValue(contexts, permission)) {
+                Tristate.UNDEFINED -> this.getPermissionDefault(permission).asBoolean()
+                else -> tristate.asBoolean()
             }
         }
     }
 
     @JvmDefault
     override fun getPermissionValue(contexts: Set<Context>, permission: String): Tristate =
-            resolveNullableSubject()?.getPermissionValue(contexts, permission) ?: getPermissionDefault(permission)
+            this.resolveNullableSubject()?.getPermissionValue(contexts, permission) ?: getPermissionDefault(permission)
 
     @JvmDefault
-    override fun isChildOf(parent: SubjectReference) = resolveNullableSubject()?.isChildOf(parent) ?: false
+    override fun isChildOf(parent: SubjectReference) = this.resolveNullableSubject()?.isChildOf(parent) ?: false
 
     @JvmDefault
-    override fun isChildOf(contexts: Set<Context>, parent: SubjectReference) = resolveNullableSubject()?.isChildOf(contexts, parent) ?: false
+    override fun isChildOf(contexts: Set<Context>, parent: SubjectReference) = this.resolveNullableSubject()?.isChildOf(contexts, parent) ?: false
 
     @JvmDefault
-    override fun getParents(): List<SubjectReference> = resolveNullableSubject()?.parents ?: emptyList()
+    override fun getParents(): List<SubjectReference> = this.resolveNullableSubject()?.parents ?: emptyList()
 
     @JvmDefault
-    override fun getParents(contexts: Set<Context>): List<SubjectReference> = resolveNullableSubject()?.getParents(contexts) ?: emptyList()
+    override fun getParents(contexts: Set<Context>): List<SubjectReference> = this.resolveNullableSubject()?.getParents(contexts) ?: emptyList()
 
     @JvmDefault
-    override fun getActiveContexts(): Set<Context> = resolveNullableSubject()?.activeContexts ?: emptySet()
+    override fun getActiveContexts(): Set<Context> = this.resolveNullableSubject()?.activeContexts ?: emptySet()
 
     @JvmDefault
-    override fun getOption(key: String): Optional<String> = resolveNullableSubject()?.getOption(key) ?: emptyOptional()
+    override fun getOption(key: String): Optional<String> = this.resolveNullableSubject()?.getOption(key) ?: emptyOptional()
 
     @JvmDefault
     override fun getOption(contexts: Set<Context>, key: String): Optional<String> =
-            resolveNullableSubject()?.getOption(contexts, key) ?: emptyOptional()
+            this.resolveNullableSubject()?.getOption(contexts, key) ?: emptyOptional()
 }

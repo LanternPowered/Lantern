@@ -13,7 +13,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.function.Function;

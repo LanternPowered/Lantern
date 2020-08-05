@@ -19,10 +19,10 @@ object SetActiveAdvancementTreeCodec : PacketEncoder<SetActiveAdvancementTreePac
 
     override fun encode(context: CodecContext, packet: SetActiveAdvancementTreePacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()
-        val id = packet.id
-        buf.writeBoolean(id != null)
-        if (id != null)
-            buf.writeString(id)
+        val key = packet.key
+        buf.writeBoolean(key != null)
+        if (key != null)
+            buf.writeNamespacedKey(key)
         return buf
     }
 }

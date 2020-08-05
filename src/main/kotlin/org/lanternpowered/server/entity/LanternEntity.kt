@@ -40,12 +40,13 @@ import org.lanternpowered.server.data.SerializableLocalMutableDataHolder
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.effect.entity.EntityEffectCollection
 import org.lanternpowered.server.entity.event.EntityEvent
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.event.LanternEventContextKeys
 import org.lanternpowered.server.event.message.sendMessage
 import org.lanternpowered.server.network.entity.EntityProtocolType
 import org.lanternpowered.server.util.LanternTransform
 import org.lanternpowered.server.world.LanternLocation
+import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
@@ -87,12 +88,12 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     private val uniqueId = creationData.uniqueId
     private val entityType = creationData.entityType
 
-    override fun getUniqueId(): UUID = this.uniqueId
-    override fun getType(): EntityType<*> = this.entityType
+    final override fun getUniqueId(): UUID = this.uniqueId
+    final override fun getType(): EntityType<*> = this.entityType
 
-    override val keyRegistry: LocalKeyRegistry<out LanternEntity> = LocalKeyRegistry.of()
+    final override val keyRegistry: LocalKeyRegistry<out LanternEntity> = LocalKeyRegistry.of()
 
-    private var _world: World? = null
+    private var _world: LanternWorldNew? = null
     private var scale = Vector3d.ONE
     private var position = Vector3d.ZERO
     private var rotation = Vector3d.ZERO
@@ -186,15 +187,14 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
             this._boundingBox = null
         }
 
-    val nullableWorld: World?
+    val nullableWorld: LanternWorldNew?
         get() = this._world
 
-    override fun getWorld(): World =
+    override fun getWorld(): LanternWorldNew =
             this._world ?: error("This entity is currently not present in a world.")
 
-    override fun getLocation(): Location {
-        return LanternLocation(this.world, this.position)
-    }
+    override fun getLocation(): Location =
+            LanternLocation(this.world, this.position)
 
     override fun getTransform(): Transform =
             LanternTransform(this.position, this.rotation, this.scale)
@@ -266,7 +266,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     }
 
     fun setRawWorld(world: World?) {
-        this._world = world
+        this._world = world as? LanternWorldNew
     }
 
     fun setRawPosition(position: Vector3d) {
@@ -333,10 +333,8 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
      * @param event The event
      */
     open fun triggerEvent(event: EntityEvent) {
-        // TODO: Send protocol event
-        // getWorld().entityProtocolManager.triggerEvent(this, event)
+        this.world.entityProtocolManager.triggerEvent(this, event)
     }
-
 
     // region Update
 
@@ -548,7 +546,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
             frame.addContext(CauseContextKeys.DAMAGE_TYPE, damageSource.type)
 
             val event = LanternEventFactory.createDamageEntityEvent(frame.currentCause, this,
-                    damageFunctions.map { damageFunction -> damageFunction.first }, damage)
+                    damageFunctions.map { (damageFunction, _) -> damageFunction }, damage)
             event.isCancelled = cancelled
             EventManager.post(event)
             if (event.isCancelled)
@@ -662,8 +660,8 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
      * @param volume The volume
      * @param pitch The pitch value
      */
-    fun playSound(soundType: Supplier<out SoundType>, relativeSoundPosition: Vector3d = Vector3d.ZERO, volume: Double = 1.0, pitch: Double = 1.0) {
-        this.playSound(soundType.get(), relativeSoundPosition, volume, pitch)
+    fun makeSound(soundType: Supplier<out SoundType>, relativeSoundPosition: Vector3d = Vector3d.ZERO, volume: Double = 1.0, pitch: Double = 1.0) {
+        this.makeSound(soundType.get(), relativeSoundPosition, volume, pitch)
     }
 
     /**
@@ -674,7 +672,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
      * @param volume The volume
      * @param pitch The pitch value
      */
-    fun playSound(soundType: SoundType, relativeSoundPosition: Vector3d = Vector3d.ZERO, volume: Double = 1.0, pitch: Double = 1.0) {
+    fun makeSound(soundType: SoundType, relativeSoundPosition: Vector3d = Vector3d.ZERO, volume: Double = 1.0, pitch: Double = 1.0) {
         // Silent entities don't make any sounds
         if (this.get(Keys.IS_SILENT).orElse(false))
             return
@@ -692,8 +690,8 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
      * @param volume The volume
      * @param pitch The pitch value
      */
-    fun playOrientedSound(soundType: Supplier<out SoundType>, relativeSoundPosition: Vector3d, volume: Double = 1.0, pitch: Double = 1.0) {
-        this.playOrientedSound(soundType.get(), relativeSoundPosition, volume, pitch)
+    fun makeOrientedSound(soundType: Supplier<out SoundType>, relativeSoundPosition: Vector3d, volume: Double = 1.0, pitch: Double = 1.0) {
+        this.makeOrientedSound(soundType.get(), relativeSoundPosition, volume, pitch)
     }
 
     /**
@@ -706,8 +704,8 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
      * @param volume The volume
      * @param pitch The pitch value
      */
-    fun playOrientedSound(soundType: SoundType, relativeSoundPosition: Vector3d, volume: Double = 1.0, pitch: Double = 1.0) {
-        this.playSound(soundType, this.orientRelativePosition(relativeSoundPosition), volume, pitch)
+    fun makeOrientedSound(soundType: SoundType, relativeSoundPosition: Vector3d, volume: Double = 1.0, pitch: Double = 1.0) {
+        this.makeSound(soundType, this.orientRelativePosition(relativeSoundPosition), volume, pitch)
     }
 
     /**

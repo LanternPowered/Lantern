@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.entity.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
@@ -43,7 +43,7 @@ import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.inventory.IContainerProvidedInventory;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
-import org.lanternpowered.server.inventory.PlayerContainerSession;
+import org.lanternpowered.server.inventory.PlayerInventoryContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
@@ -73,16 +73,16 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SetMusicDiscPa
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetActiveAdvancementTreePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetDifficultyPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowSlotPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TagsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnlockRecipesPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewDistancePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewPositionPacket;
-import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
+import org.lanternpowered.server.user.LanternUser;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBorder;
@@ -226,7 +226,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
     /**
      * The container session of this {@link Player}.
      */
-    private final PlayerContainerSession containerSession;
+    private final PlayerInventoryContainerSession containerSession;
 
     /**
      * All the boss bars that are visible for this {@link Player}.
@@ -263,7 +263,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
     @Nullable private Vector3i openedSignPosition;
 
     public LanternPlayer(GameProfile gameProfile, NetworkSession session) {
-        super((ProxyUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
+        super((LanternUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(gameProfile));
         this.gameProfile = gameProfile;
         this.interactionHandler = new PlayerInteractionHandler(this);
         this.inventory = VanillaInventoryArchetypes.PLAYER.builder()
@@ -280,7 +280,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
         // Drop/return items from the crafting grid when closing
         this.inventoryContainer.addCloseListener(new PlayerReturnItemsInventoryCloseListener(
                 QueryOperationTypes.INVENTORY_TYPE.of(CraftingInventory.class)));
-        this.containerSession = new PlayerContainerSession(this);
+        this.containerSession = new PlayerInventoryContainerSession(this);
         this.session = session;
         // Load the advancements
         this.advancementsProgress.init();
@@ -535,14 +535,14 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
                 this.session.send(new SetReducedDebugPacket(reducedDebug));
             }
             // Send the first chunks
-            pulseChunkChanges();
+            updateChunkChanges();
             // Update the sky, this contains the darkness and rain levels
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             // Update the time
             this.session.send(world.getTimeUniverse().createUpdateTimeMessage());
             // Update the difficulty
             this.session.send(new SetDifficultyPacket(world.getDifficulty(), true));
-            this.session.send(new UpdateViewDistancePacket(getServerViewDistance()));
+            this.session.send(new UpdateViewDistancePacket(getActualViewDistance()));
             // Update the player inventory
             this.inventoryContainer.initClientContainer();
             if (oldWorld != world) {
@@ -801,7 +801,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
         super.pulse(deltaTicks);
 
         // TODO: Maybe async?
-        pulseChunkChanges();
+        updateChunkChanges();
 
         // Pulse the interaction handler
         this.interactionHandler.pulse();
@@ -878,7 +878,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
         final Set<Vector2i> previousChunks = new HashSet<>(this.knownChunks);
         final List<Vector2i> newChunks = new ArrayList<>();
 
-        int radius = getServerViewDistance();
+        int radius = getActualViewDistance();
 
         for (int x = (centralX - radius); x <= (centralX + radius); x++) {
             for (int z = (centralZ - radius); z <= (centralZ + radius); z++) {
@@ -1035,9 +1035,9 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
         // Written book internal id
         final RawItemStack rawItemStack = new RawItemStack("minecraft:written_book", 1, dataView);
         final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
-        this.session.send(new PacketPlayOutSetWindowSlot(-2, slot, rawItemStack));
+        this.session.send(new SetWindowSlotPacket(-2, slot, rawItemStack));
         this.session.send(new OpenBookPacket(HandTypes.MAIN_HAND));
-        this.session.send(new PacketPlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek()));
+        this.session.send(new SetWindowSlotPacket(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek()));
     }
 
     @Override
@@ -1123,7 +1123,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
 
     public void setViewDistance(int viewDistance) {
         this.viewDistance = viewDistance;
-        this.session.send(new UpdateViewDistancePacket(getServerViewDistance()));
+        this.session.send(new UpdateViewDistancePacket(getActualViewDistance()));
     }
 
     @Override
@@ -1276,11 +1276,11 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
     }
 
     /**
-     * Gets the {@link PlayerContainerSession}.
+     * Gets the {@link PlayerInventoryContainerSession}.
      *
      * @return The container session
      */
-    public PlayerContainerSession getContainerSession() {
+    public PlayerInventoryContainerSession getContainerSession() {
         return this.containerSession;
     }
 

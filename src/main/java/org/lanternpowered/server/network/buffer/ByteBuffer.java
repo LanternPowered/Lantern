@@ -313,7 +313,7 @@ public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
 
     ResourceKey readResourceKey();
 
-    ByteBuffer writeResourceKey(ResourceKey ResourceKey);
+    ByteBuffer writeNamespacedKey(ResourceKey ResourceKey);
 
     @Nullable
     RawItemStack getRawItemStack(int index);

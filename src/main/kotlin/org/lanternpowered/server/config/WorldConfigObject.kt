@@ -69,5 +69,9 @@ class WorldConfigObject : ConfigObject() {
 
     val gameMode by WorldGameModeObject.with(name = "game-mode")
 
+    var viewDistance by setting(default = ViewDistance.USE_GLOBAL_SETTING, name = "view-distance",
+            description = "The view distance. The value must be between ${ViewDistance.MINIMUM} and ${ViewDistance.MAXIMUM} (inclusive). Or\n" +
+                          "set the value to ${ViewDistance.USE_GLOBAL_SETTING} if you want to use the setting defined in the global config.")
+
     companion object : Factory<WorldConfigObject> by { WorldConfigObject() }
 }

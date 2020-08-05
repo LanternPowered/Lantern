@@ -20,8 +20,8 @@ class PlayerRespawnCodec : Codec<PlayerRespawnPacket> {
 
     override fun encode(context: CodecContext, packet: PlayerRespawnPacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()
-        buf.writeResourceKey(packet.dimension)
-        buf.writeResourceKey(packet.worldName)
+        buf.writeNamespacedKey(packet.dimension)
+        buf.writeNamespacedKey(packet.worldName)
         buf.writeLong(packet.seed)
         buf.writeByte(GameModeRegistry.getId(packet.gameMode).toByte())
         buf.writeByte(GameModeRegistry.getId(packet.previousGameMode).toByte())

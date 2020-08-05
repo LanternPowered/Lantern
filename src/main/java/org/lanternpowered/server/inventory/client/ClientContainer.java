@@ -19,7 +19,7 @@ import com.google.common.collect.Multimap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;
@@ -27,7 +27,7 @@ import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.behavior.ContainerInteractionBehavior;
 import org.lanternpowered.server.inventory.behavior.MouseButton;
 import org.lanternpowered.server.network.packet.Packet;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowSlotPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowItemsPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket;
 import org.spongepowered.api.data.Keys;
@@ -744,7 +744,7 @@ public abstract class ClientContainer implements ContainerBase {
         packets.add(new SetWindowItemsPacket(this.containerId, items));
         // Send the cursor item if present
         if (!this.cursor.getRaw().isEmpty()) {
-            packets.add(new PacketPlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
+            packets.add(new SetWindowSlotPacket(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
         // Collect additional messages
@@ -774,7 +774,7 @@ public abstract class ClientContainer implements ContainerBase {
         }
         // Update the cursor item if needed
         if ((this.cursor.dirtyState & BaseClientSlot.IS_DIRTY) != 0) {
-            packets.add(new PacketPlayOutSetWindowSlot(-1, -1, this.cursor.getItem()));
+            packets.add(new SetWindowSlotPacket(-1, -1, this.cursor.getItem()));
             this.cursor.dirtyState = 0;
         }
         // Collect the property changes
@@ -802,7 +802,7 @@ public abstract class ClientContainer implements ContainerBase {
             // Reset the dirty state
             slot.dirtyState = 0;
             // Add a update message
-            packets.add(new PacketPlayOutSetWindowSlot(containerId, serverSlotIndexToClient(index), slot.getItem()));
+            packets.add(new SetWindowSlotPacket(containerId, serverSlotIndexToClient(index), slot.getItem()));
         }
     }
 

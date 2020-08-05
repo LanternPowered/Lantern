@@ -42,8 +42,8 @@ import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.entity.LanternEntity
-import org.lanternpowered.server.entity.living.player.LanternPlayer
-import org.lanternpowered.server.entity.living.player.tab.GlobalTabList
+import org.lanternpowered.server.entity.player.LanternPlayer
+import org.lanternpowered.server.entity.player.tab.GlobalTabList
 import org.lanternpowered.server.event.message.sendMessage
 import org.lanternpowered.server.network.NettyThreadOnlyHelper.isHandlerNettyThreadOnly
 import org.lanternpowered.server.network.entity.EntityProtocolManager
@@ -591,7 +591,7 @@ class NetworkSession(
         causeStack.pushCause(player)
 
         // Close the open container
-        player.containerSession.setRawOpenContainer(causeStack, null)
+        player.inventoryContainerSession.setRawOpenContainer(causeStack, null)
 
         val quitMessage = translatableTextOf("multiplayer.player.left", player.name)
         val audience = this.server.broadcastAudience
@@ -730,7 +730,7 @@ class NetworkSession(
         // network messages to be send
         player.setLocationAndRotation(loginEvent.toLocation, loginEvent.toRotation)
 
-        val previousProfile = this.channel.attr(NetworkSessionOld.PREVIOUS_GAME_PROFILE).getAndSet(null)
+        val previousProfile = this.channel.attr(PREVIOUS_GAME_PROFILE).getAndSet(null)
         val joinMessage = if (previousProfile != null && previousProfile.name.isPresent && previousProfile.name.get() != player.name) {
             translatableTextOf("multiplayer.player.joined.renamed", player.name, previousProfile.name.get())
         } else {
@@ -746,7 +746,7 @@ class NetworkSession(
         if (resourcePack != null)
             player.sendResourcePack(resourcePack)
 
-        player.resetIdleTimeoutCounter()
+        player.resetIdleTime()
     }
 
     private fun canBypassPlayerLimit(gameProfile: GameProfile): Boolean {

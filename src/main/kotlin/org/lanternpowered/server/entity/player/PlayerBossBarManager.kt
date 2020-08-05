@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.boss
+package org.lanternpowered.server.entity.player
 
 import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.boss.BossBarColor
@@ -17,7 +17,6 @@ import org.lanternpowered.api.boss.BossBarOverlay
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableMap
-import org.lanternpowered.server.entity.living.player.LanternPlayer
 import org.lanternpowered.server.network.vanilla.packet.type.play.BossBarPacket
 import java.util.UUID
 
@@ -59,6 +58,8 @@ class PlayerBossBarManager(
         if (this.bossBars.containsKey(bossBar))
             return
         val uniqueId = UUID.randomUUID()
+        if (this.bossBars.put(bossBar, uniqueId) != null)
+            return
         val packet = BossBarPacket.Add(uniqueId, bossBar.name(), bossBar.color(),
                 bossBar.overlay(), bossBar.percent(), bossBar.flags())
         this.player.connection.send(packet)

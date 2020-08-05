@@ -26,7 +26,6 @@ typealias BlockChangeFlag = org.spongepowered.api.world.BlockChangeFlag
 typealias BlockChangeFlags = org.spongepowered.api.world.BlockChangeFlags
 typealias Locatable = org.spongepowered.api.world.Locatable
 typealias LocatableBlock = org.spongepowered.api.world.LocatableBlock
-typealias Location = org.spongepowered.api.world.ServerLocation
 typealias WorldBorder = org.spongepowered.api.world.WorldBorder
 
 /**
@@ -60,16 +59,12 @@ inline val World.entitySpawner: EntitySpawner
     get() = (this as ExtendedWorld).entitySpawner
 
 inline fun World.getIntersectingBlockCollisionBoxes(box: AABB): Set<AABB> {
-    contract {
-        returns() implies (this@getIntersectingBlockCollisionBoxes is ExtendedWorld)
-    }
+    contract { returns() implies (this@getIntersectingBlockCollisionBoxes is ExtendedWorld) }
     return (this as ExtendedWorld).getIntersectingBlockCollisionBoxes(box)
 }
 
 inline fun World.getIntersectingEntities(box: AABB, noinline filter: (Entity) -> Boolean): Set<Entity> {
-    contract {
-        returns() implies (this@getIntersectingEntities is ExtendedWorld)
-    }
+    contract { returns() implies (this@getIntersectingEntities is ExtendedWorld) }
     return (this as ExtendedWorld).getIntersectingEntities(box, filter)
 }
 

@@ -29,6 +29,6 @@ class PlayerHurtSoundEffect(position: EntityBodyPosition) : AbstractLivingSoundE
             DamageSources.DROWNING.get() -> SoundTypes.ENTITY_PLAYER_HURT_DROWN
             else -> SoundTypes.ENTITY_PLAYER_HURT
         }
-        entity.playSound(soundType, relativePosition, getVolume(entity, random), getPitch(entity, random))
+        entity.makeSound(soundType, relativePosition, getVolume(entity, random), getPitch(entity, random))
     }
 }

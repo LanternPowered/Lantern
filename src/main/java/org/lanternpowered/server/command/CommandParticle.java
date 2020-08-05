@@ -14,7 +14,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnParticlePacket;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.ResourceKey;

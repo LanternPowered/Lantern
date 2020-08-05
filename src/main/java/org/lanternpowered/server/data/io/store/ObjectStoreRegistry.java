@@ -28,7 +28,7 @@ import org.lanternpowered.server.data.io.store.block.BlockEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.entity.LanternLiving;
-import org.lanternpowered.server.entity.living.player.AbstractUser;
+import org.lanternpowered.server.entity.player.AbstractUser;
 import org.lanternpowered.server.inventory.LanternItemStack;
 
 import java.util.HashMap;

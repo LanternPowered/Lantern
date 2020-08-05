@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player
+package org.lanternpowered.server.entity.player
 
 import org.spongepowered.api.entity.living.player.User
 import java.util.UUID

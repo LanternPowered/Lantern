@@ -36,6 +36,16 @@ interface ChunkStorage {
     fun save(position: ChunkPosition, chunkData: DataView)
 
     /**
+     * Saves the data for the given chunk coordinates.
+     *
+     * @param map The map with pairs of chunk data that needs to be saved
+     */
+    fun saveAll(map: Map<ChunkPosition, DataView>) {
+        for ((position, chunkData) in map)
+            this.save(position, chunkData)
+    }
+
+    /**
      * Deletes the data for the given chunk coordinates.
      *
      * @param position The chunk position

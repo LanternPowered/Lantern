@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;

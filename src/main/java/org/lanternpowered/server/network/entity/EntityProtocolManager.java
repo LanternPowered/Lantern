@@ -19,9 +19,8 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.event.EntityEvent;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
@@ -246,7 +245,7 @@ public final class EntityProtocolManager {
      */
     public void add(LanternEntity entity) {
         //noinspection ConstantConditions,unchecked
-        add(entity, (EntityProtocolType) entity.getEntityProtocolType());
+        add(entity, (EntityProtocolType) entity.getProtocolType());
     }
 
     /**

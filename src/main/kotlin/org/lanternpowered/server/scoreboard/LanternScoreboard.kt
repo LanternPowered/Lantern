@@ -18,7 +18,7 @@ import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.asOptional
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetActiveScoreboardObjectivePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ScoreboardObjectivePacket

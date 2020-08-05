@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.handler.play;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.NetworkContext;

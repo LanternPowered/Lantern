@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.entity;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.DefaultCatalogRegistryModule;
 import org.lanternpowered.server.network.entity.vanilla.ArmorStandEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.BatEntityProtocol;

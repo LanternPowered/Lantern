@@ -52,7 +52,7 @@ import org.lanternpowered.server.effect.firework.LanternFireworkEffectBuilder
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder
-import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder
+import org.lanternpowered.server.entity.player.tab.LanternTabListEntryBuilder
 import org.lanternpowered.server.cause.LanternCauseContextKeyBuilder
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder

@@ -104,6 +104,10 @@ class ServerConfigObject : ConfigObject() {
 
     var ipBasedContexts by setting(default = mapOf<String, List<IpSet>>(), name = "ip-based-contexts",
             description = "Configuration for ip based permission contexts.")
+
+    var viewDistance by setting(default = ViewDistance.DEFAULT, name = "view-distance",
+            description = "The view distance. The value must be between ${ViewDistance.MINIMUM} and ${ViewDistance.MAXIMUM} (inclusive).")
+
     // TODO: Expand explanation of ip based contexts
 
     val proxy by ProxyConfigObject.with(name = "proxy")

@@ -44,7 +44,7 @@ object PlayerJoinCodec : PacketEncoder<PlayerJoinPacket> {
         val worldRegistry = packet.dimensionRegistry
         buf.writeVarInt(worldRegistry.size)
         for (worldEntry in worldRegistry)
-            buf.writeResourceKey(worldEntry.key)
+            buf.writeNamespacedKey(worldEntry.key)
 
         val dimensionCodec = DataContainer.createNew()
 
@@ -59,8 +59,8 @@ object PlayerJoinCodec : PacketEncoder<PlayerJoinPacket> {
                 .map { (key, data) -> data.set(this.nameKey, key.formatted) })
 
         buf.writeDataView(dimensionCodec)
-        buf.writeResourceKey(packet.dimension)
-        buf.writeResourceKey(packet.worldName)
+        buf.writeNamespacedKey(packet.dimension)
+        buf.writeNamespacedKey(packet.worldName)
         buf.writeLong(packet.seed)
         buf.writeByte(min(packet.playerListSize, 255).toByte())
         buf.writeVarInt(packet.viewDistance)

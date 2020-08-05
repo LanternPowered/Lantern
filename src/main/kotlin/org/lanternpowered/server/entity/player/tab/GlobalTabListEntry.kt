@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player.tab
+package org.lanternpowered.server.entity.player.tab
 
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabListPacket
@@ -34,7 +34,7 @@ class GlobalTabListEntry internal constructor(
         val empty = this.entries.isEmpty()
         this.entries.add(tabListEntry)
         if (empty)
-            this.tabList.add(this)
+            GlobalTabList.add(this)
     }
 
     /**
@@ -45,7 +45,7 @@ class GlobalTabListEntry internal constructor(
     fun removeEntry(entry: LanternTabListEntry) {
         this.entries.remove(entry)
         if (this.entries.isEmpty())
-            this.tabList.remove(this.profile)
+            GlobalTabList.remove(this.profile)
     }
 
     /**
@@ -60,7 +60,7 @@ class GlobalTabListEntry internal constructor(
             entry.list.player.connection.send(packet)
         }
         this.entries.clear()
-        this.tabList.remove(this.profile)
+        GlobalTabList.remove(this.profile)
     }
 
     fun setDisplayName(displayName: Text?) {

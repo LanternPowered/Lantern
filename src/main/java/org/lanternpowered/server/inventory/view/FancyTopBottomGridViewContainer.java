@@ -12,7 +12,7 @@ package org.lanternpowered.server.inventory.view;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.PlayerTopBottomContainer;

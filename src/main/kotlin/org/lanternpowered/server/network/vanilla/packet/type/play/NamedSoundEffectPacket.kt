@@ -11,11 +11,12 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.api.effect.sound.SoundCategory
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.network.packet.Packet
 import org.spongepowered.math.vector.Vector3d
 
 data class NamedSoundEffectPacket(
-        val type: String,
+        val key: NamespacedKey,
         val position: Vector3d,
         val category: SoundCategory,
         val volume: Float,

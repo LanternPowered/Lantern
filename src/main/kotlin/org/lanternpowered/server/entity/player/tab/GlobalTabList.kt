@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player.tab
+package org.lanternpowered.server.entity.player.tab
 
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.spongepowered.api.profile.GameProfile
@@ -19,15 +19,15 @@ object GlobalTabList {
     private val entries = concurrentHashMapOf<UUID, GlobalTabListEntry>()
 
     fun add(entry: GlobalTabListEntry) {
-        this.entries[entry.profile.uniqueId] = entry
+        entries[entry.profile.uniqueId] = entry
     }
 
     operator fun get(gameProfile: GameProfile): GlobalTabListEntry? =
-            this.entries[gameProfile.uniqueId]
+            entries[gameProfile.uniqueId]
 
     fun getOrCreate(gameProfile: GameProfile): GlobalTabListEntry =
-            this.entries.computeIfAbsent(gameProfile.uniqueId) { GlobalTabListEntry(this, gameProfile) }
+            entries.computeIfAbsent(gameProfile.uniqueId) { GlobalTabListEntry(this, gameProfile) }
 
     fun remove(gameProfile: GameProfile): GlobalTabListEntry? =
-            this.entries.remove(gameProfile.uniqueId)
+            entries.remove(gameProfile.uniqueId)
 }

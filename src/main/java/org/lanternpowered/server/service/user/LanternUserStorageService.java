@@ -27,8 +27,8 @@ import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.data.io.UserIO;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.entity.living.player.ProxyUser;
+import org.lanternpowered.server.entity.player.LanternPlayer;
+import org.lanternpowered.server.user.LanternUser;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.CloseableService;
@@ -55,11 +55,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @Singleton
 public class LanternUserStorageService implements UserStorageService, CloseableService {
 
-    private final Cache<UUID, ProxyUser> userCache = CacheBuilder.newBuilder()
+    private final Cache<UUID, LanternUser> userCache = CacheBuilder.newBuilder()
             .weakValues()
             // Remove the internal user instance to save the player data
-            .removalListener((RemovalListener<UUID, ProxyUser>) notification -> {
-                final ProxyUser user = notification.getValue();
+            .removalListener((RemovalListener<UUID, LanternUser>) notification -> {
+                final LanternUser user = notification.getValue();
                 final User internalUser = user.getInternalUser();
                 if (internalUser != null && internalUser.isOnline()) {
                     user.setInternalUser(null);
@@ -78,9 +78,9 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
     }
 
     @Nullable
-    private ProxyUser getUser(UUID uniqueId) {
+    private LanternUser getUser(UUID uniqueId) {
         checkNotNull(uniqueId, "uniqueId");
-        ProxyUser user = this.userCache.getIfPresent(uniqueId);
+        LanternUser user = this.userCache.getIfPresent(uniqueId);
         if (user != null) {
             return user;
         }
@@ -112,7 +112,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
      * @return The user
      */
     @Nullable
-    private ProxyUser getFromOnlinePlayer(UUID uniqueId) {
+    private LanternUser getFromOnlinePlayer(UUID uniqueId) {
         return this.server.getPlayer(uniqueId).map(player -> ((LanternPlayer) player).getProxyUser()).orElse(null);
     }
 
@@ -123,7 +123,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
      * @return The user
      */
     @Nullable
-    private ProxyUser getFromWhitelistService(UUID uniqueId) {
+    private LanternUser getFromWhitelistService(UUID uniqueId) {
         final LanternGameProfile gameProfile;
         final WhitelistService whitelistService = this.whitelistService.get();
         if (whitelistService instanceof WhitelistConfig) {
@@ -134,7 +134,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
                     .filter(profile -> profile.getUniqueId().equals(uniqueId))
                     .findFirst().orElse(null);
         }
-        return gameProfile == null ? null : new ProxyUser(gameProfile);
+        return gameProfile == null ? null : new LanternUser(gameProfile);
     }
 
     /**
@@ -144,7 +144,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
      * @return The user
      */
     @Nullable
-    private ProxyUser getFromBanService(UUID uniqueId) {
+    private LanternUser getFromBanService(UUID uniqueId) {
         final LanternGameProfile gameProfile;
         final BanService banService = this.banService.get();
         if (banService instanceof BanConfig) {
@@ -154,7 +154,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
             gameProfile = banService.getBanFor(new LanternGameProfile(uniqueId, null))
                     .map(entry -> ((BanEntry.Profile) entry).getProfile()).orElse(null);
         }
-        return gameProfile == null ? null : new ProxyUser(gameProfile);
+        return gameProfile == null ? null : new LanternUser(gameProfile);
     }
 
     /**
@@ -164,8 +164,8 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
      * @return The user
      */
     @Nullable
-    private ProxyUser getFromOpsConfig(UUID uniqueId) {
-        return this.opsConfig.getEntryByUUID(uniqueId).map(entry -> new ProxyUser(entry.getProfile())).orElse(null);
+    private LanternUser getFromOpsConfig(UUID uniqueId) {
+        return this.opsConfig.getEntryByUUID(uniqueId).map(entry -> new LanternUser(entry.getProfile())).orElse(null);
     }
 
     /**
@@ -175,14 +175,14 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
      * @return The user
      */
     @Nullable
-    private ProxyUser getFromStoredData(UUID uniqueId) {
+    private LanternUser getFromStoredData(UUID uniqueId) {
         Optional<String> optName = Optional.empty();
         try {
             optName = UserIO.loadName(Lantern.getGame().getSavesDirectory(), uniqueId);
         } catch (IOException e) {
             Lantern.getLogger().warn("An error occurred while loading the player data for {}", uniqueId, e);
         }
-        return new ProxyUser(new LanternGameProfile(uniqueId, optName.orElse("UNKNOWN")));
+        return new LanternUser(new LanternGameProfile(uniqueId, optName.orElse("UNKNOWN")));
     }
 
     private Collection<GameProfile> getAllProfiles() {
@@ -223,7 +223,7 @@ public class LanternUserStorageService implements UserStorageService, CloseableS
             return user.get();
         }
         try {
-            return this.userCache.get(profile.getUniqueId(), () -> new ProxyUser(profile));
+            return this.userCache.get(profile.getUniqueId(), () -> new LanternUser(profile));
         } catch (ExecutionException e) {
             throw UncheckedThrowables.throwUnchecked(e);
         }

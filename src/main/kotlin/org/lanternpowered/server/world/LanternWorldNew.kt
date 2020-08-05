@@ -10,11 +10,16 @@
  */
 package org.lanternpowered.server.world
 
+import net.kyori.adventure.sound.Sound
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.server.LanternServer
+import org.lanternpowered.server.effect.sound.getEntityPacketBuilder
+import org.lanternpowered.server.effect.sound.getPacketBuilder
+import org.lanternpowered.server.entity.player.LanternPlayer
+import org.lanternpowered.server.entity.player.ObservedChunkManager
 import org.lanternpowered.server.network.entity.EntityProtocolManager
 import org.lanternpowered.server.world.chunk.ChunkManager
 import org.lanternpowered.server.world.storage.SpongeWorldStorage
@@ -47,7 +52,6 @@ import org.spongepowered.api.world.BlockChangeFlag
 import org.spongepowered.api.world.ChunkRegenerateFlag
 import org.spongepowered.api.world.HeightType
 import org.spongepowered.api.world.LightType
-import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.biome.BiomeType
 import org.spongepowered.api.world.chunk.Chunk
 import org.spongepowered.api.world.dimension.Dimension
@@ -73,7 +77,9 @@ class LanternWorldNew(
         private val ioExecutor: ExecutorService
 ) : World {
 
-    private val chunkManager = ChunkManager(this, this.ioExecutor)
+    val chunkManager = ChunkManager(this, this.ioExecutor)
+
+    val observedChunkManager = ObservedChunkManager(this)
 
     /**
      * The manager of all the regions in this world.
@@ -83,12 +89,15 @@ class LanternWorldNew(
     /**
      * The entity protocol manager of this world.
      */
-    val entityProtocolManager: EntityProtocolManager = TODO()
+    val entityProtocolManager = EntityProtocolManager()
 
     /**
      * Whether this world is currently loaded.
      */
     private var loaded: Boolean = true
+
+    val unsafePlayers: Collection<LanternPlayer>
+        get() = TODO()
 
     fun unload() {
 
@@ -104,6 +113,7 @@ class LanternWorldNew(
     override fun getRandom(): Random = this.random
     override fun getSeed(): Long = this.properties.seed
     override fun getProperties(): LanternWorldProperties = this.properties
+    override fun getBorder(): LanternWorldBorder = this.properties.worldBorder
 
     override fun getLocation(position: Vector3i): Location = LanternLocation(this, position)
     override fun getLocation(position: Vector3d): Location = LanternLocation(this, position)
@@ -402,11 +412,7 @@ class LanternWorldNew(
         TODO("Not yet implemented")
     }
 
-    override fun getBorder(): WorldBorder {
-        TODO("Not yet implemented")
-    }
-
-    override fun getPlayers(): Collection<Player> {
+    override fun getPlayers(): Collection<LanternPlayer> {
         TODO("Not yet implemented")
     }
 
@@ -469,4 +475,22 @@ class LanternWorldNew(
     override fun restoreSnapshot(x: Int, y: Int, z: Int, snapshot: BlockSnapshot?, force: Boolean, flag: BlockChangeFlag?): Boolean {
         TODO("Not yet implemented")
     }
+
+    // region Viewer
+
+    override fun playSound(sound: Sound) {
+        val builder = sound.getEntityPacketBuilder()
+        for (player in this.unsafePlayers)
+            player.connection.send(builder(player))
+    }
+
+    override fun playSound(sound: Sound, position: Vector3d) {
+        val packet = sound.getPacketBuilder()(position)
+        for (player in this.unsafePlayers)
+            player.connection.send(packet)
+    }
+
+    override fun playSound(sound: Sound, x: Double, y: Double, z: Double) = this.playSound(sound, Vector3d(x, y, z))
+
+    // endregion
 }

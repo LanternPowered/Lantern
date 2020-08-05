@@ -30,7 +30,7 @@ class StopSoundsCodec : Codec<StopSoundsPacket> {
         if (category != null)
             buf.writeVarInt(category.ordinal)
         if (sound != null)
-            buf.writeString(sound)
+            buf.writeNamespacedKey(sound)
         return buf
     }
 }

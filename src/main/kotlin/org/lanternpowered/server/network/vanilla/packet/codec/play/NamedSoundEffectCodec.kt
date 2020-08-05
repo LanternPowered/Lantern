@@ -19,7 +19,7 @@ object NamedSoundEffectCodec : PacketEncoder<NamedSoundEffectPacket> {
 
     override fun encode(context: CodecContext, packet: NamedSoundEffectPacket): ByteBuffer {
         val buf = context.byteBufAlloc().buffer()
-        buf.writeString(packet.type)
+        buf.writeNamespacedKey(packet.key)
         buf.writeVarInt(packet.category.ordinal)
         val pos = packet.position
         buf.writeInt((pos.x * 8.0).toInt())

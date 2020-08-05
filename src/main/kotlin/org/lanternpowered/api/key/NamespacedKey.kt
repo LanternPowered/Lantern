@@ -50,7 +50,7 @@ fun resolveNamespacedKey(value: String): NamespacedKey = NamespacedKey.resolve(v
  * Converts the [AdventureKey] into a [NamespacedKey].
  */
 fun AdventureKey.asNamespacedKey(): NamespacedKey =
-        if (this is NamespacedKey) this else NamespacedKey.of(namespace(), value())
+        if (this is NamespacedKey) this else NamespacedKey.of(this.namespace(), this.value())
 
 /**
  * Converts the [AdventureKey] into a [NamespacedKey].

@@ -11,9 +11,10 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.api.effect.sound.SoundCategory
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.network.packet.Packet
 
 data class StopSoundsPacket(
-        val sound: String?,
+        val sound: NamespacedKey?,
         val category: SoundCategory?
 ) : Packet

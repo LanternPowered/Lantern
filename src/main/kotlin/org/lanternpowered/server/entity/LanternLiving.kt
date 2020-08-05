@@ -29,6 +29,8 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.world.entitySpawner
 import org.lanternpowered.api.world.getGameRule
+import org.lanternpowered.server.LanternGame
+import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.effect.entity.EntityEffectCollection.Companion.builder
 import org.lanternpowered.server.effect.entity.EntityEffectTypes
@@ -37,7 +39,7 @@ import org.lanternpowered.server.effect.entity.animation.DefaultLivingHurtAnimat
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffect
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType
-import org.lanternpowered.server.entity.living.player.LanternPlayer
+import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.event.message.sendMessage
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.effect.sound.SoundTypes
@@ -130,6 +132,9 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
             }
         }
     }
+
+    val server: LanternServer
+        get() = LanternGame.server
 
     /**
      * The rotation of the head.
@@ -434,7 +439,7 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
      * Updates this entity during the state that
      * this entity is still alive.
      */
-    protected fun updateLiving(deltaTime: Duration) {
+    protected open fun updateLiving(deltaTime: Duration) {
         super.update(deltaTime)
 
         this.updatePotionEffects(deltaTime)

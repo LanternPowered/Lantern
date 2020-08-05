@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class EntityProtocolTypes {

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.command;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.packet.type.play.StopSoundsPacket;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.CatalogType;

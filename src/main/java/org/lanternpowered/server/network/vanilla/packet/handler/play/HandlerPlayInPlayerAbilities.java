@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import org.lanternpowered.server.block.BlockProperties;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.packet.handler.Handler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFlyingStatePacket;

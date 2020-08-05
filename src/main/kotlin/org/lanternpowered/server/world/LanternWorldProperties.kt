@@ -11,14 +11,19 @@
 package org.lanternpowered.server.world
 
 import net.kyori.adventure.key.KeyedValue
-import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.boss.BossBar
-import org.lanternpowered.api.util.optional.emptyOptional
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.optional.asOptional
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
 import org.lanternpowered.api.world.WorldProperties
+import org.lanternpowered.server.LanternGame
+import org.lanternpowered.server.config.ViewDistance
 import org.lanternpowered.server.config.WorldConfigObject
+import org.lanternpowered.server.entity.player.send
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetDifficultyPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewDistancePacket
 import org.lanternpowered.server.world.archetype.LanternWorldArchetype
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.server.world.portal.LanternPortalAgentType
@@ -27,7 +32,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.trader.WanderingTrader
 import org.spongepowered.api.world.SerializationBehavior
 import org.spongepowered.api.world.SerializationBehaviors
-import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.difficulty.Difficulty
 import org.spongepowered.api.world.dimension.DimensionTypes
 import org.spongepowered.api.world.gamerule.GameRule
@@ -48,7 +52,7 @@ class LanternWorldProperties(
 
     // TODO: Link some settings to config
 
-    private var world: World? = null
+    private var world: LanternWorldNew? = null
 
     val config: WorldConfigObject = TODO()
 
@@ -59,7 +63,6 @@ class LanternWorldProperties(
     private var keepSpawnLoaded = false
     private var structuresEnabled = true
     private var commandsEnabled = true
-    private var viewDistance = 10 // TODO: Proper default
     private var seed = Random.nextLong()
     private var spawnPosition = Vector3i.ZERO // TODO: Calculate based on generated terrain
     private var portalAgentType: LanternPortalAgentType<*> = PortalAgentTypes.DEFAULT.get() as LanternPortalAgentType<*>
@@ -74,7 +77,7 @@ class LanternWorldProperties(
      * Sets the world instance attached to these
      * properties, internal use only.
      */
-    fun setWorld(world: World?) { this.world = world }
+    fun setWorld(world: LanternWorldNew?) { this.world = world }
 
     /**
      * The maximum build height in this world.
@@ -162,19 +165,24 @@ class LanternWorldProperties(
 
     override fun getPortalAgentType(): LanternPortalAgentType<*> = this.portalAgentType
 
-    override fun getViewDistance(): Int = this.viewDistance
+    override fun getViewDistance(): Int {
+        var max = this.config.viewDistance
+        if (max == ViewDistance.USE_GLOBAL_SETTING)
+            max = LanternGame.config.server.viewDistance
+        return max.coerceIn(ViewDistance.MINIMUM, ViewDistance.MAXIMUM)
+    }
 
     override fun setViewDistance(viewDistance: Int) {
-        check(viewDistance > 0) { "The view distance must be greater than zero." }
-        this.viewDistance = viewDistance
+        check(viewDistance == ViewDistance.USE_GLOBAL_SETTING || viewDistance > 0) { "The view distance must be greater than zero." }
+        this.config.viewDistance = viewDistance
+        this.world?.unsafePlayers?.send(UpdateViewDistancePacket(this.viewDistance))
     }
 
     override fun getDifficulty(): Difficulty = this.config.difficulty
 
     override fun setDifficulty(difficulty: Difficulty) {
         this.config.difficulty = difficulty
-
-        // TODO: Send update to players
+        this.world?.unsafePlayers?.send(SetDifficultyPacket(difficulty, true))
     }
 
     override fun getDimensionType(): LanternDimensionType = this.dimensionType
@@ -186,7 +194,7 @@ class LanternWorldProperties(
         // TODO: Apply new terrain generator
     }
 
-    override fun getWorldBorder(): WorldBorder {
+    override fun getWorldBorder(): LanternWorldBorder {
         TODO("Not yet implemented")
     }
 

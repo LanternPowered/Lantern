@@ -20,7 +20,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.EntityEventType;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.network.packet.Packet;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.protocol;
 
-import org.lanternpowered.server.inventory.PlayerContainerSession;
+import org.lanternpowered.server.inventory.PlayerInventoryContainerSession;
 import org.lanternpowered.server.network.packet.CodecRegistration;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.packet.MessageRegistry;
@@ -110,7 +110,7 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCooldownCo
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetDifficultyCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetEntityPassengersCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetExperienceCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowSlotCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SoundEffectCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnExperienceOrbCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnMobCodec;
@@ -288,7 +288,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SetExperienceP
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetGameModePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetOpLevelPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetReducedDebugPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowSlotPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SoundEffectPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnExperienceOrbPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnMobPacket;
@@ -347,11 +347,11 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(ConfirmWindowTransactionCodec.class, ConfirmWindowTransactionPacket.class); // TODO: Handler
         inbound.bind(ClientEnchantItemCodec.class, ClientEnchantItemPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleEnchantItem));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleEnchantItem));
         inbound.bind(ClientClickWindowCodec.class, ClientClickWindowPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleWindowClick));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleWindowClick));
         inbound.bind(CloseWindowCodec.class, CloseWindowPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleWindowClose));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleWindowClose));
         inbound.bind(ChannelPayloadCodec.class);
         inbound.bind(ClientModifyBookCodec.class);
         inbound.bind(ClientRequestEntityDataCodec.class, ClientRequestDataPacket.Entity.class); // TODO: Handler
@@ -372,9 +372,9 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new ClientPlayerVehicleMovementHandler());
         inbound.bind(); // TODO: Steer Boat
         inbound.bind(ClientPickItemCodec.class, ClientPickItemPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handlePickItem));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handlePickItem));
         inbound.bind(ClientClickRecipeCodec.class, ClientClickRecipePacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleRecipeClick));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleRecipeClick));
         inbound.bind(ClientFlyingStateCodec.class, ClientFlyingStatePacket.class)
                 .bindHandler(new HandlerPlayInPlayerAbilities());
         inbound.bind(ClientDiggingCodec.class);
@@ -382,20 +382,20 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(ClientVehicleControlsCodec.class);
         inbound.bind(ClientSetDisplayedRecipeCodec.class);
         inbound.bind(ClientItemRenameCodec.class, ClientItemRenamePacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleItemRename));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleItemRename));
         inbound.bind(ResourcePackStatusCodec.class, ResourcePackStatusPacket.class)
                 .bindHandler(new ResourcePackStatusHandler());
         inbound.bind(ChangeAdvancementTreeCodec.class);
         inbound.bind(ClientChangeTradeOfferCodec.class, ClientChangeTradeOfferPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleOfferChange));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleOfferChange));
         inbound.bind(ClientAcceptBeaconEffectsCodec.class, ClientAcceptBeaconEffectsPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleAcceptBeaconEffects));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleAcceptBeaconEffects));
         inbound.bind(PlayerHeldItemChangeCodec.class, PlayerHeldItemChangePacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleHeldItemChange));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleHeldItemChange));
         inbound.bind(ClientEditCommandBlockBlockCodec.class, ClientEditCommandBlockPacket.Block.class);
         inbound.bind(ClientEditCommandBlockEntityCodec.class, ClientEditCommandBlockPacket.Entity.class);
         inbound.bind(ClientCreativeWindowActionCodec.class, ClientCreativeWindowActionPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleWindowCreativeClick));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleWindowCreativeClick));
         inbound.bind(UpdateJigsawBlockMessageCodec.class, UpdateJigsawBlockPacket.class); // TODO: Handler
         inbound.bind(); // TODO: Structure blocks
         inbound.bind(ClientChangeSignCodec.class, ClientModifySignPacket.class)
@@ -429,7 +429,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bindMessage(ClientDiggingPacket.class)
                 .bindHandler(new ClientDiggingHandler());
         inbound.bindMessage(ClientDropHeldItemPacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleItemDrop));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleItemDrop));
         inbound.bindMessage(FinishUsingItemPacket.class)
                 .bindHandler(new HandlerPlayInFinishUsingItem());
         inbound.bindMessage(ClientSwapHandItemsPacket.class)
@@ -453,7 +453,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new ClientMovementInputHandler());
         // Provided by CodecPlayInCraftingBookData
         inbound.bindMessage(ClientSetDisplayedRecipePacket.class)
-                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerContainerSession::handleDisplayedRecipe));
+                .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleDisplayedRecipe));
         inbound.bindMessage(ClientRecipeBookStatePacket.class)
                 .bindHandler(new ClientRecipeBookStatesHandler());
         // Provided by CodecPlayInAdvancementTab
@@ -491,7 +491,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(CloseWindowCodec.class, CloseWindowPacket.class);
         outbound.bind(SetWindowItemsCodec.class, SetWindowItemsPacket.class);
         outbound.bind(SetWindowPropertyCodec.class, SetWindowPropertyPacket.class);
-        outbound.bind(CodecPlayOutSetWindowSlot.class, PacketPlayOutSetWindowSlot.class);
+        outbound.bind(SetWindowSlotCodec.class, SetWindowSlotPacket.class);
         outbound.bind(SetCooldownCodec.class, SetCooldownPacket.class);
         final CodecRegistration<Packet, ChannelPayloadCodec> codecPlayInOutCustomPayload = outbound.bind(
                 ChannelPayloadCodec.class);

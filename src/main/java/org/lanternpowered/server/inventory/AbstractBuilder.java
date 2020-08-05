@@ -15,10 +15,12 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableMap;
+import net.kyori.adventure.text.Component;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructor;
 import org.lanternpowered.server.inventory.constructor.InventoryConstructorFactory;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.property.Property;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
@@ -114,7 +116,7 @@ public abstract class AbstractBuilder<R extends T, T extends AbstractInventory, 
      * @param translation The title translation
      * @return This builder, for chaining
      */
-    public B title(Translation translation) {
+    public B title(Component translation) {
         checkNotNull(translation, "translation");
         this.translation = translation;
         putProperty(InventoryProperties.TITLE, TextTranslation.toText(translation));

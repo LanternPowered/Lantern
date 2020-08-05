@@ -62,7 +62,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
  * The base implementation for all the {@link Inventory}s.
  */
 @SuppressWarnings({"unchecked", "ConstantConditions"})
-public abstract class AbstractInventory implements IInventory, PropertyHolderBase {
+public abstract class AbstractInventory implements IInventory {
 
     /**
      * Represents a invalid slot index.

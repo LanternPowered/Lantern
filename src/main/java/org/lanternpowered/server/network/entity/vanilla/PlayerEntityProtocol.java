@@ -18,7 +18,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.event.SpectateEntityEvent;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.api.data.type.TopHat;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.entity.EntityProtocolInitContext;

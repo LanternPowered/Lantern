@@ -19,9 +19,9 @@ import kotlin.random.Random
 object LightningSoundEffect : AbstractEntityEffect() {
 
     override fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random) {
-        entity.playSound(SoundTypes.ENTITY_LIGHTNING_BOLT_THUNDER,
+        entity.makeSound(SoundTypes.ENTITY_LIGHTNING_BOLT_THUNDER,
                 10000.0, 0.8 + random.nextDouble() * 0.2)
-        entity.playSound(SoundTypes.ENTITY_LIGHTNING_BOLT_IMPACT,
+        entity.makeSound(SoundTypes.ENTITY_LIGHTNING_BOLT_IMPACT,
                 2.0, 0.5 + random.nextDouble() * 0.2)
     }
 }

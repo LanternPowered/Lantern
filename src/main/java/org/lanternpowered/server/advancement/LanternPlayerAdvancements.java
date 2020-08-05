@@ -20,7 +20,7 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementDisplay;

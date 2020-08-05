@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.entity.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,6 +20,8 @@ import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.Pose;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
+import org.lanternpowered.server.entity.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.entity.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.vanilla.AbstractUserInventory;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
@@ -27,6 +29,7 @@ import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.lanternpowered.server.item.recipe.RecipeBookState;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.statistic.StatisticMap;
+import org.lanternpowered.server.user.LanternUser;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.LanternWorldPropertiesOld;
@@ -60,7 +63,7 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     public static final double DEFAULT_SATURATION = 5.0;
 
     // The proxy user
-    private final ProxyUser user;
+    private final LanternUser user;
 
     // The statistics of this player
     private final StatisticMap statisticMap = new StatisticMap();
@@ -71,11 +74,11 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     /**
      * This field is for internal use only, it is used while finding a proper
      * world to spawn the player in. Used at {@link NetworkSession#initPlayer()} and
-     * {@link UserStore}. Will also be used by {@link OfflineUser}s.
+     * {@link UserStore}. Will also be used by {@link OfflinePlayer}s.
      */
     @Nullable private LanternWorldProperties userWorld;
 
-    AbstractUser(ProxyUser user) {
+    AbstractUser(LanternUser user) {
         super(user.getUniqueId());
         this.user = user;
         offer(Keys.DISPLAY_NAME, Text.of(this.user.getName()));
@@ -179,11 +182,11 @@ public abstract class AbstractUser extends LanternLiving implements IUser, Abstr
     }
 
     /**
-     * Gets the internal {@link ProxyUser} instance of this {@link AbstractUser}.
+     * Gets the internal {@link LanternUser} instance of this {@link AbstractUser}.
      *
      * @return The proxy user
      */
-    public ProxyUser getProxyUser() {
+    public LanternUser getProxyUser() {
         return this.user;
     }
 

@@ -28,7 +28,7 @@ import org.lanternpowered.server.advancement.criteria.progress.LanternCriterionP
 import org.lanternpowered.server.advancement.criteria.progress.LanternEmptyCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternOrCriterionProgress;
 import org.lanternpowered.server.advancement.criteria.progress.LanternScoreCriterionProgress;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;

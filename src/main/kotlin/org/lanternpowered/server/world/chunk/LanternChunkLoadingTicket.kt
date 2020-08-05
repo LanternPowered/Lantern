@@ -44,15 +44,34 @@ class LanternChunkLoadingTicket(private val chunkManager: ChunkManager) : ChunkL
         }
     }
 
+    private fun release0(position: ChunkPosition): Boolean {
+        if (this.set.remove(position.packed)) {
+            this.chunkManager.releaseReference(position)
+            if (this.set.isEmpty())
+                this.chunkManager.remove(this)
+            return true
+        }
+        return false
+    }
+
     override fun release(position: ChunkPosition): Boolean {
         withLock {
-            if (this.set.remove(position.packed)) {
-                this.chunkManager.releaseReference(position)
-                if (this.set.isEmpty())
-                    this.chunkManager.remove(this)
-                return true
+            return this.release0(position)
+        }
+    }
+
+    override fun releaseAll(positions: Iterable<ChunkPosition>): Boolean {
+        withLock {
+            var change = false
+            if (positions is ChunkPositionCollection) {
+                val itr = positions.iterator()
+                while (itr.hasNext())
+                    change = this.release0(itr.nextPosition()) || change
+            } else {
+                for (position in positions)
+                    change = this.release0(position) || change
             }
-            return false
+            return change
         }
     }
 

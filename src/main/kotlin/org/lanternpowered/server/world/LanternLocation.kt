@@ -78,6 +78,10 @@ class LanternLocation : Location {
 
     private var hashCode = 0
 
+    constructor(worldKey: NamespacedKey, position: Vector3d) : this(WeakWorldReference(worldKey), position)
+
+    constructor(worldKey: NamespacedKey, position: Vector3i) : this(WeakWorldReference(worldKey), position)
+
     constructor(world: World, position: Vector3d) : this(WeakWorldReference(world), position)
 
     constructor(world: World, position: Vector3i) : this(WeakWorldReference(world), position)

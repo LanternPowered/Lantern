@@ -23,7 +23,6 @@ import org.lanternpowered.server.network.item.NetworkItemHelper;
 import org.lanternpowered.server.network.item.RawItemStack;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.persistence.DataView;
-import org.spongepowered.api.network.channel.ChannelBuf;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3f;
 import org.spongepowered.math.vector.Vector3i;
@@ -1006,7 +1005,7 @@ public final class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setResourceKey(int index, ResourceKey ResourceKey) {
-        return setAt(index, ResourceKey, this::writeResourceKey);
+        return setAt(index, ResourceKey, this::writeNamespacedKey);
     }
 
     @Override
@@ -1015,7 +1014,7 @@ public final class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public LanternByteBuffer writeResourceKey(ResourceKey resourcekey) {
+    public LanternByteBuffer writeNamespacedKey(ResourceKey resourcekey) {
         if (resourcekey.getNamespace().equals(resourcekey.MINECRAFT_NAMESPACE)) {
             return writeString(resourcekey.getValue());
         } else {

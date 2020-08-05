@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.collect.ImmutableSet
+import org.lanternpowered.api.util.collections.immutableSetBuilderOf
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Key
@@ -35,7 +35,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
     }
 
     @JvmDefault
-    override fun supports(key: Key<*>): Boolean = supportsKey(key.uncheckedCast<Key<Value<Any>>>())
+    override fun supports(key: Key<*>): Boolean = this.supportsKey(key.uncheckedCast<Key<Value<Any>>>())
 
     /**
      * Gets whether the [Key] is supported by this [LocalDataHolder].
@@ -86,7 +86,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
 
     @JvmDefault
     override fun getKeys(): Set<Key<*>> {
-        val keys = ImmutableSet.builder<Key<*>>()
+        val keys = immutableSetBuilderOf<Key<*>>()
         keys.addAll(this.keyRegistry.keys)
         keys.addAll(super.getKeys())
         for (delegate in this.keyRegistry.delegates)
@@ -96,7 +96,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
 
     @JvmDefault
     override fun getValues(): Set<Value.Immutable<*>> {
-        val values = ImmutableSet.builder<Value.Immutable<*>>()
+        val values = immutableSetBuilderOf<Value.Immutable<*>>()
         values.addAll(super.getValues())
 
         for (registration in this.keyRegistry.registrations) {

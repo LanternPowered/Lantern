@@ -30,6 +30,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.PlayerChatRouter;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -53,10 +54,12 @@ import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.event.item.inventory.DropItemEvent;
 import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.message.PlayerChatEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.event.server.query.QueryServerEvent;
+import org.spongepowered.api.event.world.ChangeWorldBorderEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -67,6 +70,7 @@ import org.spongepowered.api.network.status.StatusClient;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 
@@ -447,5 +451,23 @@ public class LanternEventFactory {
             boolean messageCancelled) {
         return SpongeEventFactory.createServerSideConnectionEventDisconnect(cause, originalAudience, Optional.ofNullable(audience),
                 originalMessage, message, connection, player, messageCancelled);
+    }
+
+    public static ChangeWorldBorderEvent.@NonNull TargetPlayer createChangeWorldBorderEventTargetPlayer(
+            @NonNull Cause cause,
+            @Nullable WorldBorder newBorder,
+            @Nullable WorldBorder previousBorder,
+            @NonNull ServerPlayer player) {
+        return SpongeEventFactory.createChangeWorldBorderEventTargetPlayer(cause,
+                Optional.ofNullable(newBorder), player, Optional.ofNullable(previousBorder));
+    }
+
+    public static @NonNull PlayerChatEvent createPlayerChatEvent(Cause cause,
+            @NonNull PlayerChatRouter originalChatRouter,
+            @Nullable PlayerChatRouter chatRouter,
+            @NonNull Component originalMessage,
+            @NonNull Component message) {
+        return SpongeEventFactory.createPlayerChatEvent(cause, originalChatRouter,
+                Optional.ofNullable(chatRouter), originalMessage, message);
     }
 }

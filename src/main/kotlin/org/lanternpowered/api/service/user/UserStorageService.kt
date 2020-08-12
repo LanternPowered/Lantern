@@ -20,6 +20,16 @@ interface UserStorageService {
     fun get(uniqueId: UUID): UserStorage
 
     /**
+     * Gets the user storage for the user with the given [UUID], if the user exists.
+     */
+    fun getIfPresent(uniqueId: UUID): UserStorage? = if (this.exists(uniqueId)) this.get(uniqueId) else null
+
+    /**
+     * Gets whether the user with the given [uniqueId] exists
+     */
+    fun exists(uniqueId: UUID): Boolean
+
+    /**
      * Gets a sequence of [UserStorage]s of users that "exist".
      */
     fun sequence(): Sequence<UserStorage>

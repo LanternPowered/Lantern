@@ -46,6 +46,7 @@ import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.scoreboard.LanternScoreboard
 import org.lanternpowered.server.service.user.DefaultUserStorageService
 import org.lanternpowered.server.service.world.DefaultWorldStorageService
+import org.lanternpowered.server.user.LanternUserManager
 import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.ShutdownMonitorThread
 import org.lanternpowered.server.util.SyncLanternThread
@@ -109,12 +110,17 @@ class LanternServer : Server {
     private lateinit var console: LanternConsole
     private lateinit var networkManager: NetworkManager
     private lateinit var audiences: Iterable<Audience>
+    private lateinit var gameProfileManager: GameProfileManager
     private var queryServer: QueryServer? = null
     private var defaultResourcePack: ResourcePack? = null
     @Volatile private var broadcastAudience: Audience = this
 
     lateinit var userStorageService: UserStorageService
         private set
+
+    lateinit var userManager: LanternUserManager
+        private set
+
 
     private val playersByUniqueId = concurrentHashMapOf<UUID, LanternPlayer>()
     private val playersByName = concurrentHashMapOf<String, LanternPlayer>()
@@ -181,6 +187,8 @@ class LanternServer : Server {
         this.userStorageService = this.game.serviceProvider.register<UserStorageService> {
             this.game.lanternPlugin to DefaultUserStorageService(usersDirectory)
         }
+
+        this.userManager = LanternUserManager(this.playersByUniqueId, this.userStorageService, this.gameProfileManager)
 
         this.syncExecutor = mainExecutor.asLanternExecutorService()
         this.syncExecutor.submit { LanternCauseStackManager.setCurrentCauseStack(LanternCauseStack()) }
@@ -375,6 +383,7 @@ class LanternServer : Server {
         this.ioExecutor.shutdown()
         this.syncExecutor.shutdown()
         this.networkManager.shutdown()
+        this.userManager.shutdown()
 
         this.queryServer?.shutdown()
 
@@ -413,6 +422,8 @@ class LanternServer : Server {
     override fun getDefaultResourcePack(): Optional<ResourcePack> = this.defaultResourcePack.asOptional()
     override fun getTeleportHelper(): TeleportHelper = LanternTeleportHelper
     override fun getScheduler(): Scheduler = this.syncScheduler
+    override fun getGameProfileManager(): GameProfileManager = this.gameProfileManager
+    override fun getUserManager(): UserManager = this.userManager
 
     override fun getMaxPlayers(): Int = this.config.server.maxPlayers
     override fun getMotd(): Text = this.config.server.messageOfTheDay
@@ -436,16 +447,11 @@ class LanternServer : Server {
     override fun getTicksPerSecond(): Double = 20.0
     override fun getRunningTimeTicks(): Int = (Duration.between(this.startTime, Instant.now()).toMillis() / 50L).toInt()
 
-    override fun getUserManager(): UserManager {
-        TODO("Not yet implemented")
-    }
-
     override fun getServerScoreboard(): Optional<Scoreboard> = this.scoreboard.asOptional()
     override fun getCauseStackManager(): CauseStackManager = LanternCauseStackManager
 
     override fun getPlayer(uniqueId: UUID): Optional<Player> = this.playersByUniqueId[uniqueId].asOptional()
     override fun getPlayer(name: String): Optional<Player> = this.playersByName[name].asOptional()
-
 
     /**
      * Adds a [Player] to the online players lookups.
@@ -465,10 +471,6 @@ class LanternServer : Server {
     fun removePlayer(player: LanternPlayer) {
         this.playersByName.remove(player.name)
         this.playersByUniqueId.remove(player.uniqueId)
-    }
-
-    override fun getGameProfileManager(): GameProfileManager {
-        TODO("Not yet implemented")
     }
 
     override fun getChunkLayout(): ChunkLayout {

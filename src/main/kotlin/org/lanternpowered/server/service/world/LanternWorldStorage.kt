@@ -250,7 +250,7 @@ class LanternWorldStorage(
         }
 
         private fun loadSpongeData(directory: Path): DataView? {
-            return SafeIO.read(directory.resolve(SPONGE_LEVEL_DATA_FILE)) { path ->
+            return readSafely(directory.resolve(SPONGE_LEVEL_DATA_FILE)) { path ->
                 NbtStreamUtils.read(Files.newInputStream(path), true)
             }?.getView(SPONGE_DATA)?.orNull()
         }

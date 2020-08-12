@@ -14,7 +14,7 @@ import java.util.UUID
 
 object UUIDHelper {
 
-    private val regex = "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89aAbB][a-f0-9]{3}-[a-f0-9]{12}$".toRegex(RegexOption.IGNORE_CASE)
+    private val regex = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Attempts to parse the given [value] as an [UUID].

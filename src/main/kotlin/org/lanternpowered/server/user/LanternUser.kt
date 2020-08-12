@@ -12,14 +12,15 @@ package org.lanternpowered.server.user
 
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.service.user.UserStorage
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.Location
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.data.MutableForwardingDataHolder
-import org.lanternpowered.server.data.io.UserIO
 import org.lanternpowered.server.entity.player.AbstractPlayer
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.entity.player.OfflinePlayer
-import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.entity.player.PlayerSerializer
 import org.lanternpowered.server.inventory.user.LanternUserInventory
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.type.HandType
@@ -36,12 +37,15 @@ import java.io.IOException
 import java.util.Optional
 import java.util.UUID
 
-class LanternUser(private var profile: GameProfile) : SubjectProxy, MutableForwardingDataHolder, User {
+class LanternUser(
+        private var profile: GameProfile,
+        val storage: UserStorage
+) : SubjectProxy, MutableForwardingDataHolder, User {
 
     private val uniqueId: UUID = this.profile.uniqueId
 
-    private var player: AbstractPlayer? = null
-    private var inventory: UserInventory? = null
+    private var _player: AbstractPlayer? = null
+    private var _inventory: UserInventory? = null
 
     override fun getUniqueId(): UUID = this.uniqueId
     override fun getProfile(): GameProfile = this.profile
@@ -49,43 +53,62 @@ class LanternUser(private var profile: GameProfile) : SubjectProxy, MutableForwa
     override fun getName(): String = this.profile.name.get()
 
     /**
-     * Sets the internal [AbstractPlayer] of this user.
-     *
-     * @param player The internal player
+     * Gets the internal player.
      */
-    private fun setInternalPlayer0(player: AbstractPlayer?) {
-        if (this.player != null) {
-            try {
-                UserIO.save(Lantern.getGame().savesDirectory, this.player)
-            } catch (e: IOException) {
-                Lantern.getLogger().warn("An error occurred while saving the player data for $profile", e)
-            }
-        }
-        this.player = player
-        this.inventory = null
+    val internalPlayer: AbstractPlayer?
+        get() = this._player
+
+    private fun setInternalPlayer(player: AbstractPlayer?) {
+        this.save()
+        this._player = player
+        this._inventory = null
         if (player != null) {
             // Update the game profile, in case anything changed
             this.profile = player.getProfile()
             check(this.uniqueId == this.profile.uniqueId)
             try {
-                UserIO.load(Lantern.getGame().savesDirectory, this.player)
+                val data = this.storage.load()
+                if (data != null)
+                    PlayerSerializer.load(player, data)
             } catch (e: IOException) {
-                Lantern.getLogger().warn("An error occurred while loading the player data for $profile", e)
+                LanternGame.logger.warn("An error occurred while loading the player data for $profile", e)
             }
         }
     }
 
-    var internalUser: AbstractPlayer?
-        get() = this.player
-        set(value) = setInternalPlayer0(value)
+    /**
+     * Loads the given player.
+     */
+    fun load(player: LanternPlayer) {
+        this.setInternalPlayer(player)
+    }
+
+    /**
+     * Resets the user, this clears the current player and user data will be saved if needed.
+     */
+    fun reset() {
+        this.setInternalPlayer(null)
+    }
+
+    /**
+     * Saves data of the current player, if the a player is loaded.
+     */
+    fun save() {
+        val currentPlayer = this._player
+        if (currentPlayer != null) {
+            val data = PlayerSerializer.save(currentPlayer)
+            this.storage.save(data)
+        }
+    }
 
     private fun resolvePlayer(): AbstractPlayer {
-        val user = this.player
+        val user = this._player
         if (user != null)
             return user
-        val offlineUser = OfflinePlayer(this.profile)
-        this.setInternalPlayer0(offlineUser)
-        return offlineUser
+        // Lazily instantiate an offline player
+        val offlinePlayer = OfflinePlayer(this.profile)
+        this.setInternalPlayer(offlinePlayer)
+        return offlinePlayer
     }
 
     override val delegateDataHolder: DataHolder.Mutable
@@ -94,12 +117,12 @@ class LanternUser(private var profile: GameProfile) : SubjectProxy, MutableForwa
     override fun getSubject(): Subject = this.resolvePlayer()
 
     override fun getInventory(): UserInventory {
-        var userInventory = this.inventory
+        var userInventory = this._inventory
         if (userInventory != null)
             return userInventory
         val playerInventory = this.resolvePlayer().inventory
         userInventory = LanternUserInventory(playerInventory, this)
-        this.inventory = userInventory
+        this._inventory = userInventory
         return userInventory
     }
 

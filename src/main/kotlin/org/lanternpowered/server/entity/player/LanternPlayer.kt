@@ -76,6 +76,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewPosi
 import org.lanternpowered.server.registry.type.block.BlockStateRegistry
 import org.lanternpowered.server.scoreboard.LanternScoreboard
 import org.lanternpowered.server.text.title.toPackets
+import org.lanternpowered.server.user.LanternUser
 import org.lanternpowered.server.world.LanternWorldBorder
 import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.advancement.Advancement
@@ -146,12 +147,21 @@ class LanternPlayer(
     }
 
     private val interactionHandler = PlayerInteractionHandler(this)
-    private val _user by lazy { this.server.userManager.getOrCreate(this.profile) }
+    private val _user: LanternUser by lazy { this.server.userManager.getOrCreate(this.profile) as LanternUser }
 
     init {
         this.initInventoryContainer()
         this.effectCollection = DEFAULT_EFFECT_COLLECTION.copy()
         this.boundingBoxExtent = BOUNDING_BOX_EXTENT
+        this._user.load(this)
+    }
+
+    /**
+     * Releases the player instance, is called after
+     * the player disconnected to cleanup remaining references.
+     */
+    fun release() {
+        this._user.reset()
     }
 
     override fun registerKeys() {

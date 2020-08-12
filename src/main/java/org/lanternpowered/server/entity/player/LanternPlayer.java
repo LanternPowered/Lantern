@@ -289,7 +289,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
         setSoundCategory(SoundCategories.PLAYER);
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
-        getProxyUser().setInternalUser(this);
+        getProxyUser().setInternalPlayer(this);
     }
 
     /**

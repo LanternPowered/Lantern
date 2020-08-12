@@ -74,13 +74,13 @@ interface CatalogTypeRegistry<T : CatalogType> : Iterable<T> {
     /**
      * Attempts to get a type for the given [key].
      */
-    fun getOptional(key: NamespacedKey): Optional<T> = get(key).asOptional()
+    fun getOptional(key: NamespacedKey): Optional<T> = this[key].asOptional()
 
     /**
      * Attempts to get a type for the given [key]. Throws an
      * [IllegalArgumentException] if the key couldn't be found.
      */
-    fun require(key: NamespacedKey): T = get(key) ?: throw IllegalArgumentException(
+    fun require(key: NamespacedKey): T = this[key] ?: throw IllegalArgumentException(
             "Can't find a ${typeToken.rawType.simpleName} with the key: $key")
 
     /**

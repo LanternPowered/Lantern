@@ -21,6 +21,9 @@ import org.lanternpowered.api.util.Identifiable
  * `DataQuery.of("Statistics")`. The data is represented
  * as a map where the key is the id of the statistic and
  * the value is the value of the statistic.
+ *
+ * The advancements data is present in the path
+ * `DataQuery.of("Advancements")`.
  */
 interface UserStorage : Identifiable {
 
@@ -30,9 +33,10 @@ interface UserStorage : Identifiable {
     val exists: Boolean
 
     /**
-     * Loads a [DataContainer] with all user data.
+     * Loads a [DataContainer] with all user data. Can return
+     * `null` if no data exists.
      */
-    fun load(): DataContainer
+    fun load(): DataContainer?
 
     /**
      * Saves a [DataView] with all user data.

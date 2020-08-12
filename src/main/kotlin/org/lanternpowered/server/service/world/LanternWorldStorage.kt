@@ -18,6 +18,7 @@ import org.lanternpowered.api.data.persistence.getOrCreateView
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils
+import org.lanternpowered.server.service.user.LanternUserStorage
 import org.lanternpowered.server.service.world.anvil.AnvilChunkStorage
 import org.lanternpowered.server.util.SafeIO
 import java.io.DataInputStream
@@ -158,7 +159,7 @@ class LanternWorldStorage(
     override fun load(): DataContainer = this.lock.read { load0() }
 
     private fun load0(): DataContainer {
-        val data = SafeIO.read(this.dataDirectory.resolve(LEVEL_DATA_FILE)) { path ->
+        val data = readSafely(this.dataDirectory.resolve(LEVEL_DATA_FILE)) { path ->
             NbtStreamUtils.read(Files.newInputStream(path), true)
         }
         check(data != null) { "The level.dat file of the world is missing." }
@@ -170,7 +171,7 @@ class LanternWorldStorage(
             data.getOrCreateView(LEVEL_DATA).set(SPONGE_DATA, spongeData)
         }
 
-        val scoreboardData = SafeIO.read(this.dataDirectory.resolve(SCOREBOARD_DATA_FILE)) { path ->
+        val scoreboardData = readSafely(this.dataDirectory.resolve(SCOREBOARD_DATA_FILE)) { path ->
             NbtStreamUtils.read(Files.newInputStream(path), true)
         }?.getView(DATA)?.orNull()
 
@@ -191,7 +192,7 @@ class LanternWorldStorage(
             val rootScoreboardData = DataContainer.createNew()
                     .set(DATA, scoreboardData)
             data.remove(SCOREBOARD)
-            SafeIO.write(this.dataDirectory.resolve(SCOREBOARD_DATA_FILE)) { path ->
+            writeSafely(this.dataDirectory.resolve(SCOREBOARD_DATA_FILE)) { path ->
                 NbtStreamUtils.write(rootScoreboardData, Files.newOutputStream(path), true)
             }
         }
@@ -207,12 +208,32 @@ class LanternWorldStorage(
         spongeData.addUniqueId(this.uniqueId)
         saveSpongeData(this.dataDirectory, spongeData)
 
-        SafeIO.write(this.dataDirectory.resolve(LEVEL_DATA_FILE)) { path ->
+        writeSafely(this.dataDirectory.resolve(LEVEL_DATA_FILE)) { path ->
             NbtStreamUtils.write(data, Files.newOutputStream(path), true)
         }
     }
 
+
     companion object {
+
+        private fun <R> readSafely(targetFile: Path, fn: (path: Path) -> R): R? {
+            if (Files.exists(targetFile))
+                return fn(targetFile)
+            val oldFile = targetFile.parent.resolve(targetFile.fileName.toString() + "_old")
+            return if (Files.exists(oldFile)) fn(oldFile) else null
+        }
+
+        private fun <R> writeSafely(targetFile: Path, fn: (path: Path) -> R): R {
+            val newFile = targetFile.parent.resolve(targetFile.fileName.toString() + "_new")
+            val oldFile = targetFile.parent.resolve(targetFile.fileName.toString() + "_old")
+            val result = fn(newFile)
+            if (Files.exists(oldFile))
+                Files.delete(oldFile)
+            if (Files.exists(targetFile))
+                Files.move(targetFile, oldFile)
+            Files.move(newFile, targetFile)
+            return result
+        }
 
         private fun DataView.addUniqueId(uniqueId: UUID) {
             set(UUID_MOST, uniqueId.mostSignificantBits)
@@ -258,9 +279,10 @@ class LanternWorldStorage(
         fun cleanupWorld(directory: Path) {
             Files.deleteIfExists(directory.resolve(REGION_DIRECTORY_NAME))
             // Not used, user data will be moved somewhere else
-            Files.deleteIfExists(directory.resolve(USER_DATA_DIRECTORY))
-            Files.deleteIfExists(directory.resolve(USER_ADVANCEMENTS_DATA_DIRECTORY))
-            Files.deleteIfExists(directory.resolve(USER_STATISTICS_DATA_DIRECTORY))
+            Files.deleteIfExists(directory.resolve(LanternUserStorage.DATA_DIRECTORY))
+            Files.deleteIfExists(directory.resolve(LanternUserStorage.ADVANCEMENTS_DATA_DIRECTORY))
+            Files.deleteIfExists(directory.resolve(LanternUserStorage.STATISTICS_DATA_DIRECTORY))
+            Files.deleteIfExists(directory.resolve(LanternUserStorage.SPONGE_DATA_DIRECTORY))
         }
 
         /**
@@ -299,9 +321,6 @@ class LanternWorldStorage(
         private const val BUKKIT_UUID_DATA_FILE = "uid.dat"
         private const val SESSION_LOCK_FILE = "session.lock"
         private const val REGION_DIRECTORY_NAME = "region"
-        private const val USER_DATA_DIRECTORY = "playerdata"
-        private const val USER_ADVANCEMENTS_DATA_DIRECTORY = "advancements"
-        private const val USER_STATISTICS_DATA_DIRECTORY = "stats"
 
         private val UUID_MOST = DataQuery.of("UUIDMost")
         private val UUID_LEAST = DataQuery.of("UUIDLeast")

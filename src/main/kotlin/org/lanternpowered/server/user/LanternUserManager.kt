@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.user
 
+import org.lanternpowered.api.service.user.UserStorageService
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.user.UserManager
@@ -17,7 +18,9 @@ import java.util.Optional
 import java.util.UUID
 import java.util.stream.Stream
 
-class LanternUserManager : UserManager {
+class LanternUserManager(
+        private val storageService: UserStorageService
+) : UserManager {
 
     override fun streamOfMatches(lastKnownName: String): Stream<GameProfile> {
         TODO("Not yet implemented")

@@ -25,9 +25,7 @@ object ItemDeathParticleEffect : EntityEffect {
     }
 
     override fun play(entity: LanternEntity) {
-        /*
         entity.world.spawnParticles(EffectHolder.DEATH_EFFECT,
-                entity.boundingBox.map { obj: AABB -> obj.center }.orElseGet { entity.position })*/
-        // TODO
+                entity.boundingBox.map { aabb -> aabb.center }.orElseGet { entity.position })
     }
 }

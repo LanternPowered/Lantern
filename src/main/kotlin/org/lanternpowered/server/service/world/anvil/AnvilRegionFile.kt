@@ -127,7 +127,7 @@ class AnvilRegionFile(
 
     /**
      * Clear all data from unused sectors, so that leftover compressed
-     * code from previous chunks gets removed. This will reduce the world
+     * data from previous chunks gets removed. This will reduce the world
      * size if it were to be zipped.
      */
     private fun cleanup() {

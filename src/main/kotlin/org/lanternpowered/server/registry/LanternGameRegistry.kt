@@ -184,6 +184,8 @@ class LanternGameRegistry(
 
     fun init() {
         factoryRegistry.apply {
+            register(LanternCatalogTypeRegistryFactory)
+
             register(ImmutableDataManipulatorFactory)
             register(MutableDataManipulatorFactory)
             register(ValueFactory)

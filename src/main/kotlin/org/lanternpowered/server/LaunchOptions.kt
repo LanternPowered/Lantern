@@ -33,6 +33,9 @@ object LaunchOptions {
     val WORLDS_DIRECTORY: ArgumentAcceptingOptionSpec<String> =
             PARSER.acceptsAll(listOf("worlds-directory", "worlds-dir"), "The path to the worlds directory").withRequiredArg()
 
+    val USERS_DIRECTORY: ArgumentAcceptingOptionSpec<String> =
+            PARSER.acceptsAll(listOf("users-directory", "users-dir"), "The path to the users directory").withRequiredArg()
+
     val PORT: ArgumentAcceptingOptionSpec<Int> =
             PARSER.acceptsAll(listOf("port", "p"), "The port to launch the server on").withRequiredArg().ofType(Int::class.java)
 }

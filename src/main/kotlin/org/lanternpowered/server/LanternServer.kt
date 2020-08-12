@@ -21,6 +21,7 @@ import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.version
 import org.lanternpowered.api.scoreboard.Scoreboard
+import org.lanternpowered.api.service.user.UserStorageService
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.collections.asUnmodifiableCollection
@@ -43,6 +44,7 @@ import org.lanternpowered.server.network.rcon.EmptyRconService
 import org.lanternpowered.server.network.rcon.RconServer
 import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.scoreboard.LanternScoreboard
+import org.lanternpowered.server.service.user.DefaultUserStorageService
 import org.lanternpowered.server.service.world.DefaultWorldStorageService
 import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.ShutdownMonitorThread
@@ -111,6 +113,9 @@ class LanternServer : Server {
     private var defaultResourcePack: ResourcePack? = null
     @Volatile private var broadcastAudience: Audience = this
 
+    lateinit var userStorageService: UserStorageService
+        private set
+
     private val playersByUniqueId = concurrentHashMapOf<UUID, LanternPlayer>()
     private val playersByName = concurrentHashMapOf<String, LanternPlayer>()
 
@@ -167,9 +172,14 @@ class LanternServer : Server {
 
         val config = this.game.config
 
-        val worldsDirectory = this.game.gameDirectory.resolve(options.valueOf(LaunchOptions.CONFIG_DIRECTORY) ?: "worlds")
+        val worldsDirectory = this.game.gameDirectory.resolve(options.valueOf(LaunchOptions.WORLDS_DIRECTORY) ?: "worlds")
         val worldStorageService = this.game.serviceProvider.register<WorldStorageService> {
             this.game.lanternPlugin to DefaultWorldStorageService(worldsDirectory)
+        }
+
+        val usersDirectory = this.game.gameDirectory.resolve(options.valueOf(LaunchOptions.USERS_DIRECTORY) ?: "users")
+        this.userStorageService = this.game.serviceProvider.register<UserStorageService> {
+            this.game.lanternPlugin to DefaultUserStorageService(usersDirectory)
         }
 
         this.syncExecutor = mainExecutor.asLanternExecutorService()

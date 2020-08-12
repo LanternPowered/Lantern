@@ -12,25 +12,15 @@ package org.lanternpowered.server.util
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 
 object SafeIO {
 
-    fun <R> write(targetFile: Path, fn: (path: Path) -> R): R {
-        val newFile = targetFile.parent.resolve(targetFile.fileName.toString() + "_new")
-        val oldFile = targetFile.parent.resolve(targetFile.fileName.toString() + "_old")
-        val result = fn(newFile)
-        if (Files.exists(oldFile))
-            Files.delete(oldFile)
-        if (Files.exists(targetFile))
-            Files.move(targetFile, oldFile)
-        Files.move(newFile, targetFile)
+    fun <R> write(targetPath: Path, fn: (tmpPath: Path) -> R): R {
+        val tmpFile = targetPath.parent.resolve(targetPath.fileName.toString() + ".tmp")
+        Files.deleteIfExists(tmpFile)
+        val result = fn(tmpFile)
+        Files.move(tmpFile, targetPath, StandardCopyOption.REPLACE_EXISTING)
         return result
-    }
-
-    fun <R> read(targetFile: Path, fn: (path: Path) -> R): R? {
-        if (Files.exists(targetFile))
-            return fn(targetFile)
-        val oldFile = targetFile.parent.resolve(targetFile.fileName.toString() + "_old")
-        return if (Files.exists(oldFile)) fn(oldFile) else null
     }
 }

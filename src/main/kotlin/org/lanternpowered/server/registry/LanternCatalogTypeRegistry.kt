@@ -102,7 +102,7 @@ private abstract class AbstractMutableCatalogTypeRegistry<T, D, B, R>(
 
     private val lock = Any()
     @Suppress("LeakingThis") @Volatile private var data = createBuilder().fix().build()
-    private val watchers = mutableListOf<R.() -> Unit>()
+    private val watchers = mutableListOf<(R) -> Unit>()
 
     private fun B.fix(): AbstractCatalogTypeRegistryBuilder<T, *, D> =
             this as AbstractCatalogTypeRegistryBuilder<T, *, D>
@@ -123,7 +123,7 @@ private abstract class AbstractMutableCatalogTypeRegistry<T, D, B, R>(
 
     override fun ensureLoaded(): D = this.data
 
-    override fun watch(watcher: R.() -> Unit) {
+    override fun watch(watcher: (R) -> Unit) {
         synchronized(this.lock) {
             this.watchers += watcher
         }

@@ -67,6 +67,9 @@ import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerReg
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
 import org.lanternpowered.server.registry.type.attribute.AttributeOperationRegistry
 import org.lanternpowered.server.registry.type.attribute.AttributeTypeRegistry
+import org.lanternpowered.server.registry.type.block.BlockEntityTypeRegistry
+import org.lanternpowered.server.registry.type.block.BlockStateRegistry
+import org.lanternpowered.server.registry.type.block.BlockTypeRegistry
 import org.lanternpowered.server.registry.type.cause.CauseContextKeyRegistry
 import org.lanternpowered.server.registry.type.cause.DamageModifierTypeRegistry
 import org.lanternpowered.server.registry.type.cause.DamageTypeRegistry
@@ -260,6 +263,10 @@ class LanternGameRegistry(
 
             register(AttributeOperationRegistry)
             register(AttributeTypeRegistry)
+
+            register(BlockEntityTypeRegistry)
+            register(BlockStateRegistry)
+            register(BlockTypeRegistry)
 
             register(CauseContextKeyRegistry)
             register(DamageModifierTypeRegistry)

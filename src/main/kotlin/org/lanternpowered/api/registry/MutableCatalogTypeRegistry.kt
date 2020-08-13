@@ -44,7 +44,7 @@ interface MutableCatalogTypeRegistryBase<T, B, R> : CatalogTypeRegistry<T>
      * Watches the registry for changes. Watchers will be triggered
      * after every [load].
      */
-    fun watch(watcher: R.() -> Unit)
+    fun watch(watcher: (registry: R) -> Unit)
 
     /**
      * Loads or reloads the [MutableCatalogTypeRegistry]. This clears the

@@ -11,6 +11,10 @@
 package org.lanternpowered.server.registry.type.block
 
 import org.lanternpowered.api.block.BlockType
+import org.lanternpowered.server.game.registry.InternalIDRegistries
 import org.lanternpowered.server.registry.mutableInternalCatalogTypeRegistry
 
 val BlockTypeRegistry = mutableInternalCatalogTypeRegistry<BlockType>()
+        .apply {
+            watch(::loadBlockStateRegistry)
+        }

@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.key.NamespacedKey
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.lanternpowered.api.text.serializer.FormattingCodeTextSerializer
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
@@ -22,12 +22,8 @@ object LanternTextSerializerFactory : TextSerializerFactory {
 
     private val formattingCodeSerializers = ConcurrentHashMap<Char, FormattingCodeTextSerializer>()
 
-    private const val defaultFormattingCode = '&'
-    private val defaultFormattingCodeTextSerializer = LanternFormattingCodeTextSerializer(
-            NamespacedKey.minecraft("formatting_code"), this.defaultFormattingCode)
-
     override val json: JsonTextSerializer
-        get() = TODO("Not yet implemented")
+        get() = LanternJsonTextSerializer
 
     override val plain: PlainTextSerializer
         get() = LanternPlainTextSerializer
@@ -37,11 +33,8 @@ object LanternTextSerializerFactory : TextSerializerFactory {
 
     override fun formatting(code: Char): FormattingCodeTextSerializer {
         return when (code) {
-            LanternFormattingCodes.LEGACY_CODE -> LanternLegacyTextSerializer
-            this.defaultFormattingCode -> this.defaultFormattingCodeTextSerializer
-            else -> this.formattingCodeSerializers.computeIfAbsent(code) {
-                LanternFormattingCodeTextSerializer(NamespacedKey.minecraft("formatting_code_$it"), it)
-            }
+            LegacyComponentSerializer.SECTION_CHAR -> LanternLegacyTextSerializer
+            else -> this.formattingCodeSerializers.computeIfAbsent(code, ::LanternFormattingCodeTextSerializer)
         }
     }
 }

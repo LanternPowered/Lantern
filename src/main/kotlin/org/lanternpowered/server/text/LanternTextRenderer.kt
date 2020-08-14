@@ -12,6 +12,7 @@ package org.lanternpowered.server.text
 
 import net.kyori.adventure.text.BuildableComponent
 import net.kyori.adventure.text.NBTComponentBuilder
+import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.Style
 import net.kyori.adventure.text.renderer.AbstractComponentRenderer
 import org.lanternpowered.api.text.BlockDataText
@@ -30,109 +31,113 @@ import java.text.MessageFormat
 
 abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
-    private fun isChildRenderNeeded(text: Text): Boolean =
-            text.children().isNotEmpty() || text.style().hoverEvent() != null
-
     protected fun <T : BuildableComponent<T, B>, B : TextBuilder<T, B>> B.applyChildren(text: Text, context: C): B = apply {
         for (child in text.children())
-            append(render(child, context))
+            this.append(render(child, context))
     }
 
     protected fun <T : BuildableComponent<T, B>, B : TextBuilder<T, B>> B.applyStyle(text: Text, context: C): B = apply {
-        mergeStyle(text, Style.Merge.colorAndDecorations())
-        clickEvent(text.clickEvent())
-        val hoverEvent = text.hoverEvent()
-        if (hoverEvent != null)
-            hoverEvent(hoverEvent.withRenderedValue(this@LanternTextRenderer, context))
+        this.mergeStyle(text, Style.Merge.colorAndDecorations())
+        this.clickEvent(text.clickEvent())
+        this.insertion(text.insertion())
+        this.hoverEvent(renderHoverEventIfNeeded(text.hoverEvent(), context) ?: text.hoverEvent())
     }
 
     protected fun <T : BuildableComponent<T, B>, B : TextBuilder<T, B>> B.applyStyleAndChildren(text: Text, context: C): B =
-            applyChildren(text, context).applyStyle(text, context)
+            this.applyChildren(text, context).applyStyle(text, context)
 
     private fun <T : DataText<T, B>, B : NBTComponentBuilder<T, B>> B.applyNbt(text: DataText<*, *>): B = apply {
-        nbtPath(text.nbtPath())
-        interpret(text.interpret())
+        this.nbtPath(text.nbtPath())
+        this.interpret(text.interpret())
     }
 
-    override fun renderText(text: LiteralText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return LiteralText.builder(text.content())
-                .applyStyleAndChildren(text, context)
-                .build()
+    final override fun renderText(text: LiteralText, context: C): Text =
+            this.renderLiteralIfNeeded(text, context) ?: text
+
+    final override fun renderStorageNbt(text: StorageDataText, context: C): Text =
+            this.renderStorageNbtIfNeeded(text, context) ?: text
+
+    final override fun renderEntityNbt(text: EntityDataText, context: C): Text =
+            this.renderEntityNbtIfNeeded(text, context) ?: text
+
+    final override fun renderBlockNbt(text: BlockDataText, context: C): Text =
+            this.renderBlockNbtIfNeeded(text, context) ?: text
+
+    final override fun renderScore(text: ScoreText, context: C): Text =
+            this.renderScoreIfNeeded(text, context) ?: text
+
+    final override fun renderKeybind(text: KeybindText, context: C): Text =
+            this.renderKeybindIfNeeded(text, context) ?: text
+
+    final override fun renderSelector(text: SelectorText, context: C): Text =
+            this.renderSelectorIfNeeded(text, context) ?: text
+
+    final override fun renderTranslatable(text: TranslatableText, context: C): Text =
+            this.renderTranslatableIfNeeded(text, context) ?: text
+
+    protected open fun renderLiteralIfNeeded(text: LiteralText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            LiteralText.builder(text.content())
+        }
     }
 
-    override fun renderStorageNbt(text: StorageDataText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return StorageDataText.builder()
-                .storage(text.storage())
-                .applyNbt(text)
-                .applyStyleAndChildren(text, context)
-                .build()
+    protected open fun renderStorageNbtIfNeeded(text: StorageDataText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            StorageDataText.builder()
+                    .storage(text.storage())
+                    .applyNbt(text)
+        }
     }
 
-    override fun renderEntityNbt(text: EntityDataText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return EntityDataText.builder()
-                .selector(text.selector())
-                .applyNbt(text)
-                .applyStyleAndChildren(text, context)
-                .build()
+    protected open fun renderEntityNbtIfNeeded(text: EntityDataText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            EntityDataText.builder()
+                    .selector(text.selector())
+                    .applyNbt(text)
+        }
     }
 
-    override fun renderBlockNbt(text: BlockDataText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return BlockDataText.builder()
-                .pos(text.pos())
-                .applyNbt(text)
-                .applyStyleAndChildren(text, context)
-                .build()
+    protected open fun renderBlockNbtIfNeeded(text: BlockDataText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            BlockDataText.builder()
+                    .pos(text.pos())
+                    .applyNbt(text)
+        }
     }
 
-    override fun renderScore(text: ScoreText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return ScoreText.builder()
-                .objective(text.objective())
-                .value(text.value())
-                .name(text.name())
-                .applyStyleAndChildren(text, context)
-                .build()
+    protected open fun renderScoreIfNeeded(text: ScoreText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            ScoreText.builder()
+                    .objective(text.objective())
+                    .value(text.value())
+                    .name(text.name())
+        }
     }
 
-    override fun renderKeybind(text: KeybindText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return KeybindText.builder()
-                .keybind(text.keybind())
-                .applyStyleAndChildren(text, context)
-                .build()
+    protected open fun renderKeybindIfNeeded(text: KeybindText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            KeybindText.builder().keybind(text.keybind())
+        }
     }
 
-    override fun renderSelector(text: SelectorText, context: C): Text {
-        if (!isChildRenderNeeded(text))
-            return text
-        return SelectorText.builder()
-                .pattern(text.pattern())
-                .applyStyleAndChildren(text, context)
-                .build()
+    protected open fun renderSelectorIfNeeded(text: SelectorText, context: C): Text? {
+        return this.renderIfNeeded(text, context) {
+            SelectorText.builder().pattern(text.pattern())
+        }
     }
 
-    override fun renderTranslatable(text: TranslatableText, context: C): Text {
-        val format = translate(text.key(), context)
+    protected open fun renderTranslatableIfNeeded(text: TranslatableText, context: C): Text? {
+        val format = this.translate(text.key(), context)
+        val args = text.args()
+
         if (format == null) {
-            if (!isChildRenderNeeded(text) && text.args().isEmpty())
-                return text
-            return TranslatableText.builder(text.key())
-                    .args(text.args().map { arg -> render(arg, context) })
-                    .applyStyleAndChildren(text, context)
-                    .build()
+            val renderedArgs = this.renderListIfNeeded(text.args(), context)
+            return this.renderIfNeeded(text, context, force = renderedArgs != null) {
+                TranslatableText.builder(text.key())
+                        .args(renderedArgs ?: args)
+            }
         }
 
-        val args = text.args()
         val builder = LiteralText.builder()
 
         if (args.isEmpty())
@@ -148,7 +153,7 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
             val end = itr.runLimit
             val index = itr.getAttribute(MessageFormat.Field.ARGUMENT) as Int?
             if (index != null) {
-                builder.append(render(args[index], context))
+                builder.append(this.render(args[index], context))
             } else {
                 builder.append(textOf(sb.substring(itr.index, end)))
             }
@@ -156,6 +161,84 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
         }
 
         return builder.applyStyleAndChildren(text, context).build()
+    }
+
+    private fun <T : Text, B : TextBuilder<T, B>> renderIfNeeded(
+            text: Text, context: C, force: Boolean = false, builderSupplier: () -> B
+    ): T? {
+        val children = this.renderListIfNeeded(text.children(), context)
+        val hoverEvent = this.renderHoverEventIfNeeded(text.hoverEvent(), context)
+        if (children == null && hoverEvent == null && !force)
+            return null
+        val builder = builderSupplier()
+        builder.append(children ?: text.children())
+        builder.mergeStyle(text, Style.Merge.colorAndDecorations())
+        builder.hoverEvent(hoverEvent ?: text.hoverEvent())
+        builder.clickEvent(text.clickEvent())
+        builder.insertion(text.insertion())
+        return builder.build()
+    }
+
+    protected fun renderHoverEventIfNeeded(hoverEvent: HoverEvent<*>?, context: C): HoverEvent<*>? {
+        if (hoverEvent == null)
+            return null
+        return when (val value = hoverEvent.value()) {
+            is Text -> {
+                val text = this.renderIfNeeded(value, context) ?: return null
+                HoverEvent.showText(text)
+            }
+            is HoverEvent.ShowEntity -> {
+                val name = value.name() ?: return null
+                val text = this.renderIfNeeded(name, context) ?: return null
+                HoverEvent.showEntity(HoverEvent.ShowEntity(value.type(), value.id(), text))
+            }
+            is HoverEvent.ShowItem -> null // TODO
+            else -> hoverEvent.withRenderedValue(this, context)
+        }
+    }
+
+    /**
+     * Renders the given [Text] for the [context]. This function will return `null`
+     * in case nothing changed to the contents when rendering.
+     */
+    fun renderIfNeeded(text: Text, context: C): Text? {
+        return when (text) {
+            is LiteralText -> this.renderLiteralIfNeeded(text, context)
+            is TranslatableText -> this.renderTranslatableIfNeeded(text, context)
+            is KeybindText -> this.renderKeybindIfNeeded(text, context)
+            is ScoreText -> this.renderScoreIfNeeded(text, context)
+            is SelectorText -> this.renderSelectorIfNeeded(text, context)
+            is DataText<*, *> -> when (text) {
+                is BlockDataText -> this.renderBlockNbtIfNeeded(text, context)
+                is EntityDataText -> this.renderEntityNbtIfNeeded(text, context)
+                is StorageDataText -> this.renderStorageNbtIfNeeded(text, context)
+                else -> text
+            }
+            else -> text
+        }
+    }
+
+    /**
+     * Renders the given list of [Text], if it's needed.
+     */
+    fun renderListIfNeeded(list: List<Text>, context: C): List<Text>? {
+        if (list.isEmpty())
+            return null
+        var resultList: MutableList<Text>? = null
+        for (index in list.indices) {
+            val text = list[index]
+            val result = this.renderIfNeeded(text, context)
+            if (result != null) {
+                if (resultList == null) {
+                    resultList = ArrayList(list.size)
+                    resultList.addAll(list.subList(0, index))
+                }
+                resultList.add(result)
+            } else {
+                resultList?.add(text)
+            }
+        }
+        return resultList
     }
 
     /**

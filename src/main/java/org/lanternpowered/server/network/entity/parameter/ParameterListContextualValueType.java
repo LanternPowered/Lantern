@@ -18,8 +18,8 @@ import org.lanternpowered.server.network.packet.codec.CodecContext;
 public final class ParameterListContextualValueType implements ContextualValueType<ParameterList> {
 
     @Override
-    public void write(CodecContext ctx, ParameterList object, ByteBuffer buf) throws CodecException {
-        ((AbstractParameterList) object).write(ctx, buf);
+    public void write(CodecContext ctx, ParameterList value, ByteBuffer buf) throws CodecException {
+        ((AbstractParameterList) value).write(ctx, buf);
     }
 
     @Override

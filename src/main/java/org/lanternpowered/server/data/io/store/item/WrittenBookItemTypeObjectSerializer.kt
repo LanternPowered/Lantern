@@ -10,17 +10,13 @@
  */
 package org.lanternpowered.server.data.io.store.item
 
-import org.lanternpowered.api.text.book.Book
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
+import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.server.data.io.store.SimpleValueContainer
-import org.lanternpowered.server.text.LanternTexts.fromLegacy
-import org.lanternpowered.server.text.LanternTexts.toLegacy
-import org.lanternpowered.server.text.translation.TranslationContext
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.item.inventory.ItemStack
-import java.util.Locale
 
 class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer() {
 
@@ -30,10 +26,10 @@ class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer
             dataView[PAGES] = pages.map { page -> JsonTextSerializer.serialize(page) }
         }
         valueContainer.remove(Keys.AUTHOR).ifPresent { text ->
-            dataView[AUTHOR] = toLegacy(text)
+            dataView[AUTHOR] = LegacyTextSerializer.serialize(text)
         }
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent { text ->
-            dataView[TITLE] = toLegacy(text)
+            dataView[TITLE] = LegacyTextSerializer.serialize(text)
         }
         valueContainer.remove(Keys.GENERATION).ifPresent { value ->
             dataView[GENERATION] = value
@@ -43,13 +39,13 @@ class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer
     override fun deserializeValues(itemStack: ItemStack, valueContainer: SimpleValueContainer, dataView: DataView) {
         super.deserializeValues(itemStack, valueContainer, dataView)
         dataView.getStringList(PAGES).ifPresent { lines ->
-            valueContainer[Keys.PAGES] = lines.map { page -> JsonTextSerializer.deserializeUnchecked(page) }
+            valueContainer[Keys.PAGES] = lines.map { page -> JsonTextSerializer.deserialize(page) }
         }
         dataView.getString(AUTHOR).ifPresent { author ->
-            valueContainer[Keys.AUTHOR] = fromLegacy(author)
+            valueContainer[Keys.AUTHOR] = LegacyTextSerializer.deserialize(author)
         }
         dataView.getString(TITLE).ifPresent { title ->
-            valueContainer[Keys.DISPLAY_NAME] = fromLegacy(title)
+            valueContainer[Keys.DISPLAY_NAME] = LegacyTextSerializer.deserialize(title)
         }
         dataView.getInt(GENERATION).ifPresent {
             value -> valueContainer[Keys.GENERATION] = value
@@ -65,16 +61,5 @@ class WrittenBookItemTypeObjectSerializer : WritableBookItemTypeObjectSerializer
         val TITLE: DataQuery = DataQuery.of("title")
 
         private val GENERATION = DataQuery.of("generation")
-
-        @JvmStatic
-        fun writeBookData(dataView: DataView, bookView: Book, locale: Locale?) {
-            TranslationContext.enter()
-                    .locale(locale)
-                    .enableForcedTranslations().use {
-                        dataView[AUTHOR] = toLegacy(bookView.author())
-                        dataView[TITLE] = toLegacy(bookView.title())
-                        dataView.set(PAGES, bookView.pages().map { page -> JsonTextSerializer.serialize(page) })
-                    }
-        }
     }
 }

@@ -24,8 +24,6 @@ import org.lanternpowered.server.registry.type.scoreboard.ScoreboardCriterionReg
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
-import org.lanternpowered.server.text.LanternTexts.fromLegacy
-import org.lanternpowered.server.text.LanternTexts.toLegacy
 import org.lanternpowered.api.key.NamespacedKey
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.scoreboard.Score
@@ -74,7 +72,7 @@ object ScoreboardIO {
         dataView.getViewList(OBJECTIVES).ifPresent { list ->
             list.forEach { entry ->
                 val name = entry.getString(NAME).get()
-                val displayName = fromLegacy(entry.getString(DISPLAY_NAME).get())
+                val displayName = LegacyTextSerializer.deserialize(entry.getString(DISPLAY_NAME).get())
                 val builder = Objective.builder()
                         .name(name)
                         .displayName(displayName)
@@ -107,7 +105,7 @@ object ScoreboardIO {
                 if (entry.getInt(INVALID).orElse(0) > 0) {
                     return@forEach
                 }
-                val name = fromLegacy(entry.getString(NAME).get())
+                val name = LegacyTextSerializer.deserialize(entry.getString(NAME).get())
                 val value = entry.getInt(SCORE).get()
                 val locked = entry.getInt(LOCKED).orElse(0) > 0 // TODO
                 val objectiveName = entry.getString(OBJECTIVE).get()
@@ -134,9 +132,9 @@ object ScoreboardIO {
                         .allowFriendlyFire(entry.getInt(ALLOW_FRIENDLY_FIRE).orElse(0) > 0)
                         .canSeeFriendlyInvisibles(entry.getInt(CAN_SEE_FRIENDLY_INVISIBLES).orElse(0) > 0)
                         .name(entry.getString(NAME).get())
-                        .displayName(fromLegacy(entry.getString(DISPLAY_NAME).get()))
-                        .prefix(fromLegacy(entry.getString(PREFIX).get()))
-                        .suffix(fromLegacy(entry.getString(SUFFIX).get()))
+                        .displayName(LegacyTextSerializer.deserialize(entry.getString(DISPLAY_NAME).get()))
+                        .prefix(LegacyTextSerializer.deserialize(entry.getString(PREFIX).get()))
+                        .suffix(LegacyTextSerializer.deserialize(entry.getString(SUFFIX).get()))
                         .members(entry.getStringList(MEMBERS).get().stream()
                                 .map { member -> LegacyTextSerializer.deserialize(member) }
                                 .toImmutableSet())
@@ -181,7 +179,7 @@ object ScoreboardIO {
                 .map { objective ->
                     DataContainer.createNew()
                             .set(NAME, objective.name)
-                            .set(DISPLAY_NAME, toLegacy(objective.displayName))
+                            .set(DISPLAY_NAME, LegacyTextSerializer.serialize(objective.displayName))
                             .set(CRITERION_NAME, objective.criterion.key)
                             .set(DISPLAY_MODE, objective.displayMode.key)
                 }
@@ -190,7 +188,7 @@ object ScoreboardIO {
         for (score in scoreboard.scores) {
             val it: Iterator<Objective> = score.objectives.iterator()
             val baseView = DataContainer.createNew()
-                    .set(NAME, toLegacy(score.name))
+                    .set(NAME, LegacyTextSerializer.serialize(score.name))
                     .set(SCORE, score.score)
             // TODO: Locked state
             val mainView: DataView = baseView.copy()
@@ -213,11 +211,11 @@ object ScoreboardIO {
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (if (team.canSeeFriendlyInvisibles()) 1 else 0).toByte())
                     .set(NAME_TAG_VISIBILITY, VisibilityRegistry.requireId(team.nameTagVisibility))
                     .set(NAME, team.name)
-                    .set(DISPLAY_NAME, toLegacy(team.displayName))
+                    .set(DISPLAY_NAME, LegacyTextSerializer.serialize(team.displayName))
                     .set(DEATH_MESSAGE_VISIBILITY, VisibilityRegistry.requireId(team.deathMessageVisibility))
                     .set(COLLISION_RULE, CollisionRuleRegistry.requireId(team.collisionRule))
-                    .set(PREFIX, toLegacy(team.prefix))
-                    .set(SUFFIX, toLegacy(team.suffix))
+                    .set(PREFIX, LegacyTextSerializer.serialize(team.prefix))
+                    .set(SUFFIX, LegacyTextSerializer.serialize(team.suffix))
             val teamColor = team.color
             container[TEAM_COLOR] = NamedTextColor.NAMES.requireKey(teamColor)
             val members = team.members

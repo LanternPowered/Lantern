@@ -26,21 +26,21 @@ import org.lanternpowered.api.util.optional.orNull
 import java.text.MessageFormat
 
 /**
- * A [LanternTextRenderer]
+ * A [LanternTextRenderer] that renders all the [Text] components in their literal form.
  */
-class LanternLiteralTextRenderer(
+class LiteralTextRenderer(
         private val translationRegistry: TranslationRegistry
 ) : LanternTextRenderer<FormattedTextRenderContext>() {
 
-    override fun renderKeybind(text: KeybindText, context: FormattedTextRenderContext): Text =
+    override fun renderKeybindIfNeeded(text: KeybindText, context: FormattedTextRenderContext): Text? =
             LiteralText.builder("[${text.keybind()}]")
                     .applyStyleAndChildren(text, context).build()
 
-    override fun renderSelector(text: SelectorText, context: FormattedTextRenderContext): Text =
+    override fun renderSelectorIfNeeded(text: SelectorText, context: FormattedTextRenderContext): Text? =
             LiteralText.builder(text.pattern())
                     .applyStyleAndChildren(text, context).build()
 
-    override fun renderScore(text: ScoreText, context: FormattedTextRenderContext): Text {
+    override fun renderScoreIfNeeded(text: ScoreText, context: FormattedTextRenderContext): Text? {
         val value = text.value()
         if (value != null)
             return LiteralText.builder(value).applyStyleAndChildren(text, context).build()
@@ -59,23 +59,23 @@ class LanternLiteralTextRenderer(
 
     // TODO: Lookup the actual data from the blocks, entities, etc.
 
-    override fun renderBlockNbt(text: BlockDataText, context: FormattedTextRenderContext): Text =
+    override fun renderBlockNbtIfNeeded(text: BlockDataText, context: FormattedTextRenderContext): Text? =
             LiteralText.builder("[${text.nbtPath()}] @ ${text.pos().asString()}")
                     .applyStyleAndChildren(text, context).build()
 
-    override fun renderEntityNbt(text: EntityDataText, context: FormattedTextRenderContext): Text =
+    override fun renderEntityNbtIfNeeded(text: EntityDataText, context: FormattedTextRenderContext): Text? =
             LiteralText.builder("[${text.nbtPath()}] @ ${text.selector()}")
                     .applyStyleAndChildren(text, context).build()
 
-    override fun renderStorageNbt(text: StorageDataText, context: FormattedTextRenderContext): Text =
+    override fun renderStorageNbtIfNeeded(text: StorageDataText, context: FormattedTextRenderContext): Text? =
             LiteralText.builder("[${text.nbtPath()}] @ ${text.storage()}")
                     .applyStyleAndChildren(text, context).build()
 
-    override fun renderTranslatable(text: TranslatableText, context: FormattedTextRenderContext): Text {
-        val format = translate(text.key(), context)
+    override fun renderTranslatableIfNeeded(text: TranslatableText, context: FormattedTextRenderContext): Text? {
+        val format = this.translate(text.key(), context)
         if (format != null)
-            return super.renderTranslatable(text, context)
-        return LiteralText.builder("[${text.key()}](${text.args().joinToString(", ")})")
+            return super.renderTranslatableIfNeeded(text, context)
+        return LiteralText.builder(text.key())
                 .applyStyleAndChildren(text, context).build()
     }
 

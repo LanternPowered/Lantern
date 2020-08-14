@@ -11,8 +11,6 @@
 package org.lanternpowered.server.registry
 
 import org.lanternpowered.api.catalog.CatalogType
-import org.lanternpowered.api.registry.CatalogTypeRegistryBuilder
-import org.lanternpowered.api.registry.MutableCatalogTypeRegistry
 import org.lanternpowered.api.registry.MutableCatalogTypeRegistryBase
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.type.typeTokenOf

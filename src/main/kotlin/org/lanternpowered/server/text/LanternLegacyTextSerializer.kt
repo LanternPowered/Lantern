@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.text
 
-import org.lanternpowered.api.key.NamespacedKey
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 
-object LanternLegacyTextSerializer : LegacyTextSerializer, LanternFormattingCodeTextSerializer(
-        NamespacedKey.minecraft("legacy"), LanternFormattingCodes.LEGACY_CODE)
+object LanternLegacyTextSerializer : LegacyTextSerializer,
+        LanternFormattingCodeTextSerializer(LegacyComponentSerializer.SECTION_CHAR)

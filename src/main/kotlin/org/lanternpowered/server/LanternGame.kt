@@ -40,6 +40,7 @@ import org.lanternpowered.server.service.LanternServiceProvider
 import org.lanternpowered.server.service.context.LanternContextCalculator
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.lanternpowered.server.sql.LanternSqlManager
+import org.lanternpowered.server.text.TranslationRegistries
 import org.lanternpowered.server.util.LocaleCache
 import org.lanternpowered.server.util.guice.GuiceModule
 import org.lanternpowered.server.util.metric.LanternMetricsConfigManager
@@ -177,6 +178,9 @@ object LanternGame : Game {
         // Register all factories, builders and catalog registries
         this.registry = LanternGameRegistry(this)
         this.registry.init()
+
+        // Load the translation files
+        TranslationRegistries.init()
 
         initPermissionService()
 

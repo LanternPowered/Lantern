@@ -13,12 +13,16 @@ package org.lanternpowered.server.console
 import net.minecrell.terminalconsole.SimpleTerminalConsole
 import net.minecrell.terminalconsole.TerminalConsoleAppender
 import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.Logger
 import org.apache.logging.log4j.io.IoBuilder
 import org.apache.logging.log4j.io.LoggerPrintStream
 import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
 import org.lanternpowered.api.audience.Audience
+import org.lanternpowered.api.audience.MessageType
 import org.lanternpowered.api.plugin.name
+import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.LanternServer
@@ -54,6 +58,9 @@ class LanternConsole(
     private val game: LanternGame
         get() = this.server.game
 
+    private val logger: Logger
+        get() = this.server.logger
+
     private val consoleHistoryFile: Path by lazy { this.server.game.configDirectory.resolve(historyFileName) }
     private val lock = Any()
 
@@ -74,7 +81,6 @@ class LanternConsole(
         // already be printed nicely with PrettyPrinter
         ignoreFqcns.add(LanternCauseStack::class.java.name)
 
-        val logger = this.server.logger
         System.setOut(IoBuilder.forLogger(logger).setLevel(Level.INFO).buildPrintStream())
         System.setErr(IoBuilder.forLogger(logger).setLevel(Level.ERROR).buildPrintStream())
     }
@@ -153,4 +159,8 @@ class LanternConsole(
 
     override fun getIdentifier() = "console"
     override fun getPermissionDefault(permission: String) = Tristate.TRUE
+
+    override fun sendMessage(message: Text, type: MessageType) {
+        this.logger.info(LegacyTextSerializer.serialize(message))
+    }
 }

@@ -17,6 +17,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.text.toText
 import org.lanternpowered.api.text.translatableTextOf
@@ -28,7 +29,6 @@ import org.lanternpowered.server.network.SimpleRemoteConnection
 import org.lanternpowered.server.network.status.LanternStatusClient
 import org.lanternpowered.server.network.status.LanternStatusHelper
 import org.lanternpowered.server.network.status.LanternStatusResponse
-import org.lanternpowered.server.text.LanternTexts.toLegacy
 import java.net.InetSocketAddress
 import java.nio.charset.StandardCharsets
 
@@ -168,7 +168,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                     online = -1
                 }
                 val data = if (full1) {
-                    val description0 = getFirstLine(toLegacy(description))
+                    val description0 = getFirstLine(LegacyTextSerializer.serialize(description))
                     // 1. This value is always 1.
                     // 2. The protocol version, just use a value out of range
                     //    of the available ones.

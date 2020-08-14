@@ -24,6 +24,6 @@ import org.lanternpowered.api.text.Text
  */
 data class FormattedTextRenderContext(
         val locale: Locale,
-        val player: Player?,
-        val scoreboard: Scoreboard?
+        val player: Player? = null,
+        val scoreboard: Scoreboard? = null
 )

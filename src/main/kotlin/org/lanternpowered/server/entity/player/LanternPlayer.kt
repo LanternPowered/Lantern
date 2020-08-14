@@ -61,6 +61,7 @@ import org.lanternpowered.server.inventory.vanilla.PlayerInventoryShiftClickBeha
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes
 import org.lanternpowered.server.item.LanternCooldownTracker
 import org.lanternpowered.server.network.NetworkSession
+import org.lanternpowered.server.network.entity.EntityProtocolManager
 import org.lanternpowered.server.network.entity.NetworkIdHolder
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChatMessagePacket
@@ -162,6 +163,12 @@ class LanternPlayer(
      */
     fun release() {
         this._user.reset()
+        // Destroy the player entity
+        this.unload(UnloadState.REMOVED)
+        // Detach the player from the world
+        // TODO this.setWorld(null)
+        // Release the players entity id
+        EntityProtocolManager.releaseEntityId(this.networkId)
     }
 
     override fun registerKeys() {

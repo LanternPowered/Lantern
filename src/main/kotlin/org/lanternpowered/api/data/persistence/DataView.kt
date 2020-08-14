@@ -14,6 +14,7 @@ import org.lanternpowered.api.util.optional.orNull
 
 typealias DataQuery = org.spongepowered.api.data.persistence.DataQuery
 typealias DataView = org.spongepowered.api.data.persistence.DataView
+typealias DataViewSafetyMode = org.spongepowered.api.data.persistence.DataView.SafetyMode
 typealias DataContainer = org.spongepowered.api.data.persistence.DataContainer
 
 /**

@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.buffer.contextual;
 import net.kyori.adventure.text.Component;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterListContextualValueType;
-import org.lanternpowered.server.network.item.ItemStackContextualValueType;
+import org.lanternpowered.server.network.item.ItemStackValueType;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancement;
 import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementContextualValueType;
 import org.lanternpowered.server.network.vanilla.recipe.NetworkRecipe;
@@ -44,7 +44,7 @@ public final class ContextualValueTypes {
      * A serializer for {@link ItemStack} objects,
      * NULL {@code null} values are SUPPORTED.
      */
-    public static final ContextualValueType<ItemStack> ITEM_STACK = new ItemStackContextualValueType();
+    public static final ContextualValueType<ItemStack> ITEM_STACK = new ItemStackValueType();
 
     /**
      * A serializer for {@link ParameterList} objects.

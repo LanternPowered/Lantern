@@ -188,7 +188,7 @@ class LanternServer : Server {
             this.game.lanternPlugin to DefaultUserStorageService(usersDirectory)
         }
 
-        this.userManager = LanternUserManager(this.playersByUniqueId, this.userStorageService, this.gameProfileManager)
+        this.userManager = LanternUserManager(this, this.userStorageService, this.gameProfileManager)
 
         this.syncExecutor = mainExecutor.asLanternExecutorService()
         this.syncExecutor.submit { LanternCauseStackManager.setCurrentCauseStack(LanternCauseStack()) }

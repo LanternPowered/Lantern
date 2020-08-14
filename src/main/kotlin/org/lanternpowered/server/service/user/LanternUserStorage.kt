@@ -129,8 +129,9 @@ class LanternUserStorage(
         Files.createDirectories(dataPath.parent)
         Files.createDirectories(advancementsPath.parent)
         Files.createDirectories(statisticsPath.parent)
+        Files.createDirectories(spongeDataPath.parent)
 
-        SafeIO.write(spongeDataPath) { tmpPath ->
+        SafeIO.write(dataPath) { tmpPath ->
             Files.newOutputStream(tmpPath).use { output ->
                 NbtStreamUtils.write(data, output, true)
             }

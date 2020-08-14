@@ -40,7 +40,6 @@ class DefaultUserStorageService(private val directory: Path) : UserStorageServic
 
     private val cache = Caffeine.newBuilder().weakValues()
             .build<UUID, UserStorage> { uniqueId -> LanternUserStorage(uniqueId, this.dataDirectory) }
-    private val cacheMap = this.cache.asMap()
 
     override fun get(uniqueId: UUID): UserStorage = this.cache.get(uniqueId)!!
 

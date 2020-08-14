@@ -27,6 +27,7 @@ import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.cause.withContext
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.service.serviceOf
 import org.lanternpowered.api.text.LiteralText
@@ -190,10 +191,13 @@ class NetworkSession(
             field = value
         }
 
+    private var _locale = Locales.DEFAULT
+
     /**
      * The locale of the player.
      */
-    private var locale = Locales.DEFAULT
+    val locale: Locale
+        get() = this._locale
 
     /**
      * Whether the first client settings packet was received.
@@ -226,7 +230,7 @@ class NetworkSession(
             actualPacket = actualPacket.packet
         }
         if (actualPacket is ClientSettingsPacket) { // Special case, keep track of the locale
-            this.locale = actualPacket.locale
+            this._locale = actualPacket.locale
             if (!this.firstClientSettingsPacket) {
                 this.firstClientSettingsPacket = true
                 // Trigger the init
@@ -604,14 +608,7 @@ class NetworkSession(
         causeStack.popCause()
 
         // Remove the proxy user from the player and save the player data
-        player.proxyUser.internalUser = null
-        // Destroy the player entity
-        player.unload(LanternEntity.UnloadState.REMOVED)
-        // Detach the player from the world
-        player.setWorld(null)
-
-        // Release the players entity id
-        EntityProtocolManager.releaseEntityId(player.networkId)
+        player.release()
     }
 
     /**

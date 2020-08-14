@@ -8,5 +8,14 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-@org.checkerframework.framework.qual.DefaultQualifier(org.checkerframework.checker.nullness.qual.NonNull.class)
-package org.lanternpowered.server.text.translation;
+package org.lanternpowered.server.item.appearance
+
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.item.ItemType
+
+/**
+ * Represents the appearance of an [ItemType].
+ *
+ * @property itemTypeKey The vanilla/modded item type key.
+ */
+class ItemAppearance(val itemTypeKey: NamespacedKey)

@@ -19,12 +19,12 @@ import org.lanternpowered.server.block.LanternBlockType
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBaseBehavior
-import org.lanternpowered.server.util.rotation.RotationHelper
 import org.lanternpowered.server.util.wrapDegRot
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.util.Direction
+import java.util.function.Supplier
 import kotlin.math.roundToInt
 
 class WallOrStandingPlacementBehavior private constructor(
@@ -67,6 +67,9 @@ class WallOrStandingPlacementBehavior private constructor(
     }
 
     companion object {
+
+        fun ofTypes(wallTypeSupplier: Supplier<out BlockType>, standingTypeSupplier: Supplier<out BlockType>): WallOrStandingPlacementBehavior =
+                WallOrStandingPlacementBehavior({ wallTypeSupplier.get().defaultState }, { standingTypeSupplier.get().defaultState })
 
         fun ofTypes(wallTypeSupplier: () -> BlockType, standingTypeSupplier: () -> BlockType): WallOrStandingPlacementBehavior =
                 WallOrStandingPlacementBehavior({ wallTypeSupplier().defaultState }, { standingTypeSupplier().defaultState })

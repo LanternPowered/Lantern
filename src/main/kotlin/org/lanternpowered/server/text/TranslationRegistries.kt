@@ -42,10 +42,10 @@ object TranslationRegistries {
      * Loads the translation files.
      */
     fun init() {
-        Default.registerBundle(Locales.EN_US, "data/lantern/lang/en_us.properties")
-        Default.registerBundle(Locales.NL_NL, "data/lantern/lang/nl_nl.properties")
+        Default.registerBundle(Locales.EN_US, "data/lantern/lang/lantern_en_us.properties")
+        Default.registerBundle(Locales.NL_NL, "data/lantern/lang/lantern_nl_nl.properties")
 
-        Minecraft.registerBundle(Locales.EN_US, "data/minecraft/lang/en_us.properties")
+        Minecraft.registerBundle(Locales.EN_US, "data/minecraft/lang/minecraft_en_us.properties")
     }
 }
 

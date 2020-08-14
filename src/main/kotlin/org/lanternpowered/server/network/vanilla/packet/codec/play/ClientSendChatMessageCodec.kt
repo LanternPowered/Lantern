@@ -13,10 +13,10 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.codec.Codec
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSendChatPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSendChatMessagePacket
 
-class ClientSendChatCodec : Codec<ClientSendChatPacket> {
+class ClientSendChatMessageCodec : Codec<ClientSendChatMessagePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientSendChatPacket =
-            ClientSendChatPacket(buf.readLimitedString(256))
+    override fun decode(context: CodecContext, buf: ByteBuffer): ClientSendChatMessagePacket =
+            ClientSendChatMessagePacket(buf.readLimitedString(256))
 }

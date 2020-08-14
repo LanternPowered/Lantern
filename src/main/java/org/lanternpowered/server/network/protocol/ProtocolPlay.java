@@ -21,7 +21,7 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.ChangeAdvance
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientItemRenameCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientChangeTradeOfferCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientChangeSignCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSendChatCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSendChatMessageCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickRecipeCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickWindowCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSettingsCodec;
@@ -138,11 +138,11 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowProp
 import org.lanternpowered.server.network.vanilla.packet.codec.play.WorldBorderCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.WorldTimeCodec;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientLockDifficultyHandler;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSendChatMessageHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSetDifficultyHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientAdvancementTreeHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientModifySignHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInChannelPayload;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSettingsHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ContainerSessionForwardingHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientRecipeBookStatesHandler;
@@ -184,7 +184,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeAdvancem
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientItemRenamePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientChangeTradeOfferPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientModifySignPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSendChatPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSendChatMessagePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickRecipePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWindowPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSettingsPacket;
@@ -338,8 +338,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(ClientRequestBlockDataCodec.class, ClientRequestDataPacket.Block.class); // TODO: Handler
         inbound.bind(ClientSetDifficultyCodec.class, ClientSetDifficultyPacket.class)
                 .bindHandler(new ClientSetDifficultyHandler());
-        inbound.bind(ClientSendChatCodec.class, ClientSendChatPacket.class)
-                .bindHandler(new HandlerPlayInChatMessage());
+        inbound.bind(ClientSendChatMessageCodec.class, ClientSendChatMessagePacket.class)
+                .bindHandler(new ClientSendChatMessageHandler());
         inbound.bind(ClientStatusCodec.class);
         inbound.bind(ClientSettingsCodec.class, ClientSettingsPacket.class)
                 .bindHandler(new ClientSettingsHandler());

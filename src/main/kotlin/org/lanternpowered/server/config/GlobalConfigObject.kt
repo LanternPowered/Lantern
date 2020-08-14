@@ -26,7 +26,11 @@ class GlobalConfigObject : ConfigObject() {
     val query by QueryConfigObject.with(name = "query",
             description = "Configuration for the query server.")
 
-    val metrics by MetricsConfigObject.with(name = "metrics")
+    val metrics by MetricsConfigObject.with(name = "metrics",
+            description = "Configuration for the metrics.")
+
+    val chat by ChatConfigObject.with(name = "chat",
+            description = "Configuration for the chat.")
 
     companion object : Factory<GlobalConfigObject> by { GlobalConfigObject() }
 }
@@ -141,4 +145,16 @@ class MetricsConfigObject : ConfigObject() {
             description = "The plugin specific collection states that override the global collection state.")
 
     companion object : Factory<MetricsConfigObject> by { MetricsConfigObject() }
+}
+
+class ChatConfigObject : ConfigObject() {
+
+    val clickableUrls by setting(default = true, name = "clickable-urls",
+            description = "Whether URL's send by the client should be automatically made clickable.")
+
+    val maxMessagesPerSecond by setting(default = 10.0, name = "max-messages-per-second",
+            description = "The maximum amount of messages you can send per second before it's " +
+                          "considered spamming and you'll be kicked.")
+
+    companion object : Factory<ChatConfigObject> by { ChatConfigObject() }
 }

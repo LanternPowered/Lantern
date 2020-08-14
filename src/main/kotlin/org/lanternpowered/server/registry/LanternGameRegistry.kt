@@ -148,6 +148,7 @@ import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder
 import org.lanternpowered.server.text.LanternTextSerializerFactory
+import org.lanternpowered.server.text.SpongeComponentsFactory
 import org.lanternpowered.server.timings.DummyTimingsFactory
 import org.lanternpowered.server.world.LanternBlockChangeFlag
 import org.lanternpowered.server.world.LanternWorldBorderBuilder
@@ -199,6 +200,7 @@ class LanternGameRegistry(
 
             register(LanternAudiencesFactory(game))
 
+            register(SpongeComponentsFactory)
             register(LanternTextSerializerFactory)
 
             register(LanternBlockChangeFlag.Factory)

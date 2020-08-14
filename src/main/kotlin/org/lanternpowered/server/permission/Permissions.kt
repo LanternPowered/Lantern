@@ -36,5 +36,9 @@ object Permissions {
         const val FORMAT_URLS = "lantern.chat.format-urls"
 
         const val FORMAT_URLS_LEVEL = 0
+
+        const val BYPASS_SPAM_CHECK = "lantern.chat.bypass-spam-check"
+
+        const val BYPASS_SPAM_CHECK_LEVEL = 0
     }
 }

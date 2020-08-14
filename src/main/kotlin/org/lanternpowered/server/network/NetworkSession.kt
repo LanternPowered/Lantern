@@ -19,6 +19,7 @@ import io.netty.handler.codec.CodecException
 import io.netty.handler.codec.DecoderException
 import io.netty.handler.timeout.TimeoutException
 import io.netty.util.AttributeKey
+import io.netty.util.AttributeMap
 import io.netty.util.ReferenceCountUtil
 import io.netty.util.concurrent.ScheduledFuture
 import org.lanternpowered.api.cause.CauseContextKeys
@@ -88,7 +89,7 @@ class NetworkSession(
         private val networkManager: NetworkManager,
         val server: LanternServer,
         private val channel: Channel
-) : SimpleChannelInboundHandler<Packet>(), ServerPlayerConnection {
+) : SimpleChannelInboundHandler<Packet>(), ServerPlayerConnection, AttributeMap by channel {
 
     companion object {
 

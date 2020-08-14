@@ -14,13 +14,21 @@ import java.util.UUID
 
 object UUIDHelper {
 
-    private val regex = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$".toRegex(RegexOption.IGNORE_CASE)
+    /**
+     * A regex to match [UUID]s.
+     */
+    val regex: Regex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex(RegexOption.IGNORE_CASE)
+
+    /**
+     * A regex which requires a value to match completely.
+     */
+    private val completeRegex = "^${regex.pattern}$".toRegex(RegexOption.IGNORE_CASE)
 
     /**
      * Attempts to parse the given [value] as an [UUID].
      */
     fun tryParse(value: String): UUID? {
-        if (!this.regex.matches(value))
+        if (!this.completeRegex.matches(value))
             return null
         return UUID.fromString(value)
     }

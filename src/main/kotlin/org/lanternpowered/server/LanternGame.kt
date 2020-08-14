@@ -229,6 +229,7 @@ object LanternGame : Game {
             applyDefault(Permissions.Login.BYPASS_PLAYER_LIMIT_LEVEL, Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION, Tristate.FALSE)
             applyDefault(Permissions.Login.BYPASS_WHITELIST_LEVEL, Permissions.Login.BYPASS_WHITELIST_PERMISSION)
             applyDefault(Permissions.Chat.FORMAT_URLS_LEVEL, Permissions.Chat.FORMAT_URLS)
+            applyDefault(Permissions.Chat.BYPASS_SPAM_CHECK_LEVEL, Permissions.Chat.BYPASS_SPAM_CHECK)
         }
     }
 

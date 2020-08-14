@@ -12,4 +12,4 @@ package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.server.network.packet.Packet
 
-data class ClientSendChatPacket(val message: String) : Packet
+data class ClientSendChatMessagePacket(val message: String) : Packet

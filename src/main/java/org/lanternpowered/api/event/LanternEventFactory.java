@@ -17,6 +17,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.advancement.Advancement;
+import org.spongepowered.api.advancement.AdvancementTree;
+import org.spongepowered.api.advancement.TreeLayout;
 import org.spongepowered.api.advancement.criteria.AdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion;
 import org.spongepowered.api.advancement.criteria.trigger.FilteredTrigger;
@@ -37,6 +39,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.event.advancement.AdvancementEvent;
+import org.spongepowered.api.event.advancement.AdvancementTreeEvent;
 import org.spongepowered.api.event.advancement.CriterionEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
@@ -469,5 +472,12 @@ public class LanternEventFactory {
             @NonNull Component message) {
         return SpongeEventFactory.createPlayerChatEvent(cause, originalChatRouter,
                 Optional.ofNullable(chatRouter), originalMessage, message);
+    }
+
+    public static AdvancementTreeEvent.@NonNull GenerateLayout createAdvancementTreeEventGenerateLayout(
+            @NonNull Cause cause,
+            @NonNull TreeLayout layout,
+            @NonNull AdvancementTree tree) {
+        return SpongeEventFactory.createAdvancementTreeEventGenerateLayout(cause, layout, tree);
     }
 }

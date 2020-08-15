@@ -31,6 +31,11 @@ import org.lanternpowered.api.scoreboard.ScoreboardBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
 import org.lanternpowered.server.LanternGame
+import org.lanternpowered.server.advancement.criteria.AndCriterionFactory
+import org.lanternpowered.server.advancement.criteria.CriterionFactory
+import org.lanternpowered.server.advancement.criteria.LanternCriterionBuilder
+import org.lanternpowered.server.advancement.criteria.LanternScoreCriterionBuilder
+import org.lanternpowered.server.advancement.criteria.OrCriterionFactory
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder
 import org.lanternpowered.server.attribute.LanternAttributeTypeBuilder
 import org.lanternpowered.server.audience.LanternAudiencesFactory
@@ -155,6 +160,8 @@ import org.lanternpowered.server.world.LanternWorldBorderBuilder
 import org.lanternpowered.server.world.archetype.LanternWorldArchetypeBuilder
 import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder
 import org.lanternpowered.server.world.gamerule.LanternGameRuleBuilder
+import org.spongepowered.api.advancement.criteria.AdvancementCriterion
+import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.block.entity.BlockEntityArchetype
 import org.spongepowered.api.data.Key
@@ -188,6 +195,10 @@ class LanternGameRegistry(
 
     fun init() {
         factoryRegistry.apply {
+            register(AndCriterionFactory)
+            register(CriterionFactory)
+            register(OrCriterionFactory)
+
             register(LanternCatalogTypeRegistryFactory)
 
             register(ImmutableDataManipulatorFactory)
@@ -209,6 +220,9 @@ class LanternGameRegistry(
         }
 
         builderRegistry.apply {
+            register<AdvancementCriterion.Builder> { LanternCriterionBuilder() }
+            register<ScoreAdvancementCriterion.Builder> { LanternScoreCriterionBuilder() }
+
             register<NamespacedKeyBuilder> { LanternNamespacedKeyBuilder() }
             register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
             register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }

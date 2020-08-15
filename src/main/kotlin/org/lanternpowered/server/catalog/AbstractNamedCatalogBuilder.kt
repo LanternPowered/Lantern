@@ -27,17 +27,18 @@ abstract class AbstractNamedCatalogBuilder<C : NamedCatalogType, B : ResettableB
         this.name = name
     } as B
 
-    protected open fun getFinalName(): String = this.name ?: this.key!!.value
+    protected open fun getFinalName(key: NamespacedKey): String = this.name ?: key.value
 
     override fun build(): C {
         val key = checkNotNull(this.key) { "The key must be set." }
-        val name = getFinalName()
+        val name = this.getFinalName(key)
         return build(key, name)
     }
 
     protected abstract fun build(key: NamespacedKey, name: String): C
 
-    override fun reset() = super.reset().apply {
-        name = null
-    }
+    override fun reset() = this.apply {
+        this.name = null
+        super.reset()
+    } as B
 }

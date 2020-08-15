@@ -15,8 +15,3 @@ package org.lanternpowered.api.util.collections
  */
 inline fun <reified T> Sequence<T>.toTypedArray(): Array<T> =
         this.toList().toTypedArray()
-
-/**
- * Converts the elements of the sequence into a string.
- */
-fun <T> Sequence<T>.contentToString(): String = this.joinToString(prefix = "[", postfix = "]", separator = ", ")

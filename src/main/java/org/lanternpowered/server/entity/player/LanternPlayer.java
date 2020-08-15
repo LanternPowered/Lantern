@@ -831,7 +831,7 @@ public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer,
         }
 
         this.cooldownTracker.process();
-        this.advancementsProgress.pulse();
+        this.advancementsProgress.update();
     }
 
     /**

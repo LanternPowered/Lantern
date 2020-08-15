@@ -10,5 +10,14 @@
  */
 package org.lanternpowered.api.util.collections
 
+/**
+ * Converts the elements of the iterable into a string.
+ */
 fun <T> Iterable<T>.contentToString(): String =
-        joinToString(separator = ", ", prefix = "[", postfix = "]")
+        this.joinToString(separator = ", ", prefix = "[", postfix = "]")
+
+/**
+ * Converts the elements of the sequence into a string.
+ */
+fun <T> Sequence<T>.contentToString(): String =
+        this.joinToString(separator = ", ", prefix = "[", postfix = "]")

@@ -11,12 +11,10 @@
 @file:JvmName("AdvancementTypeRegistry")
 package org.lanternpowered.server.registry.type.advancement
 
-import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.text.format.NamedTextColor
-import org.lanternpowered.api.text.format.TextStyle
 import org.lanternpowered.api.text.format.textStyleOf
-import org.lanternpowered.server.catalog.DefaultCatalogType
+import org.lanternpowered.server.advancement.LanternAdvancementType
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.advancement.AdvancementType
 
@@ -29,5 +27,3 @@ val AdvancementTypeRegistry = internalCatalogTypeRegistry<AdvancementType> {
     register("challenge", NamedTextColor.LIGHT_PURPLE)
     register("goal", NamedTextColor.YELLOW)
 }
-
-private class LanternAdvancementType(key: NamespacedKey, val textStyle: TextStyle) : DefaultCatalogType(key), AdvancementType

@@ -57,6 +57,12 @@ inline fun textOf(text: String): LiteralText =
         LiteralText.of(text)
 
 /**
+ * Creates a new [Text].
+ */
+inline fun textOf(vararg text: TextRepresentable): Text =
+        LiteralText.builder().append(text.asList()).build()
+
+/**
  * Creates a new [TranslatableText].
  */
 inline fun translatableTextOf(key: String): TranslatableText =
@@ -94,6 +100,17 @@ inline fun TextRepresentable.toText(): Text = this.asComponent()
  * Gets this [ItemStack] as a [Text] representation.
  */
 inline fun ItemStack.toText(): Text = (this as TextRepresentable).toText()
+
+/**
+ * Gets whether this [Text] is not empty.
+ */
+inline fun Text.isNotEmpty(): Boolean = !this.isEmpty()
+
+/**
+ * Gets whether this [Text] is empty.
+ */
+fun Text.isEmpty(): Boolean =
+        if (this is LiteralText) this.content().isEmpty() && this.children().all { child -> child.isEmpty() } else false
 
 fun Text.italic(): Text = this.decorate(TextDecoration.ITALIC)
 fun Text.bold(): Text = this.decorate(TextDecoration.BOLD)

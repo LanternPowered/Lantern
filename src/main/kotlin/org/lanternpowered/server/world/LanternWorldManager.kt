@@ -19,7 +19,6 @@ import org.lanternpowered.api.key.namespacedKey
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList
-import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldArchetype
@@ -75,14 +74,14 @@ class LanternWorldManager(
 
     fun init() {
         for (storage in this.worldStorageService.all)
-            loadEntry(storage)
+            this.loadEntry(storage)
 
         this.worldStorageService.onDiscover += this::onDiscover
         this.worldStorageService.onRemove += this::onRemove
 
         val registrations = registerWorlds()
         for ((key, archetype) in registrations)
-            createPropertiesNow(key, archetype)
+            this.createPropertiesNow(key, archetype)
     }
 
     override fun getDefaultPropertiesKey(): NamespacedKey =
@@ -93,7 +92,7 @@ class LanternWorldManager(
 
     private fun onDiscover(storage: WorldStorage) {
         // Just load the new entry
-        loadEntry(storage)
+        this.loadEntry(storage)
     }
 
     private fun onRemove(storage: WorldStorage) {
@@ -123,41 +122,40 @@ class LanternWorldManager(
         return registrations
     }
 
-    override fun copyWorld(sourceKey: NamespacedKey, copyValue: String): CompletableFuture<Optional<WorldProperties>> =
+    override fun copyWorld(sourceKey: NamespacedKey, copyValue: String): CompletableFuture<WorldProperties> =
             CompletableFuture.supplyAsync(Supplier { copyWorld0(sourceKey, copyValue) }, this.ioExecutor)
 
-    private fun copyWorld0(sourceKey: NamespacedKey, copyValue: String): Optional<WorldProperties> {
+    private fun copyWorld0(sourceKey: NamespacedKey, copyValue: String): WorldProperties {
         val copyKey = namespacedKey(sourceKey.namespace, copyValue)
         // The copy directory is already in use
         if (this.entryByKey.contains(copyKey))
-            return emptyOptional()
+            error("The copy directory $copyValue is already in use.")
         val sourceEntry = this.entryByKey[sourceKey]
-                ?: return emptyOptional() // The target world doesn't exist
+                ?: error("The target world $sourceKey doesn't exist.")
         val newStorage = this.worldStorageService.copy(sourceKey, copyKey)
-                ?: return emptyOptional() // Copying the world failed for some reason
         // TODO: Disable saving for the source world, if it's loaded
-        val newEntry = loadEntry(newStorage)
-        return newEntry.properties.asOptional()
+        val newEntry = this.loadEntry(newStorage)
+        return newEntry.properties
     }
 
-    override fun renameWorld(oldKey: NamespacedKey, newValue: String): CompletableFuture<Optional<WorldProperties>> =
+    override fun renameWorld(oldKey: NamespacedKey, newValue: String): CompletableFuture<WorldProperties> =
             CompletableFuture.supplyAsync(Supplier { renameWorld0(oldKey, newValue) }, this.ioExecutor)
 
-    private fun renameWorld0(oldKey: NamespacedKey, newValue: String): Optional<WorldProperties> {
+    private fun renameWorld0(oldKey: NamespacedKey, newValue: String): WorldProperties {
         val newKey = namespacedKey(oldKey.namespace, newValue)
-        val entry = this.entryByKey[oldKey] ?: return emptyOptional()
+        val entry = this.entryByKey[oldKey]
+                ?: error("The target world $oldKey doesn't exist.")
         entry.modifyLock.withLock {
             // The world is currently loaded
             if (entry.world != null) {
                 // The world first needs to be unloaded, this can fail
                 // if there are still players in the world
-                if (!unloadWorld(entry))
-                    return emptyOptional()
+                if (!this.unloadWorld(entry))
+                    error("The was loaded but couldn't be unloaded.")
             }
             val newStorage = this.worldStorageService.move(oldKey, newKey)
-                    ?: return emptyOptional() // Moving failed
-            val newEntry = loadEntry(newStorage)
-            return newEntry.properties.asOptional()
+            val newEntry = this.loadEntry(newStorage)
+            return newEntry.properties
         }
     }
 
@@ -184,7 +182,7 @@ class LanternWorldManager(
     }
 
     override fun deleteWorld(key: NamespacedKey): CompletableFuture<Boolean> =
-            CompletableFuture.supplyAsync(Supplier { deleteWorld0(key) }, this.ioExecutor)
+            CompletableFuture.supplyAsync(Supplier { this.deleteWorld0(key) }, this.ioExecutor)
 
     private fun deleteWorld0(key: NamespacedKey): Boolean {
         val entry = this.entryByKey[key]
@@ -197,46 +195,56 @@ class LanternWorldManager(
         }
     }
 
-    override fun loadWorld(key: NamespacedKey): CompletableFuture<Optional<World>> =
-            CompletableFuture.supplyAsync(Supplier { loadWorld0(key).asOptional() }, this.ioExecutor)
+    override fun loadWorld(key: NamespacedKey): CompletableFuture<World> =
+            CompletableFuture.supplyAsync(Supplier { this.loadWorld0(key) }, this.ioExecutor)
 
-    private fun loadWorld0(key: NamespacedKey): World? {
+    private fun loadWorld0(key: NamespacedKey): World {
         val entry = this.entryByKey[key]
-                ?: return null
-        return loadWorld(entry)
+                ?: error("The target world $key doesn't exist.")
+        return this.loadWorld(entry)
     }
 
-    override fun loadWorld(properties: WorldProperties): CompletableFuture<Optional<World>> =
-            CompletableFuture.supplyAsync(Supplier { loadWorld0(properties).asOptional() }, this.ioExecutor)
+    override fun loadWorld(properties: WorldProperties): CompletableFuture<World> =
+            CompletableFuture.supplyAsync(Supplier { this.loadWorld0(properties) }, this.ioExecutor)
 
-    private fun loadWorld0(properties: WorldProperties): World? {
+    private fun loadWorld0(properties: WorldProperties): World {
         val entry = this.entryByUniqueId[properties.uniqueId]
-                ?: return null
-        return loadWorld(entry)
+                ?: error("The target world ${properties.key} doesn't exist.")
+        return this.loadWorld(entry)
     }
 
-    private fun loadWorld(entry: WorldEntry): World? {
+    private fun loadWorld(entry: WorldEntry): World {
         entry.modifyLock.withLock {
+            var world = entry.world
             // The world is already loaded
-            if (entry.world != null)
-                return entry.world
+            if (world != null)
+                return world
             val storageLock = entry.storage.acquireLock()
-                    ?: return null
+                    ?: error("Failed to acquire a lock to the world storage.")
             entry.storageLock = storageLock
-            val world = LanternWorldNew(this.server, entry.properties, entry.storage, this.ioExecutor)
+            world = LanternWorldNew(this.server, entry.properties, entry.storage, this.ioExecutor)
             entry.world = world
             entry.properties.setWorld(world)
             return world
         }
     }
 
+    override fun unloadWorld(key: NamespacedKey): CompletableFuture<Boolean> =
+            CompletableFuture.supplyAsync(Supplier { this.unloadWorld0(key) }, this.ioExecutor)
+
+    private fun unloadWorld0(world: NamespacedKey): Boolean {
+        val entry = this.entryByKey[world]
+                ?: return false
+        return this.unloadWorld(entry)
+    }
+
     override fun unloadWorld(world: World): CompletableFuture<Boolean> =
-            CompletableFuture.supplyAsync(Supplier { unloadWorld0(world) }, this.ioExecutor)
+            CompletableFuture.supplyAsync(Supplier { this.unloadWorld0(world) }, this.ioExecutor)
 
     private fun unloadWorld0(world: World): Boolean {
         val entry = this.entryByUniqueId[world.uniqueId]
                 ?: return false
-        return unloadWorld(entry)
+        return this.unloadWorld(entry)
     }
 
     private fun unloadWorld(entry: WorldEntry): Boolean {
@@ -253,21 +261,20 @@ class LanternWorldManager(
         }
     }
 
-    override fun createProperties(key: NamespacedKey, archetype: WorldArchetype): CompletableFuture<Optional<WorldProperties>> =
-            CompletableFuture.supplyAsync(Supplier { createPropertiesNow(key, archetype) }, this.ioExecutor)
+    override fun createProperties(key: NamespacedKey, archetype: WorldArchetype): CompletableFuture<WorldProperties> =
+            CompletableFuture.supplyAsync(Supplier { this.createPropertiesNow(key, archetype) }, this.ioExecutor)
 
-    private fun createPropertiesNow(key: NamespacedKey, archetype: WorldArchetype): Optional<WorldProperties> {
+    private fun createPropertiesNow(key: NamespacedKey, archetype: WorldArchetype): WorldProperties {
         if (this.entryByKey.containsKey(key))
-            return emptyOptional()
+            error("There already exists a world with the key $key")
         val storage = this.worldStorageService.create(key)
-                ?: return emptyOptional() // The construction failed
         val properties = LanternWorldProperties(key, UUID.randomUUID())
         val entry = WorldEntry(storage, properties)
         entry.modifyLock.withLock {
             val previous = this.entryByKey.putIfAbsent(storage.key, entry)
             // Someone beat us to it
             if (previous != null)
-                return emptyOptional()
+                error("Somebody was faster to create a world with the key $key")
             this.entryByUniqueId[storage.uniqueId] = entry
             // TODO: Write config file
             // Copy all the information from the archetype to the properties
@@ -275,11 +282,11 @@ class LanternWorldManager(
             // Write the world data
             storage.save(WorldPropertiesSerializer.serialize(properties))
         }
-        return properties.asOptional()
+        return properties
     }
 
     override fun saveProperties(properties: WorldProperties): CompletableFuture<Boolean> =
-            CompletableFuture.supplyAsync(Supplier { saveProperties0(properties) }, this.ioExecutor)
+            CompletableFuture.supplyAsync(Supplier { this.saveProperties0(properties) }, this.ioExecutor)
 
     private fun saveProperties0(properties: WorldProperties): Boolean {
         val entry = this.entryByUniqueId[properties.uniqueId]

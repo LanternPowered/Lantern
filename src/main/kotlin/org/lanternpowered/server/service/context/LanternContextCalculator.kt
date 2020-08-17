@@ -76,7 +76,7 @@ class LanternContextCalculator<C : Contextual>(
         val source = contextual.getSource() ?: return
         if (source is Locatable) {
             val world = source.serverLocation.world
-            accumulator.add(world.dimension.type.context)
+            accumulator.add(world.dimensionType.context)
             accumulator.add(world.context)
         }
         var connection: RemoteConnection? = null
@@ -100,7 +100,7 @@ class LanternContextCalculator<C : Contextual>(
             if (context.key == Context.WORLD_KEY)
                 return world.context == context
             if (context.key == Context.DIMENSION_KEY)
-                return world.dimension.type.context == context
+                return world.dimensionType.context == context
         }
         var connection: RemoteConnection? = null
         if (source is Player) {

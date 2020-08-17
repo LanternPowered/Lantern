@@ -105,15 +105,15 @@ class DefaultWorldStorageService(
     override fun getByKey(key: NamespacedKey): WorldStorage? =
             this.knownStoragesByKey[key]
 
-    override fun create(key: NamespacedKey, uniqueId: UUID): WorldStorage? {
+    override fun create(key: NamespacedKey, uniqueId: UUID): WorldStorage {
         synchronized(this.modifyLock) {
             if (this.knownStoragesByKey.containsKey(key) ||
                     this.knownStoragesByUniqueId.containsKey(uniqueId))
-                return null
+                error("There already exists a world for the given key: $key")
 
             val worldDirectory = this.directory.resolve(key.namespace).resolve(key.value)
             if (Files.exists(worldDirectory) && Files.list(worldDirectory).count() > 0)
-                return null
+                error("There already exists a world directory for the given key: $key")
 
             Files.createDirectories(worldDirectory)
             val worldStorage = LanternWorldStorage(key, uniqueId, worldDirectory)
@@ -125,11 +125,11 @@ class DefaultWorldStorageService(
         }
     }
 
-    override fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID): WorldStorage? {
+    override fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID): WorldStorage {
         TODO("Not yet implemented")
     }
 
-    override fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage? {
+    override fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage {
         TODO("Not yet implemented")
     }
 

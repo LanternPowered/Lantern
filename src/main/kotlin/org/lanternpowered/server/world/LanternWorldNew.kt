@@ -15,6 +15,11 @@ import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
+import org.lanternpowered.api.world.dimension.allowsPlayerRespawns
+import org.lanternpowered.api.world.dimension.doesWaterEvaporate
+import org.lanternpowered.api.world.dimension.hasSkylight
+import org.lanternpowered.api.world.dimension.isCaveWorld
+import org.lanternpowered.api.world.dimension.isSurfaceWorld
 import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.block.action.BlockAction
 import org.lanternpowered.server.effect.sound.getEntityPacketBuilder
@@ -55,7 +60,7 @@ import org.spongepowered.api.world.HeightType
 import org.spongepowered.api.world.LightType
 import org.spongepowered.api.world.biome.BiomeType
 import org.spongepowered.api.world.chunk.Chunk
-import org.spongepowered.api.world.dimension.Dimension
+import org.spongepowered.api.world.dimension.DimensionType
 import org.spongepowered.api.world.explosion.Explosion
 import org.spongepowered.api.world.volume.archetype.ArchetypeVolume
 import org.spongepowered.api.world.weather.Weather
@@ -102,6 +107,17 @@ class LanternWorldNew(
 
     fun unload() {
 
+    }
+
+    override fun isSurfaceWorld(): Boolean = this.dimensionType.isSurfaceWorld
+    override fun isCaveWorld(): Boolean = this.dimensionType.isCaveWorld
+    override fun hasSkylight(): Boolean = this.dimensionType.hasSkylight
+    override fun allowsPlayerRespawns(): Boolean = this.dimensionType.allowsPlayerRespawns
+    override fun doesWaterEvaporate(): Boolean = this.dimensionType.doesWaterEvaporate
+    override fun getDimensionType(): DimensionType = this.properties.dimensionType
+
+    override fun sendEnvironment(dimensionType: DimensionType) {
+        TODO("Not yet implemented")
     }
 
     private val random = Random()
@@ -322,10 +338,6 @@ class LanternWorldNew(
     }
 
     override fun save(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun getDimension(): Dimension {
         TODO("Not yet implemented")
     }
 

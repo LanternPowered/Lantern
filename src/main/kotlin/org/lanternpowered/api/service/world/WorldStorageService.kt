@@ -66,8 +66,9 @@ interface WorldStorageService {
      *
      * @param key The key
      * @param uniqueId The unique id to use for the world
+     * @throws Exception If something failed
      */
-    fun create(key: NamespacedKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
+    fun create(key: NamespacedKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
@@ -75,8 +76,9 @@ interface WorldStorageService {
      * @param sourceKey The source key
      * @param copyKey The copy or destination key
      * @return The provider of the new copy
+     * @throws Exception If something failed
      */
-    fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage?
+    fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID = UUID.randomUUID()): WorldStorage
 
     /**
      * Attempts to copy the world at the source directory name to the copy directory name.
@@ -84,6 +86,7 @@ interface WorldStorageService {
      * @param oldKey The old key
      * @param newKey The new key
      * @return The provider of the new copy
+     * @throws Exception If something failed
      */
-    fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage?
+    fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage
 }

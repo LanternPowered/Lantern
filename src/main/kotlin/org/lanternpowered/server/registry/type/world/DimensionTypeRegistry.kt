@@ -14,7 +14,6 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.world.dimension.DimensionType
 import org.lanternpowered.server.world.dimension.LanternDimensionType
 import org.lanternpowered.api.key.NamespacedKey
-import org.spongepowered.api.world.gen.GeneratorTypes
 
 val DimensionTypeRegistry = catalogTypeRegistry<DimensionType> {
     // TODO: Cleanup
@@ -23,32 +22,38 @@ val DimensionTypeRegistry = catalogTypeRegistry<DimensionType> {
             key = NamespacedKey.minecraft("the_nether"),
             name = "The Nether",
             internalId = -1,
-            defaultGeneratorType = GeneratorTypes.THE_NETHER.get(),
+            // defaultGeneratorType = GeneratorTypes.THE_NETHER.get(),
             keepSpawnLoaded = true,
             doesWaterEvaporate = true,
             hasSkylight = false,
-            allowsPlayerRespawns = false
+            allowsPlayerRespawns = false,
+            isCaveWorld = true,
+            isSurfaceWorld = false
     ))
 
     register(LanternDimensionType(
             key = NamespacedKey.minecraft("overworld"),
             name = "Overworld",
             internalId = 0,
-            defaultGeneratorType = GeneratorTypes.OVERWORLD.get(),
+            // defaultGeneratorType = GeneratorTypes.OVERWORLD.get(),
             keepSpawnLoaded = true,
             doesWaterEvaporate = false,
             hasSkylight = true,
-            allowsPlayerRespawns = true
+            allowsPlayerRespawns = true,
+            isCaveWorld = false,
+            isSurfaceWorld = true
     ))
 
     register(LanternDimensionType(
             key = NamespacedKey.minecraft("the_end"),
             name = "The End",
             internalId = 0,
-            defaultGeneratorType = GeneratorTypes.OVERWORLD.get(),
+            // defaultGeneratorType = GeneratorTypes.OVERWORLD.get(),
             keepSpawnLoaded = true,
             doesWaterEvaporate = true,
             hasSkylight = false,
-            allowsPlayerRespawns = false
+            allowsPlayerRespawns = false,
+            isCaveWorld = false,
+            isSurfaceWorld = false
     ))
 }

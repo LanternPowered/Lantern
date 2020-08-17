@@ -26,18 +26,17 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SetDifficultyP
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateViewDistancePacket
 import org.lanternpowered.server.world.archetype.LanternWorldArchetype
 import org.lanternpowered.server.world.dimension.LanternDimensionType
-import org.lanternpowered.server.world.portal.LanternPortalAgentType
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.entity.living.trader.WanderingTrader
 import org.spongepowered.api.world.SerializationBehavior
 import org.spongepowered.api.world.SerializationBehaviors
 import org.spongepowered.api.world.difficulty.Difficulty
+import org.spongepowered.api.world.dimension.DimensionType
 import org.spongepowered.api.world.dimension.DimensionTypes
 import org.spongepowered.api.world.gamerule.GameRule
-import org.spongepowered.api.world.gen.GeneratorType
-import org.spongepowered.api.world.gen.GeneratorTypes
-import org.spongepowered.api.world.teleport.PortalAgentTypes
+import org.spongepowered.api.world.gen.GeneratorModifierType
+import org.spongepowered.api.world.gen.GeneratorModifierTypes
 import org.spongepowered.api.world.weather.Weather
 import org.spongepowered.math.vector.Vector3i
 import java.time.Duration
@@ -65,8 +64,7 @@ class LanternWorldProperties(
     private var commandsEnabled = true
     private var seed = Random.nextLong()
     private var spawnPosition = Vector3i.ZERO // TODO: Calculate based on generated terrain
-    private var portalAgentType: LanternPortalAgentType<*> = PortalAgentTypes.DEFAULT.get() as LanternPortalAgentType<*>
-    private var generatorType = GeneratorTypes.DEFAULT.get()
+    private var generatorModifier = GeneratorModifierTypes.NONE.get()
     private var dimensionType: LanternDimensionType = DimensionTypes.OVERWORLD.get() as LanternDimensionType
 
     // TODO: Move some things to game rules?
@@ -118,7 +116,7 @@ class LanternWorldProperties(
         this.config.difficulty = archetype.difficulty
         this.config.gameMode.mode = archetype.gameMode
         this.config.maxBuildHeight = archetype.buildHeight
-        this.generatorType = archetype.generatorType
+        this.generatorModifier = archetype.generatorModifier
         this.dimensionType = archetype.dimensionType
     }
 
@@ -163,8 +161,6 @@ class LanternWorldProperties(
     override fun getGameMode(): GameMode = this.config.gameMode.mode
     override fun setGameMode(gameMode: GameMode) { this.config.gameMode.mode = gameMode }
 
-    override fun getPortalAgentType(): LanternPortalAgentType<*> = this.portalAgentType
-
     override fun getViewDistance(): Int {
         var max = this.config.viewDistance
         if (max == ViewDistance.USE_GLOBAL_SETTING)
@@ -187,10 +183,15 @@ class LanternWorldProperties(
 
     override fun getDimensionType(): LanternDimensionType = this.dimensionType
 
-    override fun getGeneratorType(): GeneratorType = this.generatorType
+    override fun setDimensionType(dimensionType: DimensionType) {
+        this.dimensionType = dimensionType as LanternDimensionType
+        // TODO: Apply new dimension type
+    }
 
-    override fun setGeneratorType(type: GeneratorType) {
-        this.generatorType = type
+    override fun getGeneratorModifierType(): GeneratorModifierType = this.generatorModifier
+
+    override fun setGeneratorModifierType(type: GeneratorModifierType) {
+        this.generatorModifier = type
         // TODO: Apply new terrain generator
     }
 

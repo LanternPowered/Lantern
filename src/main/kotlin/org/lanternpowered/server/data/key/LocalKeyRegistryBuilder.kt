@@ -15,6 +15,7 @@ import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.item.ItemKeys
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.Keys
+import org.spongepowered.api.util.weighted.WeightedTable
 
 fun <H : DataHolder> LocalKeyRegistry<H>.registerApplicablePotionEffects(vararg effects: PotionEffect) =
         registerApplicablePotionEffects(effects.toSet())
@@ -22,7 +23,16 @@ fun <H : DataHolder> LocalKeyRegistry<H>.registerApplicablePotionEffects(vararg 
 fun <H : DataHolder> LocalKeyRegistry<H>.registerApplicablePotionEffects(effects: Set<PotionEffect>) =
         registerApplicablePotionEffects { effects }
 
-fun <H : DataHolder> LocalKeyRegistry<H>.registerApplicablePotionEffects(fn: H.() -> Set<PotionEffect>) {
+fun <H : DataHolder> LocalKeyRegistry<H>.registerApplicablePotionEffects(fn: H.() -> Set<PotionEffect>) =
+        this.registerWeightedApplicablePotionEffects {
+            val effects = fn()
+            val table = WeightedTable<PotionEffect>(effects.size)
+            for (effect in effects)
+                table.add(effect, 1.0)
+            table
+        }
+
+fun <H : DataHolder> LocalKeyRegistry<H>.registerWeightedApplicablePotionEffects(fn: H.() -> WeightedTable<PotionEffect>) {
     registerProvider(Keys.APPLICABLE_POTION_EFFECTS) {
         get(fn)
     }
@@ -37,4 +47,3 @@ fun <H : DataHolder> LocalKeyRegistry<H>.registerUseDuration(duration: IntRange)
     register(ItemKeys.MINIMUM_USE_DURATION, duration.first)
     register(ItemKeys.MAXIMUM_USE_DURATION, duration.last)
 }
-

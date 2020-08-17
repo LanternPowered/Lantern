@@ -19,11 +19,11 @@ import org.spongepowered.api.effect.potion.PotionEffect
 import org.spongepowered.api.item.inventory.ItemStack
 
 val PotionEffectsProvider: ItemStack.() -> Set<PotionEffect> = {
-    val potionType = get(Keys.POTION_TYPE).orNull()
+    val potionType = this.get(Keys.POTION_TYPE).orNull()
     // The base potion effects based on the potion type
     var potionEffects = potionType?.effects
     // Add extra customizable potion effects
-    val extraPotionEffects = get(Keys.POTION_EFFECTS).orNull()
+    val extraPotionEffects = this.get(Keys.POTION_EFFECTS).orNull()
     if (extraPotionEffects != null) {
         potionEffects = potionEffects?.merge(extraPotionEffects) ?: extraPotionEffects
     }

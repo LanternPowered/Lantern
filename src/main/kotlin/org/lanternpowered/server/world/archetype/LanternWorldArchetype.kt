@@ -20,13 +20,13 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode
 import org.spongepowered.api.world.SerializationBehavior
 import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.difficulty.Difficulty
-import org.spongepowered.api.world.gen.GeneratorType
+import org.spongepowered.api.world.gen.GeneratorModifierType
 
 internal data class LanternWorldArchetype(
         private val key: NamespacedKey,
         private val gameMode: GameMode,
         private val dimensionType: LanternDimensionType,
-        private val generatorType: GeneratorType?,
+        private val generatorModifier: GeneratorModifierType,
         private val generatorSettings: DataContainer?,
         private val difficulty: Difficulty,
         private val serializationBehavior: SerializationBehavior,
@@ -54,16 +54,17 @@ internal data class LanternWorldArchetype(
     override fun getSeed(): Long = this.seedProvider.get()
     override fun isSeedRandomized(): Boolean = this.seedProvider == SeedProvider.Random
     override fun getGameMode(): GameMode = this.gameMode
-    override fun getGeneratorType(): GeneratorType = this.generatorType ?: this.dimensionType.defaultGeneratorType
+    override fun getGeneratorModifier(): GeneratorModifierType = this.generatorModifier
     override fun isHardcore(): Boolean = this.hardcore
     override fun areCommandsEnabled(): Boolean = this.commandsEnabled
     override fun doesGenerateBonusChest(): Boolean = this.generateBonusChest
     override fun getDimensionType(): LanternDimensionType = this.dimensionType
-    override fun getPortalAgentType(): LanternPortalAgentType<*> = this.portalAgentType
     override fun getSerializationBehavior(): SerializationBehavior = this.serializationBehavior
     override fun isPVPEnabled(): Boolean = this.pvpEnabled
     override fun areStructuresEnabled(): Boolean = this.generateStructures
-    override fun getGeneratorSettings(): DataContainer = this.generatorSettings?.copy() ?: getGeneratorType().defaultGeneratorSettings
+
+    // TODO: getGeneratorType().defaultGeneratorSettings
+    override fun getGeneratorSettings(): DataContainer = this.generatorSettings?.copy() ?: DataContainer.createNew()
 
     fun allowPlayerRespawns() = this.allowPlayerRespawns ?: this.dimensionType.allowsPlayerRespawns
     fun doesWaterEvaporate() = this.waterEvaporates ?: this.dimensionType.doesWaterEvaporate

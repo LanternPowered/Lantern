@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.block.entity.vanilla;
 
+import org.lanternpowered.server.block.entity.BlockEntityCreationData;
 import org.lanternpowered.server.block.entity.ICarrierBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.state.BlockStateProperties;
@@ -47,7 +48,7 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, ICarr
     // The tick since the last pulse
     private long lastTick = -1;
 
-    public LanternFurnace() {
+    public LanternFurnace(BlockEntityCreationData creationData) {
         this.inventory = VanillaInventoryArchetypes.FURNACE.builder()
                 .withCarrier(this).build(Lantern.getMinecraftPlugin());
         this.inventory.enableCachedProgress();
@@ -69,8 +70,8 @@ public class LanternFurnace extends LanternBlockEntity implements Furnace, ICarr
     }
 
     @Override
-    public void pulse() {
-        super.pulse();
+    public void update(double deltaTime) {
+        super.update(deltaTime);
 
         if (this.lastTick == -1) {
             this.lastTick = LanternGame.currentTimeTicks();

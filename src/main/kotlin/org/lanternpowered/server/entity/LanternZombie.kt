@@ -14,10 +14,7 @@ import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
 import org.spongepowered.api.entity.living.monster.zombie.Zombie
-import org.spongepowered.api.item.inventory.Carrier
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory
-import org.spongepowered.api.item.inventory.type.CarriedInventory
-import java.util.UUID
 
 open class LanternZombie(creationData: EntityCreationData) : LanternAgent(creationData), Zombie, AbstractArmorEquipable {
 
@@ -26,10 +23,6 @@ open class LanternZombie(creationData: EntityCreationData) : LanternAgent(creati
     init {
         this.protocolType = EntityProtocolTypes.ZOMBIE
         this.equipmentInventory = VanillaInventoryArchetypes.ENTITY_EQUIPMENT.build()
-    }
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(LanternKeys.POSE, Pose.STANDING)

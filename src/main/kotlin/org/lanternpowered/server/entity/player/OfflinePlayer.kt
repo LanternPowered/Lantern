@@ -20,9 +20,7 @@ class OfflinePlayer(profile: GameProfile) : AbstractPlayer(profile) {
 
     private var _worldKey: NamespacedKey? = null
 
-    override fun registerKeys() {
-        super.registerKeys()
-
+    init {
         keyRegistry {
             registerProvider(Keys.ACTIVE_ITEM) {
                 get { null }

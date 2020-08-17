@@ -11,6 +11,7 @@
 package org.lanternpowered.server.block.entity.vanilla
 
 import org.lanternpowered.api.text.emptyText
+import org.lanternpowered.server.block.entity.BlockEntityCreationData
 import org.lanternpowered.server.block.entity.LanternBlockEntity
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.lanternpowered.server.permission.ProxySubject
@@ -19,14 +20,15 @@ import org.spongepowered.api.data.Keys
 import org.spongepowered.api.service.permission.SubjectReference
 import org.spongepowered.api.util.Tristate
 
-class LanternSign : LanternBlockEntity(), ProxySubject, Sign {
+class LanternSign(creationData: BlockEntityCreationData) : LanternBlockEntity(creationData), ProxySubject, Sign {
 
     override val subjectCollectionIdentifier: String get() = "sign" // PermissionService.SUBJECTS_SIGN
     override var internalSubject: SubjectReference? = null
 
     init {
-        protocolType = BlockEntityProtocolTypes.SIGN
-        resolveSubject()
+        this.protocolType = BlockEntityProtocolTypes.SIGN
+        this.resolveSubject()
+
         keyRegistry {
             register(Keys.SIGN_LINES, listOf(emptyText(), emptyText(), emptyText(), emptyText()))
         }

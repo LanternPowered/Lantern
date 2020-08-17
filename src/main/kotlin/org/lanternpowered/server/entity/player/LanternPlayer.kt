@@ -154,25 +154,6 @@ class LanternPlayer(
         this.initInventoryContainer()
         this.effectCollection = DEFAULT_EFFECT_COLLECTION.copy()
         this.boundingBoxExtent = BOUNDING_BOX_EXTENT
-        this._user.load(this)
-    }
-
-    /**
-     * Releases the player instance, is called after
-     * the player disconnected to cleanup remaining references.
-     */
-    fun release() {
-        this._user.reset()
-        // Destroy the player entity
-        this.unload(UnloadState.REMOVED)
-        // Detach the player from the world
-        // TODO this.setWorld(null)
-        // Release the players entity id
-        EntityProtocolManager.releaseEntityId(this.networkId)
-    }
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(Keys.IS_SLEEPING_IGNORED, false)
@@ -200,6 +181,22 @@ class LanternPlayer(
                 this.triggerEvent(SpectateEntityEvent(newEntity))
             }
         }
+
+        this._user.load(this)
+    }
+
+    /**
+     * Releases the player instance, is called after
+     * the player disconnected to cleanup remaining references.
+     */
+    fun release() {
+        this._user.reset()
+        // Destroy the player entity
+        this.unload(UnloadState.REMOVED)
+        // Detach the player from the world
+        // TODO this.setWorld(null)
+        // Release the players entity id
+        EntityProtocolManager.releaseEntityId(this.networkId)
     }
 
     override fun getName(): String = this.profile.name.get()

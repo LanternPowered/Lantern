@@ -14,6 +14,7 @@ import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.effect.sound.SoundTypes
 import org.lanternpowered.api.effect.sound.soundEffectOf
 import org.lanternpowered.api.world.Location
+import org.lanternpowered.server.block.entity.BlockEntityCreationData
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.inventory.InventorySnapshot
@@ -23,7 +24,7 @@ import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.spongepowered.api.data.Keys
 import kotlin.random.Random
 
-class LanternShulkerBox : ContainerBlockEntity<ChestInventory>() {
+class LanternShulkerBox(creationData: BlockEntityCreationData) : ContainerBlockEntity<ChestInventory>() {
 
     init {
         this.protocolType = BlockEntityProtocolTypes.DEFAULT
@@ -42,9 +43,8 @@ class LanternShulkerBox : ContainerBlockEntity<ChestInventory>() {
         }
     }
 
-    override fun createInventory(): ChestInventory {
-        return VanillaInventoryArchetypes.SHULKER_BOX.builder().withCarrier(this).build(Lantern.getMinecraftPlugin())
-    }
+    override fun createInventory(): ChestInventory =
+            VanillaInventoryArchetypes.SHULKER_BOX.builder().withCarrier(this).build(Lantern.getMinecraftPlugin())
 
     override fun playOpenSound(location: Location) {
         val effect = soundEffectOf(SoundTypes.BLOCK_SHULKER_BOX_OPEN,

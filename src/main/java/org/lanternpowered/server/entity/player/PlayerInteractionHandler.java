@@ -279,7 +279,7 @@ public final class PlayerInteractionHandler {
         // Don't pass the players profile through, this avoids an
         // unnecessary user lookup
         return this.player.getWorld().getBlockDigTimeWith(pos.getX(), pos.getY(), pos.getZ(),
-                null, this.player.getItemInHand(HandTypes.MAIN_HAND));
+                this.player.getItemInHand(HandTypes.MAIN_HAND), null);
     }
 
     public void handleBlockPlacing(ClientBlockPlacementPacket message) {

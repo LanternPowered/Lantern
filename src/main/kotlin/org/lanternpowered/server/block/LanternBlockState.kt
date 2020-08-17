@@ -57,10 +57,6 @@ class LanternBlockState(
 
     companion object {
 
-        private val nameQuery = DataQuery.of("Name")
-        private val propertiesQuery = DataQuery.of("Properties")
-
-
         /**
          * Serializes the [BlockState] into the format
          * used by [BlockPalette] to store block states.

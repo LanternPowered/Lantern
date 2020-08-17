@@ -19,5 +19,5 @@ import java.util.UUID
  */
 data class EntityCreationData(
         val uniqueId: UUID,
-        val entityType: EntityType<*>
+        val type: EntityType<*>
 )

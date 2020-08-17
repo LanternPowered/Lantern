@@ -29,7 +29,7 @@ import org.spongepowered.math.vector.Vector3i;
 import java.util.Optional;
 import java.util.UUID;
 
-public class LanternBlockEntityArchetype implements BlockEntityArchetype, PropertyHolderBase, LocalMutableDataHolder {
+public class LanternBlockEntityArchetype implements BlockEntityArchetype, LocalMutableDataHolder {
 
     final LanternBlockEntity blockEntity;
 
@@ -90,7 +90,7 @@ public class LanternBlockEntityArchetype implements BlockEntityArchetype, Proper
 
     @Override
     public BlockSnapshot toSnapshot(Location location) {
-        BlockState blockState = this.blockEntity.blockState;
+        BlockState blockState = this.blockEntity._block;
         if (blockState == null) {
             blockState = getBlockEntityType().getDefaultBlock();
         }

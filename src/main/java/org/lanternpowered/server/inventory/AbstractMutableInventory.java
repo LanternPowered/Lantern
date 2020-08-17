@@ -175,12 +175,12 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             return this;
         }
         final AbstractInventory abstractInventory = (AbstractInventory) inventory;
-        List<AbstractSlot> slots = abstractInventory.getSlots();
+        List<AbstractSlot> slots = abstractInventory.slots;
         if (slots.isEmpty()) {
             return genericEmpty();
         }
         slots = new ArrayList<>(slots);
-        slots.retainAll(getSlots());
+        slots.retainAll(slots);
         if (slots.isEmpty()) { // No slots were intersected, just return a empty inventory
             return genericEmpty();
         } else {
@@ -199,12 +199,12 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
             return this;
         }
         final AbstractInventory abstractInventory = (AbstractInventory) inventory;
-        List<AbstractSlot> slotsB = abstractInventory.getSlots();
+        List<AbstractSlot> slotsB = abstractInventory.slots;
         if (slotsB.isEmpty()) {
             return this;
         }
         slotsB = new ArrayList<>(slotsB);
-        final List<AbstractSlot> slotsA = getSlots();
+        final List<AbstractSlot> slotsA = slots;
         slotsB.removeAll(slotsA);
         slotsB.addAll(0, slotsA);
         if (slotsB.isEmpty()) { // No slots were intersected, just return a empty inventory

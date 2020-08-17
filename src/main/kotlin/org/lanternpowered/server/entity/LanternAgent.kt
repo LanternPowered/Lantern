@@ -19,9 +19,7 @@ import java.util.Optional
 
 open class LanternAgent(creationData: EntityCreationData) : LanternLiving(creationData), Agent {
 
-    override fun registerKeys() {
-        super.registerKeys()
-
+    init {
         keyRegistry {
             register(Keys.IS_AI_ENABLED, true)
             register(Keys.TARGET_ENTITY)

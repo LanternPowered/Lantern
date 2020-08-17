@@ -82,7 +82,7 @@ class LanternItemStackBuilder : AbstractDataBuilder<ItemStack>(ItemStack::class.
     }
 
     override fun fromSnapshot(snapshot: ItemStackSnapshot) = apply {
-        from((snapshot as LanternItemStackSnapshot).unwrap())
+        from((snapshot as LanternItemStackSnapshot).asStack())
     }
 
     override fun fromItemStack(itemStack: ItemStack) = apply {

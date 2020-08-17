@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.handler.play
 
-import org.lanternpowered.api.item.inventory.isNotEmpty
+import org.lanternpowered.api.item.inventory.stack.isNotEmpty
 import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.network.NetworkContext

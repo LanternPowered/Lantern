@@ -60,10 +60,6 @@ class LanternLightningBolt(creationData: EntityCreationData) : LanternEntity(cre
         this.protocolType = EntityProtocolTypes.LIGHTNING
         this.effectCollection = DEFAULT_SOUND_COLLECTION.copy()
         this.soundCategory = SoundCategory.WEATHER
-    }
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(Keys.IS_EFFECT_ONLY, false)

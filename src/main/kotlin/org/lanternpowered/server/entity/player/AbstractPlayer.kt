@@ -32,7 +32,6 @@ import org.spongepowered.api.data.type.HandPreferences
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.item.inventory.Carrier
-import org.spongepowered.api.item.inventory.entity.PlayerInventory
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.Subject
@@ -70,17 +69,6 @@ abstract class AbstractPlayer(private val profile: GameProfile) : LanternLiving(
         this.enderChestInventory = VanillaInventoryArchetypes.ENDER_CHEST.builder()
                 .withCarrier(this).build(Lantern.getMinecraftPlugin())
         this.resolveSubject()
-    }
-
-    fun getProfile(): GameProfile = this.profile
-
-    override fun getIdentifier(): String = this.uniqueId.toString()
-
-    open val worldKey: NamespacedKey
-        get() = this.world.key
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(LanternKeys.TOP_HAT)
@@ -133,12 +121,17 @@ abstract class AbstractPlayer(private val profile: GameProfile) : LanternLiving(
             register(LanternKeys.POSE, Pose.STANDING)
             registerProvider(Keys.STATISTICS) {
                 get { this.statistics.statisticValues }
-                set { value ->
-                    this.statistics.statisticValues = value
-                }
+                set { value -> this.statistics.statisticValues = value }
             }
         }
     }
+
+    fun getProfile(): GameProfile = this.profile
+
+    override fun getIdentifier(): String = this.uniqueId.toString()
+
+    open val worldKey: NamespacedKey
+        get() = this.world.key
 
     override fun getInventory(): LanternPlayerInventory = this.playerInventory
 

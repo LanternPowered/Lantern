@@ -60,6 +60,26 @@ interface GlobalKeyRegistry : KeyRegistry<GlobalKeyRegistration<*,*>> {
     fun <V : Value<E>, E : Any> register(key: Key<V>): GlobalKeyRegistration<V, E>
 
     /**
+     * Registers a provider for the given [Key].
+     *
+     * @param key The key to register
+     * @return The global key registration
+     */
+    fun <V : Value<E>, E : Any> registerProvider(
+            key: Key<V>, fn: DataProviderBuilder<V, E>.(key: Key<V>) -> Unit
+    ): GlobalKeyRegistration<V, E> = this.register(key).addProvider(fn)
+
+    /**
+     * Registers a provider for the given [Key].
+     *
+     * @param key The key to register
+     * @return The global key registration
+     */
+    fun <V : Value<E>, E : Any> registerProvider(
+            key: Supplier<out Key<V>>, fn: DataProviderBuilder<V, E>.(key: Key<V>) -> Unit
+    ): GlobalKeyRegistration<V, E> = this.register(key).addProvider(fn)
+
+    /**
      * Registers the given [Key].
      *
      * @param key The key to register

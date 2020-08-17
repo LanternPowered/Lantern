@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.block.entity.vanilla;
 
+import org.lanternpowered.server.block.entity.BlockEntityCreationData;
 import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes;
 import org.spongepowered.api.block.entity.EnderChest;
@@ -22,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class LanternEnderChest extends ContainerBlockEntityBase implements EnderChest {
 
-    public LanternEnderChest() {
+    public LanternEnderChest(BlockEntityCreationData creationData) {
         setProtocolType(BlockEntityProtocolTypes.DEFAULT);
     }
 

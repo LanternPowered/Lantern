@@ -67,10 +67,6 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
         this.protocolType = EntityProtocolTypes.ITEM
         this.boundingBoxExtent = BOUNDING_BOX_EXTENT
         this.effectCollection = DEFAULT_EFFECT_COLLECTION.copy()
-    }
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(Keys.ITEM_STACK_SNAPSHOT, ItemStackSnapshot.empty())

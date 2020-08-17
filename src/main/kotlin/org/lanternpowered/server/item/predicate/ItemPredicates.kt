@@ -72,6 +72,6 @@ object ItemPredicates {
      */
     @JvmStatic
     fun similarItem(itemStackSnapshot: ItemStackSnapshot): ItemPredicate {
-        return SimilarItemPredicate((itemStackSnapshot as LanternItemStackSnapshot).unwrap())
+        return SimilarItemPredicate((itemStackSnapshot as LanternItemStackSnapshot).asStack())
     }
 }

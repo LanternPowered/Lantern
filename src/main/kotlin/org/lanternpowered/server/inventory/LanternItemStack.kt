@@ -12,6 +12,7 @@ package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ExtendedItemStack
+import org.lanternpowered.api.item.inventory.ExtendedItemStackSnapshot
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
@@ -164,7 +165,7 @@ class LanternItemStack private constructor(
      * @return Is similar
      */
     override fun isSimilarTo(other: ItemStackSnapshot): Boolean =
-            this.isSimilarTo((other as LanternItemStackSnapshot).unwrap())
+            this.isSimilarTo((other as LanternItemStackSnapshot).asStack())
 
     /**
      *
@@ -184,6 +185,9 @@ class LanternItemStack private constructor(
             this.type == other.type && LocalDataHolderHelper.matchContents(this, other as LanternItemStack)
         }
     }
+
+    override fun asSnapshot(): ExtendedItemStackSnapshot =
+            LanternItemStackSnapshot.wrap(this)
 
     override fun toString() = ToStringHelper(this)
             .add("type", this.type.key)
@@ -236,7 +240,7 @@ class LanternItemStack private constructor(
 
         @JvmStatic
         fun areSimilar(itemStackA: ItemStack?, itemStackB: ItemStackSnapshot?): Boolean {
-            return if (itemStackA === (itemStackB as LanternItemStackSnapshot).unwrap())
+            return if (itemStackA === (itemStackB as LanternItemStackSnapshot).asStack())
                 true
             else if (itemStackA == null || itemStackB == null)
                 false
@@ -246,7 +250,7 @@ class LanternItemStack private constructor(
 
         @JvmStatic
         fun areSimilar(itemStackA: ItemStackSnapshot?, itemStackB: ItemStack?): Boolean {
-            return if (itemStackB === (itemStackA as LanternItemStackSnapshot).unwrap())
+            return if (itemStackB === (itemStackA as LanternItemStackSnapshot).asStack())
                 true
             else if (itemStackA == null || itemStackB == null)
                 false
@@ -256,9 +260,9 @@ class LanternItemStack private constructor(
 
         @JvmStatic
         fun areSimilar(itemStackA: ItemStackSnapshot?, itemStackB: ItemStackSnapshot?): Boolean {
-            return if ((itemStackA as LanternItemStackSnapshot).unwrap() === (itemStackA as LanternItemStackSnapshot).unwrap())
+            return if ((itemStackA as LanternItemStackSnapshot).asStack() === (itemStackA as LanternItemStackSnapshot).asStack())
                 true
-            else if (itemStackA == null || itemStackB == null) false else (itemStackB as LanternItemStackSnapshot).unwrap().isSimilarTo(itemStackA)
+            else if (itemStackA == null || itemStackB == null) false else (itemStackB as LanternItemStackSnapshot).asStack().isSimilarTo(itemStackA)
         }
 
         @JvmStatic

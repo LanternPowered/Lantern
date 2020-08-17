@@ -13,6 +13,7 @@ package org.lanternpowered.server.block.entity.vanilla;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.server.block.entity.BlockEntityCreationData;
 import org.lanternpowered.server.block.entity.ICarrierBlockEntity;
 import org.lanternpowered.server.block.entity.LanternBlockEntity;
 import org.lanternpowered.server.block.state.BlockStateProperties;
@@ -42,6 +43,10 @@ public final class LanternJukebox extends LanternBlockEntity implements Jukebox,
     private JukeboxInventory inventory = VanillaInventoryArchetypes.JUKEBOX.builder()
             .withCarrier(this).build(Lantern.getMinecraftPlugin());
     private boolean playing;
+
+    public LanternJukebox(BlockEntityCreationData creationData) {
+        super(creationData);
+    }
 
     @Override
     public void play() {

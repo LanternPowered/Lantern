@@ -1059,7 +1059,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         getBlockEntities().forEach(blockEntity -> {
             causeStack.pushCause(blockEntity); // Add the blockEntity entity to the cause
             try {
-                ((LanternBlockEntity) blockEntity).pulse();
+                ((LanternBlockEntity) blockEntity).update();
             } catch (Throwable t) {
                 final Vector3i pos = blockEntity.getLocation().getBlockPosition();
                 Lantern.getLogger().error("Failed to pulse BlockEntity at ({};{};{})", pos.getX(), pos.getY(), pos.getZ(), t);

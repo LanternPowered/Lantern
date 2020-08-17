@@ -12,6 +12,7 @@ package org.lanternpowered.server.block.entity.vanilla;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
+import org.lanternpowered.server.block.entity.BlockEntityCreationData;
 import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.type.LanternChestAttachmentType;
 import org.lanternpowered.server.game.Lantern;
@@ -70,7 +71,7 @@ public class LanternChest extends ContainerBlockEntity<ChestInventory> implement
         }
     }
 
-    public LanternChest() {
+    public LanternChest(BlockEntityCreationData creationData) {
         setProtocolType(BlockEntityProtocolTypes.DEFAULT);
     }
 

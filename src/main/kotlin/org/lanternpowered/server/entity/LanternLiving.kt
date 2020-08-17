@@ -94,10 +94,6 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
 
     init {
         this.effectCollection = DEFAULT_EFFECT_COLLECTION.copy()
-    }
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             registerBounded(Keys.MAX_AIR, 300).minimum(0).maximum(Int.MAX_VALUE).coerceInBounds()

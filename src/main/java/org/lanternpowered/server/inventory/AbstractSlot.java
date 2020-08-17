@@ -10,10 +10,11 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.api.item.inventory.slot.ExtendedSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractSlot extends AbstractMutableInventory implements ISlot {
+public abstract class AbstractSlotOld extends AbstractMutableInventory implements ExtendedSlot {
 
     public static final int DEFAULT_MAX_STACK_SIZE = 64;
 

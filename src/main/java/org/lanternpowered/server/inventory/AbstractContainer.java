@@ -85,7 +85,7 @@ public abstract class AbstractContainer extends AbstractChildrenInventory implem
         final ImmutableList.Builder<AbstractContainerSlot> slots = ImmutableList.builder();
         final Map<AbstractSlot, AbstractContainerSlot> slotsToContainerSlot = new HashMap<>();
         for (AbstractMutableInventory inventory : inventories) {
-            for (AbstractSlot slot : inventory.getSlots()) {
+            for (AbstractSlot slot : inventory.slots) {
                 slotsToContainerSlot.computeIfAbsent(slot, slot1 -> {
                     final AbstractContainerSlot containerSlot = ((AbstractInventorySlot) slot).constructContainerSlot();
                     containerSlot.slot = (AbstractInventorySlot) slot;

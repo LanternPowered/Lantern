@@ -17,44 +17,8 @@ import java.util.function.Supplier
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-typealias ItemStack = org.spongepowered.api.item.inventory.ItemStack
 typealias ItemStackSnapshot = org.spongepowered.api.item.inventory.ItemStackSnapshot
 typealias ItemStackBuilder = org.spongepowered.api.item.inventory.ItemStack.Builder
-
-/**
- * Will return {@code null} if this stack is empty.
- */
-fun ItemStack.orNull(): ItemStack? = if (isEmpty) null else this
-
-/**
- * Will return the given [ItemStack] if this stack is empty.
- */
-fun ItemStack.orElse(itemStack: ItemStack): ItemStack = if (isEmpty) itemStack else this
-
-/**
- * Will return the a supplied [ItemStack] if this stack is empty.
- */
-fun ItemStack.orElse(supplier: () -> ItemStack): ItemStack {
-    contract {
-        callsInPlace(supplier, InvocationKind.AT_MOST_ONCE)
-    }
-    return if (isEmpty) supplier() else this
-}
-
-/**
- * Whether this item stack isn't empty.
- */
-inline val ItemStack.isNotEmpty get() = !this.isEmpty
-
-/**
- * Executes the given function if the stack isn't empty.
- */
-inline fun ItemStack.ifNotEmpty(block: (ItemStack) -> Unit) {
-    contract {
-        callsInPlace(block, InvocationKind.AT_MOST_ONCE)
-    }
-    if (!isEmpty) block(this)
-}
 
 /**
  * Constructs a new [ItemStack] with the given [ItemType], quantity and
@@ -76,18 +40,4 @@ inline fun itemStackOf(type: ItemType, quantity: Int = 1, block: ItemStackBuilde
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     return ItemStack.builder().itemType(type).quantity(quantity).apply(block).build()
-}
-
-interface ExtendedItemStack : ItemStack {
-
-    fun isSimilarTo(other: ItemStack): Boolean
-
-    fun isSimilarTo(other: ItemStackSnapshot): Boolean
-}
-
-interface ExtendedItemStackSnapshot : ItemStackSnapshot {
-
-    fun isSimilarTo(other: ItemStack): Boolean
-
-    fun isSimilarTo(other: ItemStackSnapshot): Boolean
 }

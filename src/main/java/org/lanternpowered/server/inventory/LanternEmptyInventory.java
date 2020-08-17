@@ -38,7 +38,7 @@ import java.util.function.Predicate;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @SuppressWarnings("unchecked")
-class LanternEmptyInventory extends AbstractInventory implements EmptyInventory, IQueryInventory {
+class LanternEmptyInventoryOld extends AbstractInventory implements EmptyInventory, IQueryInventory {
 
     static class Name {
         static final Translation INSTANCE = tr("inventory.empty.name");

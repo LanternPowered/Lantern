@@ -99,22 +99,28 @@ interface ProxySubject : Subject {
             this.resolveNullableSubject()?.getPermissionValue(contexts, permission) ?: getPermissionDefault(permission)
 
     @JvmDefault
-    override fun isChildOf(parent: SubjectReference) = this.resolveNullableSubject()?.isChildOf(parent) ?: false
+    override fun isChildOf(parent: SubjectReference) =
+            this.resolveNullableSubject()?.isChildOf(parent) ?: false
 
     @JvmDefault
-    override fun isChildOf(contexts: Set<Context>, parent: SubjectReference) = this.resolveNullableSubject()?.isChildOf(contexts, parent) ?: false
+    override fun isChildOf(contexts: Set<Context>, parent: SubjectReference) =
+            this.resolveNullableSubject()?.isChildOf(contexts, parent) ?: false
 
     @JvmDefault
-    override fun getParents(): List<SubjectReference> = this.resolveNullableSubject()?.parents ?: emptyList()
+    override fun getParents(): List<SubjectReference> =
+            this.resolveNullableSubject()?.parents ?: emptyList()
 
     @JvmDefault
-    override fun getParents(contexts: Set<Context>): List<SubjectReference> = this.resolveNullableSubject()?.getParents(contexts) ?: emptyList()
+    override fun getParents(contexts: Set<Context>): List<SubjectReference> =
+            this.resolveNullableSubject()?.getParents(contexts) ?: emptyList()
 
     @JvmDefault
-    override fun getActiveContexts(): Set<Context> = this.resolveNullableSubject()?.activeContexts ?: emptySet()
+    override fun getActiveContexts(): Set<Context> =
+            this.resolveNullableSubject()?.activeContexts ?: emptySet()
 
     @JvmDefault
-    override fun getOption(key: String): Optional<String> = this.resolveNullableSubject()?.getOption(key) ?: emptyOptional()
+    override fun getOption(key: String): Optional<String> =
+            this.resolveNullableSubject()?.getOption(key) ?: emptyOptional()
 
     @JvmDefault
     override fun getOption(contexts: Set<Context>, key: String): Optional<String> =

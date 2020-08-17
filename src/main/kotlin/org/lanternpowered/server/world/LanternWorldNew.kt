@@ -16,6 +16,7 @@ import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.server.LanternServer
+import org.lanternpowered.server.block.action.BlockAction
 import org.lanternpowered.server.effect.sound.getEntityPacketBuilder
 import org.lanternpowered.server.effect.sound.getPacketBuilder
 import org.lanternpowered.server.entity.player.LanternPlayer
@@ -117,6 +118,10 @@ class LanternWorldNew(
 
     override fun getLocation(position: Vector3i): Location = LanternLocation(this, position)
     override fun getLocation(position: Vector3d): Location = LanternLocation(this, position)
+
+    fun addBlockAction(position: Vector3i, blockType: BlockType, blockAction: BlockAction) {
+        TODO("Not yet implemented")
+    }
 
     override fun isChunkLoaded(x: Int, y: Int, z: Int, allowEmpty: Boolean): Boolean {
         TODO("Not yet implemented")

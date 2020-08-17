@@ -88,12 +88,12 @@ public abstract class AbstractForwardingSlot extends AbstractSlot {
 
     @Override
     protected List<AbstractSlot> getSlots() {
-        return getDelegateSlot().getSlots();
+        return getDelegateSlot().slots;
     }
 
     @Override
     protected List<? extends AbstractInventory> getChildren() {
-        return getDelegateSlot().getChildren();
+        return getDelegateSlot().children;
     }
 
     @Override

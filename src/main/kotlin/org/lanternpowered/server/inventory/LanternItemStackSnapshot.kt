@@ -10,9 +10,10 @@
  */
 package org.lanternpowered.server.inventory
 
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
+import org.lanternpowered.api.item.inventory.ExtendedItemStack
 import org.lanternpowered.api.item.inventory.ExtendedItemStackSnapshot
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.data.DataQueries
@@ -31,7 +32,7 @@ class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack)
     override fun getType(): ItemType = this.backingDataHolder.type
     override fun getQuantity(): Int = this.backingDataHolder.quantity
     override fun isEmpty(): Boolean = this.backingDataHolder.isEmpty
-    override fun asComponent(): Component = this.backingDataHolder.asComponent()
+    override fun asComponent(): Text = this.backingDataHolder.asComponent()
 
     override fun createStack() = this.backingDataHolder.copy()
 
@@ -70,14 +71,7 @@ class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack)
      */
     override fun isSimilarTo(other: ItemStack): Boolean = this.backingDataHolder.isSimilarTo(other)
 
-    /**
-     * Gets the internal [LanternItemStack],
-     * internal use only to avoid copying. The returned
-     * stack may never be modified.
-     *
-     * @return The internal stack
-     */
-    fun unwrap() = this.backingDataHolder
+    override fun asStack(): ExtendedItemStack = this.backingDataHolder
 
     override fun asHoverEvent(op: UnaryOperator<HoverEvent.ShowItem>): HoverEvent<HoverEvent.ShowItem> {
         TODO("Not yet implemented")

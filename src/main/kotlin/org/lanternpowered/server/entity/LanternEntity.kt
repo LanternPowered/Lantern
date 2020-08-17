@@ -35,6 +35,7 @@ import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.server.data.DataHelper
 import org.lanternpowered.server.data.DataQueries
+import org.lanternpowered.server.data.LocalDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.data.SerializableLocalMutableDataHolder
 import org.lanternpowered.server.data.key.LanternKeys
@@ -86,7 +87,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     private val random = Random()
 
     private val uniqueId = creationData.uniqueId
-    private val entityType = creationData.entityType
+    private val entityType = creationData.type
 
     final override fun getUniqueId(): UUID = this.uniqueId
     final override fun getType(): EntityType<*> = this.entityType
@@ -116,10 +117,6 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     var effectCollection: EntityEffectCollection = EntityEffectCollection.of()
 
     init {
-        this.registerKeys()
-    }
-
-    open fun registerKeys() {
         keyRegistry {
             register(Keys.DISPLAY_NAME, emptyText())
             register(Keys.IS_CUSTOM_NAME_VISIBLE, true)
@@ -142,6 +139,10 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
         this.registerPassengerKeys()
         this.registerDamageKeys()
     }
+
+    // Final so IntelliJ stops complaining when using it in <init>
+    final override fun <H : LocalDataHolder> H.keyRegistry(fn: LocalKeyRegistry<H>.() -> Unit): LocalKeyRegistry<H> =
+            this.keyRegistry.forHolderUnchecked<H>().apply(fn)
 
     override fun createSnapshot(): EntitySnapshot {
         TODO("Not yet implemented")

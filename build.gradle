@@ -118,9 +118,11 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
             '-Xuse-experimental=kotlin.contracts.ExperimentalContracts',
             '-Xuse-experimental=kotlin.ExperimentalStdlibApi',
             '-Xuse-experimental=kotlin.time.ExperimentalTime',
+            '-Xuse-experimental=org.lanternpowered.api.item.inventory.UnsafeInventoryApi',
             '-XXLanguage:+InlineClasses',
             '-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes',
-            '-Xjvm-default=enable'
+            '-Xjvm-default=enable',
+            '-Xopt-in=kotlin.RequiresOptIn'
     ]
 }
 

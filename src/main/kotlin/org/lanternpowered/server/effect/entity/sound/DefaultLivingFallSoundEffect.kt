@@ -42,7 +42,7 @@ class DefaultLivingFallSoundEffect @JvmOverloads constructor(
                 soundType = this.bigFallSoundType
             }
         }
-        entity.makeSound(soundType, 1.0, 1.0)
+        entity.makeSound(soundType!!)
 
         // Play a sound for hitting the ground
         val blockPos = entity.position.add(0.0, -0.2, 0.0).toInt()

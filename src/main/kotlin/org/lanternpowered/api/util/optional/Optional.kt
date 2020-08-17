@@ -41,7 +41,7 @@ inline fun emptyOptionalLong(): OptionalLong = OptionalLong.empty()
 /**
  * Unwraps the [Optional] value.
  */
-inline fun <T> Optional<T>.orNull(): T? = orElse(null)
+inline fun <T> Optional<T>.orNull(): T? = this.orElse(null)
 
 /**
  * Wraps the boolean value into an [Optional].
@@ -104,9 +104,9 @@ inline fun Long?.asOptionalLong(): OptionalLong = if (this == null) OptionalLong
 /**
  * Transforms this [Optional] into a [OptionalInt].
  */
-inline fun Optional<Int>.asInt(): OptionalInt = if (isPresent) OptionalInt.of(get()) else OptionalInt.empty()
+inline fun Optional<Int>.asInt(): OptionalInt = if (this.isPresent) OptionalInt.of(this.get()) else OptionalInt.empty()
 
 /**
  * Transforms this [Optional] into a [OptionalDouble].
  */
-inline fun Optional<Double>.asDouble(): OptionalDouble = if (isPresent) OptionalDouble.of(get()) else OptionalDouble.empty()
+inline fun Optional<Double>.asDouble(): OptionalDouble = if (this.isPresent) OptionalDouble.of(this.get()) else OptionalDouble.empty()

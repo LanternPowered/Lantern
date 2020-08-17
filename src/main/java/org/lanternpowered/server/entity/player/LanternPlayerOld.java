@@ -157,7 +157,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternPlayer extends AbstractUser implements ServerPlayer, Viewer, NetworkIdHolder {
+public class LanternPlayerOld extends AbstractUser implements ServerPlayer, Viewer, NetworkIdHolder {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = LanternLiving.DEFAULT_EFFECT_COLLECTION.toBuilder()
             // Override the fall sound

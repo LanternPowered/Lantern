@@ -23,17 +23,18 @@ import org.spongepowered.api.block.BlockSoundGroup
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.entity.BlockEntity
+import org.spongepowered.api.block.entity.BlockEntityType
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.state.StateProperty
 import java.util.Optional
 
 /**
- * @property blockEntityProvider The provider for block entities of this block type
+ * @property blockEntityType The type for block entities of this block type, or null if there's no block entity
  */
 class LanternBlockType(
         private val key: NamespacedKey,
         private val name: Text,
-        val blockEntityProvider: (() -> BlockEntity)?,
+        val blockEntityType: BlockEntityType?,
         stateProperties: Iterable<StateProperty<*>>,
         override val keyRegistry: LocalKeyRegistry<BlockType>
 ) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalImmutableDataHolder<BlockType> {

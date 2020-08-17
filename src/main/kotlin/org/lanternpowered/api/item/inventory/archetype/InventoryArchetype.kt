@@ -8,6 +8,13 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.text.action
+package org.lanternpowered.api.item.inventory.archetype
 
-typealias TextAction<R> = org.spongepowered.api.text.action.TextAction<R>
+import org.lanternpowered.api.item.inventory.ExtendedInventory
+
+/**
+ * Represents an archetype of an [ExtendedInventory].
+ */
+interface InventoryArchetype<T : ExtendedInventory> {
+
+}

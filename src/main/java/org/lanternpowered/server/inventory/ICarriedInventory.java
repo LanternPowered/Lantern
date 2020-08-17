@@ -26,12 +26,12 @@ public interface ICarriedInventory<C extends Carrier> extends CarriedInventory<C
 
     @Override
     default Optional<C> getCarrier() {
-        final CarrierReference<C> ref = ((AbstractInventory) this).getCarrierReference();
+        final CarrierReference<C> ref = ((AbstractInventory) this).carrierReference;
         return ref == null ? Optional.empty() : ref.get();
     }
 
     default <R> Optional<R> getCarrierAs(Class<R> ret) {
-        final CarrierReference<C> ref = ((AbstractInventory) this).getCarrierReference();
+        final CarrierReference<C> ref = ((AbstractInventory) this).carrierReference;
         return ref == null ? Optional.empty() : ref.as(ret);
     }
 }

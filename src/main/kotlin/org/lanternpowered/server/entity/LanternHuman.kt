@@ -27,10 +27,6 @@ class LanternHuman(creationData: EntityCreationData) : LanternAgent(creationData
     init {
         this.protocolType = EntityProtocolTypes.HUMAN
         this.equipmentInventory = VanillaInventoryArchetypes.ENTITY_EQUIPMENT.build()
-    }
-
-    override fun registerKeys() {
-        super.registerKeys()
 
         keyRegistry {
             register(LanternKeys.DISPLAYED_SKIN_PARTS, emptySet())

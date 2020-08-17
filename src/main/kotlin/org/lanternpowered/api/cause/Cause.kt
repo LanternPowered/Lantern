@@ -19,11 +19,11 @@ import kotlin.reflect.KClass
 /**
  * A cause represents the reason or initiator of an event.
  */
-typealias Cause = org.spongepowered.api.event.cause.Cause
-typealias CauseContextKey<T> = org.spongepowered.api.event.cause.EventContextKey<T>
-typealias CauseContextKeys = org.spongepowered.api.event.cause.EventContextKeys
-typealias CauseContext = org.spongepowered.api.event.cause.EventContext
-typealias CauseContextBuilder = org.spongepowered.api.event.cause.EventContext.Builder
+typealias Cause = org.spongepowered.api.event.Cause
+typealias CauseContextKey<T> = org.spongepowered.api.event.EventContextKey<T>
+typealias CauseContextKeys = org.spongepowered.api.event.EventContextKeys
+typealias CauseContext = org.spongepowered.api.event.EventContext
+typealias CauseContextBuilder = org.spongepowered.api.event.EventContext.Builder
 
 /**
  * Gets the first [T] object of this [Cause], if available.

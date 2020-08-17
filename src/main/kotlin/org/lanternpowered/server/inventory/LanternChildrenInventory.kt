@@ -10,6 +10,9 @@
  */
 package org.lanternpowered.server.inventory
 
-class LanternChildrenInventory : AbstractChildrenInventory() {
+class LanternChildrenInventory(children: List<AbstractMutableInventory>) : AbstractChildrenInventory() {
 
+    init {
+        this.init(children)
+    }
 }

@@ -425,7 +425,7 @@ public class VanillaContainerInteractionBehavior extends AbstractContainerIntera
                             if (replacedItem.isNotEmpty()) {
                                 setCursorItem(replacedItem);
                             }
-                            cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(), replacedItem.toSnapshot());
+                            cursorTransaction = new Transaction<>(getCursorItem().createSnapshot(), replacedItem.createSnapshot());
                             transactions.addAll(result1.getTransactions());
                         }
                     }

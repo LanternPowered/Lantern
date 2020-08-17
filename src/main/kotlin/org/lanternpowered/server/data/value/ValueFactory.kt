@@ -29,7 +29,7 @@ object ValueFactory : Value.Factory {
      * @param valueContainer The value container
      * @return The string
      */
-    fun toString(valueContainer: ValueContainer) = toString(valueContainer.values)
+    fun toString(valueContainer: ValueContainer) = this.toString(valueContainer.values)
 
     /**
      * Converts the [Value]s into a nicely
@@ -40,9 +40,8 @@ object ValueFactory : Value.Factory {
      */
     fun toString(values: Iterable<Value<*>>) = ToStringHelper(brackets = ToStringHelper.Brackets.SQUARE)
             .apply {
-                values.forEach { value ->
-                    add(value.key.key.toString(), value.get())
-                }
+                for (value in values)
+                    this.add(value.key.key.formatted, value.get())
             }
             .toString()
 }

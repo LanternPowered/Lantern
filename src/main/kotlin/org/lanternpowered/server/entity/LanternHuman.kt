@@ -13,6 +13,7 @@ package org.lanternpowered.server.entity
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.server.data.key.LanternKeys
+import org.lanternpowered.server.inventory.AbstractArmorEquipable
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
 import org.lanternpowered.server.profile.LanternProfileProperty

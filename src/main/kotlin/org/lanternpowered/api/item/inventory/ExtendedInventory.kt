@@ -19,6 +19,7 @@ import org.lanternpowered.api.item.inventory.query.TwoParamQueryType
 import org.lanternpowered.api.item.inventory.query.of
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.util.optional.asOptional
+import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.KeyValueMatcher
 import java.util.Optional
 import java.util.function.Supplier
@@ -31,6 +32,12 @@ typealias InventoryTransactionResultType = org.spongepowered.api.item.inventory.
 typealias PollInventoryTransactionResult = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Poll
 typealias Inventory = org.spongepowered.api.item.inventory.Inventory
 typealias Slot = org.spongepowered.api.item.inventory.Slot
+
+/**
+ * Gets the normal inventories as an extended inventories.
+ */
+inline fun List<Inventory>.fix(): List<ExtendedInventory> =
+        this.uncheckedCast()
 
 /**
  * Gets the normal inventory as an extended inventory.
@@ -47,12 +54,24 @@ inline fun Inventory.fix(): ExtendedInventory {
 inline fun ExtendedInventory.fix(): ExtendedInventory = this
 
 /**
- * Attempts to get the index for the given [slot] relative to this inventory. Return
- * `null` if the slot doesn't exist in this inventory.
+ * Attempts to get the index for the given [slot] relative to this inventory.
+ *
+ * Throws an [IllegalArgumentException] if the given slot isn't part
+ * of this inventory.
  */
-inline fun Inventory.slotIndex(slot: Slot): Int? {
+inline fun Inventory.slotIndex(slot: Slot): Int {
     contract { returns() implies (this@slotIndex is ExtendedInventory) }
     return (this as ExtendedInventory).slotIndex(slot)
+}
+
+/**
+ * Attempts to get the index for the given [slot] relative to this inventory.
+ *
+ * Returns `null` if the given slot isn't part of this inventory.
+ */
+inline fun Inventory.slotIndexOrNull(slot: Slot): Int? {
+    contract { returns() implies (this@slotIndexOrNull is ExtendedInventory) }
+    return (this as ExtendedInventory).slotIndexOrNull(slot)
 }
 
 /**
@@ -131,16 +150,38 @@ interface ExtendedInventory : Inventory {
 
     /**
      * Attempts to get the slot at the given [index].
+     *
+     * Throws an [IndexOutOfBoundsException] if the given index isn't
+     * within the bounds of this inventory.
      */
-    fun slot(index: Int): ExtendedSlot?
+    fun slot(index: Int): ExtendedSlot =
+            this.slotOrNull(index) ?: throw IndexOutOfBoundsException(index)
 
     /**
-     * Attempts to get the index for the given [slot] relative to this inventory. Return
-     * `null` if the slot doesn't exist in this inventory.
+     * Attempts to get the slot at the given [index].
+     *
+     * Returns `null` if the given index isn't within the bounds of this inventory.
      */
-    fun slotIndex(slot: Slot): Int?
+    fun slotOrNull(index: Int): ExtendedSlot?
 
-    override fun getSlot(index: Int): Optional<Slot> = this.slot(index).asOptional()
+    /**
+     * Attempts to get the index for the given [slot] relative to this inventory.
+     *
+     * Throws an [IllegalArgumentException] if the given slot isn't part
+     * of this inventory.
+     */
+    fun slotIndex(slot: Slot): Int =
+            this.slotIndexOrNull(slot) ?: throw IllegalArgumentException("The slot $slot isn't part of this inventory.")
+
+    /**
+     * Attempts to get the index for the given [slot] relative to this inventory.
+     *
+     * Returns `null` if the given slot isn't part of this inventory.
+     */
+    fun slotIndexOrNull(slot: Slot): Int?
+
+    override fun getSlot(index: Int): Optional<Slot> =
+            this.slotOrNull(index).asOptional()
 
     override fun intersect(inventory: Inventory): ExtendedInventory
     override fun union(inventory: Inventory): ExtendedInventory

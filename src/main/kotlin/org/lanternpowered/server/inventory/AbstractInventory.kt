@@ -78,7 +78,7 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     final override fun hasChildren(): Boolean = this.children().isNotEmpty()
 
     override fun getSlot(index: Int): Optional<Slot> =
-            this.slot(index).asOptional()
+            this.slotOrNull(index).asOptional()
 
     final override fun asViewable(): Optional<ViewableInventory> =
             if (this is ViewableInventory) this.asOptional() else this.toViewable().asOptional()
@@ -230,10 +230,10 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     }
 
     override fun safeSet(index: Int, stack: ItemStack): InventoryTransactionResult =
-            this.slot(index)?.safeSet(stack) ?: InventoryTransactionResults.rejectPollNoSlot()
+            this.slotOrNull(index)?.safeSet(stack) ?: InventoryTransactionResults.rejectPollNoSlot()
 
     override fun forceSet(index: Int, stack: ItemStack): InventoryTransactionResult =
-            this.slot(index)?.forceSet(stack) ?: InventoryTransactionResults.rejectPollNoSlot()
+            this.slotOrNull(index)?.forceSet(stack) ?: InventoryTransactionResults.rejectPollNoSlot()
 
     final override fun poll(): PollInventoryTransactionResult = this.poll { true }
 
@@ -269,16 +269,16 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     }
 
     override fun offer(index: Int, stack: ItemStack): InventoryTransactionResult =
-            this.slot(index)?.offer(stack) ?: InventoryTransactionResults.rejectNoSlot(stack)
+            this.slotOrNull(index)?.offer(stack) ?: InventoryTransactionResults.rejectNoSlot(stack)
 
     override fun pollFrom(index: Int): PollInventoryTransactionResult =
-            this.slot(index)?.poll() ?: InventoryTransactionResults.rejectPollNoSlot()
+            this.slotOrNull(index)?.poll() ?: InventoryTransactionResults.rejectPollNoSlot()
 
     override fun pollFrom(index: Int, limit: Int): PollInventoryTransactionResult =
-            this.slot(index)?.poll(limit) ?: InventoryTransactionResults.rejectPollNoSlot()
+            this.slotOrNull(index)?.poll(limit) ?: InventoryTransactionResults.rejectPollNoSlot()
 
     override fun peekAt(index: Int): Optional<ItemStack> =
-            this.slot(index)?.peek().asOptional()
+            this.slotOrNull(index)?.peek().asOptional()
 
     override fun <V : Any> get(key: Key<out Value<V>>): Optional<V> =
             super<DataHolderBase>.get(key)
@@ -293,7 +293,7 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
             this.children().contains(child)
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> {
-        if (key == Keys.SLOT_INDEX && child is Slot)
+        if (key == Keys.SLOT_INDEX.get() && child is Slot)
             return this.slotIndex(child).asOptional().uncheckedCast()
         return child.get(key)
     }

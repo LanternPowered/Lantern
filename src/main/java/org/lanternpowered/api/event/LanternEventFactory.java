@@ -41,7 +41,7 @@ import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.event.advancement.AdvancementEvent;
 import org.spongepowered.api.event.advancement.AdvancementTreeEvent;
 import org.spongepowered.api.event.advancement.CriterionEvent;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageFunction;
 import org.spongepowered.api.event.data.ChangeDataHolderEvent;
 import org.spongepowered.api.event.entity.ConstructEntityEvent;

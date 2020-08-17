@@ -12,7 +12,7 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.entity.Equipable;
+import org.spongepowered.api.item.inventory.Equipable;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;

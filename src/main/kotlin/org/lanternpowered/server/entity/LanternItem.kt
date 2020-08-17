@@ -230,7 +230,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
                 break
         }
         if (stack.isNotEmpty) {
-            this.offer(Keys.ITEM_STACK_SNAPSHOT, stack.toWrappedSnapshot())
+            this.offer(Keys.ITEM_STACK_SNAPSHOT, stack.asSnapshot())
         } else {
             this.remove()
         }

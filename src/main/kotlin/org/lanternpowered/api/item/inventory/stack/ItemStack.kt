@@ -228,6 +228,13 @@ fun ItemStack.orElse(supplier: () -> ItemStack): ExtendedItemStack {
 }
 
 /**
+ * If this item stack is null, an empty one will be returned
+ * instead. Otherwise returns itself.
+ */
+fun ItemStack?.orEmpty(): ExtendedItemStack =
+        if (this == null || this.isEmpty) emptyItemStack() else this.fix()
+
+/**
  * Whether this item stack isn't empty.
  */
 inline val ItemStack.isNotEmpty: Boolean

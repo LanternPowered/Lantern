@@ -248,7 +248,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             newItem = ItemStackSnapshot.empty();
         } else {
             itemStack.setQuantity(quantity - limit);
-            newItem = itemStack.toSnapshot();
+            newItem = itemStack.createSnapshot();
             itemStack.setQuantity(limit);
         }
         final List<SlotTransaction> transactions = new ArrayList<>();
@@ -319,7 +319,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             stack.setQuantity(0);
         }
         if (transactionAdder != null) {
-            transactionAdder.accept(new SlotTransaction(this, this.itemStack.toSnapshot(), newStack.toWrappedSnapshot()));
+            transactionAdder.accept(new SlotTransaction(this, this.itemStack.createSnapshot(), newStack.toWrappedSnapshot()));
         }
     }
 
@@ -336,7 +336,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         }
         ItemStackSnapshot oldSnapshot = null;
         if (transactionAdder != null) {
-            oldSnapshot = this.itemStack.toSnapshot();
+            oldSnapshot = this.itemStack.createSnapshot();
         }
         // Get the amount of space we have left
         final int availableSpace = maxStackSize - this.itemStack.getQuantity();
@@ -358,7 +358,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             stack.setQuantity(0);
         }
         if (transactionAdder != null) {
-            transactionAdder.accept(new SlotTransaction(this, oldSnapshot, this.itemStack.toSnapshot()));
+            transactionAdder.accept(new SlotTransaction(this, oldSnapshot, this.itemStack.createSnapshot()));
         }
         queueUpdate();
     }
@@ -369,7 +369,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
         if (stack.isEmpty() && !isValidItem(stack)) {
             return new PeekedSetTransactionResult(ImmutableList.of(), stack.createSnapshot());
         }
-        final ItemStackSnapshot oldSnapshot = this.itemStack.toSnapshot();
+        final ItemStackSnapshot oldSnapshot = this.itemStack.createSnapshot();
         ItemStackSnapshot rejectedSnapshot = ItemStackSnapshot.empty();
         ItemStackSnapshot newSnapshot = ItemStackSnapshot.empty();
         if (!stack.isEmpty()) {
@@ -423,7 +423,7 @@ public abstract class AbstractInventorySlot extends AbstractSlot {
             stack.setQuantity(0);
         }
         if (transactionAdder != null) {
-            transactionAdder.accept(new SlotTransaction(this, this.itemStack.toSnapshot(), newStack.toSnapshot()));
+            transactionAdder.accept(new SlotTransaction(this, this.itemStack.createSnapshot(), newStack.createSnapshot()));
         }
         this.itemStack = newStack;
         queueUpdate();

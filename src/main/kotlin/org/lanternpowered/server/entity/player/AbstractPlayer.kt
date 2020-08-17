@@ -13,7 +13,7 @@ package org.lanternpowered.server.entity.player
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.data.key.LanternKeys
-import org.lanternpowered.server.entity.AbstractArmorEquipable
+import org.lanternpowered.server.inventory.AbstractArmorEquipable
 import org.lanternpowered.server.entity.EntityCreationData
 import org.lanternpowered.server.entity.LanternLiving
 import org.lanternpowered.server.entity.Pose

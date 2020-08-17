@@ -34,6 +34,13 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.spongepowered.api.item.inventory.Carrier
 import org.spongepowered.api.item.inventory.type.ViewableInventory
 
+internal fun Sequence<AbstractInventory>.slots(): Sequence<AbstractSlot> =
+        this.flatMap { inventory ->
+            if (inventory is AbstractSlot)
+                return@flatMap sequenceOf(inventory)
+            inventory.children().asSequence().slots()
+        }
+
 abstract class AbstractChildrenInventory : AbstractMutableInventory() {
 
     companion object {
@@ -46,34 +53,25 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
     private lateinit var slotsByIndex: List<AbstractSlot>
     private lateinit var slotsToIndex: Object2IntMap<AbstractSlot>
 
-    fun init(children: List<AbstractMutableInventory>) {
-        val slotsByIndex = ArrayList<AbstractSlot>()
+    private fun init(children: List<AbstractMutableInventory>, slots: Iterable<AbstractSlot>) {
         val slotsToIndex = Object2IntOpenHashMap<AbstractSlot>()
         slotsToIndex.defaultReturnValue(INVALID_SLOT_INDEX)
-        val slots = children.asSequence()
-                .slots()
-                .distinctBy { slot -> slot.actual }
-        for (slot in slots) {
-            slotsToIndex[slot] = slotsByIndex.size
-            slotsByIndex.add(slot)
-        }
-        this.slotsByIndex = slotsByIndex.toImmutableList()
+        for ((index, slot) in slots.withIndex())
+            slotsToIndex[slot] = index
         this.slotsToIndex = Object2IntMaps.unmodifiable(slotsToIndex)
-        // Children is a list of slots, and not nested children,
-        // so we can reuse the list
-        if (children.all { child -> child is AbstractSlot }) {
-            this.children = this.slotsByIndex
-        } else {
-            this.children = children.toImmutableList()
-        }
+        this.slotsByIndex = slots.toImmutableList()
+        this.children = children.toImmutableList()
     }
 
-    private fun Sequence<AbstractInventory>.slots(): Sequence<AbstractSlot> =
-            this.flatMap { inventory ->
-                if (inventory is AbstractSlot)
-                    return@flatMap sequenceOf(inventory)
-                inventory.children().asSequence().slots()
-            }
+    protected open fun init(children: List<AbstractMutableInventory>, slots: List<AbstractSlot>) {
+        this.init(children, slots as Iterable<AbstractSlot>)
+    }
+
+    protected open fun init(children: List<AbstractMutableInventory>) {
+        this.init(children, children.asSequence().slots()
+                .distinctBy { slot -> slot.actual }
+                .asIterable())
+    }
 
     override fun addSlotChangeListener(listener: (ExtendedSlot) -> Unit) {
         for (child in this.children)
@@ -83,10 +81,10 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
     override fun children(): List<AbstractInventory> = this.children
     override fun slots(): List<ExtendedSlot> = this.slotsByIndex
 
-    override fun slot(index: Int): ExtendedSlot? =
+    override fun slotOrNull(index: Int): ExtendedSlot? =
             if (index in this.slotsByIndex.indices) this.slotsByIndex[index] else null
 
-    override fun slotIndex(slot: Slot): Int? {
+    override fun slotIndexOrNull(slot: Slot): Int? {
         slot as AbstractSlot
         val index = this.slotsToIndex.getInt(slot)
         return if (index == INVALID_SLOT_INDEX) null else index

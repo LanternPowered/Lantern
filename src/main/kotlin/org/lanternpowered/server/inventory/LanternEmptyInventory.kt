@@ -30,6 +30,7 @@ class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
 
     override fun empty(): LanternEmptyInventory = this
     override fun children(): List<AbstractInventory> = emptyList()
+    override fun addSlotChangeListener(listener: (ExtendedSlot) -> Unit) {}
     override fun contains(stack: ItemStack): Boolean = false
     override fun contains(type: ItemType): Boolean = false
     override fun clear() {}
@@ -44,8 +45,8 @@ class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
     override fun freeCapacity(): Int = 0
     override fun capacity(): Int = 0
     override fun totalQuantity(): Int = 0
-    override fun slot(index: Int): ExtendedSlot? = null
-    override fun slotIndex(slot: Slot): Int? = null
+    override fun slotOrNull(index: Int): ExtendedSlot? = null
+    override fun slotIndexOrNull(slot: Slot): Int? = null
     override fun intersect(inventory: Inventory): ExtendedInventory = this
     override fun union(inventory: Inventory): ExtendedInventory = if (inventory is EmptyInventory) this else inventory.fix()
     override fun slots(): List<ExtendedSlot> = emptyList()

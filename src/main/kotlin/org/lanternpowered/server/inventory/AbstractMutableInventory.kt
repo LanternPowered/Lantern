@@ -35,9 +35,7 @@ abstract class AbstractMutableInventory : AbstractInventory() {
         intersectedSlots.retainAll(this.slots())
         if (intersectedSlots.isEmpty())
             return this.empty()
-        val result = LanternChildrenInventory()
-        result.init(intersectedSlots.uncheckedCast())
-        return result
+        return LanternChildrenInventory(intersectedSlots.uncheckedCast())
     }
 
     final override fun union(inventory: Inventory): ExtendedInventory {
@@ -54,8 +52,6 @@ abstract class AbstractMutableInventory : AbstractInventory() {
         // Add the slots of this inventory before that inventory
         unionSlots.removeAll(slotsThis)
         unionSlots.addAll(0, slotsThis)
-        val result = LanternChildrenInventory()
-        result.init(unionSlots.uncheckedCast())
-        return result
+        return LanternChildrenInventory(unionSlots.uncheckedCast())
     }
 }

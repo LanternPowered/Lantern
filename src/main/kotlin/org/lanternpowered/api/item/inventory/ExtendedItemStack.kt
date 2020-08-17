@@ -23,7 +23,7 @@ inline fun emptyItemStack(): ExtendedItemStack =
         ItemStack.empty().fix()
 
 /**
- * An extended version of the [ItemStack].
+ * An extended version of [ItemStack].
  */
 interface ExtendedItemStack : ItemStack {
 
@@ -48,6 +48,32 @@ interface ExtendedItemStack : ItemStack {
      * @return Whether the stacks are similar
      */
     infix fun isSimilarTo(other: ItemStackSnapshot): Boolean
+
+    /**
+     * Gets whether this item stack is similar to the other one.
+     *
+     * Stacks are equal if all the data matches, including
+     * the quantity.
+     *
+     * @param other The other stack to match with
+     * @return Whether the stacks are similar
+     */
+    infix fun isEqualTo(other: ItemStack): Boolean
+
+    /**
+     * Gets whether this item stack is similar to the other one.
+     *
+     * Stacks are equal if all the data matches, including
+     * the quantity.
+     *
+     * @param other The other stack to match with
+     * @return Whether the stacks are similar
+     */
+    infix fun isEqualTo(other: ItemStackSnapshot): Boolean
+
+    @Deprecated(message = "Prefer to use isEqualTo", replaceWith = ReplaceWith("this.isEqualTo(other)"))
+    override fun equalTo(other: ItemStack): Boolean =
+            this.isEqualTo(other)
 
     /**
      * Creates a *view* of this [ItemStack] as an [ItemStackSnapshot], changes

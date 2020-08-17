@@ -13,6 +13,8 @@ package org.lanternpowered.server.inventory
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ExtendedItemStack
 import org.lanternpowered.api.item.inventory.ExtendedItemStackSnapshot
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.util.ToStringHelper
@@ -28,8 +30,6 @@ import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.entity.attribute.AttributeModifier
 import org.spongepowered.api.entity.attribute.type.AttributeType
 import org.spongepowered.api.item.ItemTypes
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import java.util.function.Consumer
 
@@ -57,7 +57,7 @@ class LanternItemStack private constructor(
     constructor(itemType: ItemType, quantity: Int = 1) :
             this(itemType, quantity, (itemType as LanternItemType).stackKeyRegistry.copy()) {
         check(quantity >= 0) { "quantity may not be negative" }
-        registerKeys(itemType)
+        this.registerKeys(itemType)
     }
 
     private fun registerKeys(itemType: ItemType) {
@@ -110,10 +110,6 @@ class LanternItemStack private constructor(
         } else LanternItemStackSnapshot(this)
     }
 
-    override fun equalTo(that: ItemStack): Boolean {
-        return isSimilarTo(that) && getQuantity() == that.quantity
-    }
-
     override fun getAttributeModifiers(attributeType: AttributeType, equipmentType: EquipmentType): MutableCollection<AttributeModifier> {
         TODO("Not yet implemented")
     }
@@ -133,58 +129,43 @@ class LanternItemStack private constructor(
         return isSimilarTo(that) && getQuantity() == that.quantity
     }
 
-    override fun isEmpty(): Boolean {
-        return this.itemType === ItemTypes.AIR || this.quantity <= 0
-    }
+    override fun isEmpty(): Boolean =
+            this.itemType == ItemTypes.AIR.get() || this.quantity <= 0
 
-    override fun copy(): LanternItemStack {
-        // Just return the empty instance
-        return if (isEmpty) {
-            empty
-        } else LanternItemStack(this.itemType, this.quantity, keyRegistry.copy())
-    }
+    override fun copy(): LanternItemStack =
+            if (this.isEmpty) empty else LanternItemStack(this.itemType, this.quantity, this.keyRegistry.copy())
 
     /**
      * Applies the [Consumer] when this item stack isn't empty.
      *
      * @param consumer The consumer to accept
-     * @see .isEmpty
+     * @see isEmpty
      */
     fun ifNotEmpty(consumer: Consumer<LanternItemStack>) {
-        if (!isEmpty) {
+        if (!this.isEmpty) {
             consumer.accept(this)
         }
     }
 
-    /**
-     * Gets whether the specified [ItemStackSnapshot] is similar
-     * to this [ItemStack]. The [ItemType] and all
-     * the applied data must match.
-     *
-     * @param other The other snapshot
-     * @return Is similar
-     */
     override fun isSimilarTo(other: ItemStackSnapshot): Boolean =
             this.isSimilarTo((other as LanternItemStackSnapshot).asStack())
 
-    /**
-     *
-     * Gets whether the specified [ItemStack] is similar
-     * to this [ItemStack]. The [ItemType] and all
-     * the applied data must match.
-     *
-     * @param other The other snapshot
-     * @return Is similar
-     */
     override fun isSimilarTo(other: ItemStack): Boolean {
-        val emptyA = isEmpty
-        val emptyB = other.isEmpty
-        return if (emptyA != emptyB) {
-            emptyA && emptyB
-        } else {
-            this.type == other.type && LocalDataHolderHelper.matchContents(this, other as LanternItemStack)
-        }
+        if (this.isEmpty) {
+            if (other.isEmpty)
+                return true
+            return false
+        } else if (other.isEmpty)
+            return false
+        return this.type == other.type &&
+                LocalDataHolderHelper.matchContents(this, other as LanternItemStack)
     }
+
+    override fun isEqualTo(other: ItemStack): Boolean =
+            this.isSimilarTo(other) && this.quantity == other.quantity
+
+    override fun isEqualTo(other: ItemStackSnapshot): Boolean =
+            this.isSimilarTo(other) && this.quantity == other.quantity
 
     override fun asSnapshot(): ExtendedItemStackSnapshot =
             LanternItemStackSnapshot.wrap(this)

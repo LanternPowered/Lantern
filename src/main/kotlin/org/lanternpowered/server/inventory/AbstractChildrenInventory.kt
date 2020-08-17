@@ -75,6 +75,11 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
                 inventory.children().asSequence().slots()
             }
 
+    override fun addSlotChangeListener(listener: (ExtendedSlot) -> Unit) {
+        for (child in this.children)
+            child.addSlotChangeListener(listener)
+    }
+
     override fun children(): List<AbstractInventory> = this.children
     override fun slots(): List<ExtendedSlot> = this.slotsByIndex
 

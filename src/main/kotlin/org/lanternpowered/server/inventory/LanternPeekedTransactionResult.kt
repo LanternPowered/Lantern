@@ -29,7 +29,7 @@ open class LanternPeekedTransactionResult(override val transactions: List<SlotTr
     override fun acceptFast() {
         for (transaction in this.transactions) {
             if (!transaction.isValid)
-                return
+                continue
             transaction.slot.set(transaction.final.createStack())
         }
     }

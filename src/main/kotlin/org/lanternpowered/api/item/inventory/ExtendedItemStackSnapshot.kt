@@ -20,11 +20,54 @@ import org.lanternpowered.api.item.inventory.stack.fix
 inline fun emptyItemStackSnapshot(): ExtendedItemStackSnapshot =
         ItemStackSnapshot.empty().fix()
 
+/**
+ * An extended version of [ItemStackSnapshot].
+ */
 interface ExtendedItemStackSnapshot : ItemStackSnapshot {
 
-    fun isSimilarTo(other: ItemStack): Boolean
+    /**
+     * Gets whether this item stack is similar to the other one.
+     *
+     * Stacks are similar if all the data matches, excluding
+     * the quantity.
+     *
+     * @param other The other stack to match with
+     * @return Whether the stacks are similar
+     */
+    infix fun isSimilarTo(other: ItemStack): Boolean
 
-    fun isSimilarTo(other: ItemStackSnapshot): Boolean
+    /**
+     * Gets whether this item stack is similar to the other one.
+     *
+     * Stacks are similar if all the data matches, excluding
+     * the quantity.
+     *
+     * @param other The other stack to match with
+     * @return Whether the stacks are similar
+     */
+    infix fun isSimilarTo(other: ItemStackSnapshot): Boolean
+
+    /**
+     * Gets whether this item stack is similar to the other one.
+     *
+     * Stacks are equal if all the data matches, including
+     * the quantity.
+     *
+     * @param other The other stack to match with
+     * @return Whether the stacks are similar
+     */
+    infix fun isEqualTo(other: ItemStack): Boolean
+
+    /**
+     * Gets whether this item stack is similar to the other one.
+     *
+     * Stacks are equal if all the data matches, including
+     * the quantity.
+     *
+     * @param other The other stack to match with
+     * @return Whether the stacks are similar
+     */
+    infix fun isEqualTo(other: ItemStackSnapshot): Boolean
 
     /**
      * Creates a *view* of this [ItemStackSnapshot] as an [ItemStack], changes

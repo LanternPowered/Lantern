@@ -22,6 +22,7 @@ import org.lanternpowered.api.item.inventory.Slot
 import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.query.Query
 import org.lanternpowered.api.item.inventory.result.reject
+import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.api.item.inventory.stack.isNotEmpty
 import org.lanternpowered.api.item.inventory.transaction.SlotTransaction
@@ -85,6 +86,13 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     abstract override fun children(): List<AbstractInventory>
 
     /**
+     * Adds a slot change listener to this inventory.
+     *
+     * @param listener The listener to add
+     */
+    abstract fun addSlotChangeListener(listener: (ExtendedSlot) -> Unit)
+
+    /**
      * Attempts to convert this inventory into a [ViewableInventory].
      *
      * @return The viewable inventory
@@ -138,20 +146,22 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     }
 
     final override fun offer(stack: ItemStack): InventoryTransactionResult {
-        val copy = stack.copy()
-        return this.offerAndConsume0(copy) { copy.asSnapshot() }
+        val quantity = stack.quantity
+        val result = this.offerAndConsume0(stack)
+        stack.quantity = quantity
+        return result
     }
 
     final override fun offerAndConsume(stack: ItemStack): InventoryTransactionResult =
-            this.offerAndConsume0(stack) { stack.createSnapshot() }
+            this.offerAndConsume0(stack)
 
-    private fun offerAndConsume0(stack: ItemStack, createSnapshot: () -> ItemStackSnapshot): InventoryTransactionResult {
+    private fun offerAndConsume0(stack: ItemStack): InventoryTransactionResult {
         val builder = InventoryTransactionResult.builder()
         this.offerAndConsume(stack) { transaction -> builder.transaction(transaction) }
         if (stack.isEmpty) {
             builder.type(InventoryTransactionResultType.SUCCESS)
         } else {
-            builder.type(InventoryTransactionResultType.FAILURE).reject(createSnapshot())
+            builder.type(InventoryTransactionResultType.FAILURE).reject(stack.createSnapshot())
         }
         return builder.build()
     }
@@ -162,10 +172,11 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     final override fun offerFast(stacks: Iterable<ItemStack>): Boolean {
         var success = true
         for (stack in stacks) {
-            val copy = stack.copy()
-            this.offerAndConsume(copy, null)
-            if (copy.isNotEmpty)
+            val quantity = stack.quantity
+            this.offerAndConsume(stack, null)
+            if (stack.isNotEmpty)
                 success = false
+            stack.quantity = quantity
         }
         return success
     }
@@ -272,14 +283,14 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     override fun <V : Any> get(key: Key<out Value<V>>): Optional<V> =
             super<DataHolderBase>.get(key)
 
-    final override fun containsInventory(child: Inventory): Boolean { // TODO: Move to AbstractInventory?
+    final override fun containsInventory(child: Inventory): Boolean {
         if (child == this)
             return true
         return this.children().any { inventory -> inventory.containsInventory(child) }
     }
 
     final override fun containsChild(child: Inventory): Boolean =
-            this.children().contains(child) // TODO: Move to AbstractInventory?
+            this.children().contains(child)
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> {
         if (key == Keys.SLOT_INDEX && child is Slot)

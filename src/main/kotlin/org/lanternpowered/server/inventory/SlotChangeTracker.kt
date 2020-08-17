@@ -8,55 +8,55 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.inventory
 
-import org.lanternpowered.server.inventory.client.ClientSlot;
-import org.spongepowered.api.item.inventory.Slot;
+import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.server.inventory.client.ClientSlot
 
 /**
- * Can be used to track the changes of a {@link Slot}.
+ * Can be used to track the changes of a [Slot].
  */
-public interface SlotChangeTracker {
+interface SlotChangeTracker {
 
     /**
-     * Queues a silent slot change for the specified {@link Slot}.
+     * Queues a silent slot change for the specified [Slot].
      *
      * @param slot The slot
      */
-    void queueSlotChange(Slot slot);
+    fun queueSlotChange(slot: Slot)
 
     /**
-     * Queues a slot change for the specified {@link ClientSlot}.
+     * Queues a slot change for the specified [ClientSlot].
      *
      * @param clientSlot The client slot
      */
-    void queueSlotChange(ClientSlot clientSlot);
+    fun queueSlotChange(clientSlot: ClientSlot)
 
     /**
      * Queues a slot change for the specified slot index.
      *
      * @param index The slot index
      */
-    void queueSlotChange(int index);
+    fun queueSlotChange(index: Int)
 
     /**
-     * Queues a silent slot change for the specified {@link Slot}.
+     * Queues a silent slot change for the specified [Slot].
      *
      * @param slot The slot
      */
-    void queueSilentSlotChange(Slot slot);
+    fun queueSilentSlotChange(slot: Slot)
 
     /**
-     * Queues a silent slot change for the specified {@link ClientSlot}.
+     * Queues a silent slot change for the specified [ClientSlot].
      *
      * @param clientSlot The client slot
      */
-    void queueSilentSlotChange(ClientSlot clientSlot);
+    fun queueSilentSlotChange(clientSlot: ClientSlot)
 
     /**
      * Queues a silent slot change for the specified slot index.
      *
      * @param index The slot index
      */
-    void queueSilentSlotChange(int index);
+    fun queueSilentSlotChange(index: Int)
 }

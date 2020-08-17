@@ -108,6 +108,62 @@ inline infix fun ItemStackSnapshot.isSimilarTo(other: ItemStackSnapshot): Boolea
 }
 
 /**
+ * Gets whether this item stack is similar to the other one.
+ *
+ * Stacks are equal if all the data matches, including
+ * the quantity.
+ *
+ * @param other The other stack to match with
+ * @return Whether the stacks are similar
+ */
+inline infix fun ItemStack.isEqualTo(other: ItemStack): Boolean {
+    contract { returns() implies (this@isEqualTo is ExtendedItemStack) }
+    return (this as ExtendedItemStack).isEqualTo(other)
+}
+
+/**
+ * Gets whether this item stack is similar to the other one.
+ *
+ * Stacks are equal if all the data matches, including
+ * the quantity.
+ *
+ * @param other The other stack to match with
+ * @return Whether the stacks are similar
+ */
+inline infix fun ItemStack.isEqualTo(other: ItemStackSnapshot): Boolean {
+    contract { returns() implies (this@isEqualTo is ExtendedItemStack) }
+    return (this as ExtendedItemStack).isEqualTo(other)
+}
+
+/**
+ * Gets whether this item stack is similar to the other one.
+ *
+ * Stacks are equal if all the data matches, including
+ * the quantity.
+ *
+ * @param other The other stack to match with
+ * @return Whether the stacks are similar
+ */
+inline infix fun ItemStackSnapshot.isEqualTo(other: ItemStack): Boolean {
+    contract { returns() implies (this@isEqualTo is ExtendedItemStackSnapshot) }
+    return (this as ExtendedItemStackSnapshot).isEqualTo(other)
+}
+
+/**
+ * Gets whether this item stack is similar to the other one.
+ *
+ * Stacks are equal if all the data matches, including
+ * the quantity.
+ *
+ * @param other The other stack to match with
+ * @return Whether the stacks are similar
+ */
+inline infix fun ItemStackSnapshot.isEqualTo(other: ItemStackSnapshot): Boolean {
+    contract { returns() implies (this@isEqualTo is ExtendedItemStackSnapshot) }
+    return (this as ExtendedItemStackSnapshot).isEqualTo(other)
+}
+
+/**
  * Creates a *view* of this [ItemStack] as an [ItemStackSnapshot], changes
  * to the item stack will reflect to the snapshot.
  *

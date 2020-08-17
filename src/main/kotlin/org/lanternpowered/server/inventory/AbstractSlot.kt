@@ -35,6 +35,20 @@ abstract class AbstractSlot : AbstractMutableInventory(), ExtendedSlot {
      */
     abstract var rawItem: ItemStack
 
+    /**
+     * Adds the [SlotChangeTracker].
+     *
+     * @param tracker The slot change tracker
+     */
+    abstract fun addTracker(tracker: SlotChangeTracker)
+
+    /**
+     * Removes the [SlotChangeTracker].
+     *
+     * @param tracker The slot change tracker
+     */
+    abstract fun removeTracker(tracker: SlotChangeTracker)
+
     override fun viewedSlot(): ExtendedSlot = this
 
     override fun children(): List<AbstractInventory> = emptyList()

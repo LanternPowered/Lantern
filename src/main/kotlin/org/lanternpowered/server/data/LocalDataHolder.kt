@@ -17,7 +17,7 @@ import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
 
-interface LocalDataHolder : ValueContainerBase, DataHolderBase {
+interface LocalDataHolder : DataHolderBase {
 
     /**
      * Gets the [LocalKeyRegistry].
@@ -51,7 +51,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
                 return true
         }
 
-        return super<DataHolderBase>.supports(key)
+        return super.supports(key)
     }
 
     @JvmDefault
@@ -66,7 +66,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
                 return result
         }
 
-        return super<DataHolderBase>.getValue(key)
+        return super.getValue(key)
     }
 
     @JvmDefault
@@ -81,7 +81,7 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
                 return result
         }
 
-        return super<DataHolderBase>.get(key)
+        return super.get(key)
     }
 
     @JvmDefault
@@ -100,7 +100,8 @@ interface LocalDataHolder : ValueContainerBase, DataHolderBase {
         values.addAll(super.getValues())
 
         for (registration in this.keyRegistry.registrations) {
-            registration.anyDataProvider().getValue(this).ifPresent { value -> values.add(value.asImmutable()) }
+            registration.anyDataProvider().getValue(this)
+                    .ifPresent { value -> values.add(value.asImmutable()) }
         }
 
         return values.build()

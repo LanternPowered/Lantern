@@ -50,26 +50,17 @@ class LanternItemStackSnapshot internal constructor(itemStack: LanternItemStack)
             .add("data", ValueFactory.toString(this.backingDataHolder))
             .toString()
 
-    /**
-     * Gets whether the specified [ItemStackSnapshot] is similar
-     * to this [ItemStackSnapshot]. The [ItemType] and all
-     * the applied data must match.
-     *
-     * @param other The other snapshot
-     * @return Is similar
-     */
-    override fun isSimilarTo(other: ItemStackSnapshot): Boolean = this.isSimilarTo((other as LanternItemStackSnapshot).backingDataHolder)
+    override fun isSimilarTo(other: ItemStackSnapshot): Boolean =
+            this.isSimilarTo((other as LanternItemStackSnapshot).backingDataHolder)
 
-    /**
-     *
-     * Gets whether the specified [ItemStack] is similar
-     * to this [ItemStackSnapshot]. The [ItemType] and all
-     * the applied data must match.
-     *
-     * @param other The other snapshot
-     * @return Is similar
-     */
-    override fun isSimilarTo(other: ItemStack): Boolean = this.backingDataHolder.isSimilarTo(other)
+    override fun isSimilarTo(other: ItemStack): Boolean =
+            this.backingDataHolder.isSimilarTo(other)
+
+    override fun isEqualTo(other: ItemStack): Boolean =
+            this.isSimilarTo(other) && this.quantity == other.quantity
+
+    override fun isEqualTo(other: ItemStackSnapshot): Boolean =
+            this.isSimilarTo(other) && this.quantity == other.quantity
 
     override fun asStack(): ExtendedItemStack = this.backingDataHolder
 

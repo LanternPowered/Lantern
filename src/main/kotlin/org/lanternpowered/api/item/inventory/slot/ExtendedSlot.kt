@@ -72,15 +72,37 @@ interface ExtendedSlot : Slot, ExtendedInventory {
     override fun viewedSlot(): ExtendedSlot
 
     /**
+     * The maximum stack size that can be stored, for the given [stack].
+     *
+     * In vanilla, most slots specify a limit of 64 items. But if the items
+     * default max stack quantity is lower, the 64 items will be reduced to
+     * that default.
+     *
+     * Different kind of implementations may handle this differently.
+     */
+    fun maxStackQuantity(stack: ItemStack): Int
+
+    /**
      * Sets the given stack into this slot.
      *
-     * This is the fast variant of [set], use this if you don't care
+     * This is the fast variant of [safeSet], use this if you don't care
      * about the transaction result.
      *
      * @param stack The stack of items to set (partially) into this slot
      * @return Whether the stack was completely added
      */
-    fun setFast(stack: ItemStack): Boolean
+    fun safeSetFast(stack: ItemStack): Boolean
+
+    /**
+     * Sets the given stack into this slot.
+     *
+     * This is the fast variant of [forceSet], use this if you don't care
+     * about the transaction result.
+     *
+     * @param stack The stack of items to set (partially) into this slot
+     * @return Whether the stack was completely added
+     */
+    fun forceSetFast(stack: ItemStack): Boolean
 
     /**
      * Forcibly sets at [ItemStack] in this slot.

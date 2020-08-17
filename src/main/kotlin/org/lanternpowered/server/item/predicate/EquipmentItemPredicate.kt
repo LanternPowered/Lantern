@@ -14,6 +14,7 @@ import org.spongepowered.api.data.Keys
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.spongepowered.api.item.inventory.equipment.EquipmentGroup
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
 interface EquipmentItemPredicate : ItemPredicate {
@@ -81,15 +82,13 @@ interface EquipmentItemPredicate : ItemPredicate {
         }
 
         /**
-         * Constructs a [ItemPredicate] for the provided
-         * [EquipmentType] predicate.
+         * Constructs a [ItemPredicate] for the given [EquipmentGroup].
          *
-         * @param equipmentType The equipment type
+         * @param group The equipment group
          * @return The equipment item filter
          */
         @JvmStatic
-        fun of(equipmentType: EquipmentType): EquipmentItemPredicate {
-            return of(equipmentType::includes)
-        }
+        fun ofGroup(group: EquipmentGroup): EquipmentItemPredicate =
+                this.of { type -> type.group == group }
     }
 }

@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.inventory.slot
 
-import org.lanternpowered.api.item.inventory.slot.FilteringSlot
+import org.lanternpowered.api.item.ItemType
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.slot.ExtendedFilteringSlot
 import org.lanternpowered.server.inventory.AbstractSlot
-import org.spongepowered.api.item.ItemType
-import org.spongepowered.api.item.inventory.ItemStack
 
-abstract class AbstractFilteringSlotView<T> : AbstractSlotView<T>(), FilteringSlot
+abstract class AbstractFilteringSlotView<T> : AbstractSlotView<T>(), ExtendedFilteringSlot
     where T : AbstractSlot,
-          T : FilteringSlot {
+          T : ExtendedFilteringSlot {
 
     override fun isValidItem(stack: ItemStack): Boolean =
             this.backing.isValidItem(stack)

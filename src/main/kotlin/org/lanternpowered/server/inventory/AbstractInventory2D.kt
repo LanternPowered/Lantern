@@ -29,12 +29,12 @@ abstract class AbstractInventory2D : AbstractChildrenInventory(), ExtendedInvent
     override val width: Int get() = this._width
     override val height: Int get() = this._height
 
-    protected fun init(children: List<AbstractMutableInventory>, slots: List<AbstractSlot>, width: Int, height: Int) {
+    protected fun init(children: List<AbstractInventory>, slots: List<AbstractSlot>, width: Int, height: Int) {
         this.initSize(slots.size, width, height)
         super.init(children, slots)
     }
 
-    protected fun init(children: List<AbstractMutableInventory>, width: Int, height: Int) {
+    protected fun init(children: List<AbstractInventory>, width: Int, height: Int) {
         this.init(children, children.asSequence().slots().toImmutableList(), width, height)
     }
 
@@ -50,10 +50,10 @@ abstract class AbstractInventory2D : AbstractChildrenInventory(), ExtendedInvent
         this._height = height
     }
 
-    override fun init(children: List<AbstractMutableInventory>, slots: List<AbstractSlot>): Unit =
+    override fun init(children: List<AbstractInventory>, slots: List<AbstractSlot>): Unit =
             throw UnsupportedOperationException()
 
-    override fun init(children: List<AbstractMutableInventory>): Unit =
+    override fun init(children: List<AbstractInventory>): Unit =
             throw UnsupportedOperationException()
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> {

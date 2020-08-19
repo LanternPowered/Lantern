@@ -15,6 +15,7 @@ package org.lanternpowered.api.item.inventory.slot
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.InventoryTransactionResult
 import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
 import java.util.Optional
 
@@ -97,6 +98,12 @@ interface ExtendedSlot : Slot, ExtendedInventory {
      * @param stack The stack of items to set
      */
     fun safeSet(stack: ItemStack): InventoryTransactionResult
+
+    /**
+     * Tests whether the slot contains an item validated by the given
+     * function. The function is also applied to empty items.
+     */
+    fun contains(fn: (ItemStackSnapshot) -> Boolean): Boolean
 
     // region Redundant slot functions
 

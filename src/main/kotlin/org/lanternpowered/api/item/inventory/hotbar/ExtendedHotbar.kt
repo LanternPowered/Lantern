@@ -10,13 +10,20 @@
  */
 package org.lanternpowered.api.item.inventory.hotbar
 
+import org.lanternpowered.api.item.inventory.ExtendedInventoryRow
+import org.lanternpowered.api.item.inventory.fix
+import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.slot.Slot
-import org.lanternpowered.api.util.optional.orNull
 
 typealias Hotbar = org.spongepowered.api.item.inventory.entity.Hotbar
 
 /**
  * The [Slot] that's currently selected.
  */
-val Hotbar.selectedSlot: Slot
-    get() = this.getSlot(this.selectedSlotIndex).orNull() ?: error("The selected slot doesn't exist.")
+val Hotbar.selectedSlot: ExtendedSlot
+    get() = this.fix().slot(this.selectedSlotIndex)
+
+/**
+ * An extended version of [Hotbar].
+ */
+interface ExtendedHotbar : ExtendedInventoryRow, Hotbar

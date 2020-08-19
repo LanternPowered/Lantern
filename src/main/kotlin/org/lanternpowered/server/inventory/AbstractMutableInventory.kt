@@ -10,10 +10,6 @@
  */
 package org.lanternpowered.server.inventory
 
-import org.lanternpowered.api.item.inventory.ExtendedInventory
-import org.lanternpowered.api.item.inventory.Inventory
-import org.lanternpowered.api.util.uncheckedCast
-
 abstract class AbstractMutableInventory : AbstractInventory() {
 
     abstract override fun instantiateView(): InventoryView<AbstractMutableInventory>
@@ -23,37 +19,4 @@ abstract class AbstractMutableInventory : AbstractInventory() {
     }
 
     final override fun empty(): LanternEmptyInventory = this.empty
-
-    // TODO: Consider wrapped slots?
-
-    final override fun intersect(inventory: Inventory): ExtendedInventory {
-        if (inventory == this || this.slots().isEmpty())
-            return this.empty()
-        inventory as AbstractInventory
-        val slots = inventory.slots()
-        if (slots.isEmpty())
-            return this.empty()
-        val intersectedSlots = slots.toMutableList()
-        intersectedSlots.retainAll(this.slots())
-        if (intersectedSlots.isEmpty())
-            return this.empty()
-        return LanternChildrenInventory(intersectedSlots.uncheckedCast())
-    }
-
-    final override fun union(inventory: Inventory): ExtendedInventory {
-        if (inventory == this)
-            return this
-        inventory as AbstractInventory
-        val slotsThis = this.slots()
-        if (slotsThis.isEmpty())
-            return inventory
-        val slotsThat = inventory.slots()
-        if (slotsThat.isEmpty())
-            return this
-        val unionSlots = slotsThat.toMutableList()
-        // Add the slots of this inventory before that inventory
-        unionSlots.removeAll(slotsThis)
-        unionSlots.addAll(0, slotsThis)
-        return LanternChildrenInventory(unionSlots.uncheckedCast())
-    }
 }

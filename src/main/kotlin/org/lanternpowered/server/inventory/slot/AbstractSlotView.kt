@@ -73,6 +73,9 @@ abstract class AbstractSlotView<T : AbstractSlot> : AbstractSlot(), InventoryVie
     override fun contains(type: ItemType): Boolean =
             this.backing.contains(type)
 
+    override fun contains(fn: (ItemStackSnapshot) -> Boolean): Boolean =
+            this.backing.contains(fn)
+
     override fun clear() =
             this.backing.clear()
 

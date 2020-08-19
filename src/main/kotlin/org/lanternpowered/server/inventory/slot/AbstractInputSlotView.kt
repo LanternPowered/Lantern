@@ -10,9 +10,9 @@
  */
 package org.lanternpowered.server.inventory.slot
 
-import org.lanternpowered.api.item.inventory.slot.InputSlot
+import org.lanternpowered.api.item.inventory.slot.ExtendedInputSlot
 import org.lanternpowered.server.inventory.AbstractSlot
 
-abstract class AbstractInputSlotView<T> : AbstractFilteringSlotView<T>(), InputSlot
+abstract class AbstractInputSlotView<T> : AbstractFilteringSlotView<T>(), ExtendedInputSlot
     where T : AbstractSlot,
-          T : InputSlot
+          T : ExtendedInputSlot

@@ -40,7 +40,7 @@ inline fun ExtendedInventoryRow.fix(): ExtendedInventoryRow = this
 /**
  * An extended version of [InventoryRow].
  */
-interface ExtendedInventoryRow : InventoryRow, ExtendedInventory2D {
+interface ExtendedInventoryRow : ExtendedInventory2D, InventoryRow {
 
     @Deprecated(message = "Is always 1 for rows.", replaceWith = ReplaceWith("1"))
     override val height: Int

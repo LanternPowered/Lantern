@@ -29,9 +29,9 @@ import java.util.Optional;
 public class VanillaHotbarBehavior extends SimpleHotbarBehavior {
 
     @Override
-    public void handleSelectedSlotChange(ClientContainer clientContainer, int hotbarSlot) {
+    public void handleSelectedSlotChange(ClientContainer clientContainer, int slotIndex) {
         final Optional<ClientSlot> oldHotbarSlot = clientContainer.getClientSlot(getSelectedSlotIndex());
-        final Optional<ClientSlot> newHotbarSlot = clientContainer.getClientSlot(hotbarSlot);
+        final Optional<ClientSlot> newHotbarSlot = clientContainer.getClientSlot(slotIndex);
 
         final AbstractSlot oldSlot = oldHotbarSlot.get() instanceof ClientSlot.Slot ?
                 ((ClientSlot.Slot) oldHotbarSlot.get()).getSlot() : null;
@@ -66,6 +66,6 @@ public class VanillaHotbarBehavior extends SimpleHotbarBehavior {
             }
         }
 
-        super.handleSelectedSlotChange(clientContainer, hotbarSlot);
+        super.handleSelectedSlotChange(clientContainer, slotIndex);
     }
 }

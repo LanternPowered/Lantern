@@ -8,6 +8,8 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
+@file:Suppress("OverridingDeprecatedMember")
+
 package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.entity.player.Player
@@ -19,12 +21,13 @@ import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.PeekedOfferTransactionResult
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.ViewableInventory
 import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.query.Query
+import org.lanternpowered.api.item.inventory.query.of
 import org.lanternpowered.api.item.inventory.result.reject
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.api.item.inventory.stack.isNotEmpty
 import org.lanternpowered.api.item.inventory.transaction.SlotTransaction
@@ -34,6 +37,7 @@ import org.lanternpowered.server.data.DataHolderBase
 import org.lanternpowered.server.inventory.carrier.CarrierInventoryTypes
 import org.lanternpowered.server.inventory.carrier.CarrierReference
 import org.spongepowered.api.data.Key
+import org.spongepowered.api.data.KeyValueMatcher
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.item.inventory.Carrier
@@ -126,6 +130,7 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
             if (this is ViewableInventory) this.asOptional() else this.toViewable().asOptional()
 
     abstract override fun children(): List<AbstractInventory>
+    abstract override fun slots(): List<AbstractSlot>
 
     /**
      * Adds a slot change listener to this inventory.
@@ -290,24 +295,44 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
 
     final override fun peek(limit: Int): ItemStack = this.peek(limit) { true }
 
-    final override fun query(query: Query): ExtendedInventory = query.execute(this).fix()
+    override fun query(query: Query): ExtendedInventory = query.execute(this).fix()
+
+    final override fun query(matcher: KeyValueMatcher<*>): ExtendedInventory =
+            this.query(org.spongepowered.api.item.inventory.query.QueryTypes.KEY_VALUE.of(matcher))
 
     final override fun <T : Inventory> query(inventoryType: Class<T>): Optional<T> =
             this.query(inventoryType.kotlin).firstOrNull().asOptional()
 
-    final override fun <T : Inventory> query(inventoryType: KClass<T>): Sequence<T> {
-        val initial: Sequence<T> = if (inventoryType.isInstance(this)) sequenceOf(this.uncheckedCast()) else emptySequence()
-        return initial + this.queryChildren(inventoryType)
+    final override fun <T : Inventory> query(inventoryType: KClass<T>): Sequence<T> =
+            this.queryAny(inventoryType)
+
+    fun <T : Any> queryAny(type: KClass<T>): Sequence<T> =
+            this.queryAny { inventory -> type.isInstance(inventory) }.uncheckedCast()
+
+    fun queryAny(fn: (AbstractInventory) -> Boolean): Sequence<AbstractInventory> {
+        val initial: Sequence<AbstractInventory> = if (fn(this)) sequenceOf(this.uncheckedCast()) else emptySequence()
+        return initial + this.queryChildren(fn)
     }
 
-    protected open fun <T : Inventory> queryChildren(inventoryType: KClass<T>): Sequence<T> {
+    protected open fun queryChildren(fn: (AbstractInventory) -> Boolean): Sequence<AbstractInventory> {
         return sequence {
             for (child in children()) {
-                if (inventoryType.isInstance(child))
+                if (fn(child))
                     this.yield(child.uncheckedCast())
             }
             for (child in children())
-                this.yieldAll(child.query(inventoryType))
+                this.yieldAll(child.queryAny(fn))
+        }
+    }
+
+    protected open fun <T : Any> queryChildren(type: KClass<T>): Sequence<T> {
+        return sequence {
+            for (child in children()) {
+                if (type.isInstance(child))
+                    this.yield(child.uncheckedCast())
+            }
+            for (child in children())
+                this.yieldAll(child.queryAny(type))
         }
     }
 
@@ -339,5 +364,39 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
         if (key == Keys.SLOT_INDEX.get() && child is Slot)
             return this.slotIndex(child).asOptional().uncheckedCast()
         return child.get(key)
+    }
+
+    // TODO: Consider wrapped slots?
+
+    final override fun intersect(inventory: Inventory): ExtendedInventory {
+        if (inventory == this || this.slots().isEmpty())
+            return this.empty()
+        inventory as AbstractInventory
+        val slots = inventory.slots()
+        if (slots.isEmpty())
+            return this.empty()
+        val intersectedSlots = slots.toMutableList()
+        intersectedSlots.retainAll(this.slots())
+        if (intersectedSlots.isEmpty())
+            return this.empty()
+        return LanternChildrenInventory(intersectedSlots.uncheckedCast())
+    }
+
+    final override fun union(inventory: Inventory): ExtendedInventory {
+        if (inventory == this)
+            return this
+        inventory as AbstractInventory
+        var slotsThis = this.slots()
+        if (slotsThis.isEmpty())
+            return inventory
+        val slotsThat = inventory.slots()
+        if (slotsThat.isEmpty())
+            return this
+        val unionSlots = slotsThat.mapTo(mutableListOf()) { slot -> slot.original() }
+        // Add the slots of this inventory before that inventory
+        slotsThis = slotsThis.map { slot -> slot.original() }
+        unionSlots.removeAll(slotsThis)
+        unionSlots.addAll(0, slotsThis)
+        return LanternChildrenInventory(unionSlots.uncheckedCast())
     }
 }

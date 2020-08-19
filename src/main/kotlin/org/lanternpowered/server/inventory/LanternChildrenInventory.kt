@@ -12,7 +12,7 @@ package org.lanternpowered.server.inventory
 
 open class LanternChildrenInventory : AbstractChildrenInventory {
 
-    constructor(children: List<AbstractMutableInventory>) {
+    constructor(children: List<AbstractInventory>) {
         this.init(children)
     }
 

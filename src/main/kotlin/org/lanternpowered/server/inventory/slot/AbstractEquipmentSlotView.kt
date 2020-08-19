@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.inventory.slot
 
-import org.lanternpowered.api.item.inventory.slot.EquipmentSlot
+import org.lanternpowered.api.item.inventory.slot.ExtendedEquipmentSlot
 import org.lanternpowered.server.inventory.AbstractSlot
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
-abstract class AbstractEquipmentSlotView<T> : AbstractFilteringSlotView<T>(), EquipmentSlot
+abstract class AbstractEquipmentSlotView<T> : AbstractFilteringSlotView<T>(), ExtendedEquipmentSlot
     where T : AbstractSlot,
-          T : EquipmentSlot {
+          T : ExtendedEquipmentSlot {
 
     override fun isValidItem(type: EquipmentType): Boolean =
             this.backing.isValidItem(type)

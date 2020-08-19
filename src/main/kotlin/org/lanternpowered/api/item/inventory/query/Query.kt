@@ -13,10 +13,11 @@ package org.lanternpowered.api.item.inventory.query
 import java.util.function.Supplier
 
 typealias Query = org.spongepowered.api.item.inventory.query.Query
+typealias QueryBuilder = org.spongepowered.api.item.inventory.query.Query.Builder
 typealias QueryType = org.spongepowered.api.item.inventory.query.QueryType
+typealias NoParamQueryType = org.spongepowered.api.item.inventory.query.QueryType.NoParam
 typealias OneParamQueryType<T> = org.spongepowered.api.item.inventory.query.QueryType.OneParam<T>
 typealias TwoParamQueryType<T1, T2> = org.spongepowered.api.item.inventory.query.QueryType.TwoParam<T1, T2>
-typealias QueryTypes = org.spongepowered.api.item.inventory.query.QueryTypes
 
 /**
  * Returns the query for the given parameter.

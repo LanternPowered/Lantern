@@ -12,7 +12,6 @@ package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.inventory.ExtendedInventoryRow
 import org.lanternpowered.api.item.inventory.slot.Slot
-import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.spongepowered.math.vector.Vector2i
 
@@ -21,13 +20,13 @@ open class LanternInventoryRow : AbstractInventory2D(), ExtendedInventoryRow {
     override val height: Int
         get() = 1
 
-    override fun init(children: List<AbstractMutableInventory>, slots: List<AbstractSlot>) =
+    override fun init(children: List<AbstractInventory>, slots: List<AbstractSlot>) =
             super.init(children, slots, width = slots.size, height = 1)
 
-    override fun init(children: List<AbstractMutableInventory>) =
+    override fun init(children: List<AbstractInventory>) =
             this.init(children, children.asSequence().slots().toImmutableList())
 
-    override fun slotOrNull(position: Vector2i): ExtendedSlot? {
+    override fun slotOrNull(position: Vector2i): AbstractSlot? {
         if (position.y != 0)
             return null
         return this.slotOrNull(position.x)

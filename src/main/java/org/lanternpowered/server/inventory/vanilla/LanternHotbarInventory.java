@@ -50,7 +50,7 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
      * @return The selected slot
      */
     public AbstractSlot getSelectedSlot() {
-        final int slotIndex = this.hotbarBehavior.getSelectedSlotIndex();
+        final int slotIndex = this.hotbarBehavior.selectedSlotIndex;
         return (AbstractSlot) getSlot(slotIndex).orElseThrow(() -> new IllegalStateException("No slot at index: " + slotIndex));
     }
 
@@ -75,12 +75,12 @@ public class LanternHotbarInventory extends AbstractInventoryRow implements Hotb
 
     @Override
     public int getSelectedSlotIndex() {
-        return this.hotbarBehavior.getSelectedSlotIndex();
+        return this.hotbarBehavior.selectedSlotIndex;
     }
 
     @Override
     public void setSelectedSlotIndex(int index) {
-        this.hotbarBehavior.setSelectedSlotIndex(index);
+        this.hotbarBehavior.selectedSlotIndex = index;
     }
 
     // The EquipmentSlotType off the selected hotbar slot is dynamic,

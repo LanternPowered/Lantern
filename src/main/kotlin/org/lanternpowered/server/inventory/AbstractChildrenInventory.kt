@@ -49,12 +49,12 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
         private const val INVALID_SLOT_INDEX = -1
     }
 
-    private lateinit var children: List<AbstractMutableInventory>
+    private lateinit var children: List<AbstractInventory>
 
     private lateinit var slotsByIndex: List<AbstractSlot>
     private lateinit var slotsToIndex: Object2IntMap<AbstractSlot>
 
-    private fun init(children: List<AbstractMutableInventory>, slots: Iterable<AbstractSlot>) {
+    private fun init(children: List<AbstractInventory>, slots: Iterable<AbstractSlot>) {
         val slotsToIndex = Object2IntOpenHashMap<AbstractSlot>()
         slotsToIndex.defaultReturnValue(INVALID_SLOT_INDEX)
         for ((index, slot) in slots.withIndex())
@@ -64,11 +64,11 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
         this.children = children.toImmutableList()
     }
 
-    protected open fun init(children: List<AbstractMutableInventory>, slots: List<AbstractSlot>) {
+    protected open fun init(children: List<AbstractInventory>, slots: List<AbstractSlot>) {
         this.init(children, slots as Iterable<AbstractSlot>)
     }
 
-    protected open fun init(children: List<AbstractMutableInventory>) {
+    protected open fun init(children: List<AbstractInventory>) {
         this.init(children, children.asSequence().slots()
                 .distinctBy { slot -> slot.original() }
                 .asIterable())
@@ -79,10 +79,10 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
             child.addSlotChangeListener(listener)
     }
 
-    override fun children(): List<AbstractMutableInventory> = this.children
-    override fun slots(): List<ExtendedSlot> = this.slotsByIndex
+    override fun children(): List<AbstractInventory> = this.children
+    override fun slots(): List<AbstractSlot> = this.slotsByIndex
 
-    override fun slotOrNull(index: Int): ExtendedSlot? =
+    override fun slotOrNull(index: Int): AbstractSlot? =
             if (index in this.slotsByIndex.indices) this.slotsByIndex[index] else null
 
     override fun slotIndexOrNull(slot: Slot): Int? {
@@ -246,7 +246,7 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
             return
         val processed = mutableSetOf<Inventory>()
         // First try to offer to slots which contain a similar item
-        val inventory = this.query(QueryTypes.ITEM_STACK_IGNORE_QUANTITY, stack)
+        val inventory = this.query(QueryTypes.SIMILAR_ITEM_STACK, stack)
         if (inventory is AbstractChildrenInventory) {
             inventory.offerAndConsume0(stack, processed, fn)
             if (stack.isEmpty)
@@ -257,11 +257,7 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
 
     private fun offerAndConsume0(stack: ItemStack, processed: MutableSet<Inventory>, fn: (child: AbstractInventory) -> Unit) {
         for (inventory in this.children()) {
-            var delegate = inventory
-            // Check for the delegate slot if present
-            while (delegate is AbstractForwardingSlot)
-                delegate = delegate.delegateSlot
-            if (!processed.add(delegate))
+            if (!processed.add(inventory.original()))
                 continue
             fn(inventory)
             // Stack got consumed, stop fast

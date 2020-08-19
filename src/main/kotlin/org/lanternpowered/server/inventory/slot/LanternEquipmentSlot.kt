@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.inventory.slot
 
-import org.lanternpowered.api.item.inventory.slot.EquipmentSlot
+import org.lanternpowered.api.item.inventory.slot.ExtendedEquipmentSlot
 import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.item.predicate.EquipmentItemPredicate
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 
-class LanternEquipmentSlot : LanternFilteringSlot(), EquipmentSlot {
+class LanternEquipmentSlot : LanternFilteringSlot(), ExtendedEquipmentSlot {
 
     override fun isValidItem(type: EquipmentType): Boolean =
             (this.filter as? EquipmentItemPredicate)?.test(type) ?: true

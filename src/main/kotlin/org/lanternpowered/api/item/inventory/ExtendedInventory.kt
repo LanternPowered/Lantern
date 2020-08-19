@@ -12,9 +12,9 @@
 
 package org.lanternpowered.api.item.inventory
 
+import org.lanternpowered.api.item.inventory.query.NoParamQueryType
 import org.lanternpowered.api.item.inventory.query.OneParamQueryType
 import org.lanternpowered.api.item.inventory.query.Query
-import org.lanternpowered.api.item.inventory.query.QueryTypes
 import org.lanternpowered.api.item.inventory.query.TwoParamQueryType
 import org.lanternpowered.api.item.inventory.query.of
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
@@ -497,7 +497,52 @@ interface ExtendedInventory : Inventory {
      */
     fun <T : Inventory> query(inventoryType: KClass<T>): Sequence<T>
 
+    /**
+     * Query this inventory with given [Query].
+     *
+     * @param query The query
+     * @return The queried inventory
+     */
     override fun query(query: Query): ExtendedInventory
+
+    /**
+     * Query this inventory with given [NoParamQueryType].
+     *
+     * @param queryType The query type
+     * @return The queried inventory
+     */
+    fun <P> query(queryType: Supplier<NoParamQueryType>): ExtendedInventory =
+            this.query(queryType.get().toQuery())
+
+    /**
+     * Query this inventory with given [NoParamQueryType].
+     *
+     * @param queryType The query type
+     * @return The queried inventory
+     */
+    fun <P> query(queryType: NoParamQueryType): ExtendedInventory =
+            this.query(queryType.toQuery())
+
+    /**
+     * Query this inventory with given [OneParamQueryType] and parameter.
+     *
+     * @param queryType The query type
+     * @param param The parameter
+     * @return The queried inventory
+     */
+    fun <P> query(queryType: OneParamQueryType<P>, param: P): ExtendedInventory =
+            this.query(queryType.of(param))
+
+    /**
+     * Query this inventory with given [TwoParamQueryType] and parameters.
+     *
+     * @param queryType The query type
+     * @param param1 The first parameter
+     * @param param2 The second parameter
+     * @return The queried inventory
+     */
+    fun <P1, P2> query(queryType: TwoParamQueryType<P1, P2>, param1: P1, param2: P2): ExtendedInventory =
+            this.query(queryType.of(param1, param2))
 
     @JvmDefault
     override fun <P> query(queryType: Supplier<OneParamQueryType<P>>, param: P): ExtendedInventory =
@@ -507,7 +552,7 @@ interface ExtendedInventory : Inventory {
     override fun <P1, P2> query(queryType: Supplier<TwoParamQueryType<P1, P2>>, param1: P1, param2: P2): ExtendedInventory =
             this.query(queryType.of(param1, param2))
 
+    @Deprecated("Use different query operations.")
     @JvmDefault
-    override fun query(matcher: KeyValueMatcher<*>): ExtendedInventory =
-            this.query(QueryTypes.KEY_VALUE.of(matcher))
+    override fun query(matcher: KeyValueMatcher<*>): ExtendedInventory
 }

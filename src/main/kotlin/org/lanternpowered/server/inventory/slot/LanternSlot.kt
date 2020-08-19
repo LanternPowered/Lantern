@@ -189,6 +189,9 @@ open class LanternSlot : AbstractSlot() {
     override fun contains(type: ItemType): Boolean =
             this.rawItem.isNotEmpty && this.rawItem.type == type
 
+    override fun contains(fn: (ItemStackSnapshot) -> Boolean): Boolean =
+            fn(this.rawItem.asSnapshot())
+
     override fun containsAny(stack: ItemStack): Boolean =
             this.rawItem.isNotEmpty && this.rawItem.isSimilarTo(stack)
 

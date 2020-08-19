@@ -10,15 +10,15 @@
  */
 package org.lanternpowered.server.inventory.crafting
 
-import org.lanternpowered.api.item.inventory.crafting.CraftingOutput
+import org.lanternpowered.api.item.inventory.crafting.ExtendedCraftingOutput
 import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.slot.AbstractOutputSlotView
 import org.lanternpowered.server.inventory.slot.LanternOutputSlot
 
-class LanternCraftingOutput : LanternOutputSlot(), CraftingOutput {
+class LanternCraftingOutput : LanternOutputSlot(), ExtendedCraftingOutput {
 
     override fun instantiateView(): InventoryView<LanternCraftingOutput> = View(this)
 
     private class View(override val backing: LanternCraftingOutput) :
-            AbstractOutputSlotView<LanternCraftingOutput>(), CraftingOutput
+            AbstractOutputSlotView<LanternCraftingOutput>(), ExtendedCraftingOutput
 }

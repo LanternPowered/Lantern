@@ -90,7 +90,7 @@ public class PlayerClientContainer extends ClientContainer {
     @Override
     protected void collectInitMessages(List<Packet> packets) {
         super.collectInitMessages(packets);
-        this.previousSelectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
+        this.previousSelectedHotbarSlot = this.hotbarBehavior.selectedSlotIndex;
         packets.add(new PlayerHeldItemChangePacket(this.previousSelectedHotbarSlot));
     }
 
@@ -116,7 +116,7 @@ public class PlayerClientContainer extends ClientContainer {
     }
 
     private void collectHotbarSlotChange(List<Packet> packets) {
-        final int selectedHotbarSlot = this.hotbarBehavior.getSelectedSlotIndex();
+        final int selectedHotbarSlot = this.hotbarBehavior.selectedSlotIndex;
         // Update the selected hotbar slot
         if (selectedHotbarSlot != this.previousSelectedHotbarSlot) {
             this.previousSelectedHotbarSlot = selectedHotbarSlot;
@@ -177,7 +177,7 @@ public class PlayerClientContainer extends ClientContainer {
      */
     public void setSelectedHotbarSlotIndex(int hotbarSlotIndex) {
         checkArgument(hotbarSlotIndex >= 0 && hotbarSlotIndex <= 8);
-        this.hotbarBehavior.setSelectedSlotIndex(hotbarSlotIndex);
+        this.hotbarBehavior.selectedSlotIndex = hotbarSlotIndex;
     }
 
     /**
@@ -188,7 +188,7 @@ public class PlayerClientContainer extends ClientContainer {
      * @return The hotbar slot index
      */
     public int getSelectedHotbarSlotIndex() {
-        final int hotbarSlotIndex = this.hotbarBehavior.getSelectedSlotIndex();
+        final int hotbarSlotIndex = this.hotbarBehavior.selectedSlotIndex;
         checkArgument(hotbarSlotIndex >= 0 && hotbarSlotIndex <= 8);
         return hotbarSlotIndex;
     }

@@ -29,6 +29,7 @@ import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.WorldManager
+import org.lanternpowered.api.world.teleport.TeleportHelper
 import org.lanternpowered.server.cause.LanternCauseStack
 import org.lanternpowered.server.cause.LanternCauseStackManager
 import org.lanternpowered.server.config.GlobalConfigObject
@@ -62,7 +63,6 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.scheduler.Scheduler
 import org.spongepowered.api.service.rcon.RconService
 import org.spongepowered.api.user.UserManager
-import org.spongepowered.api.world.TeleportHelper
 import org.spongepowered.api.world.storage.ChunkLayout
 import java.io.Closeable
 import java.io.FileNotFoundException

@@ -11,12 +11,12 @@
 package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.inventory.ExtendedInventoryRow
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.spongepowered.math.vector.Vector2i
 
-class LanternInventoryRow : AbstractInventory2D(), ExtendedInventoryRow {
+open class LanternInventoryRow : AbstractInventory2D(), ExtendedInventoryRow {
 
     override val height: Int
         get() = 1
@@ -36,5 +36,14 @@ class LanternInventoryRow : AbstractInventory2D(), ExtendedInventoryRow {
     override fun slotPositionOrNull(slot: Slot): Vector2i? {
         val index = this.slotIndexOrNull(slot) ?: return null
         return Vector2i(index, 0)
+    }
+
+    override fun instantiateView(): InventoryView<LanternInventoryRow> = View(this)
+
+    private class View(override val backing: LanternInventoryRow) : LanternInventoryRow(), InventoryView<LanternInventoryRow> {
+
+        init {
+            this.init(this.backing.children().createViews(this).asInventories())
+        }
     }
 }

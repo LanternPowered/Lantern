@@ -17,7 +17,7 @@ import java.util.Optional
 
 typealias TeleportHelperFilter = org.spongepowered.api.world.teleport.TeleportHelperFilter
 
-interface TeleportHelper : org.spongepowered.api.world.TeleportHelper {
+interface TeleportHelper : org.spongepowered.api.world.teleport.TeleportHelper {
 
     override fun getSafeLocation(location: Location, height: Int, width: Int, floorDistance: Int,
             filter: TeleportHelperFilter, vararg additionalFilters: TeleportHelperFilter): Optional<Location> {
@@ -46,7 +46,7 @@ interface TeleportHelper : org.spongepowered.api.world.TeleportHelper {
      *  location is safe.
      * @return A safe location near the original location or the original
      *   location if it is deemed safe. If no safe location can be found,
-     *  [Optional.empty] will be returned
+     *   [Optional.empty] will be returned
      */
      fun getSafeLocation(location: Location, height: Int, width: Int, floorDistance: Int, filters: Iterable<TeleportHelperFilter>): Location?
 

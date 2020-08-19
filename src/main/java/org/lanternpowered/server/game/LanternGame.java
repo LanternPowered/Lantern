@@ -62,7 +62,7 @@ import org.spongepowered.api.SystemSubject;
 import org.spongepowered.api.command.manager.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;

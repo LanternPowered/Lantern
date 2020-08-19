@@ -17,7 +17,7 @@ import org.spongepowered.api.item.inventory.ArmorEquipable
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 
-interface AbstractArmorEquipable : ArmorEquipable {
+interface AbstractArmorEquipable : AbstractEquipable, ArmorEquipable {
 
     @JvmDefault
     override fun getHead(): ItemStack =

@@ -23,7 +23,7 @@ import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Locatable
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.command.CommandCause
-import org.spongepowered.api.event.cause.Cause
+import org.lanternpowered.api.cause.Cause
 import org.spongepowered.api.service.permission.Subject
 import org.spongepowered.api.world.ServerLocation
 import org.spongepowered.math.vector.Vector3d

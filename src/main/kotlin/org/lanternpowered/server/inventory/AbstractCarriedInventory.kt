@@ -19,8 +19,8 @@ import java.util.Optional
 interface AbstractCarriedInventory<C : Carrier> : ExtendedCarriedInventory<C> {
 
     @Suppress("UNCHECKED_CAST")
-    override fun carrier(): C? =
+    override fun carrierOrNull(): C? =
             ((this as AbstractInventory).carrierReference as? CarrierReference<C>)?.get()
 
-    override fun getCarrier(): Optional<C> = this.carrier().asOptional()
+    override fun getCarrier(): Optional<C> = this.carrierOrNull().asOptional()
 }

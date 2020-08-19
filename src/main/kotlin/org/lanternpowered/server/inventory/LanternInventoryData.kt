@@ -11,7 +11,7 @@
 package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.inventory.Inventory2D
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.slotIndex
 import org.lanternpowered.api.item.inventory.slotPosition
 import org.lanternpowered.server.data.GlobalKeyRegistry

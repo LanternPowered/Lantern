@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.inventory
 
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.server.inventory.client.ClientSlot
 
 /**

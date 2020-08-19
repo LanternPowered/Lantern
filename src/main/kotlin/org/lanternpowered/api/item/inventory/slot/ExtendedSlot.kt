@@ -16,15 +16,9 @@ import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.InventoryTransactionResult
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.Slot
 import java.util.Optional
 
-typealias EquipmentSlot = org.spongepowered.api.item.inventory.slot.EquipmentSlot
-typealias FilteringSlot = org.spongepowered.api.item.inventory.slot.FilteringSlot
-typealias FuelSlot = org.spongepowered.api.item.inventory.slot.FuelSlot
-typealias InputSlot = org.spongepowered.api.item.inventory.slot.InputSlot
-typealias OutputSlot = org.spongepowered.api.item.inventory.slot.OutputSlot
-typealias SidedSlot = org.spongepowered.api.item.inventory.slot.SidedSlot
+typealias Slot = org.spongepowered.api.item.inventory.Slot
 
 /**
  * An extended version of [Slot].

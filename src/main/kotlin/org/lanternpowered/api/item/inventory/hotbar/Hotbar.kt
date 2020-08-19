@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.item.inventory.hotbar
 
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.util.optional.orNull
 
 typealias Hotbar = org.spongepowered.api.item.inventory.entity.Hotbar

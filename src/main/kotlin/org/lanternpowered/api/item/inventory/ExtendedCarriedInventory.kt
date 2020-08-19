@@ -14,6 +14,7 @@ package org.lanternpowered.api.item.inventory
 
 import org.spongepowered.api.item.inventory.Carrier
 import org.spongepowered.api.item.inventory.type.CarriedInventory
+import java.util.Optional
 import kotlin.contracts.contract
 
 /**
@@ -33,9 +34,9 @@ inline fun <C : Carrier> ExtendedCarriedInventory<C>.fix(): ExtendedCarriedInven
 /**
  * Gets the carrier of this inventory.
  */
-inline fun <C : Carrier> CarriedInventory<C>.carrier(): C? {
-    contract { returns() implies (this@carrier is ExtendedCarriedInventory) }
-    return (this as ExtendedCarriedInventory).carrier()
+inline fun <C : Carrier> CarriedInventory<C>.carrierOrNull(): C? {
+    contract { returns() implies (this@carrierOrNull is ExtendedCarriedInventory) }
+    return (this as ExtendedCarriedInventory).carrierOrNull()
 }
 
 /**
@@ -46,5 +47,8 @@ interface ExtendedCarriedInventory<C : Carrier> : ExtendedInventory, CarriedInve
     /**
      * Gets the carrier of this inventory.
      */
-    fun carrier(): C?
+    fun carrierOrNull(): C?
+
+    @Deprecated(message = "Prefer to use carrierOrNull()")
+    override fun getCarrier(): Optional<C>
 }

@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.inventory
 
+import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.InventoryTransactionResult
@@ -18,7 +19,8 @@ import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.PeekedOfferTransactionResult
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
+import org.lanternpowered.api.item.inventory.ViewableInventory
 import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.query.Query
 import org.lanternpowered.api.item.inventory.result.reject
@@ -35,33 +37,73 @@ import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.item.inventory.Carrier
-import org.spongepowered.api.item.inventory.type.ViewableInventory
 import java.util.Optional
 import kotlin.reflect.KClass
 
-typealias TransactionConsumer = (SlotTransaction) -> Unit
+typealias TransactionConsumer = (slot: Slot, original: ItemStackSnapshot, replacement: ItemStackSnapshot) -> Unit
 
 abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
 
+    /**
+     * Instantiates a view for this inventory. No parent
+     * will be applied here.
+     */
+    abstract fun instantiateView(): InventoryView<AbstractInventory>
+    
     /**
      * The parent inventory of this inventory.
      */
     var parent: ExtendedInventory? = null
 
     /**
-     * The carrier reference of this inventory, if applicable.
+     * The carrier reference of this inventory, will only be used if this
+     * class implements [AbstractCarriedInventory].
      */
     val carrierReference: CarrierReference<*>?
+
+    /**
+     * The viewers of this inventory, will only be used if this
+     * class implements [AbstractViewableInventory].
+     */
+    private val _viewers: MutableSet<Player>?
+
+    /**
+     * The players that are currently viewing this inventory, will only be
+     * used if this class implements [AbstractViewableInventory].
+     */
+    val viewersSet: Set<Player>
+        get() = this._viewers ?: emptySet()
 
     init {
         val carrierType = CarrierInventoryTypes.getCarrierType(this::class.java)
         this.carrierReference = if (carrierType == null) null else CarrierReference.of(carrierType)
+        @Suppress("LeakingThis")
+        this._viewers = if (this is ViewableInventory) HashSet() else null
     }
 
     /**
      * Gets an empty inventory.
      */
     abstract fun empty(): LanternEmptyInventory
+
+
+    /**
+     * Adds a viewer to this inventory.
+     *
+     * @param player The player
+     */
+    open fun addViewer(player: Player) {
+        this._viewers?.add(player)
+    }
+
+    /**
+     * Removes a [Player] viewer from this inventory.
+     *
+     * @param player The player
+     */
+    open fun removeViewer(player: Player) {
+        this._viewers?.remove(player)
+    }
 
     /**
      * Sets the carrier of this inventory.
@@ -125,7 +167,7 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
     final override fun peekOffer(stack: ItemStack): PeekedOfferTransactionResult.Single {
         val copy = stack.copy()
         val transactions = mutableListOf<SlotTransaction>()
-        this.peekOfferAndConsume(copy) { transaction -> transactions.add(transaction) }
+        this.peekOfferAndConsume(copy) { slot, original, replacement -> transactions.add(SlotTransaction(slot, original, replacement)) }
         return LanternPeekedOfferSingleItemTransactionResult(transactions, copy.asSnapshot())
     }
 
@@ -157,7 +199,7 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
 
     private fun offerAndConsume0(stack: ItemStack): InventoryTransactionResult {
         val builder = InventoryTransactionResult.builder()
-        this.offerAndConsume(stack) { transaction -> builder.transaction(transaction) }
+        this.offerAndConsume(stack) { slot, original, replacement -> builder.transaction(SlotTransaction(slot, original, replacement)) }
         if (stack.isEmpty) {
             builder.type(InventoryTransactionResultType.SUCCESS)
         } else {
@@ -196,11 +238,12 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
         val transactions = mutableMapOf<Slot, SlotTransaction>()
         var rejected: MutableList<ItemStackSnapshot>? = null
         for (stack in stacks) {
-            this.offerAndConsume(stack) { transaction ->
-                transactions.compute(transaction.slot) { slot, previous ->
+            this.offerAndConsume(stack) { slot, original, replacement ->
+                slot as AbstractSlot
+                transactions.compute(slot.original()) { _, previous ->
                     if (previous == null)
-                        return@compute transaction
-                    SlotTransaction(slot, previous.original, transaction.default)
+                        return@compute SlotTransaction(slot, original, replacement)
+                    SlotTransaction(slot, previous.original, replacement)
                 }
             }
             if (stack.isNotEmpty) {
@@ -249,23 +292,23 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
 
     final override fun query(query: Query): ExtendedInventory = query.execute(this).fix()
 
-    final override fun <T : Inventory> query(inventoryType: KClass<T>): T? {
-        if (inventoryType.isInstance(this))
-            return this.uncheckedCast()
-        return this.queryChild(inventoryType)
+    final override fun <T : Inventory> query(inventoryType: Class<T>): Optional<T> =
+            this.query(inventoryType.kotlin).firstOrNull().asOptional()
+
+    final override fun <T : Inventory> query(inventoryType: KClass<T>): Sequence<T> {
+        val initial: Sequence<T> = if (inventoryType.isInstance(this)) sequenceOf(this.uncheckedCast()) else emptySequence()
+        return initial + this.queryChildren(inventoryType)
     }
 
-    protected open fun <T : Inventory> queryChild(inventoryType: KClass<T>): T? {
-        for (child in this.children()) {
-            if (inventoryType.isInstance(child))
-                return child.uncheckedCast()
+    protected open fun <T : Inventory> queryChildren(inventoryType: KClass<T>): Sequence<T> {
+        return sequence {
+            for (child in children()) {
+                if (inventoryType.isInstance(child))
+                    this.yield(child.uncheckedCast())
+            }
+            for (child in children())
+                this.yieldAll(child.query(inventoryType))
         }
-        for (child in this.children()) {
-            val result = child.query(inventoryType)
-            if (result != null)
-                return result
-        }
-        return null
     }
 
     override fun offer(index: Int, stack: ItemStack): InventoryTransactionResult =

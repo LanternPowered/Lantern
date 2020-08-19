@@ -13,6 +13,7 @@ package org.lanternpowered.server.inventory
 import it.unimi.dsi.fastutil.objects.Object2IntMap
 import it.unimi.dsi.fastutil.objects.Object2IntMaps
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
+import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.InventoryTransactionResult
@@ -20,7 +21,7 @@ import org.lanternpowered.api.item.inventory.InventoryTransactionResultType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.emptyItemStack
 import org.lanternpowered.api.item.inventory.emptyItemStackSnapshot
 import org.lanternpowered.api.item.inventory.query.QueryTypes
@@ -69,7 +70,7 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
 
     protected open fun init(children: List<AbstractMutableInventory>) {
         this.init(children, children.asSequence().slots()
-                .distinctBy { slot -> slot.actual }
+                .distinctBy { slot -> slot.original() }
                 .asIterable())
     }
 
@@ -78,7 +79,7 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
             child.addSlotChangeListener(listener)
     }
 
-    override fun children(): List<AbstractInventory> = this.children
+    override fun children(): List<AbstractMutableInventory> = this.children
     override fun slots(): List<ExtendedSlot> = this.slotsByIndex
 
     override fun slotOrNull(index: Int): ExtendedSlot? =
@@ -95,6 +96,20 @@ abstract class AbstractChildrenInventory : AbstractMutableInventory() {
 
         for (child in this.children())
             child.setCarrier(carrier, override)
+    }
+
+    override fun addViewer(player: Player) {
+        super.addViewer(player)
+
+        for (child in this.children())
+            child.addViewer(player)
+    }
+
+    override fun removeViewer(player: Player) {
+        super.removeViewer(player)
+
+        for (child in this.children())
+            child.removeViewer(player)
     }
 
     override fun clear() {

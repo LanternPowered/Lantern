@@ -10,12 +10,13 @@
  */
 package org.lanternpowered.server.cause
 
-import com.google.common.reflect.TypeToken
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.cause.CauseContextKeyBuilder
 import org.lanternpowered.server.catalog.AbstractCatalogBuilder
 import org.lanternpowered.api.key.NamespacedKey
-import org.spongepowered.api.event.cause.EventContextKey
+import org.lanternpowered.api.util.type.TypeToken
 
-class LanternCauseContextKeyBuilder<T> : AbstractCatalogBuilder<EventContextKey<T>, EventContextKey.Builder<T>>(), EventContextKey.Builder<T> {
+class LanternCauseContextKeyBuilder<T> : AbstractCatalogBuilder<CauseContextKey<T>, CauseContextKeyBuilder<T>>(), CauseContextKeyBuilder<T> {
 
     private var typeToken: TypeToken<T>? = null
 
@@ -29,7 +30,7 @@ class LanternCauseContextKeyBuilder<T> : AbstractCatalogBuilder<EventContextKey<
         this.typeToken = null
     }
 
-    override fun build(key: NamespacedKey): EventContextKey<T> {
+    override fun build(key: NamespacedKey): CauseContextKey<T> {
         val typeToken = checkNotNull(this.typeToken) { "The allowed type must be set" }
         return LanternCauseContextKey(key, typeToken)
     }

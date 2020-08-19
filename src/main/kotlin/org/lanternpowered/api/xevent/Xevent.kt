@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.xevent
 
-import org.spongepowered.api.event.cause.Cause
+import org.lanternpowered.api.cause.Cause
 
 /**
  * Represents a event that can be posted on a [XeventBus].

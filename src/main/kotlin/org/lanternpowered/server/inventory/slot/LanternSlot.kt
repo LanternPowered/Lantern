@@ -11,23 +11,16 @@
 package org.lanternpowered.server.inventory.slot
 
 import org.lanternpowered.api.item.ItemType
-import org.lanternpowered.api.item.inventory.InventoryTransactionResult
-import org.lanternpowered.api.item.inventory.InventoryTransactionResultType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
-import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.Slot
 import org.lanternpowered.api.item.inventory.emptyItemStack
-import org.lanternpowered.api.item.inventory.emptyItemStackSnapshot
-import org.lanternpowered.api.item.inventory.result.reject
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.api.item.inventory.stack.isEqualTo
 import org.lanternpowered.api.item.inventory.stack.isNotEmpty
 import org.lanternpowered.api.item.inventory.stack.isSimilarTo
-import org.lanternpowered.api.item.inventory.transaction.SlotTransaction
 import org.lanternpowered.server.inventory.AbstractSlot
-import org.lanternpowered.server.inventory.InventoryTransactionResults
+import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.SlotChangeTracker
 import org.lanternpowered.server.inventory.TransactionConsumer
 import org.lanternpowered.server.item.predicate.ItemPredicate
@@ -42,7 +35,6 @@ open class LanternSlot : AbstractSlot() {
     override fun maxStackQuantity(stack: ItemStack): Int =
             min(stack.maxStackQuantity, this.maxStackQuantity)
 
-    override val actual: Slot get() = this
     override var rawItem: ItemStack = emptyItemStack()
 
     /**
@@ -69,37 +61,7 @@ open class LanternSlot : AbstractSlot() {
         this.trackers -= tracker
     }
 
-    override fun safeSet(stack: ItemStack): InventoryTransactionResult = this.set(stack, false)
-
-    override fun forceSet(stack: ItemStack): InventoryTransactionResult = this.set(stack, true)
-
-    private fun set(stack: ItemStack, force: Boolean): InventoryTransactionResult {
-        val builder = InventoryTransactionResult.builder()
-        val quantity = stack.quantity
-        this.setAndConsume(stack, force) { transaction -> builder.transaction(transaction) }
-        if (stack.isEmpty) {
-            builder.type(InventoryTransactionResultType.SUCCESS)
-        } else {
-            builder.type(InventoryTransactionResultType.FAILURE)
-            builder.reject(stack.createSnapshot())
-        }
-        stack.quantity = quantity
-        return builder.reject().build()
-    }
-
-    override fun safeSetFast(stack: ItemStack): Boolean = this.setFast(stack, false)
-
-    override fun forceSetFast(stack: ItemStack): Boolean = this.setFast(stack, true)
-
-    private fun setFast(stack: ItemStack, force: Boolean): Boolean {
-        val quantity = stack.quantity
-        this.setAndConsume(stack, force, null)
-        val success = stack.isEmpty
-        stack.quantity = quantity
-        return success
-    }
-
-    private fun setAndConsume(stack: ItemStack, force: Boolean, transactionAdder: TransactionConsumer?) {
+    override fun setAndConsume(stack: ItemStack, force: Boolean, transactionAdder: TransactionConsumer?) {
         if (stack.isNotEmpty && !force && !this.canContain(stack))
             return
         if (stack.isEqualTo(this.rawItem))
@@ -116,7 +78,7 @@ open class LanternSlot : AbstractSlot() {
         }
         if (transactionAdder != null) {
             val resultSnapshot = this.rawItem.createSnapshot()
-            transactionAdder(SlotTransaction(this, originalSnapshot, resultSnapshot))
+            transactionAdder(this, originalSnapshot!!, resultSnapshot)
         }
         this.queueUpdate()
     }
@@ -165,28 +127,10 @@ open class LanternSlot : AbstractSlot() {
         }
         if (transactionAdder != null) {
             val resultSnapshot = if (peek) result.asSnapshot() else result.createSnapshot()
-            transactionAdder(SlotTransaction(this, originalSnapshot!!, resultSnapshot))
+            transactionAdder(this, originalSnapshot!!, resultSnapshot)
         }
         if (!peek)
             this.queueUpdate()
-    }
-
-    override fun poll(predicate: (ItemStackSnapshot) -> Boolean): PollInventoryTransactionResult =
-            this.buildPollResult(this.pollFast(predicate))
-
-    override fun poll(limit: Int, predicate: (ItemStackSnapshot) -> Boolean): PollInventoryTransactionResult =
-            this.buildPollResult(this.pollFast(limit, predicate))
-
-    private fun buildPollResult(stack: ItemStack): PollInventoryTransactionResult {
-        if (stack.isEmpty)
-            return InventoryTransactionResults.rejectPoll()
-        val snapshot = stack.asSnapshot()
-        val transaction = SlotTransaction(this, snapshot, emptyItemStackSnapshot())
-        return InventoryTransactionResult.builder()
-                .type(InventoryTransactionResultType.SUCCESS)
-                .transaction(transaction)
-                .poll(snapshot)
-                .build()
     }
 
     override fun pollFast(predicate: (ItemStackSnapshot) -> Boolean): ItemStack {
@@ -264,4 +208,8 @@ open class LanternSlot : AbstractSlot() {
         for (tracker in this.trackers)
             tracker.queueSlotChange(this)
     }
+
+    override fun instantiateView(): InventoryView<LanternSlot> = View(this)
+
+    private class View(override val backing: LanternSlot) : AbstractSlotView<LanternSlot>()
 }

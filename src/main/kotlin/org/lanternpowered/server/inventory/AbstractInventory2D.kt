@@ -12,7 +12,7 @@ package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.inventory.ExtendedInventory2D
 import org.lanternpowered.api.item.inventory.Inventory
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast

@@ -13,6 +13,7 @@
 package org.lanternpowered.api.item.inventory
 
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.math.vector.Vector2i

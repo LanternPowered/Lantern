@@ -11,5 +11,11 @@
 package org.lanternpowered.server.inventory.slot
 
 import org.lanternpowered.api.item.inventory.slot.InputSlot
+import org.lanternpowered.server.inventory.InventoryView
 
-class LanternInputSlot : LanternFilteringSlot(), InputSlot
+class LanternInputSlot : LanternFilteringSlot(), InputSlot {
+
+    override fun instantiateView(): InventoryView<LanternInputSlot> = View(this)
+
+    private class View(override val backing: LanternInputSlot) : AbstractInputSlotView<LanternInputSlot>()
+}

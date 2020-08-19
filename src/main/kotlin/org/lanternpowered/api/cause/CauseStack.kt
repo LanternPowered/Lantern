@@ -222,6 +222,12 @@ interface CauseStack : org.spongepowered.api.event.CauseStackManager {
     companion object {
 
         /**
+         * Gets the current [Cause].
+         */
+        val currentCause: Cause
+            get() = this.current().currentCause
+
+        /**
          * Gets the [CauseStack] for the current [Thread].
          * `null` will be returned if the thread isn't supported.
          *

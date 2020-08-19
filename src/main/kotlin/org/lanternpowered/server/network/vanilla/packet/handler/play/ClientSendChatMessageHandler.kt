@@ -32,6 +32,7 @@ import org.lanternpowered.server.permission.Permissions
 import org.lanternpowered.server.text.ClickActionCallbacks
 import org.spongepowered.api.command.CommandCause
 import java.util.regex.Pattern
+import kotlin.math.max
 import kotlin.time.milliseconds
 
 object ClientSendChatMessageHandler : Handler<ClientSendChatMessagePacket> {
@@ -88,7 +89,7 @@ object ClientSendChatMessageHandler : Handler<ClientSendChatMessagePacket> {
             // Make the urls clickable
             text = text.replace(this.urlPattern) { url -> url.clickEvent(ClickEvent.openUrl(url.content())) }
         }
-        player.simulateChat(text, CauseStack.current().currentCause)
+        player.simulateChat(text, CauseStack.currentCause)
     }
 
     private fun isAllowedString(string: String): Boolean =
@@ -111,7 +112,7 @@ object ClientSendChatMessageHandler : Handler<ClientSendChatMessagePacket> {
         val currentTime = System.currentTimeMillis()
         if (chatData.lastTime != -1L) {
             val elapsedTime = (currentTime - chatData.lastTime).milliseconds.inSeconds
-            chatData.threshold -= elapsedTime
+            chatData.threshold = max(0.0, chatData.threshold - elapsedTime)
         }
         chatData.lastTime = currentTime
         chatData.threshold += 1.0 / session.server.config.chat.maxMessagesPerSecond

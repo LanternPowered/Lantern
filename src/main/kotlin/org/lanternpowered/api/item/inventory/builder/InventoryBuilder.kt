@@ -14,7 +14,7 @@ import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.archetype.InventoryArchetype
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.archetype.SlotArchetype
 import org.lanternpowered.api.item.inventory.slot.EquipmentSlot
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot

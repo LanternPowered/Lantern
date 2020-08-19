@@ -10,9 +10,22 @@
  */
 package org.lanternpowered.server.inventory
 
-class LanternChildrenInventory(children: List<AbstractMutableInventory>) : AbstractChildrenInventory() {
+open class LanternChildrenInventory : AbstractChildrenInventory {
 
-    init {
+    constructor(children: List<AbstractMutableInventory>) {
         this.init(children)
+    }
+
+    private constructor()
+
+    override fun instantiateView(): InventoryView<LanternChildrenInventory> = View(this)
+
+    private class View(
+            override val backing: LanternChildrenInventory
+    ) : LanternChildrenInventory(), InventoryView<LanternChildrenInventory> {
+
+        init {
+            this.init(this.backing.children().createViews(this).asInventories())
+        }
     }
 }

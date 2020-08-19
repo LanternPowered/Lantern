@@ -16,6 +16,8 @@ import org.lanternpowered.api.util.uncheckedCast
 
 abstract class AbstractMutableInventory : AbstractInventory() {
 
+    abstract override fun instantiateView(): InventoryView<AbstractMutableInventory>
+
     private val empty by lazy {
         LanternEmptyInventory().also { inventory -> inventory.parent = this }
     }

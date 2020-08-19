@@ -16,7 +16,7 @@ import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.emptyItemStack
 import org.lanternpowered.api.item.inventory.fix
 import org.spongepowered.api.data.Key
@@ -26,7 +26,7 @@ import org.spongepowered.api.item.inventory.EmptyInventory
 import org.spongepowered.api.item.inventory.type.ViewableInventory
 import java.util.Optional
 
-class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
+open class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
 
     override fun empty(): LanternEmptyInventory = this
     override fun children(): List<AbstractInventory> = emptyList()
@@ -59,4 +59,8 @@ class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
             InventoryTransactionResults.rejectPoll()
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> = child.get(key)
+
+    override fun instantiateView(): InventoryView<AbstractInventory> = View(this)
+
+    private class View(override val backing: LanternEmptyInventory) : LanternEmptyInventory(), InventoryView<LanternEmptyInventory>
 }

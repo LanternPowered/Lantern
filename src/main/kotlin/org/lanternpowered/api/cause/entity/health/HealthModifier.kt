@@ -12,7 +12,7 @@ package org.lanternpowered.api.cause.entity.health
 
 import org.lanternpowered.api.registry.builderOf
 import org.spongepowered.api.entity.Entity
-import org.spongepowered.api.event.cause.Cause
+import org.lanternpowered.api.cause.Cause
 import org.spongepowered.api.util.ResettableBuilder
 import java.util.function.DoubleUnaryOperator
 

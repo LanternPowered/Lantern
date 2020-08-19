@@ -14,6 +14,7 @@ import net.kyori.adventure.sound.SoundStop
 import org.lanternpowered.api.Server
 import org.lanternpowered.api.audience.MessageType
 import org.lanternpowered.api.boss.BossBar
+import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.effect.sound.SoundEffect
@@ -96,7 +97,6 @@ import org.spongepowered.api.entity.living.player.PlayerChatRouter
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.entity.living.player.chat.ChatVisibility
 import org.spongepowered.api.entity.living.player.tab.TabList
-import org.spongepowered.api.event.cause.Cause
 import org.spongepowered.api.event.message.PlayerChatEvent
 import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.inventory.Container

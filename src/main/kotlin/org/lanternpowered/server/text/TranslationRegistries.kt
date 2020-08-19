@@ -29,7 +29,7 @@ object TranslationRegistries {
      * A translation registry which contains all the vanilla
      * minecraft translations.
      */
-    val Minecraft: TranslationRegistry = LanternTranslationRegistry()
+    val Minecraft: TranslationRegistry = TranslationRegistry.create()
 
     /**
      * The translation registry that will attempt to translate everything,

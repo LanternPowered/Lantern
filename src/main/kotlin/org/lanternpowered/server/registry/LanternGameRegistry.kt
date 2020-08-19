@@ -17,6 +17,9 @@ import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.cause.CauseContextKey
+import org.lanternpowered.api.cause.CauseContextKeyBuilder
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
 import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
@@ -169,8 +172,6 @@ import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.sound.SoundType
 import org.spongepowered.api.entity.living.player.tab.TabListEntry
-import org.spongepowered.api.event.cause.Cause
-import org.spongepowered.api.event.cause.EventContextKey
 import org.spongepowered.api.event.lifecycle.RegisterBuilderEvent
 import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent
 import org.spongepowered.api.fluid.FluidStack
@@ -226,7 +227,7 @@ class LanternGameRegistry(
             register<NamespacedKeyBuilder> { LanternNamespacedKeyBuilder() }
             register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
             register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }
-            register<EventContextKey.Builder<Any>> { LanternCauseContextKeyBuilder() }
+            register<CauseContextKeyBuilder<Any>> { LanternCauseContextKeyBuilder() }
 
             register<BlockSnapshot.Builder> { LanternBlockSnapshotBuilder() }
             register<BlockSnapshotBuilder> { LanternBlockSnapshotBuilder() }

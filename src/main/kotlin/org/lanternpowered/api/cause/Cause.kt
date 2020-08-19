@@ -21,6 +21,7 @@ import kotlin.reflect.KClass
  */
 typealias Cause = org.spongepowered.api.event.Cause
 typealias CauseContextKey<T> = org.spongepowered.api.event.EventContextKey<T>
+typealias CauseContextKeyBuilder<T> = org.spongepowered.api.event.EventContextKey.Builder<T>
 typealias CauseContextKeys = org.spongepowered.api.event.EventContextKeys
 typealias CauseContext = org.spongepowered.api.event.EventContext
 typealias CauseContextBuilder = org.spongepowered.api.event.EventContext.Builder

@@ -10,6 +10,9 @@
  */
 package org.lanternpowered.server.inventory.slot
 
-import org.spongepowered.api.item.inventory.crafting.CraftingOutput
+import org.lanternpowered.api.item.inventory.slot.InputSlot
+import org.lanternpowered.server.inventory.AbstractSlot
 
-class LanternCraftingOutput : LanternOutputSlot(), CraftingOutput
+abstract class AbstractInputSlotView<T> : AbstractFilteringSlotView<T>(), InputSlot
+    where T : AbstractSlot,
+          T : InputSlot

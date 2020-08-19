@@ -18,6 +18,7 @@ import org.lanternpowered.api.item.inventory.query.QueryTypes
 import org.lanternpowered.api.item.inventory.query.TwoParamQueryType
 import org.lanternpowered.api.item.inventory.query.of
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.KeyValueMatcher
@@ -31,7 +32,6 @@ typealias InventoryTransactionResultBuilder = org.spongepowered.api.item.invento
 typealias InventoryTransactionResultType = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type
 typealias PollInventoryTransactionResult = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Poll
 typealias Inventory = org.spongepowered.api.item.inventory.Inventory
-typealias Slot = org.spongepowered.api.item.inventory.Slot
 
 /**
  * Gets the normal inventories as an extended inventories.
@@ -126,6 +126,18 @@ inline fun Inventory.offerFast(vararg stacks: ItemStack): Boolean {
 inline fun Inventory.offerFast(stacks: Iterable<ItemStack>): Boolean {
     contract { returns() implies (this@offerFast is ExtendedInventory) }
     return (this as ExtendedInventory).offerFast(stacks)
+}
+
+/**
+ * Query this inventory for a sequence of inventories matching the
+ * supplied inventory type.
+ *
+ * @param T The type of inventory to query for
+ * @return The query result
+ */
+inline fun <reified T : Inventory> Inventory.query(): Sequence<T> {
+    contract { returns() implies (this@query is ExtendedInventory) }
+    return (this as ExtendedInventory).query(T::class)
 }
 
 /**
@@ -470,8 +482,8 @@ interface ExtendedInventory : Inventory {
      */
     fun safeSet(index: Int, stack: ItemStack): InventoryTransactionResult
 
-    override fun <T : Inventory> query(inventoryType: Class<T>): Optional<T> =
-            this.query(inventoryType.kotlin).asOptional()
+    @Deprecated("Prefer to use query(kClass)")
+    override fun <T : Inventory> query(inventoryType: Class<T>): Optional<T>
 
     /**
      * Query this inventory for a single inventory matching the supplied inventory type.
@@ -480,10 +492,10 @@ interface ExtendedInventory : Inventory {
      * matching the supplied inventory type.
      *
      * @param inventoryType The inventory type to query for
-     * @param T The Type of inventory
+     * @param T The type of inventory
      * @return The query result
      */
-    fun <T : Inventory> query(inventoryType: KClass<T>): T?
+    fun <T : Inventory> query(inventoryType: KClass<T>): Sequence<T>
 
     override fun query(query: Query): ExtendedInventory
 

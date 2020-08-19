@@ -18,7 +18,7 @@ import org.lanternpowered.api.item.inventory.InventoryRow
 import org.lanternpowered.api.item.inventory.InventoryTransactionResult
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.Slot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.util.optional.asOptional
 import org.spongepowered.math.vector.Vector2i
@@ -87,4 +87,8 @@ class LanternGridInventory : AbstractInventory2D(), ExtendedGridInventory {
 
     override fun poll(x: Int, y: Int, limit: Int): PollInventoryTransactionResult =
             this.slotOrNull(x, y)?.poll(limit) ?: InventoryTransactionResults.rejectPollNoSlot()
+
+    override fun instantiateView(): InventoryView<AbstractMutableInventory> {
+        TODO("Not yet implemented")
+    }
 }

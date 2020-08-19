@@ -18,10 +18,14 @@ import java.time.Duration
 /**
  * Gets the [Packet]s to show a [Title].
  */
-fun Title.toPackets(): List<Packet> = listOf(
-        TitlePacket.SetTitle(title()),
-        TitlePacket.SetSubtitle(subtitle()),
-        TitlePacket.SetTimes(fadeInTime().toTicks(), fadeInTime().toTicks(), fadeInTime().toTicks())
-)
+fun Title.toPackets(): List<Packet> {
+    val packets = mutableListOf(
+            TitlePacket.SetTitle(this.title()),
+            TitlePacket.SetSubtitle(this.subtitle()))
+    val times = this.times()
+    if (times != null)
+        packets += TitlePacket.SetTimes(times.fadeIn().toTicks(), times.stay().toTicks(), times.fadeOut().toTicks())
+    return packets
+}
 
 private fun Duration.toTicks(): Int = toMillis().toInt() / 50

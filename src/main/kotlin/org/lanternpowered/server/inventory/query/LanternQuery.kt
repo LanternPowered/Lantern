@@ -17,13 +17,13 @@ import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.query.NoParamQueryType
 import org.lanternpowered.api.item.inventory.query.OneParamQueryType
 import org.lanternpowered.api.item.inventory.query.Query
-import org.lanternpowered.api.item.inventory.query.QueryBuilder
 import org.lanternpowered.api.item.inventory.query.QueryType
 import org.lanternpowered.api.item.inventory.query.TwoParamQueryType
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.server.inventory.AbstractInventory
+import org.spongepowered.api.item.inventory.query.Query.Builder as SpongeQueryBuilder
 
 class AndQuery(private val queries: List<Query>) : Query {
     override fun execute(inventory: Inventory): Inventory =
@@ -41,21 +41,21 @@ class OrQuery(private val queries: List<Query>) : Query {
     }
 }
 
-class LanternQueryBuilder : QueryBuilder {
+class LanternQueryBuilder : SpongeQueryBuilder {
 
     private var query: Query = EmptyQuery
 
-    override fun and(vararg queries: Query): QueryBuilder = this.apply {
+    override fun and(vararg queries: Query): SpongeQueryBuilder = this.apply {
         this.query = AndQuery(queries.toImmutableList())
     }
 
-    override fun or(vararg queries: Query): QueryBuilder = this.apply {
+    override fun or(vararg queries: Query): SpongeQueryBuilder = this.apply {
         this.query = OrQuery(queries.toImmutableList())
     }
 
     override fun build(): Query = this.query
 
-    override fun reset(): QueryBuilder = this.apply {
+    override fun reset(): SpongeQueryBuilder = this.apply {
         this.query = EmptyQuery
     }
 }

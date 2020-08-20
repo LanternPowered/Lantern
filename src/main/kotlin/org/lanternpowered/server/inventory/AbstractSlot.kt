@@ -131,7 +131,7 @@ abstract class AbstractSlot : AbstractMutableInventory(), ExtendedSlot {
     override fun pollFrom(index: Int, limit: Int): PollInventoryTransactionResult =
             if (index == 0) this.poll(limit) else InventoryTransactionResults.rejectPollNoSlot()
 
-    override fun slots(): List<ExtendedSlot> = listOf(this)
+    override fun slots(): List<AbstractSlot> = this.slots
     override fun children(): List<AbstractMutableInventory> = emptyList()
     override fun capacity(): Int = 1
 }

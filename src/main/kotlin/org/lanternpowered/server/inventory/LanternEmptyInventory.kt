@@ -10,23 +10,21 @@
  */
 package org.lanternpowered.server.inventory
 
-import org.lanternpowered.api.item.inventory.ExtendedInventory
-import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
+import org.lanternpowered.api.item.ItemType
+import org.lanternpowered.api.item.inventory.ExtendedEmptyInventory
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.PollInventoryTransactionResult
-import org.lanternpowered.api.item.inventory.slot.Slot
+import org.lanternpowered.api.item.inventory.ViewableInventory
 import org.lanternpowered.api.item.inventory.emptyItemStack
-import org.lanternpowered.api.item.inventory.fix
+import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
+import org.lanternpowered.api.item.inventory.slot.Slot
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.value.Value
-import org.spongepowered.api.item.ItemType
-import org.spongepowered.api.item.inventory.EmptyInventory
-import org.spongepowered.api.item.inventory.type.ViewableInventory
 import java.util.Optional
 
-open class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
+open class LanternEmptyInventory : AbstractInventory(), ExtendedEmptyInventory {
 
     override fun empty(): LanternEmptyInventory = this
     override fun children(): List<AbstractInventory> = emptyList()
@@ -47,9 +45,7 @@ open class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
     override fun totalQuantity(): Int = 0
     override fun slotOrNull(index: Int): ExtendedSlot? = null
     override fun slotIndexOrNull(slot: Slot): Int? = null
-    override fun intersect(inventory: Inventory): ExtendedInventory = this
-    override fun union(inventory: Inventory): ExtendedInventory = if (inventory is EmptyInventory) this else inventory.fix()
-    override fun slots(): List<ExtendedSlot> = emptyList()
+    override fun slots(): List<AbstractSlot> = emptyList()
     override fun canContain(stack: ItemStack): Boolean = false
 
     override fun poll(predicate: (ItemStackSnapshot) -> Boolean): PollInventoryTransactionResult =
@@ -60,7 +56,7 @@ open class LanternEmptyInventory : AbstractInventory(), EmptyInventory {
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> = child.get(key)
 
-    override fun instantiateView(): InventoryView<AbstractInventory> = View(this)
+    override fun instantiateView(): InventoryView<LanternEmptyInventory> = View(this)
 
     private class View(override val backing: LanternEmptyInventory) : LanternEmptyInventory(), InventoryView<LanternEmptyInventory>
 }

@@ -12,13 +12,16 @@
 
 package org.lanternpowered.api.item.inventory
 
+import org.lanternpowered.api.item.inventory.query.InventoryFilterBuilderFunction
 import org.lanternpowered.api.item.inventory.query.NoParamQueryType
 import org.lanternpowered.api.item.inventory.query.OneParamQueryType
 import org.lanternpowered.api.item.inventory.query.Query
 import org.lanternpowered.api.item.inventory.query.TwoParamQueryType
+import org.lanternpowered.api.item.inventory.query.build
 import org.lanternpowered.api.item.inventory.query.of
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.slot.Slot
+import org.lanternpowered.api.registry.factoryOf
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.KeyValueMatcher
@@ -31,6 +34,7 @@ typealias InventoryTransactionResult = org.spongepowered.api.item.inventory.tran
 typealias InventoryTransactionResultBuilder = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Builder
 typealias InventoryTransactionResultType = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type
 typealias PollInventoryTransactionResult = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Poll
+typealias PollInventoryTransactionResultBuilder = org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Builder.PollBuilder
 typealias Inventory = org.spongepowered.api.item.inventory.Inventory
 
 /**
@@ -141,9 +145,42 @@ inline fun <reified T : Inventory> Inventory.query(): Sequence<T> {
 }
 
 /**
+ * Filters the [Sequence] of inventories. Only inventories that match the
+ * filter will be in the resulting sequence.
+ */
+fun <T : Inventory> Sequence<T>.where(fn: InventoryFilterBuilderFunction<T>): Sequence<T> =
+        this.filter(fn.build())
+
+/**
+ * Filters the [Sequence] of inventories. Only inventories that match the
+ * filter will be in the resulting sequence.
+ */
+fun <T : Inventory> Iterable<T>.where(fn: InventoryFilterBuilderFunction<T>): List<T> =
+        this.filter(fn.build())
+
+/**
+ * Joins the iterable of inventories into a single inventory.
+ */
+fun Iterable<Inventory>.join(): ExtendedInventory =
+        factoryOf<ExtendedInventory.Factory>().union(this)
+
+/**
+ * Joins the sequence of inventories into a single inventory.
+ */
+fun Sequence<Inventory>.join(): ExtendedInventory =
+        factoryOf<ExtendedInventory.Factory>().union(this)
+
+/**
  * An extended version of [Inventory].
  */
 interface ExtendedInventory : Inventory {
+
+    interface Factory {
+
+        fun union(inventories: Iterable<Inventory>): ExtendedInventory
+
+        fun union(inventories: Sequence<Inventory>): ExtendedInventory
+    }
 
     /**
      * Gets the root inventory of this inventory.

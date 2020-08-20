@@ -8,13 +8,13 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inventory
+package org.lanternpowered.server.inventory.equipment
 
 import org.lanternpowered.api.data.type.hand.getEquipmentType
+import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.emptyItemStack
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.item.inventory.ArmorEquipable
-import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 
 interface AbstractArmorEquipable : AbstractEquipable, ArmorEquipable {

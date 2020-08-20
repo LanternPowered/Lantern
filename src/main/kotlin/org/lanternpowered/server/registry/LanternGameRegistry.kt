@@ -18,7 +18,6 @@ import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.cause.Cause
-import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseContextKeyBuilder
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
@@ -26,6 +25,7 @@ import org.lanternpowered.api.effect.firework.FireworkEffectBuilder
 import org.lanternpowered.api.effect.potion.PotionEffectBuilder
 import org.lanternpowered.api.event.lifecycle.RegisterCatalogRegistryEvent
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
+import org.lanternpowered.api.item.inventory.InventoryTransactionResultBuilder
 import org.lanternpowered.api.item.inventory.ItemStackBuilder
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.registry.GameRegistry
@@ -64,8 +64,10 @@ import org.lanternpowered.server.entity.player.tab.LanternTabListEntryBuilder
 import org.lanternpowered.server.cause.LanternCauseContextKeyBuilder
 import org.lanternpowered.server.fluid.LanternFluidStackBuilder
 import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder
+import org.lanternpowered.server.inventory.LanternInventoryFactory
+import org.lanternpowered.server.inventory.LanternInventoryFilterBuilderFactory
 import org.lanternpowered.server.inventory.LanternItemStackBuilder
-import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResult
+import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResultBuilder
 import org.lanternpowered.server.item.ItemStackComparatorsRegistry
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder
@@ -177,7 +179,6 @@ import org.spongepowered.api.event.lifecycle.RegisterFactoryEvent
 import org.spongepowered.api.fluid.FluidStack
 import org.spongepowered.api.fluid.FluidStackSnapshot
 import org.spongepowered.api.item.enchantment.Enchantment
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult
 import org.spongepowered.api.scheduler.Task
 import org.spongepowered.api.util.ResettableBuilder
 import org.spongepowered.api.util.RespawnLocation
@@ -196,12 +197,15 @@ class LanternGameRegistry(
 
     fun init() {
         factoryRegistry.apply {
+            // Advancements
             register(AndCriterionFactory)
             register(CriterionFactory)
             register(OrCriterionFactory)
 
+            // Registries
             register(LanternCatalogTypeRegistryFactory)
 
+            // Data
             register(ImmutableDataManipulatorFactory)
             register(MutableDataManipulatorFactory)
             register(ValueFactory)
@@ -218,6 +222,10 @@ class LanternGameRegistry(
             register(LanternBlockChangeFlag.Factory)
 
             register(DummyTimingsFactory)
+
+            // Inventory
+            register(LanternInventoryFactory)
+            register(LanternInventoryFilterBuilderFactory)
         }
 
         builderRegistry.apply {
@@ -250,7 +258,7 @@ class LanternGameRegistry(
             register<ItemStackBuilder> { LanternItemStackBuilder() }
             register<Enchantment.Builder> { LanternEnchantmentBuilder() }
             register<EnchantmentTypeBuilder> { LanternEnchantmentTypeBuilder() }
-            register<InventoryTransactionResult.Builder> { LanternInventoryTransactionResult.Builder() }
+            register<InventoryTransactionResultBuilder> { LanternInventoryTransactionResultBuilder() }
 
             register<Task.Builder> { LanternTaskBuilder() }
 

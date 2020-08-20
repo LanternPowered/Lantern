@@ -15,7 +15,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.lanternpowered.server.inventory.AbstractCarrier;
 import org.lanternpowered.server.inventory.LanternEmptyCarriedInventory;
 import org.spongepowered.api.item.inventory.BlockCarrier;
 import org.spongepowered.api.item.inventory.Inventory;

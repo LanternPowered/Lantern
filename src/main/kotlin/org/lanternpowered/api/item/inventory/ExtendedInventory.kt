@@ -133,6 +133,28 @@ inline fun Inventory.offerFast(stacks: Iterable<ItemStack>): Boolean {
 }
 
 /**
+ * Query this inventory with given [NoParamQueryType].
+ *
+ * @param queryType The query type
+ * @return The queried inventory
+ */
+inline fun Inventory.query(queryType: Supplier<NoParamQueryType>): ExtendedInventory {
+    contract { returns() implies (this@query is ExtendedInventory) }
+    return (this as ExtendedInventory).query(queryType)
+}
+
+/**
+ * Query this inventory with given [NoParamQueryType].
+ *
+ * @param queryType The query type
+ * @return The queried inventory
+ */
+inline fun Inventory.query(queryType: NoParamQueryType): ExtendedInventory {
+    contract { returns() implies (this@query is ExtendedInventory) }
+    return (this as ExtendedInventory).query(queryType)
+}
+
+/**
  * Query this inventory for a sequence of inventories matching the
  * supplied inventory type.
  *
@@ -157,6 +179,12 @@ fun <T : Inventory> Sequence<T>.where(fn: InventoryFilterBuilderFunction<T>): Se
  */
 fun <T : Inventory> Iterable<T>.where(fn: InventoryFilterBuilderFunction<T>): List<T> =
         this.filter(fn.build())
+
+/**
+ * Returns `true` if all elements match the given filter.
+ */
+fun <T : Inventory> Iterable<T>.whereAll(fn: InventoryFilterBuilderFunction<T>): Boolean =
+        this.all(fn.build())
 
 /**
  * Joins the iterable of inventories into a single inventory.
@@ -548,7 +576,7 @@ interface ExtendedInventory : Inventory {
      * @param queryType The query type
      * @return The queried inventory
      */
-    fun <P> query(queryType: Supplier<NoParamQueryType>): ExtendedInventory =
+    fun query(queryType: Supplier<NoParamQueryType>): ExtendedInventory =
             this.query(queryType.get().toQuery())
 
     /**
@@ -557,7 +585,7 @@ interface ExtendedInventory : Inventory {
      * @param queryType The query type
      * @return The queried inventory
      */
-    fun <P> query(queryType: NoParamQueryType): ExtendedInventory =
+    fun query(queryType: NoParamQueryType): ExtendedInventory =
             this.query(queryType.toQuery())
 
     /**

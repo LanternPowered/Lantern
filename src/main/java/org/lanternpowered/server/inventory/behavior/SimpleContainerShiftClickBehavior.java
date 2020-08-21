@@ -17,7 +17,7 @@ import org.lanternpowered.server.inventory.PlayerTopBottomContainer;
 
 public class SimpleContainerShiftClickBehavior extends AbstractTopBottomShiftClickBehavior {
 
-    public static final SimpleContainerShiftClickBehavior INSTANCE = new SimpleContainerShiftClickBehavior();
+    public static final SimpleTopBottomShiftClickBehavior INSTANCE = new SimpleTopBottomShiftClickBehavior();
 
     @Override
     public IInventory getTarget(PlayerTopBottomContainer container, AbstractSlot slot) {

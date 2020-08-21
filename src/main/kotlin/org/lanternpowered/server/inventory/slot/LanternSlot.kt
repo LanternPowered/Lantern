@@ -32,7 +32,7 @@ open class LanternSlot : AbstractSlot() {
 
     private var maxStackQuantity: Int = 64
 
-    override fun maxStackQuantity(stack: ItemStack): Int =
+    override fun maxStackQuantityFor(stack: ItemStack): Int =
             min(stack.maxStackQuantity, this.maxStackQuantity)
 
     override var rawItem: ItemStack = emptyItemStack()
@@ -70,7 +70,7 @@ open class LanternSlot : AbstractSlot() {
         if (stack.isEmpty) {
             this.rawItem = emptyItemStack()
         } else {
-            val max = this.maxStackQuantity(stack)
+            val max = this.maxStackQuantityFor(stack)
             val set =  min(stack.quantity, max)
             this.rawItem = stack.copy()
             this.rawItem.quantity = set
@@ -103,7 +103,7 @@ open class LanternSlot : AbstractSlot() {
         val originalSnapshot = if (transactionAdder == null) null else this.rawItem.createSnapshot()
         val result: ItemStack
         if (this.rawItem.isNotEmpty) {
-            val max = this.maxStackQuantity(this.rawItem)
+            val max = this.maxStackQuantityFor(this.rawItem)
             val quantity = this.rawItem.quantity
             val space = max - quantity
             // The slot is full
@@ -117,7 +117,7 @@ open class LanternSlot : AbstractSlot() {
             result.quantity += added
             stack.quantity -= added
         } else {
-            val max = this.maxStackQuantity(stack)
+            val max = this.maxStackQuantityFor(stack)
             val added = min(stack.quantity, max)
             result = stack.copy()
             result.quantity = added

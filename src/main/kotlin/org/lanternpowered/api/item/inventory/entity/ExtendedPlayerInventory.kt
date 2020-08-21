@@ -8,23 +8,13 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inventory.behavior;
+@file:Suppress("NOTHING_TO_INLINE")
+
+package org.lanternpowered.api.item.inventory.entity
+
+typealias PlayerInventory = org.spongepowered.api.item.inventory.entity.PlayerInventory
 
 /**
- * The available mouse buttons.
+ * An extended version of [PlayerInventory].
  */
-public enum MouseButton {
-    /**
-     * The left or primary mouse button.
-     */
-    LEFT,
-    /**
-     * The middle mouse button.
-     */
-    MIDDLE,
-    /**
-     * The right or secondary mouse button.
-     */
-    RIGHT,
-    ;
-}
+interface ExtendedPlayerInventory : ExtendedStandardInventory, PlayerInventory

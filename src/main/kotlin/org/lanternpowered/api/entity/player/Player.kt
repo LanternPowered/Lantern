@@ -12,6 +12,7 @@ package org.lanternpowered.api.entity.player
 
 import kotlin.contracts.contract
 
+typealias BasePlayer = org.spongepowered.api.entity.living.player.Player
 typealias Player = org.spongepowered.api.entity.living.player.server.ServerPlayer
 
 /**

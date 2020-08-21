@@ -17,7 +17,7 @@ import org.lanternpowered.server.block.state.BlockStateProperties;
 import org.lanternpowered.server.data.type.LanternChestAttachmentType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.AbstractGridInventory;
-import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
+import org.lanternpowered.server.inventory.behavior.SimpleTopBottomShiftClickBehavior;
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes;
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes;
@@ -109,7 +109,7 @@ public class LanternChest extends ContainerBlockEntity<ChestInventory> implement
         if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
             final LanternChest otherChest = (LanternChest) optTileEntity.get();
             final AbstractGridInventory.RowsViewBuilder<DoubleChestInventory> doubleChestBuilder = AbstractGridInventory.rowsViewBuilder()
-                    .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
+                    .shiftClickBehavior(SimpleTopBottomShiftClickBehavior.INSTANCE)
                     .title(tr("container.chestDouble"))
                     .property(InventoryProperties.GUI_ID, GuiIds.CHEST)
                     .type(DoubleChestInventory.class)

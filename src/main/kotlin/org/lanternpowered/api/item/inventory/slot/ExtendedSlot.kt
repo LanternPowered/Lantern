@@ -12,6 +12,7 @@
 
 package org.lanternpowered.api.item.inventory.slot
 
+import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.InventoryTransactionResult
 import org.lanternpowered.api.item.inventory.ItemStack
@@ -29,7 +30,7 @@ interface ExtendedSlot : Slot, ExtendedInventory {
     override fun viewedSlot(): ExtendedSlot
 
     /**
-     * The maximum stack size that can be stored, for the given [stack].
+     * The maximum stack size that can be stored, for the given [ItemStack].
      *
      * In vanilla, most slots specify a limit of 64 items. But if the items
      * default max stack quantity is lower, the 64 items will be reduced to
@@ -37,7 +38,18 @@ interface ExtendedSlot : Slot, ExtendedInventory {
      *
      * Different kind of implementations may handle this differently.
      */
-    fun maxStackQuantity(stack: ItemStack): Int
+    fun maxStackQuantityFor(stack: ItemStack): Int
+
+    /**
+     * The maximum stack size that can be stored, for the given [ItemType].
+     *
+     * In vanilla, most slots specify a limit of 64 items. But if the items
+     * default max stack quantity is lower, the 64 items will be reduced to
+     * that default.
+     *
+     * Different kind of implementations may handle this differently.
+     */
+    fun maxStackQuantityFor(type: ItemType): Int
 
     /**
      * Sets the given stack into this slot.

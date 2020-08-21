@@ -8,11 +8,24 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.item.inventory.archetype
-
-import org.lanternpowered.api.item.inventory.ExtendedInventory
+package org.lanternpowered.server.inventory.behavior
 
 /**
- * Represents an archetype of an [ExtendedInventory].
+ * The available mouse buttons.
  */
-interface InventoryArchetype<T : ExtendedInventory>
+enum class MouseButton {
+    /**
+     * The left or primary mouse button.
+     */
+    LEFT,
+
+    /**
+     * The middle mouse button.
+     */
+    MIDDLE,
+
+    /**
+     * The right or secondary mouse button.
+     */
+    RIGHT
+}

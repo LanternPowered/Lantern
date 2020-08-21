@@ -12,6 +12,9 @@ package org.lanternpowered.server.inventory.behavior
 
 import org.lanternpowered.server.inventory.client.ClientContainer
 
+/**
+ * A simple (base) implementation of [HotbarBehavior].
+ */
 open class SimpleHotbarBehavior(private val slots: Int) : HotbarBehavior {
 
     override var selectedSlotIndex: Int = 0

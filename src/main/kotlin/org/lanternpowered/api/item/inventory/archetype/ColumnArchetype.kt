@@ -10,9 +10,6 @@
  */
 package org.lanternpowered.api.item.inventory.archetype
 
-import org.lanternpowered.api.item.inventory.ExtendedInventory
+import org.lanternpowered.api.item.inventory.ExtendedInventoryColumn
 
-/**
- * Represents an archetype of an [ExtendedInventory].
- */
-interface InventoryArchetype<T : ExtendedInventory>
+interface ColumnArchetype<T : ExtendedInventoryColumn> : InventoryArchetype<T>

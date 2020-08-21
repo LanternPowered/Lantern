@@ -20,7 +20,7 @@ import org.lanternpowered.server.inventory.AbstractGridInventory;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternInventoryArchetype;
 import org.lanternpowered.server.inventory.LanternInventoryProperties;
-import org.lanternpowered.server.inventory.behavior.SimpleContainerShiftClickBehavior;
+import org.lanternpowered.server.inventory.behavior.SimpleTopBottomShiftClickBehavior;
 import org.lanternpowered.server.inventory.type.LanternArmorEquipableInventory;
 import org.lanternpowered.server.inventory.type.LanternChildrenInventory;
 import org.lanternpowered.server.inventory.type.LanternCraftingGridInventory;
@@ -358,7 +358,7 @@ public final class VanillaInventoryArchetypes {
 
         final AbstractGridInventory.SlotsBuilder<ChestInventory> chestBuilder = AbstractGridInventory.slotsBuilder()
                 .expand(9, 3)
-                .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
+                .shiftClickBehavior(SimpleTopBottomShiftClickBehavior.INSTANCE)
                 .type(ChestInventory.class);
         for (int y = 0; y < 3; y++) {
             for (int x = 0; x < 9; x++) {
@@ -386,7 +386,7 @@ public final class VanillaInventoryArchetypes {
                 .title(tr("container.chestDouble"))
                 .grid(0, CHEST)
                 .grid(3, CHEST)
-                .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
+                .shiftClickBehavior(SimpleTopBottomShiftClickBehavior.INSTANCE)
                 .property(InventoryProperties.GUI_ID, GuiIds.CHEST)
                 .type(ChestInventory.class)
                 .buildArchetype(NamespacedKeys.minecraft("double_chest"));
@@ -397,7 +397,7 @@ public final class VanillaInventoryArchetypes {
 
         final AbstractGridInventory.SlotsBuilder<DispenserInventory> dispenserBuilder = AbstractGridInventory.slotsBuilder()
                 .title(tr("container.dispenser"))
-                .shiftClickBehavior(SimpleContainerShiftClickBehavior.INSTANCE)
+                .shiftClickBehavior(SimpleTopBottomShiftClickBehavior.INSTANCE)
                 .property(InventoryProperties.GUI_ID, GuiIds.DISPENSER)
                 .type(DispenserInventory.class)
                 .expand(3, 3);

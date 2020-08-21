@@ -88,6 +88,6 @@ abstract class AbstractSlotView<T : AbstractSlot> : AbstractSlot(), InventoryVie
     override fun totalQuantity(): Int =
             this.backing.totalQuantity()
 
-    override fun maxStackQuantity(stack: ItemStack): Int =
-            this.backing.maxStackQuantity(stack)
+    override fun maxStackQuantityFor(stack: ItemStack): Int =
+            this.backing.maxStackQuantityFor(stack)
 }

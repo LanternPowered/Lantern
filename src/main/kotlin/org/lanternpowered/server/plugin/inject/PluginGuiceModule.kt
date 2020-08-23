@@ -24,7 +24,7 @@ import java.nio.file.Path
 /**
  * A module which provides bindings for configuration annotations.
  */
-internal class PluginGuiceModule(
+internal abstract class PluginGuiceModule(
         private val plugin: PluginContainer,
         private val configManager: ConfigManager
 ) : GuiceModule() {

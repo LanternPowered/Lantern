@@ -11,6 +11,7 @@
 package org.lanternpowered.server.plugin
 
 import com.google.inject.Injector
+import com.google.inject.Scopes
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.plugin.inject.PluginGuiceModule
 import org.lanternpowered.server.util.guice.getInstance
@@ -30,19 +31,34 @@ class LanternPluginLoader : JVMPluginLoader<LanternPluginContainer>() {
     }
 
     override fun createPluginInstance(environment: PluginEnvironment, container: LanternPluginContainer, targetClassLoader: ClassLoader): Any {
-        val pluginClass = Class.forName(container.metadata.mainClass, true, targetClassLoader)
+        @Suppress("UNCHECKED_CAST")
+        val pluginClass: Class<Any> = Class.forName(container.metadata.mainClass, true, targetClassLoader) as Class<Any>
         val objectInstance = pluginClass.kotlin.objectInstance
 
         val parentInjector = environment.blackboard.get(PARENT_INJECTOR).get()
         val configManager: ConfigManager = parentInjector.getInstance()
-        val injector = parentInjector.createChildInjector(PluginGuiceModule(container, configManager))
-        container.injector = injector
 
         if (objectInstance != null) {
+            val module = object : PluginGuiceModule(container, configManager) {
+                override fun configure() {
+                    this.bind(pluginClass).toInstance(objectInstance)
+                    super.configure()
+                }
+            }
+            val injector = parentInjector.createChildInjector(module)
+            container.injector = injector
             injector.injectMembers(objectInstance)
             return objectInstance
         }
 
+        val module = object : PluginGuiceModule(container, configManager) {
+            override fun configure() {
+                this.bind(pluginClass).`in`(Scopes.SINGLETON)
+                super.configure()
+            }
+        }
+        val injector = parentInjector.createChildInjector(module)
+        container.injector = injector
         return injector.getInstance(pluginClass)
     }
 

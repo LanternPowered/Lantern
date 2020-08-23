@@ -54,13 +54,13 @@ internal class LanternTaskExecutorService(
 
     override fun <T> submit(command: Callable<T>): TaskFuture<T> {
         val runnable = FutureTask(command)
-        val task = createTask(runnable).build()
+        val task = this.createTask(runnable).build()
         return LanternTaskFuture<T, Future<*>>(this.scheduler.submit(task), runnable)
     }
 
     override fun <T> submit(command: Runnable, result: T?): TaskFuture<T> {
         val runnable = FutureTask(command, result as T)
-        val task = createTask(runnable).build()
+        val task = this.createTask(runnable).build()
         return LanternTaskFuture<T, Future<*>>(this.scheduler.submit(task), runnable)
     }
 
@@ -77,34 +77,34 @@ internal class LanternTaskExecutorService(
     }
 
     override fun schedule(command: Runnable, delay: Long, unit: TemporalUnit): ScheduledTaskFuture<*> {
-        val task = createTask(command).delay(delay, unit).build()
+        val task = this.createTask(command).delay(delay, unit).build()
         return LanternScheduledTaskFuture<Any>(submitScheduledTask(task))
     }
 
     override fun schedule(command: Runnable, delay: Long, unit: TimeUnit): ScheduledTaskFuture<*> {
-        val task = createTask(command).delay(delay, unit).build()
+        val task = this.createTask(command).delay(delay, unit).build()
         return LanternScheduledTaskFuture<Any>(submitScheduledTask(task))
     }
 
     override fun <V> schedule(callable: Callable<V>, delay: Long, unit: TemporalUnit): ScheduledTaskFuture<V> {
         val runnable = FutureTask(callable)
-        val task = createTask(runnable).delay(delay, unit).build()
+        val task = this.createTask(runnable).delay(delay, unit).build()
         return LanternScheduledTaskFuture(submitScheduledTask(task), runnable)
     }
 
     override fun <V> schedule(callable: Callable<V>, delay: Long, unit: TimeUnit): ScheduledTaskFuture<V> {
         val runnable = FutureTask(callable)
-        val task = createTask(runnable).delay(delay, unit).build()
+        val task = this.createTask(runnable).delay(delay, unit).build()
         return LanternScheduledTaskFuture(submitScheduledTask(task), runnable)
     }
 
     override fun scheduleAtFixedRate(command: Runnable, initialDelay: Long, period: Long, unit: TemporalUnit): ScheduledTaskFuture<*> {
-        val task = createTask(command).delay(initialDelay, unit).interval(period, unit).build()
+        val task = this.createTask(command).delay(initialDelay, unit).interval(period, unit).build()
         return LanternScheduledTaskFuture<Any>(submitScheduledTask(task))
     }
 
     override fun scheduleAtFixedRate(command: Runnable, initialDelay: Long, period: Long, unit: TimeUnit): ScheduledTaskFuture<*> {
-        val task = createTask(command).delay(initialDelay, unit).interval(period, unit).build()
+        val task = this.createTask(command).delay(initialDelay, unit).interval(period, unit).build()
         return LanternScheduledTaskFuture<Any>(submitScheduledTask(task))
     }
 
@@ -117,12 +117,12 @@ internal class LanternTaskExecutorService(
     }
 
     override fun scheduleWithFixedDelay(command: Runnable, initialDelay: Long, delay: Long, unit: TemporalUnit): ScheduledTaskFuture<*> {
-        val task = createTask(command).delay(initialDelay, unit).interval(delay, unit).build()
+        val task = this.createTask(command).delay(initialDelay, unit).interval(delay, unit).build()
         return LanternScheduledTaskFuture<Any>(submitTaskWithFixedDelay(task))
     }
 
     override fun scheduleWithFixedDelay(command: Runnable, initialDelay: Long, delay: Long, unit: TimeUnit): ScheduledTaskFuture<*> {
-        val task = createTask(command).delay(initialDelay, unit).interval(delay, unit).build()
+        val task = this.createTask(command).delay(initialDelay, unit).interval(delay, unit).build()
         return LanternScheduledTaskFuture<Any>(submitTaskWithFixedDelay(task))
     }
 

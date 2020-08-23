@@ -13,8 +13,9 @@ package org.lanternpowered.server.plugin
 import com.google.inject.Injector
 import org.spongepowered.plugin.PluginCandidate
 import org.spongepowered.plugin.jvm.JVMPluginContainer
+import org.spongepowered.plugin.jvm.locator.JVMPluginResource
 
-class LanternPluginContainer(candidate: PluginCandidate) : JVMPluginContainer(candidate) {
+class LanternPluginContainer(candidate: PluginCandidate<JVMPluginResource>) : JVMPluginContainer(candidate) {
 
     var injector: Injector? = null
 }

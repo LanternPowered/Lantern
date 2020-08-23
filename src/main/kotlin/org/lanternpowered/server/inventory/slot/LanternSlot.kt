@@ -35,6 +35,9 @@ open class LanternSlot : AbstractSlot() {
     override fun maxStackQuantityFor(stack: ItemStack): Int =
             min(stack.maxStackQuantity, this.maxStackQuantity)
 
+    override fun maxStackQuantityFor(type: ItemType): Int =
+            min(type.maxStackQuantity, this.maxStackQuantity)
+
     override var rawItem: ItemStack = emptyItemStack()
 
     /**

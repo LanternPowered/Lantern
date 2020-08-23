@@ -213,7 +213,6 @@ class LanternWorldStorage(
         }
     }
 
-
     companion object {
 
         private fun <R> readSafely(targetFile: Path, fn: (path: Path) -> R): R? {

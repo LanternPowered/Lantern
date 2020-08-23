@@ -74,7 +74,7 @@ object LanternEventManager : EventManager {
             this.shouldFireFields[target] = ShouldFireField(target, field)
         }
 
-        updateShouldFireFields()
+        this.updateShouldFireFields()
     }
 
     /**
@@ -119,28 +119,28 @@ object LanternEventManager : EventManager {
     }
 
     override fun <T : Event> registerListener(plugin: PluginContainer, eventClass: KClass<T>, listener: EventListener<in T>) {
-        registerListener(plugin, TypeToken.of(eventClass.java), listener)
+        this.registerListener(plugin, TypeToken.of(eventClass.java), listener)
     }
 
     override fun <T : Event> registerListener(plugin: PluginContainer, eventClass: Class<T>, listener: EventListener<in T>) {
-        registerListener(plugin, TypeToken.of(eventClass), listener)
+        this.registerListener(plugin, TypeToken.of(eventClass), listener)
     }
 
     override fun <T : Event> registerListener(plugin: PluginContainer, eventType: TypeToken<T>, listener: EventListener<in T>) {
-        registerListener(plugin, eventType, Order.DEFAULT, listener)
+        this.registerListener(plugin, eventType, Order.DEFAULT, listener)
     }
 
     override fun <T : Event> registerListener(plugin: PluginContainer, eventClass: Class<T>, order: Order, listener: EventListener<in T>) {
-        registerListener(plugin, eventClass, Order.DEFAULT, listener)
+        this.registerListener(plugin, eventClass, Order.DEFAULT, listener)
     }
 
     override fun <T : Event> registerListener(plugin: PluginContainer, eventType: TypeToken<T>, order: Order, listener: EventListener<in T>) {
-        register(plugin, eventType, order, listener)
+        this.register(plugin, eventType, order, listener)
     }
 
     fun <T : Event> register(plugin: PluginContainer, eventType: TypeToken<T>, order: Order, listener: EventListener<in T>): RegisteredListener<T> {
         val registered = RegisteredListener(plugin, listener, EventType.of(eventType), order)
-        register(plugin, listener, listOf(registered))
+        this.register(plugin, listener, listOf(registered))
         return registered
     }
 
@@ -152,7 +152,7 @@ object LanternEventManager : EventManager {
         for (method in handle.methods) {
             val subscribe = method.getAnnotation(Listener::class.java)
             if (subscribe != null) {
-                val error = getHandlerErrorOrNull(method)
+                val error = this.getHandlerErrorOrNull(method)
                 if (error == null) {
                     val eventToken = TypeToken.of(method.genericParameterTypes[0])
                     val handler = try {
@@ -180,21 +180,19 @@ object LanternEventManager : EventManager {
         while (handleParent != Any::class.java) {
             for (method in handleParent.declaredMethods) {
                 if (method.getAnnotation(Listener::class.java) != null && !methodErrors.containsKey(method)) {
-                    val error = getHandlerErrorOrNull(method)
-                    if (error != null) {
+                    val error = this.getHandlerErrorOrNull(method)
+                    if (error != null)
                         methodErrors[method] = error
-                    }
                 }
             }
             handleParent = handleParent.superclass
         }
 
 
-        for ((key, value) in methodErrors) {
+        for ((key, value) in methodErrors)
             this.logger.warn("Invalid listener method $key in ${key.declaringClass.name}: $value")
-        }
 
-        register(plugin, instance, handlers)
+        this.register(plugin, instance, handlers)
     }
 
     private fun getHandlerErrorOrNull(method: Method): String? {
@@ -246,7 +244,7 @@ object LanternEventManager : EventManager {
         }
         if (listenersToInvalidate.isNotEmpty()) {
             this.listenersCache.invalidateAll()
-            updateShouldFireFields()
+            this.updateShouldFireFields()
         }
     }
 
@@ -266,16 +264,16 @@ object LanternEventManager : EventManager {
         }
         if (changes.isNotEmpty()) {
             this.listenersCache.invalidateAll()
-            updateShouldFireFields()
+            this.updateShouldFireFields()
         }
     }
 
     override fun unregisterListeners(instance: Any) {
-        unregister { handler -> instance == handler.handle }
+        this.unregister { handler -> instance == handler.handle }
     }
 
     override fun unregisterPluginListeners(plugin: PluginContainer) {
-        unregister { handler -> plugin == handler.plugin }
+        this.unregister { handler -> plugin == handler.plugin }
     }
 
     private fun <E : Event> E.eventType(): EventType<E> =
@@ -288,7 +286,7 @@ object LanternEventManager : EventManager {
     fun postFor(event: Event, plugin: PluginContainer): Boolean {
         val listeners = this.listenersCache.get(event.eventType())!!
                 .filter { it.plugin == plugin }
-        return post(event, listeners)
+        return this.post(event, listeners)
     }
 
     override fun post(event: Event): Boolean {

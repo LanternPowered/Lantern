@@ -19,13 +19,13 @@ import java.nio.file.Path
 import java.util.Optional
 
 class InternalPluginContainer(
-        private val file: Path,
+        private val path: Path,
         private val metadata: PluginMetadata,
         private val logger: Logger,
         private val instance: Any
 ) : PluginContainer {
 
-    override fun getFile(): Path = this.file
+    override fun getPath(): Path = this.path
     override fun getMetadata(): PluginMetadata = this.metadata
     override fun getLogger(): Logger = this.logger
     override fun getInstance(): Any = this.instance

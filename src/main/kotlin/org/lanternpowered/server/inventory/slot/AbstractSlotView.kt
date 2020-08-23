@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.inventory.slot
 
+import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.ViewableInventory
@@ -19,7 +20,6 @@ import org.lanternpowered.server.inventory.AbstractSlot
 import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.SlotChangeTracker
 import org.lanternpowered.server.inventory.TransactionConsumer
-import org.spongepowered.api.item.ItemType
 
 abstract class AbstractSlotView<T : AbstractSlot> : AbstractSlot(), InventoryView<T> {
 
@@ -90,4 +90,7 @@ abstract class AbstractSlotView<T : AbstractSlot> : AbstractSlot(), InventoryVie
 
     override fun maxStackQuantityFor(stack: ItemStack): Int =
             this.backing.maxStackQuantityFor(stack)
+
+    override fun maxStackQuantityFor(type: ItemType): Int =
+            this.backing.maxStackQuantityFor(type)
 }

@@ -18,13 +18,13 @@ typealias Plugin = org.spongepowered.plugin.jvm.Plugin
 typealias PluginContainer = org.spongepowered.plugin.PluginContainer
 
 val PluginContainer.id: String
-    get() = metadata.id
+    get() = this.metadata.id
 
 val PluginContainer.name: String
-    get() = metadata.name.orElse(metadata.id)
+    get() = this.metadata.name.orElse(this.metadata.id)
 
 val PluginContainer.version: String
-    get() = metadata.version
+    get() = this.metadata.version
 
 interface PluginManager : org.spongepowered.api.plugin.PluginManager {
 

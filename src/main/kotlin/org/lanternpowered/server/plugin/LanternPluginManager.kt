@@ -17,7 +17,6 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withCause
 import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.plugin.PluginManager
-import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.getAndRemoveAll
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.collections.toImmutableMap
@@ -33,6 +32,8 @@ import org.spongepowered.plugin.PluginEnvironment
 import org.spongepowered.plugin.PluginKeys
 import org.spongepowered.plugin.PluginLanguageService
 import org.spongepowered.plugin.PluginLoader
+import org.spongepowered.plugin.PluginResource
+import org.spongepowered.plugin.PluginResourceLocatorService
 import org.spongepowered.plugin.metadata.PluginMetadata
 import java.nio.file.Path
 import java.util.Optional
@@ -60,7 +61,7 @@ class LanternPluginManager(
 
     private lateinit var pluginEnvironment: PluginEnvironment
     private lateinit var resources: List<Path>
-    private lateinit var candidatesByService: Map<PluginLanguageService, List<PluginCandidate>>
+    private lateinit var candidatesByService: Map<LoadedLanguageService, List<PluginCandidate<PluginResource>>>
 
     lateinit var lanternPlugin: PluginContainer
         private set
@@ -75,19 +76,21 @@ class LanternPluginManager(
         private set
 
     fun findCandidates() {
-        val languageServices = findLanguageServices()
-        findCandidates(languageServices)
+        val locatorServices = this.findLocatorServices()
+        val languageServices = this.findLanguageServices()
+        this.findCandidates(locatorServices, languageServices)
     }
 
-    private fun findLanguageServices(): List<PluginLanguageService> {
-        val services = mutableListOf<PluginLanguageService>()
+    private fun findLocatorServices(): List<PluginResourceLocatorService<PluginResource>> {
+        val services = mutableListOf<PluginResourceLocatorService<PluginResource>>()
 
-        val it = ServiceLoader.load(PluginLanguageService::class.java).iterator()
+        val it = ServiceLoader.load(PluginResourceLocatorService::class.java).iterator()
         while (it.hasNext()) {
             try {
-                services += it.next()
+                @Suppress("UNCHECKED_CAST")
+                services += it.next() as PluginResourceLocatorService<PluginResource>
             } catch (ex: ServiceConfigurationError) {
-                this.logger.error("Error encountered initializing plugin language service!", ex)
+                this.logger.error("Error encountered initializing plugin resource locator service!", ex)
                 continue
             }
         }
@@ -95,36 +98,79 @@ class LanternPluginManager(
         return services
     }
 
-    private fun findCandidates(languageServices: List<PluginLanguageService>) {
+    private class LoadedLanguageService(
+            val service: PluginLanguageService<PluginResource>,
+            val loader: PluginLoader<PluginResource, PluginContainer>
+    )
+
+    private fun findLanguageServices(): List<LoadedLanguageService> {
+        val services = mutableListOf<LoadedLanguageService>()
+
+        val it = ServiceLoader.load(PluginLanguageService::class.java).iterator()
+        while (it.hasNext()) {
+            val service = try {
+                @Suppress("UNCHECKED_CAST")
+                it.next() as PluginLanguageService<PluginResource>
+            } catch (ex: ServiceConfigurationError) {
+                this.logger.error("Error encountered initializing plugin language service!", ex)
+                continue
+            }
+            val pluginLoaderClass = try {
+                Class.forName(service.pluginLoader)
+            } catch (t: ClassNotFoundException) {
+                this.logger.error("Failed to find plugin loader class ${service.pluginLoader} for the " +
+                        "plugin language service ${service.name}.", t)
+                continue
+            }
+            val pluginLoader = try {
+                @Suppress("UNCHECKED_CAST")
+                pluginLoaderClass.getConstructor().newInstance() as PluginLoader<PluginResource, PluginContainer>
+            } catch (t: Throwable) {
+                this.logger.error("Failed to instantiate plugin loader ${service.pluginLoader} for the " +
+                        "plugin language service ${service.name}.", t)
+                continue
+            }
+            services += LoadedLanguageService(service, pluginLoader)
+        }
+
+        return services
+    }
+
+    private fun findCandidates(
+            locatorServices: List<PluginResourceLocatorService<PluginResource>>,
+            languageServices: List<LoadedLanguageService>
+    ) {
         this.pluginEnvironment = PluginEnvironment(LogManager.getLogger("plugin-manager"))
         this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.BASE_DIRECTORY) { this.baseDirectory }
         this.pluginEnvironment.blackboard.getOrCreate(PluginKeys.PLUGIN_DIRECTORIES) { listOf(this.pluginsDirectory) }
 
-        val resources = mutableSetOf<Path>()
-        val candidatesByService = mutableMapOf<PluginLanguageService, MutableList<PluginCandidate>>()
-        for (service in languageServices) {
+        val resourcesByLocator = mutableMapOf<PluginResourceLocatorService<PluginResource>, List<PluginResource>>()
+        for (service in locatorServices) {
             try {
-                resources += service.discoverPluginResources(this.pluginEnvironment)
+                resourcesByLocator[service] = service.locatePluginResources(this.pluginEnvironment)
             } catch (t: Throwable) {
-                this.logger.error("The plugin language service ${service.name} " +
-                        "(${service.javaClass.name}) failed to discover plugin resources.", t)
+                this.logger.error("The plugin resource locator ${service.name} failed to locate resources.", t)
                 continue
             }
+        }
 
-            val candidates = try {
-                service.createPluginCandidates(this.pluginEnvironment)
-            } catch (t: Throwable) {
-                this.logger.error("The plugin language service ${service.name} " +
-                        "(${service.javaClass.name}) failed to create plugin candidates.", t)
-                continue
+        val candidatesByService = mutableMapOf<LoadedLanguageService, MutableList<PluginCandidate<PluginResource>>>()
+        for (service in languageServices) {
+            for (resource in resourcesByLocator.values.flatten()) {
+                val candidates = try {
+                    service.service.createPluginCandidates(this.pluginEnvironment, resource)
+                } catch (t: Throwable) {
+                    this.logger.error("The plugin language service ${service.service.name} failed to create plugin candidates.", t)
+                    continue
+                }
+                if (candidates.isEmpty())
+                    continue
+                candidatesByService.computeIfAbsent(service) { ArrayList() }.addAll(candidates)
             }
-
-            for (candidate in candidates)
-                candidatesByService.computeIfAbsent(service) { mutableListOf() }.add(candidate)
         }
 
         fun extractInternalCandidate(id: String): PluginContainer {
-            var firstCandidate: PluginCandidate? = null
+            var firstCandidate: PluginCandidate<*>? = null
             for ((_, candidates) in candidatesByService) {
                 val candidate = candidates.getAndRemoveAll { candidate -> candidate.metadata.id == id }
                 if (firstCandidate == null)
@@ -132,7 +178,7 @@ class LanternPluginManager(
             }
 
             val metadata = firstCandidate?.metadata ?: PluginMetadata.builder().setId(id).build()
-            val file = firstCandidate?.file ?: this.baseDirectory.resolve("magic/$id.jar") // Use something as path.
+            val file = firstCandidate?.resource?.path ?: this.baseDirectory.resolve("magic/$id.jar") // Use something as path.
 
             val pluginContainer = InternalPluginContainer(file, metadata, this.logger, this.game)
             this.byId[id] = pluginContainer
@@ -167,30 +213,13 @@ class LanternPluginManager(
         val causeStack = CauseStack.current()
 
         for ((service, candidates) in this.candidatesByService) {
-            val pluginLoaderClass = try {
-                Class.forName(service.pluginLoader)
-            } catch (t: ClassNotFoundException) {
-                this.logger.error("Failed to find plugin loader class ${service.pluginLoader} for the " +
-                        "plugin language service ${service.name}.", t)
-                continue
-            }
-            val pluginLoader = try {
-                @Suppress("UNCHECKED_CAST")
-                pluginLoaderClass.getConstructor().newInstance() as PluginLoader<PluginContainer>
-            } catch (t: Throwable) {
-                this.logger.error("Failed to instantiate plugin loader ${service.pluginLoader} for the " +
-                        "plugin language service ${service.name}.", t)
-                continue
-            }
-
             for (candidate in candidates) {
                 val pluginContainer = try {
-                    pluginLoader.createPluginContainer(candidate, this.pluginEnvironment).orNull() ?: continue
+                    service.loader.createPluginContainer(candidate, this.pluginEnvironment).orNull() ?: continue
                 } catch (t: Throwable) {
-                    this.logger.error("Failed to create the plugin plugin of ${candidate.asString()}", t)
+                    this.logger.error("Failed to create the plugin plugin of $candidate", t)
                     continue
                 }
-
 
                 // Already store it so it can be looked up through injections.
                 this.byId[candidate.metadata.id] = pluginContainer
@@ -200,10 +229,10 @@ class LanternPluginManager(
                 causeStack.withCause(pluginContainer) {
                     // Instantiate the plugin instance.
                     try {
-                        pluginLoader.loadPlugin(this.pluginEnvironment, pluginContainer, classLoader)
+                        service.loader.loadPlugin(this.pluginEnvironment, pluginContainer, classLoader)
                         this.byInstance[pluginContainer.instance] = pluginContainer
                     } catch (t: Throwable) {
-                        this.logger.error("Failed to instantiate the plugin instance of ${candidate.asString()}", t)
+                        this.logger.error("Failed to instantiate the plugin instance of $candidate", t)
                         // Remove the failed plugin
                         this.byId -= candidate.metadata.id
                     }
@@ -211,11 +240,6 @@ class LanternPluginManager(
             }
         }
     }
-
-    private fun PluginCandidate.asString(): String = ToStringHelper(this)
-            .add("file", this.file)
-            .add("metadata", this.metadata)
-            .toString()
 
     /**
      * Registers all the listeners of the plugins and

@@ -13,6 +13,6 @@ package org.lanternpowered.server.plugin
 import org.spongepowered.plugin.jvm.JVMPluginLanguageService
 
 class LanternPluginLanguageService : JVMPluginLanguageService() {
-    override fun getName(): String = "lantern"
+    override fun getName(): String = "java_plain"
     override fun getPluginLoader(): String = LanternPluginLoader::class.java.name
 }

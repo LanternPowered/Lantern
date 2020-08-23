@@ -138,7 +138,7 @@ private class ScheduledDispatcherService(private val dispatcher: CoroutineDispat
                 delayCoroutine(delayMillis)
                 start = end
             }
-    }
+        }
         return ScheduledDeferredFuture(deferred, initialDelayMillis)
     }
 

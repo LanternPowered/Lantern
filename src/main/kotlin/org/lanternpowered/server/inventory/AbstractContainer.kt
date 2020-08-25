@@ -11,7 +11,7 @@
 package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.entity.player.Player
-import org.lanternpowered.api.item.inventory.ExtendedContainer
+import org.lanternpowered.api.item.inventory.container.ExtendedContainer
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.slot.Slot

@@ -17,6 +17,7 @@ import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.InventoryColumn
 import org.lanternpowered.api.item.inventory.InventoryRow
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
+import org.lanternpowered.api.item.inventory.ViewableInventory
 import org.lanternpowered.api.item.inventory.archetype.ColumnArchetype
 import org.lanternpowered.api.item.inventory.archetype.InventoryArchetype
 import org.lanternpowered.api.item.inventory.archetype.RowArchetype
@@ -30,6 +31,7 @@ import org.lanternpowered.api.item.inventory.slot.FuelSlot
 import org.lanternpowered.api.item.inventory.slot.InputSlot
 import org.lanternpowered.api.item.inventory.slot.OutputSlot
 import org.lanternpowered.api.item.inventory.slot.Slot
+import org.spongepowered.api.item.inventory.ContainerType
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroup
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
@@ -54,6 +56,13 @@ object InventoryTypes {
 class InventoryType<I : Inventory>
 
 interface InventoryBaseBuilder {
+
+    /**
+     * Applies the container type of this inventory, applying a container
+     * type converts this inventory into a [ViewableInventory] which will
+     * use the given container type.
+     */
+    fun containerType(containerType: ContainerType)
 
     /**
      * Applies a "tag" to the inventory, which can be queried for later.

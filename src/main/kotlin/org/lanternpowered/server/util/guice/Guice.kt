@@ -13,12 +13,12 @@ package org.lanternpowered.server.util.guice
 import com.google.inject.AbstractModule
 import com.google.inject.Injector
 import com.google.inject.Key
+import com.google.inject.Provider
 import com.google.inject.Scopes
 import com.google.inject.TypeLiteral
 import com.google.inject.binder.AnnotatedBindingBuilder
 import com.google.inject.binder.LinkedBindingBuilder
 import com.google.inject.binder.ScopedBindingBuilder
-import javax.inject.Provider
 import kotlin.reflect.KClass
 
 inline fun <reified T> typeLiteralOf(): TypeLiteral<T> = object : TypeLiteral<T>() {}

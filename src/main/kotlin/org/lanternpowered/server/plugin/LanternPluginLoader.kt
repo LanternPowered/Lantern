@@ -11,9 +11,9 @@
 package org.lanternpowered.server.plugin
 
 import com.google.inject.Injector
-import com.google.inject.Scopes
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.plugin.inject.PluginGuiceModule
+import org.lanternpowered.server.util.guice.asSingleton
 import org.lanternpowered.server.util.guice.getInstance
 import org.spongepowered.api.config.ConfigManager
 import org.spongepowered.plugin.Blackboard
@@ -53,7 +53,7 @@ class LanternPluginLoader : JVMPluginLoader<LanternPluginContainer>() {
 
         val module = object : PluginGuiceModule(container, configManager) {
             override fun configure() {
-                this.bind(pluginClass).`in`(Scopes.SINGLETON)
+                this.bind(pluginClass).asSingleton()
                 super.configure()
             }
         }

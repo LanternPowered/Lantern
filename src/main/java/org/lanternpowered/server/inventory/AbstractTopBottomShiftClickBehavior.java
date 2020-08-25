@@ -11,7 +11,7 @@
 package org.lanternpowered.server.inventory;
 
 import org.lanternpowered.server.inventory.behavior.AbstractShiftClickBehavior;
-import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
+import org.lanternpowered.api.item.inventory.behavior.ShiftClickBehavior;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 

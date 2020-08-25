@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.inventory.behavior;
 
+import org.lanternpowered.api.item.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.AbstractContainer;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.IInventory;

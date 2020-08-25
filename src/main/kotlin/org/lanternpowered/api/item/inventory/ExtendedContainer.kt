@@ -12,9 +12,9 @@
 
 package org.lanternpowered.api.item.inventory
 
+import org.lanternpowered.api.item.inventory.container.Container
+import org.lanternpowered.api.item.inventory.container.ExtendedContainer
 import kotlin.contracts.contract
-
-typealias Container = org.spongepowered.api.item.inventory.Container
 
 /**
  * Gets the normal container as an extended container.
@@ -29,8 +29,3 @@ inline fun Container.fix(): ExtendedContainer {
  */
 @Deprecated(message = "Redundant call.", replaceWith = ReplaceWith(""))
 inline fun ExtendedContainer.fix(): ExtendedContainer = this
-
-/**
- * An extended version of [Container].
- */
-interface ExtendedContainer : Container, ExtendedInventory

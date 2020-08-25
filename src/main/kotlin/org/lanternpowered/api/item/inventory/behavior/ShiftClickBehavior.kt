@@ -8,9 +8,9 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inventory.behavior
+package org.lanternpowered.api.item.inventory.behavior
 
-import org.lanternpowered.api.item.inventory.ExtendedContainer
+import org.lanternpowered.api.item.inventory.container.ExtendedContainer
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot

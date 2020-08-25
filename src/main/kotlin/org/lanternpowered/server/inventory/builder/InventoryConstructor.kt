@@ -19,8 +19,8 @@ import org.spongepowered.api.item.inventory.Carrier
 interface InventoryConstructor<T : Inventory> {
 
     /**
-     * Constructs a new inventory with the given
-     * parent inventory and carrier.
+     * Constructs a new inventory with the given parent
+     * inventory and carrier.
      */
     fun construct(parent: Inventory?, carrier: Carrier?): T
 }

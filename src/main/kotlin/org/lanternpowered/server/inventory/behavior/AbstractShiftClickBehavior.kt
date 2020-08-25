@@ -10,7 +10,8 @@
  */
 package org.lanternpowered.server.inventory.behavior
 
-import org.lanternpowered.api.item.inventory.ExtendedContainer
+import org.lanternpowered.api.item.inventory.behavior.ShiftClickBehavior
+import org.lanternpowered.api.item.inventory.container.ExtendedContainer
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.query
 import org.lanternpowered.api.item.inventory.query.QueryTypes

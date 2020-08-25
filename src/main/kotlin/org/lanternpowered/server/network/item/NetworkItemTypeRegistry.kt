@@ -22,10 +22,8 @@ import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.resolveNamespacedKey
 import org.lanternpowered.api.registry.CatalogTypeRegistry
-import org.lanternpowered.server.game.registry.InternalIDRegistries
 import org.lanternpowered.server.item.LanternItemType
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 
 /**
@@ -44,21 +42,17 @@ object NetworkItemTypeRegistry {
         val normalToNetwork = Object2IntOpenHashMap<NamespacedKey>()
         normalToNetwork.defaultReturnValue(NO_NETWORK_ID)
         val networkToNormal = Int2ObjectOpenHashMap<NamespacedKey>()
-        try {
-            val input = InputStreamReader(InternalIDRegistries::class.java
-                    .getResourceAsStream("/internal/registries/item.json"))
-            BufferedReader(input).use { reader ->
-                val jsonArray = gson.fromJson(reader, JsonArray::class.java)
-                for (index in 0 until jsonArray.size()) {
-                    val element = jsonArray.get(index)
-                    val id = if (element.isJsonPrimitive) element.asString else element.asJsonObject.get("id").asString
-                    val key = resolveNamespacedKey(id)
-                    normalToNetwork[key] = index
-                    networkToNormal[index] = key
-                }
+        val input = InputStreamReader(NetworkItemTypeRegistry::class.java
+                .getResourceAsStream("/internal/registries/item.json"))
+        BufferedReader(input).use { reader ->
+            val jsonArray = gson.fromJson(reader, JsonArray::class.java)
+            for (index in 0 until jsonArray.size()) {
+                val element = jsonArray.get(index)
+                val id = if (element.isJsonPrimitive) element.asString else element.asJsonObject.get("id").asString
+                val key = resolveNamespacedKey(id)
+                normalToNetwork[key] = index
+                networkToNormal[index] = key
             }
-        } catch (e: IOException) {
-            throw IllegalStateException(e)
         }
         this.vanillaToNetworkId = Object2IntMaps.unmodifiable(normalToNetwork)
         this.networkIdToVanilla = Int2ObjectMaps.unmodifiable(networkToNormal)

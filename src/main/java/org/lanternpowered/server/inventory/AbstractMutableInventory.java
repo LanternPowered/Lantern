@@ -13,7 +13,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.api.cause.CauseStack;
-import org.lanternpowered.server.inventory.behavior.ShiftClickBehavior;
+import org.lanternpowered.api.item.inventory.behavior.ShiftClickBehavior;
 import org.lanternpowered.server.inventory.behavior.SimpleShiftClickBehavior;
 import org.lanternpowered.server.inventory.client.ClientContainer;
 import org.spongepowered.api.data.property.Property;

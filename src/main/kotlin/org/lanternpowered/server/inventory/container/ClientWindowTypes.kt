@@ -11,6 +11,7 @@
 package org.lanternpowered.server.inventory.container
 
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.resolveNamespacedKey
 import org.lanternpowered.server.game.registry.InternalRegistries
 
 object ClientWindowTypes {
@@ -19,13 +20,13 @@ object ClientWindowTypes {
 
     init {
         InternalRegistries.visit("menu") { name, _ ->
-            val key = NamespacedKey.resolve(name)
-            keyToIdMap[key] = ClientWindowType(key)
+            val key = resolveNamespacedKey(name)
+            this.keyToIdMap[key] = ClientWindowType(key)
         }
     }
 
-    fun get(key: String) = get(NamespacedKey.resolve(key))
-    fun get(key: NamespacedKey) = requireNotNull(keyToIdMap[key]) { "Cannot find mapping for $key" }
+    fun get(key: String) = get(resolveNamespacedKey(key))
+    fun get(key: NamespacedKey) = requireNotNull(this.keyToIdMap[key]) { "Cannot find mapping for $key" }
 
     @JvmField val ANVIL = get("anvil")
     @JvmField val BEACON = get("beacon")

@@ -47,7 +47,8 @@ class RootBrewingContainerLayout : LanternTopBottomContainerLayout<BrewingContai
         set(value) {
             field = value.coerceIn(0.0, 1.0)
             // Update the client property
-            this.setProperty(BREW_PROGRESS_PROPERTY, (field * 400.0).toInt())
+            // 0.0 is full, 1.0 is empty, so it needs to be swapped
+            this.setProperty(BREW_PROGRESS_PROPERTY, ((1.0 - field) * 400.0).toInt())
         }
 
     var fuelProgress: Double = 0.0

@@ -36,6 +36,13 @@ interface BeaconContainerLayout : ContainerLayout {
     var selectedSecondaryEffect: PotionEffectType?
 
     /**
+     * The power level, this controls which buttons are enabled.
+     *
+     * A value between 0 and 4 (inclusive).
+     */
+    var powerLevel: Int
+
+    /**
      * The function will be called when the player selected the
      * potion effect types and confirms.
      */

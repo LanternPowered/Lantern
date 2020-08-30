@@ -45,7 +45,7 @@ import kotlin.math.min
  * @property slotFlags An array with all the information about the slots in this layout
  */
 abstract class LanternContainerLayout(
-        private var _title: Text,
+        title: Text,
         protected val slotFlags: IntArray,
         propertyCount: Int
 ) : RootContainerLayout, SlotChangeTracker {
@@ -139,6 +139,8 @@ abstract class LanternContainerLayout(
             }
         }
     }
+
+    private var _title: Text = title
 
     /**
      * All the viewers of this container layout.
@@ -404,6 +406,12 @@ abstract class LanternContainerLayout(
 
     protected open fun clientSlotIndexToServer(index: Int): Int = if (index < 0) -1 else index
     protected open fun serverSlotIndexToClient(index: Int): Int = if (index < 0) -1 else index
+
+    /**
+     * Handles a client click action on a button in the container.
+     */
+    open fun handleButtonClick(player: Player, index: Int) {
+    }
 
     /**
      * Handles a client creative click interaction for the given [player].

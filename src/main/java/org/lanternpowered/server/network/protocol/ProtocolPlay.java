@@ -32,7 +32,7 @@ import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientRequest
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientRequestEntityDataCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientEditCommandBlockBlockCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientEditCommandBlockEntityCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientEnchantItemCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickWindowButtonCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientLocksDifficultyCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientModifyBookCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CloseWindowCodec;
@@ -193,7 +193,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientRequestD
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSetDisplayedRecipePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDropHeldItemPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEditCommandBlockPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEnchantItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWindowButtonPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientLeaveBedPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientLockDifficultyPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientModifyBookPacket;
@@ -346,7 +346,7 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(ClientTabCompleteCodec.class, ClientTabCompletePacket.class)
                 .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(ConfirmWindowTransactionCodec.class, ConfirmWindowTransactionPacket.class); // TODO: Handler
-        inbound.bind(ClientEnchantItemCodec.class, ClientEnchantItemPacket.class)
+        inbound.bind(ClientClickWindowButtonCodec.class, ClientClickWindowButtonPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleEnchantItem));
         inbound.bind(ClientClickWindowCodec.class, ClientClickWindowPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleWindowClick));

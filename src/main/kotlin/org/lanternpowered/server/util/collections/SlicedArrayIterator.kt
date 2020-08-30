@@ -12,17 +12,17 @@ package org.lanternpowered.server.util.collections
 
 class SlicedArrayIterator<T>(
         private val array: Array<T>,
-        offset: Int = 0,
-        private val size: Int = array.size
+        private val offset: Int = 0,
+        private val size: Int = array.size - offset
 ) : Iterator<T> {
 
-    private var index = offset
+    private var index = 0
 
     override fun hasNext(): Boolean = this.index < this.size
 
     override fun next(): T {
         if (!this.hasNext())
             throw NoSuchElementException()
-        return this.array[this.index++]
+        return this.array[this.offset + this.index++]
     }
 }

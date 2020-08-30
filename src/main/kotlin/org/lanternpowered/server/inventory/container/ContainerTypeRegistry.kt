@@ -26,9 +26,11 @@ import org.lanternpowered.server.inventory.container.layout.RootGeneric3x3Contai
 import org.lanternpowered.server.inventory.container.layout.RootGeneric9xNContainerLayout
 import org.lanternpowered.server.inventory.container.layout.RootGrindstoneContainerLayout
 import org.lanternpowered.server.inventory.container.layout.RootHopperContainerLayout
+import org.lanternpowered.server.inventory.container.layout.RootLecternContainerLayout
 import org.lanternpowered.server.inventory.container.layout.RootMerchantContainerLayout
 import org.lanternpowered.server.inventory.container.layout.RootShulkerBoxContainerLayout
 import org.lanternpowered.server.inventory.container.layout.RootSmokerContainerLayout
+import org.lanternpowered.server.inventory.container.layout.RootStoneCutterContainerLayout
 
 val ContainerTypeRegistry = catalogTypeRegistry<ContainerType> {
     fun <L : ContainerLayout> register(id: String, layoutProvider: () -> L): ExtendedContainerType<L> =
@@ -50,9 +52,11 @@ val ContainerTypeRegistry = catalogTypeRegistry<ContainerType> {
     register("generic_9x6") { RootGeneric9xNContainerLayout(6) }
     register("grindstone", ::RootGrindstoneContainerLayout)
     register("hopper", ::RootHopperContainerLayout)
+    register("lectern", ::RootLecternContainerLayout)
     register("merchant", ::RootMerchantContainerLayout)
     register("shulker_box", ::RootShulkerBoxContainerLayout)
     register("smoker", ::RootSmokerContainerLayout)
+    register("stonecutter", ::RootStoneCutterContainerLayout)
 
     // TODO: Missing layouts, e.g. horse, etc.
 }

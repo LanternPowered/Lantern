@@ -10,39 +10,40 @@
  */
 package org.lanternpowered.server.inventory.container.layout
 
-import org.lanternpowered.api.item.inventory.container.layout.ContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.ContainerSlot
-import org.lanternpowered.api.item.inventory.container.layout.GrindstoneContainerLayout
+import org.lanternpowered.api.item.inventory.container.layout.StoneCutterContainerLayout
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.inventory.container.ClientWindowTypes
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket
 
-class RootGrindstoneContainerLayout : LanternTopBottomContainerLayout<GrindstoneContainerLayout>(
+class RootStoneCutterContainerLayout : LanternTopBottomContainerLayout<StoneCutterContainerLayout>(
         title = TITLE, slotFlags = ALL_INVENTORY_FLAGS
 ) {
 
     companion object {
 
-        private val TITLE = translatableTextOf("container.grindstone")
+        private val TITLE = translatableTextOf("container.stonecutter")
 
+        // TODO: Check flags
         private val TOP_INVENTORY_FLAGS = intArrayOf(
-                0, // First input slot
-                0, // Second input slot
+                Flags.POSSIBLY_DISABLED_SHIFT_INSERTION, // Input slot
                 Flags.REVERSE_SHIFT_INSERTION + Flags.DISABLE_SHIFT_INSERTION + Flags.IGNORE_DOUBLE_CLICK // Result slot
         )
 
         private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.GRINDSTONE, this.title)
-    override val top: GrindstoneContainerLayout = SubGrindstoneContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
+    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.STONE_CUTTER, this.title)
+    override val top: StoneCutterContainerLayout = SubStoneCutterContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
+
+    // TODO: Add recipes and which recipe was selected
 }
 
-private class SubGrindstoneContainerLayout(
-        offset: Int, size: Int, root: RootGrindstoneContainerLayout
-) : SubContainerLayout(offset, size, root), GrindstoneContainerLayout {
+private class SubStoneCutterContainerLayout(
+        offset: Int, size: Int, root: RootStoneCutterContainerLayout
+) : SubContainerLayout(offset, size, root), StoneCutterContainerLayout {
 
-    override val inputs: ContainerLayout = SubContainerLayout(offset, this.size - 1, this.base)
-    override val output: ContainerSlot get() = this[this.size - 1]
+    override val input: ContainerSlot get() = this[0]
+    override val output: ContainerSlot get() = this[1]
 }

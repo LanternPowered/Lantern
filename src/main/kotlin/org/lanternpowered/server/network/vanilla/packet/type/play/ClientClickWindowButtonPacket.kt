@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.server.network.packet.Packet
 
-data class ClientEnchantItemPacket(
+data class ClientClickWindowButtonPacket(
         val windowId: Int,
-        val enchantmentSlot: Int
+        val button: Int
 ) : Packet

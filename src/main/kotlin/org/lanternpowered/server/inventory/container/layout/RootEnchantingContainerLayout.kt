@@ -69,7 +69,7 @@ class RootEnchantingContainerLayout : LanternTopBottomContainerLayout<Enchanting
         this.onClickButton += fn
     }
 
-    fun handleButton(player: Player, index: Int) {
+    override fun handleButtonClick(player: Player, index: Int) {
         this.getData(player) ?: return
 
         val button = this.buttons[index]

@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWin
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientCreativeWindowActionPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSetDisplayedRecipePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDropHeldItemPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEnchantItemPacket;
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWindowButtonPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.CloseWindowPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerHeldItemChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPickItemPacket;
@@ -311,13 +311,13 @@ public class PlayerInventoryContainerSession {
         }
     }
 
-    public void handleEnchantItem(ClientEnchantItemPacket message) {
+    public void handleEnchantItem(ClientClickWindowButtonPacket message) {
         if (message.getWindowId() != getContainerId()) {
             return;
         }
         final ClientContainer clientContainer = getClientContainer();
         if (clientContainer instanceof EnchantmentTableClientContainer) {
-            ((EnchantmentTableClientContainer) clientContainer).handleButton(message.getEnchantmentSlot());
+            ((EnchantmentTableClientContainer) clientContainer).handleButton(message.getButton());
         }
     }
 }

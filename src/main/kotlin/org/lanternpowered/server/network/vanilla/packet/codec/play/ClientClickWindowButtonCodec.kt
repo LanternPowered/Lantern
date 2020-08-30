@@ -13,13 +13,13 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
-import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEnchantItemPacket
+import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickWindowButtonPacket
 
-object ClientEnchantItemCodec : PacketDecoder<ClientEnchantItemPacket> {
+object ClientClickWindowButtonCodec : PacketDecoder<ClientClickWindowButtonPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientEnchantItemPacket {
+    override fun decode(context: CodecContext, buf: ByteBuffer): ClientClickWindowButtonPacket {
         val windowId = buf.readByte().toInt()
-        val slot = buf.readByte().toInt()
-        return ClientEnchantItemPacket(windowId, slot)
+        val button = buf.readByte().toInt()
+        return ClientClickWindowButtonPacket(windowId, button)
     }
 }

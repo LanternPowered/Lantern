@@ -21,7 +21,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPack
 import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
 
 class RootBeaconContainerLayout : LanternTopBottomContainerLayout<BeaconContainerLayout>(
-        title = TITLE, slotFlags = ALL_INVENTORY_FLAGS, propertyCount = 2
+        title = TITLE, slotFlags = ALL_INVENTORY_FLAGS, propertyCount = 3
 ) {
 
     companion object {
@@ -34,8 +34,9 @@ class RootBeaconContainerLayout : LanternTopBottomContainerLayout<BeaconContaine
 
         private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
 
-        private const val PRIMARY_POTION_EFFECT = 0
-        private const val SECONDARY_POTION_EFFECT = 1
+        private const val POWER_LEVEL = 0
+        private const val PRIMARY_POTION_EFFECT = 1
+        private const val SECONDARY_POTION_EFFECT = 2
 
         private const val NO_POTION_EFFECT = -1
     }
@@ -66,6 +67,13 @@ class RootBeaconContainerLayout : LanternTopBottomContainerLayout<BeaconContaine
                     if (value == null) NO_POTION_EFFECT else PotionEffectTypeRegistry.getId(value))
         }
 
+    var powerLevel: Int = 0
+        set(value) {
+            field = value.coerceIn(0, 4)
+            // Update the client property
+            this.setProperty(POWER_LEVEL, field)
+        }
+
     fun onSelectEffects(fn: (player: Player, primaryEffect: PotionEffectType?, secondaryEffect: PotionEffectType?) -> Unit) {
         this.onSelectEffects += fn
     }
@@ -90,6 +98,10 @@ private class SubBeaconContainerLayout(
 
     override val payment: ContainerSlot
         get() = this[0]
+
+    override var powerLevel: Int
+        get() = this.root.powerLevel
+        set(value) { this.root.powerLevel = value }
 
     override var selectedPrimaryEffect: PotionEffectType?
         get() = this.root.selectedPrimaryEffect

@@ -21,11 +21,14 @@ import org.lanternpowered.api.item.ItemType
  * @property type The actual item type this type represents
  * @property networkId The int id that the client uses to represent this item type (the appearance)
  * @property internalId The int id that the server assigned to the item type, to make it unique
+ * @property originalMaxStackSize The maximum stack size that is originally applicable to item on the client,
+ *                        this is not the one returned by the item type.
  */
 data class NetworkItemType(
         val type: ItemType,
         val networkId: Int,
-        val internalId: Int
+        val internalId: Int,
+        val originalMaxStackSize: Int
 ) {
 
     val isVanilla: Boolean

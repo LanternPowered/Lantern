@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.item.inventory.container.layout
 
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.slot.Slot
 
 interface ContainerSlot {
@@ -23,6 +24,12 @@ interface ContainerSlot {
      * The container button if this slot is marked as a button.
      */
     val button: ContainerButton?
+
+    /**
+     * Sets a fill item that will be displayed if this slot
+     * isn't bound.
+     */
+    fun fill(item: ItemStackSnapshot)
 
     /**
      * Binds this slot as a "button". Will return the same instance

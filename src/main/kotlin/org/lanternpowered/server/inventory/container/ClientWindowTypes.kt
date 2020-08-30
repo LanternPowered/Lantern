@@ -8,7 +8,7 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inventory.client
+package org.lanternpowered.server.inventory.container
 
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.server.game.registry.InternalRegistries
@@ -18,14 +18,14 @@ object ClientWindowTypes {
     private val keyToIdMap = HashMap<NamespacedKey, ClientWindowType>()
 
     init {
-        InternalRegistries.visit("menu") { name, internalId ->
+        InternalRegistries.visit("menu") { name, _ ->
             val key = NamespacedKey.resolve(name)
-            this.keyToIdMap[key] = ClientWindowType(key, internalId)
+            keyToIdMap[key] = ClientWindowType(key)
         }
     }
 
     fun get(key: String) = get(NamespacedKey.resolve(key))
-    fun get(key: NamespacedKey) = requireNotNull(this.keyToIdMap[key]) { "Cannot find mapping for $key" }
+    fun get(key: NamespacedKey) = requireNotNull(keyToIdMap[key]) { "Cannot find mapping for $key" }
 
     @JvmField val ANVIL = get("anvil")
     @JvmField val BEACON = get("beacon")
@@ -49,5 +49,5 @@ object ClientWindowTypes {
     @JvmField val MERCHANT = get("merchant")
     @JvmField val SHULKER_BOX = get("shulker_box")
     @JvmField val SMOKER = get("smoker")
-    @JvmField val STONECUTTER = get("stonecutter")
+    @JvmField val STONE_CUTTER = get("stonecutter")
 }

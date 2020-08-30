@@ -18,10 +18,12 @@ interface GrindstoneContainerLayout : ContainerLayout {
     /**
      * The sub layout with all the inputs.
      */
-    fun inputs(): ContainerLayout
+    val inputs: ContainerLayout
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
+
+    // TODO: Handle clicking on grindstone recipes, etc.
 }

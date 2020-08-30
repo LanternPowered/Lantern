@@ -13,6 +13,7 @@ package org.lanternpowered.server.inventory.client;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.inventory.behavior.event.EnchantButtonEvent;
+import org.lanternpowered.server.inventory.container.ClientWindowTypes;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentType;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
@@ -81,7 +82,7 @@ public class EnchantmentTableClientContainer extends ClientContainer {
 
     @Override
     protected Packet createInitMessage() {
-        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.ENCHANTMENT, getTitle());
+        return new OpenWindowPacket(containerId, ClientWindowTypes.ENCHANTMENT, getTitle());
     }
 
     @Override

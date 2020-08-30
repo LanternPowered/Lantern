@@ -13,20 +13,32 @@ package org.lanternpowered.api.item.inventory.container.layout
 /**
  * Represents the top container layout of a furnace.
  */
-interface FurnaceContainerLayout : ContainerLayout {
+interface SmeltingContainerLayout : ContainerLayout {
 
     /**
      * The input slot.
      */
-    fun input(): ContainerSlot
+    val input: ContainerSlot
 
     /**
      * The fuel slot.
      */
-    fun fuel(): ContainerSlot
+    val fuel: ContainerSlot
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
+
+    /**
+     * The progress arrow, 0 - 1. When it's 0 the arrow is
+     * empty and for 1 it is filled.
+     */
+    var smeltProgress: Double
+
+    /**
+     * The fuel burn progress, 0 - 1. When it's 0 the icon is
+     * empty and for 1 it is filled.
+     */
+    var fuelProgress: Double
 }

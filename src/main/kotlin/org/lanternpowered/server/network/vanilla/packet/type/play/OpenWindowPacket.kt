@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.server.inventory.client.ClientWindowType
+import org.lanternpowered.server.inventory.container.ClientWindowType
 import org.lanternpowered.server.network.packet.Packet
 
 data class OpenWindowPacket(val windowId: Int, val windowType: ClientWindowType, val title: Text) : Packet

@@ -13,10 +13,10 @@ package org.lanternpowered.api.item.inventory.container
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.item.ItemTypes
 import org.lanternpowered.api.item.inventory.Inventory
-import org.lanternpowered.api.item.inventory.container.layout.ContainerLayout
 import org.lanternpowered.api.item.inventory.behavior.ShiftClickBehavior
+import org.lanternpowered.api.item.inventory.container.layout.ContainerLayout
 import org.lanternpowered.api.item.inventory.entity.PlayerInventory
-import org.lanternpowered.api.item.inventory.itemStackOf
+import org.lanternpowered.api.text.textOf
 
 /**
  * Constructs a new container.
@@ -47,12 +47,8 @@ interface ContainerBuilder {
 fun testFurnace(player: Player, playerInventory: PlayerInventory, furnaceInventory: Inventory) {
     val container = container {
         layout(ContainerTypes.Furnace) {
-            top {
-                slots(furnaceInventory)
-            }
-            bottom {
-                slots(playerInventory.primary)
-            }
+            top.slots(furnaceInventory)
+            bottom.slots(playerInventory.primary)
         }
     }
     player.openInventory(container)
@@ -61,6 +57,7 @@ fun testFurnace(player: Player, playerInventory: PlayerInventory, furnaceInvento
 fun test(player: Player, playerInventory: PlayerInventory, furnaceInventory: Inventory) {
     val container = container {
         layout(ContainerTypes.Generic9x5) {
+            title(textOf("My Fancy Furnace"))
             top {
                 fill(ContainerFills.Black)
                 val slots = furnaceInventory.slots()

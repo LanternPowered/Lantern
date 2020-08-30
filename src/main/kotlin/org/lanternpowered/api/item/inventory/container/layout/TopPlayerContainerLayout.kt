@@ -18,15 +18,15 @@ interface TopPlayerContainerLayout : ContainerLayout {
     /**
      * The crafting layout in the players inventory.
      */
-    fun crafting(): CraftingContainerLayout
+    val crafting: CraftingContainerLayout
 
     /**
      * The sub layout of the armor.
      */
-    fun armor(): GridContainerLayout
+    val armor: GridContainerLayout
 
     /**
      * The offhand slot.
      */
-    fun offhand(): ContainerSlot
+    val offhand: ContainerSlot
 }

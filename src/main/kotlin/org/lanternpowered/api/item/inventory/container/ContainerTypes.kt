@@ -14,8 +14,8 @@ import org.lanternpowered.api.item.inventory.container.layout.AnvilContainerLayo
 import org.lanternpowered.api.item.inventory.container.layout.BeaconContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.BrewingContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.CartographyContainerLayout
-import org.lanternpowered.api.item.inventory.container.layout.EmptyContainerLayout
-import org.lanternpowered.api.item.inventory.container.layout.FurnaceContainerLayout
+import org.lanternpowered.api.item.inventory.container.layout.LecternContainerLayout
+import org.lanternpowered.api.item.inventory.container.layout.SmeltingContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.GridContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.GrindstoneContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.LoomContainerLayout
@@ -31,13 +31,13 @@ import org.lanternpowered.api.registry.require
  */
 object ContainerTypes {
 
-    val Furnace: ExtendedContainerType<TopBottomContainerLayout<FurnaceContainerLayout>> =
+    val Furnace: ExtendedContainerType<TopBottomContainerLayout<SmeltingContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("furnace")).fixWithLayout()
 
-    val BlastFurnace: ExtendedContainerType<TopBottomContainerLayout<FurnaceContainerLayout>> =
+    val BlastFurnace: ExtendedContainerType<TopBottomContainerLayout<SmeltingContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("blast_furnace")).fixWithLayout()
 
-    val Smoker: ExtendedContainerType<TopBottomContainerLayout<FurnaceContainerLayout>> =
+    val Smoker: ExtendedContainerType<TopBottomContainerLayout<SmeltingContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("smoker")).fixWithLayout()
 
     val Hopper: ExtendedContainerType<TopBottomContainerLayout<GridContainerLayout>> =
@@ -64,7 +64,7 @@ object ContainerTypes {
     val Generic9x6: ExtendedContainerType<TopBottomContainerLayout<GridContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("generic_9x6")).fixWithLayout()
 
-    val Lectern: ExtendedContainerType<EmptyContainerLayout> =
+    val Lectern: ExtendedContainerType<LecternContainerLayout> =
             CatalogRegistry.require<ContainerType>(minecraftKey("lectern")).fixWithLayout()
 
     val ShulkerBox: ExtendedContainerType<TopBottomContainerLayout<GridContainerLayout>> =

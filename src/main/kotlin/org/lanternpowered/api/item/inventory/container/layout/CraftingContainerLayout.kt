@@ -18,10 +18,10 @@ interface CraftingContainerLayout : ContainerLayout {
     /**
      * The input grid.
      */
-    fun inputs(): GridContainerLayout
+    val inputs: GridContainerLayout
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
 }

@@ -18,6 +18,8 @@ import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.UnsafeInventoryApi
 import org.lanternpowered.api.item.inventory.emptyItemStack
+import org.lanternpowered.api.item.inventory.emptyItemStackSnapshot
+import java.util.Optional
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 import kotlin.math.max
@@ -231,8 +233,22 @@ fun ItemStack.orElse(supplier: () -> ItemStack): ExtendedItemStack {
  * If this item stack is null, an empty one will be returned
  * instead. Otherwise returns itself.
  */
-fun ItemStack?.orEmpty(): ExtendedItemStack =
+fun ItemStack?.orEmptyStack(): ExtendedItemStack =
         if (this == null || this.isEmpty) emptyItemStack() else this.fix()
+
+/**
+ * If this item stack is null, an empty one will be returned
+ * instead. Otherwise returns itself.
+ */
+fun ItemStackSnapshot?.orEmptySnapshot(): ExtendedItemStackSnapshot =
+        if (this == null || this.isEmpty) emptyItemStackSnapshot() else this.fix()
+
+/**
+ * If this item stack is null, an empty one will be returned
+ * instead. Otherwise returns itself.
+ */
+fun Optional<ItemStackSnapshot>.orEmptySnapshot(): ExtendedItemStackSnapshot =
+        if (this.isEmpty || this.get().isEmpty) emptyItemStackSnapshot() else this.get().fix()
 
 /**
  * Whether this item stack isn't empty.

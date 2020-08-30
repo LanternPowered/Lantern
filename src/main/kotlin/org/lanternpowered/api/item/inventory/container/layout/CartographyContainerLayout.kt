@@ -18,10 +18,10 @@ interface CartographyContainerLayout : ContainerLayout {
     /**
      * The sub layout with all the inputs (map and paper).
      */
-    fun inputs(): ContainerLayout
+    val inputs: ContainerLayout
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
 }

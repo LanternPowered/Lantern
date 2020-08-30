@@ -18,7 +18,7 @@ import org.lanternpowered.server.inventory.client.BeaconClientContainer
 import org.lanternpowered.server.inventory.client.BrewingStandClientContainer
 import org.lanternpowered.server.inventory.client.ChestClientContainer
 import org.lanternpowered.server.inventory.client.ClientContainer
-import org.lanternpowered.server.inventory.client.ClientContainerType
+import org.lanternpowered.server.inventory.container.LanternContainerType
 import org.lanternpowered.server.inventory.client.CraftingTableClientContainer
 import org.lanternpowered.server.inventory.client.DispenserClientContainer
 import org.lanternpowered.server.inventory.client.EnchantmentTableClientContainer
@@ -40,7 +40,7 @@ object ClientContainerRegistryModule : DefaultCatalogRegistryModule<ContainerTyp
 
     override fun registerDefaults() {
         fun register(id: String, supplier: (AbstractInventory) -> ClientContainer) {
-            register(ClientContainerType(NamespacedKey.minecraft(id), supplier))
+            register(LanternContainerType(NamespacedKey.minecraft(id), supplier))
         }
 
         register("chest") { inventory ->

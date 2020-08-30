@@ -11,6 +11,7 @@
 package org.lanternpowered.api.item.inventory.hotbar
 
 import org.lanternpowered.api.item.inventory.ExtendedInventoryRow
+import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.slot.Slot
 

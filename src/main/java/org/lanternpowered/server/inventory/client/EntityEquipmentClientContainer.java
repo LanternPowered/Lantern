@@ -55,7 +55,7 @@ public class EntityEquipmentClientContainer extends ClientContainer {
 
     @Override
     protected Packet createInitMessage() {
-        return new OpenHorseWindowPacket(getContainerId(), TOP_SLOT_FLAGS.length, this.entityId);
+        return new OpenHorseWindowPacket(containerId, TOP_SLOT_FLAGS.length, this.entityId);
     }
 
     @Override

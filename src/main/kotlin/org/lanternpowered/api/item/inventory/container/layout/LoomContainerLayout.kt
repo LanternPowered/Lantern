@@ -18,20 +18,20 @@ interface LoomContainerLayout : ContainerLayout {
     /**
      * The banner input slot.
      */
-    fun banner(): ContainerSlot
+    val banner: ContainerSlot
 
     /**
      * The dye input slot.
      */
-    fun dye(): ContainerSlot
+    val dye: ContainerSlot
 
     /**
      * The pattern input slot.
      */
-    fun pattern(): ContainerSlot
+    val pattern: ContainerSlot
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
 }

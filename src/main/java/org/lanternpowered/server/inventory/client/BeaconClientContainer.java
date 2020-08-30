@@ -14,6 +14,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
 import org.lanternpowered.server.inventory.behavior.event.BeaconEffectsEvent;
+import org.lanternpowered.server.inventory.container.ClientWindowTypes;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.effect.potion.PotionEffectType;
@@ -42,7 +43,7 @@ public class BeaconClientContainer extends ClientContainer {
 
     @Override
     protected Packet createInitMessage() {
-        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.BEACON, getTitle());
+        return new OpenWindowPacket(containerId, ClientWindowTypes.BEACON, getTitle());
     }
 
     @Override

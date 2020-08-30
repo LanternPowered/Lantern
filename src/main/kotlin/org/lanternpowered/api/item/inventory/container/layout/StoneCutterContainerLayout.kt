@@ -18,10 +18,10 @@ interface StoneCutterContainerLayout : ContainerLayout {
     /**
      * The input slot.
      */
-    fun input(): ContainerSlot
+    val input: ContainerSlot
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
 }

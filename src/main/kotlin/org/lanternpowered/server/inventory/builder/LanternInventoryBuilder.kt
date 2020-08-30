@@ -15,6 +15,7 @@ import org.lanternpowered.api.item.inventory.builder.GridBuilder
 import org.lanternpowered.api.item.inventory.builder.InventoryBuilder
 import org.lanternpowered.api.item.inventory.builder.RowBuilder
 import org.lanternpowered.api.item.inventory.builder.SlotBuilder
+import org.spongepowered.api.item.inventory.ContainerType
 import java.util.UUID
 
 class LanternInventoryBuilder<I, S, R, C> : InventoryBuilder<I, S, R, C> {
@@ -63,6 +64,10 @@ class LanternInventoryBuilder<I, S, R, C> : InventoryBuilder<I, S, R, C> {
     }
 
     override fun grid(width: Int, height: Int) {
+        TODO("Not yet implemented")
+    }
+
+    override fun containerType(containerType: ContainerType) {
         TODO("Not yet implemented")
     }
 

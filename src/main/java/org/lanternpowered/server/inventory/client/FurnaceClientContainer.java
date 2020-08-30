@@ -12,6 +12,7 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import org.lanternpowered.server.inventory.container.ClientWindowTypes;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket;
@@ -53,14 +54,14 @@ public class FurnaceClientContainer extends ClientContainer {
 
     @Override
     protected void collectInitMessages(List<Packet> packets) {
-        final int containerId = getContainerId();
+        final int containerId = containerId;
         packets.add(new SetWindowPropertyPacket(containerId, 1, MAX_PROGRESS_VALUE));
         packets.add(new SetWindowPropertyPacket(containerId, 3, MAX_PROGRESS_VALUE));
     }
 
     @Override
     protected Packet createInitMessage() {
-        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.FURNACE, getTitle());
+        return new OpenWindowPacket(containerId, ClientWindowTypes.FURNACE, getTitle());
     }
 
     @Override

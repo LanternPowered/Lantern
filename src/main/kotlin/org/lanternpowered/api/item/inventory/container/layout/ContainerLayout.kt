@@ -13,6 +13,7 @@ package org.lanternpowered.api.item.inventory.container.layout
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.slot.Slot
+import org.lanternpowered.api.text.Text
 
 /**
  * Represents the layout of a container.
@@ -25,11 +26,27 @@ interface ContainerLayout : Iterable<ContainerSlot> {
     val size: Int
 
     /**
+     * The title of the container.
+     */
+    val title: Text
+
+    /**
+     * Sets the title.
+     *
+     * Applying a title to a non root layout will
+     * not have any effect.
+     */
+    fun title(title: Text)
+
+    /**
      * Sets a fill item that will be displayed in every slot
      * index that wasn't bound. It is not possible to modify
      * these slots.
      */
-    fun fill(item: ItemStackSnapshot)
+    fun fill(item: ItemStackSnapshot) {
+        for (containerSlot in this)
+            containerSlot.fill(item)
+    }
 
     /**
      * Gets the [ContainerSlot] at the given index.

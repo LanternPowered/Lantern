@@ -37,7 +37,7 @@ object ContainerFills {
     /**
      * A white container fill item which fills the complete slot.
      */
-    val White: ItemStackSnapshot = this.of(ItemTypes.BLACK_STAINED_GLASS_PANE)
+    val White: ItemStackSnapshot = this.of(ItemTypes.WHITE_STAINED_GLASS_PANE)
 
     /**
      * Creates a new container fill item with the given type.

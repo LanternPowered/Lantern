@@ -12,6 +12,7 @@ package org.lanternpowered.server.inventory.client;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import org.lanternpowered.server.inventory.container.ClientWindowTypes;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket;
 import org.spongepowered.api.text.Text;
@@ -38,7 +39,7 @@ public class GrindstoneClientContainer extends ClientContainer {
 
     @Override
     protected Packet createInitMessage() {
-        return new OpenWindowPacket(getContainerId(), ClientWindowTypes.GRINDSTONE, getTitle());
+        return new OpenWindowPacket(containerId, ClientWindowTypes.GRINDSTONE, getTitle());
     }
 
     @Override

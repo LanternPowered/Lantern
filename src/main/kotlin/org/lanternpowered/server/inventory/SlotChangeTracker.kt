@@ -11,7 +11,6 @@
 package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.inventory.slot.Slot
-import org.lanternpowered.server.inventory.client.ClientSlot
 
 /**
  * Can be used to track the changes of a [Slot].
@@ -26,13 +25,6 @@ interface SlotChangeTracker {
     fun queueSlotChange(slot: Slot)
 
     /**
-     * Queues a slot change for the specified [ClientSlot].
-     *
-     * @param clientSlot The client slot
-     */
-    fun queueSlotChange(clientSlot: ClientSlot)
-
-    /**
      * Queues a slot change for the specified slot index.
      *
      * @param index The slot index
@@ -45,13 +37,6 @@ interface SlotChangeTracker {
      * @param slot The slot
      */
     fun queueSilentSlotChange(slot: Slot)
-
-    /**
-     * Queues a silent slot change for the specified [ClientSlot].
-     *
-     * @param clientSlot The client slot
-     */
-    fun queueSilentSlotChange(clientSlot: ClientSlot)
 
     /**
      * Queues a silent slot change for the specified slot index.

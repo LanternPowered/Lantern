@@ -10,18 +10,31 @@
  */
 package org.lanternpowered.api.item.inventory.container.layout
 
+import org.lanternpowered.api.entity.player.Player
+
 /**
  * Represents the top container layout of an anvil.
  */
 interface AnvilContainerLayout : ContainerLayout {
 
     /**
+     * The repair cost in experience levels.
+     */
+    var repairCost: Int
+
+    /**
      * The sub layout with all the inputs.
      */
-    fun inputs(): ContainerLayout
+    val inputs: ContainerLayout
 
     /**
      * The output slot.
      */
-    fun output(): ContainerSlot
+    val output: ContainerSlot
+
+    /**
+     * The function will be called when the name in the
+     * anvil text field is being renamed.
+     */
+    fun onChangeName(fn: (player: Player, name: String) -> Unit)
 }

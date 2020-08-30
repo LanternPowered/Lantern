@@ -74,7 +74,7 @@ public class PlayerInventoryContainerSession {
     }
 
     private int getContainerId() {
-        return getClientContainer().getContainerId();
+        return getClientContainer().containerId;
     }
 
     private ClientContainer getClientContainer() {
@@ -144,7 +144,7 @@ public class PlayerInventoryContainerSession {
                             // The optional should always return something at this point, otherwise
                             // something is broken
                             final ClientContainer clientContainer = getClientContainer();
-                            if (clientContainer.getContainerId() != 0) {
+                            if (clientContainer.containerId != 0) {
                                 // Reinitialize the client container
                                 clientContainer.init();
                                 return false;
@@ -236,7 +236,7 @@ public class PlayerInventoryContainerSession {
             openPlayerContainer();
         }
         final ClientContainer clientContainer = getClientContainer();
-        clientContainer.handleCreativeClick(message.getSlot(),
+        clientContainer.handleCreativeClick(this.player, message.getSlot(),
                 message.getItemStack() == null ? LanternItemStack.empty() : message.getItemStack());
     }
 

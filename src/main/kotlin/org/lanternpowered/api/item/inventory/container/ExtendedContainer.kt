@@ -13,10 +13,18 @@
 package org.lanternpowered.api.item.inventory.container
 
 import org.lanternpowered.api.item.inventory.ExtendedInventory
+import org.lanternpowered.api.item.inventory.container.layout.ContainerLayout
 
 typealias Container = org.spongepowered.api.item.inventory.Container
 
 /**
  * An extended version of [Container].
  */
-interface ExtendedContainer : Container, ExtendedInventory
+interface ExtendedContainer : Container, ExtendedInventory {
+
+    /**
+     * The current layout of the container. The layout can be modified
+     * anytime you want.
+     */
+    var layout: ContainerLayout
+}

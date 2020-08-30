@@ -67,6 +67,7 @@ import org.lanternpowered.server.fluid.LanternFluidStackSnapshotBuilder
 import org.lanternpowered.server.inventory.LanternInventoryFactory
 import org.lanternpowered.server.inventory.LanternInventoryFilterBuilderFactory
 import org.lanternpowered.server.inventory.LanternItemStackBuilder
+import org.lanternpowered.server.inventory.container.ContainerTypeRegistry
 import org.lanternpowered.server.inventory.transaction.LanternInventoryTransactionResultBuilder
 import org.lanternpowered.server.item.ItemStackComparatorsRegistry
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder
@@ -354,6 +355,7 @@ class LanternGameRegistry(
 
             register(EnchantmentTypeRegistry)
             register(ItemTypeRegistry)
+            register(ContainerTypeRegistry)
 
             register(BlockEntityProtocolTypeRegistry)
 

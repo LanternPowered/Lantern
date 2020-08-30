@@ -18,15 +18,27 @@ interface BrewingContainerLayout : ContainerLayout {
     /**
      * The sub layout with all the bottles.
      */
-    fun bottles(): ContainerLayout
+    val bottles: ContainerLayout
 
     /**
      * The ingredient slot.
      */
-    fun ingredient(): ContainerSlot
+    val ingredient: ContainerSlot
 
     /**
      * The fuel (blaze powder) slot.
      */
-    fun fuel(): ContainerSlot
+    val fuel: ContainerSlot
+
+    /**
+     * The brew progress arrow, 0 - 1. When it's 0 the icon is
+     * empty and for 1 it is filled.
+     */
+    var brewProgress: Double
+
+    /**
+     * The fuel burn progress, 0 - 1. When it's 0 the icon is
+     * empty and for 1 it is filled.
+     */
+    var fuelProgress: Double
 }

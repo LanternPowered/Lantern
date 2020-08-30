@@ -15,7 +15,7 @@ import org.lanternpowered.api.item.inventory.crafting.ExtendedCraftingInventory
 import org.lanternpowered.api.item.inventory.crafting.ExtendedCraftingOutput
 import org.lanternpowered.api.item.inventory.query
 import org.lanternpowered.server.inventory.AbstractChildrenInventory
-import org.lanternpowered.server.inventory.AbstractMutableInventory
+import org.lanternpowered.server.inventory.AbstractInventory
 import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.asInventories
 import org.lanternpowered.server.inventory.createViews
@@ -25,7 +25,7 @@ open class LanternCraftingInventory : AbstractChildrenInventory(), ExtendedCraft
     private lateinit var craftingGrid: ExtendedCraftingGridInventory
     private lateinit var craftingOutput: ExtendedCraftingOutput
 
-    override fun init(children: List<AbstractMutableInventory>) {
+    override fun init(children: List<AbstractInventory>) {
         super.init(children)
 
         this.craftingGrid = this.query<ExtendedCraftingGridInventory>().first()

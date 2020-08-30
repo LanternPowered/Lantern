@@ -103,7 +103,7 @@ interface ContainerInteractionBehavior {
      * @param clientSlot The client slot
      * @param itemStack The item stack
      */
-    fun handleCreativeClick(clientContainer: ClientContainer, clientSlot: ClientSlot, itemStack: ItemStack)
+    fun handleCreativeClick(clientContainer: ClientContainer, clientSlot: ClientSlot?, itemStack: ItemStack)
 
     /**
      * Handles a item pick operation. The client sends a [ClientSlot] to swap

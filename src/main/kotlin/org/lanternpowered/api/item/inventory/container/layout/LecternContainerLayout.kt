@@ -8,8 +8,9 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.inventory.client
+package org.lanternpowered.api.item.inventory.container.layout
 
-import org.lanternpowered.api.key.NamespacedKey
-
-data class ClientWindowType(val id: NamespacedKey, val internalId: Int)
+/**
+ * Represents a lectern container layout.
+ */
+interface LecternContainerLayout : ContainerLayout

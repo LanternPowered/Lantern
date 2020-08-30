@@ -8,9 +8,8 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.item.inventory.container.layout
+package org.lanternpowered.server.inventory.container
 
-/**
- * Represents an empty container layout.
- */
-interface EmptyContainerLayout : ContainerLayout
+import org.lanternpowered.api.key.NamespacedKey
+
+data class ClientWindowType(val id: NamespacedKey)

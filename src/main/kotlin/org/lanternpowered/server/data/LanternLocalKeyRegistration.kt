@@ -25,7 +25,7 @@ internal abstract class LanternLocalKeyRegistration<V : Value<E>, E : Any, H : D
      */
     protected var changeListeners: MutableList<ChangeListener<H, E>>? = null
 
-    private interface ChangeListenerImpl {
+    private interface ChangeListenerImpl<H, E> : (H, E?, E?) -> Unit {
         val instance: Any
     }
 
@@ -34,7 +34,7 @@ internal abstract class LanternLocalKeyRegistration<V : Value<E>, E : Any, H : D
 
     private class ChangeListenerNoOldValue<H, E>(
             override val instance: H.(newValue: E?) -> Unit
-    ) : (H, E?, E?) -> Unit, ChangeListenerImpl {
+    ) : ChangeListenerImpl<H, E> {
         override fun invoke(holder: H, newValue: E?, oldValue: E?) {
             this.instance(holder, newValue)
         }
@@ -42,7 +42,7 @@ internal abstract class LanternLocalKeyRegistration<V : Value<E>, E : Any, H : D
 
     private class ChangeListenerNoValue<H, E>(
             override val instance: H.() -> Unit
-    ) : (H, E?, E?) -> Unit, ChangeListenerImpl {
+    ) : ChangeListenerImpl<H, E> {
         override fun invoke(holder: H, newValue: E?, oldValue: E?) {
             this.instance(holder)
         }
@@ -50,7 +50,7 @@ internal abstract class LanternLocalKeyRegistration<V : Value<E>, E : Any, H : D
 
     private class ChangeListenerTriConsumer<H, E>(
             override val instance: TriConsumer<H, E?, E?>
-    ) : (H, E?, E?) -> Unit, ChangeListenerImpl {
+    ) : ChangeListenerImpl<H, E> {
         override fun invoke(holder: H, newValue: E?, oldValue: E?) {
             this.instance.apply(holder, newValue, oldValue)
         }

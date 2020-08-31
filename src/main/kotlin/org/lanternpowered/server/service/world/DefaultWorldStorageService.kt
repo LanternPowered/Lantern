@@ -15,6 +15,8 @@ import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.game.Lantern
+import org.spongepowered.api.util.file.CopyFileVisitor
+import org.spongepowered.api.util.file.DeleteFileVisitor
 import java.io.Closeable
 import java.nio.file.Files
 import java.nio.file.Path
@@ -64,11 +66,11 @@ class DefaultWorldStorageService(
         // First check all the sub directories
         for (subDirectory in Files.walk(directory, 1)) {
             if (LanternWorldStorage.isWorld(subDirectory))
-                importWorld(subDirectory)
+                this.importWorld(subDirectory)
         }
         // Import the root world
         if (LanternWorldStorage.isWorld(this.directory))
-            importWorld(directory, "DIM0")
+            this.importWorld(directory, "DIM0")
     }
 
     private fun importWorld(path: Path, oldName: String = path.fileName.toString()): Path {
@@ -87,7 +89,9 @@ class DefaultWorldStorageService(
             Lantern.getLogger().info("The directory $newName was already in use, so the imported world " +
                     "from $oldName will be moved to $destination.")
         }
-        com.google.common.io.Files.move(path.toFile(), destination.resolve(LanternWorldStorage.DATA_DIRECTORY_NAME).toFile())
+        val dataDestination = destination.resolve(LanternWorldStorage.DATA_DIRECTORY_NAME)
+        Files.walkFileTree(path, CopyFileVisitor(dataDestination))
+        Files.walkFileTree(path, DeleteFileVisitor.INSTANCE)
         // Remove unneeded data
         LanternWorldStorage.cleanupWorld(destination)
         return destination
@@ -105,32 +109,74 @@ class DefaultWorldStorageService(
     override fun getByKey(key: NamespacedKey): WorldStorage? =
             this.knownStoragesByKey[key]
 
+    private fun put(storage: LanternWorldStorage): LanternWorldStorage {
+        this.knownStoragesByKey[storage.key] = storage
+        this.knownStoragesByUniqueId[storage.uniqueId] = storage
+        return storage
+    }
+
     override fun create(key: NamespacedKey, uniqueId: UUID): WorldStorage {
         synchronized(this.modifyLock) {
-            if (this.knownStoragesByKey.containsKey(key) ||
-                    this.knownStoragesByUniqueId.containsKey(uniqueId))
+            if (this.knownStoragesByKey.containsKey(key))
                 error("There already exists a world for the given key: $key")
+            if (this.knownStoragesByUniqueId.containsKey(uniqueId))
+                error("There already exists a world for the given unique id: $uniqueId")
 
             val worldDirectory = this.directory.resolve(key.namespace).resolve(key.value)
             if (Files.exists(worldDirectory) && Files.list(worldDirectory).count() > 0)
                 error("There already exists a world directory for the given key: $key")
 
             Files.createDirectories(worldDirectory)
-            val worldStorage = LanternWorldStorage(key, uniqueId, worldDirectory)
-
-            this.knownStoragesByKey[key] = worldStorage
-            this.knownStoragesByUniqueId[uniqueId] = worldStorage
-
-            return worldStorage
+            return this.put(LanternWorldStorage(key, uniqueId, worldDirectory))
         }
     }
 
     override fun copy(sourceKey: NamespacedKey, copyKey: NamespacedKey, uniqueId: UUID): WorldStorage {
-        TODO("Not yet implemented")
+        synchronized(this.modifyLock) {
+            if (!this.knownStoragesByKey.containsKey(sourceKey))
+                error("There doesn't exist a world for the given source key: $sourceKey")
+            if (this.knownStoragesByKey.containsKey(copyKey))
+                error("There already exists a world for the given copy key: $copyKey")
+            if (this.knownStoragesByUniqueId.containsKey(uniqueId))
+                error("There already exists a world for the given copy unique id: $uniqueId")
+
+            val sourceDirectory = this.directory.resolve(sourceKey.namespace).resolve(sourceKey.value)
+            if (!Files.exists(sourceDirectory) || Files.list(sourceDirectory).count() == 0L)
+                error("There doesn't exist a world directory for the given source key: $sourceKey")
+
+            val copyDirectory = this.directory.resolve(copyKey.namespace).resolve(copyKey.value)
+            if (Files.exists(copyDirectory) && Files.list(copyDirectory).count() > 0)
+                error("There already exists a world directory for the given copy key: $copyKey")
+
+            Files.walkFileTree(sourceDirectory, CopyFileVisitor(copyDirectory))
+            return this.put(LanternWorldStorage(copyKey, uniqueId, copyDirectory))
+        }
     }
 
     override fun move(oldKey: NamespacedKey, newKey: NamespacedKey): WorldStorage {
-        TODO("Not yet implemented")
+        synchronized(this.modifyLock) {
+            val source = this.knownStoragesByKey[oldKey]
+                    ?: error("There doesn't exist a world for the given source key: $oldKey")
+
+            if (this.knownStoragesByKey.containsKey(newKey))
+                error("There already exists a world for the given destination key: $newKey")
+
+            val sourceDirectory = this.directory.resolve(oldKey.namespace).resolve(oldKey.value)
+            if (!Files.exists(sourceDirectory) || Files.list(sourceDirectory).count() == 0L)
+                error("There doesn't exist a world directory for the given source key: $oldKey")
+
+            val destinationDirectory = this.directory.resolve(newKey.namespace).resolve(newKey.value)
+            if (Files.exists(destinationDirectory) && Files.list(destinationDirectory).count() > 0)
+                error("There already exists a world directory for the given destination key: $newKey")
+
+            Files.walkFileTree(sourceDirectory, CopyFileVisitor(destinationDirectory))
+            Files.walkFileTree(sourceDirectory, DeleteFileVisitor.INSTANCE)
+
+            this.knownStoragesByKey.remove(source.key)
+            this.knownStoragesByUniqueId.remove(source.uniqueId)
+
+            return this.put(LanternWorldStorage(newKey, source.uniqueId, destinationDirectory))
+        }
     }
 
     override fun close() {

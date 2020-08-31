@@ -40,7 +40,9 @@ class RootBrewingContainerLayout : LanternTopBottomContainerLayout<BrewingContai
         private const val FUEL_PROGRESS_PROPERTY = 1
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.BREWING_STAND, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.BREWING_STAND, this.title))
+
     override val top: BrewingContainerLayout = SubBrewingContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     var brewProgress: Double = 0.0

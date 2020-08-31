@@ -43,6 +43,17 @@ public final class EntityParameters {
          */
         public static final ParameterType<Byte> FLAGS = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
 
+        public static class Flags {
+
+            public static final int IS_ON_FIRE = 0x1;
+            public static final int IS_SNEAKING = 0x2;
+            public static final int IS_SPRINTING = 0x8;
+            public static final int IS_SWIMMING = 0x10;
+            public static final int IS_INVISIBLE = 0x20;
+            public static final int IS_GLOWING = 0x40;
+            public static final int IS_ELYTRA_FlYING = 0x80;
+        }
+
         /**
          * The air level of the entity.
          */
@@ -335,6 +346,20 @@ public final class EntityParameters {
         public static final ParameterTypeCollection PARAMETERS = ChestedHorse.PARAMETERS.copy();
 
         private Mule() {
+        }
+    }
+
+    public static final class Llama {
+
+        public static final ParameterTypeCollection PARAMETERS = ChestedHorse.PARAMETERS.copy();
+
+        public static final ParameterType<Integer> STRENGTH = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        public static final ParameterType<Integer> CARPET_COLOR = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        public static final ParameterType<Integer> VARIANT = PARAMETERS.newParameterType(ParameterValueTypes.INT);
+
+        private Llama() {
         }
     }
 

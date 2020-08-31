@@ -40,7 +40,9 @@ class RootAnvilContainerLayout : LanternTopBottomContainerLayout<AnvilContainerL
 
     private val onChangeName = ArrayList<(Player, String) -> Unit>()
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.ANVIL, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.ANVIL, this.title))
+
     override val top: AnvilContainerLayout = SubAnvilContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     override fun collectChangePackets(data: ContainerData, packets: MutableList<Packet>) {

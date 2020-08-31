@@ -41,6 +41,8 @@ class RootCraftingContainerLayout : LanternTopBottomContainerLayout<CraftingCont
         private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.CRAFTING, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.CARTOGRAPHY, this.title))
+
     override val top: CraftingContainerLayout = SubCraftingContainerLayout(0, 3, 3, this)
 }

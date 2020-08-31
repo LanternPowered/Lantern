@@ -15,6 +15,7 @@ import static org.lanternpowered.server.network.vanilla.packet.codec.play.CodecU
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnMobPacket;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -42,7 +43,7 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
         final double headYaw = headRot != null ? headRot.getY() : 0;
 
-        final int entityTypeId = NetworkIDs.REGISTRY.require(getMobType());
+        final int entityTypeId = EntityNetworkIDs.REGISTRY.require(ResourceKey.resolve(getMobType()));
 
         context.sendToAllExceptSelf(() -> new SpawnMobPacket(getRootEntityId(), this.entity.getUniqueId(), entityTypeId,
                 pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel));

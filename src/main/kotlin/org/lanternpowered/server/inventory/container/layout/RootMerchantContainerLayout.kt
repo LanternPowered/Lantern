@@ -46,7 +46,9 @@ class RootMerchantContainerLayout : LanternTopBottomContainerLayout<MerchantCont
 
     private val onClickOffer = ArrayList<(Player, TradeOffer) -> Unit>()
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.MERCHANT, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.MERCHANT, this.title))
+
     override val top: MerchantContainerLayout = SubMerchantContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     override fun collectChangePackets(data: ContainerData, packets: MutableList<Packet>) {

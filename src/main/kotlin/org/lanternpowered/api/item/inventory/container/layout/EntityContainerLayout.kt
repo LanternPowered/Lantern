@@ -10,23 +10,17 @@
  */
 package org.lanternpowered.api.item.inventory.container.layout
 
+import org.spongepowered.api.entity.Entity
+
 /**
- * Represents the top container layout of a cartography table.
+ * A container layout where an entity is being rendered on the layout.
  */
-interface CartographyContainerLayout : ContainerLayout {
+interface EntityContainerLayout : ContainerLayout {
 
     /**
-     * The map input slot.
+     * The entity of this container layout. Some containers
+     * may only display entities which the layout was designed
+     * for on the official client.
      */
-    val map: ContainerSlot
-
-    /**
-     * The paper input slot.
-     */
-    val paper: ContainerSlot
-
-    /**
-     * The output slot.
-     */
-    val output: ContainerSlot
+    var entity: Entity?
 }

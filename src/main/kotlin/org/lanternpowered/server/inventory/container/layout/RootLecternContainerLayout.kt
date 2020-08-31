@@ -47,7 +47,8 @@ class RootLecternContainerLayout : LanternContainerLayout(
         this.onClick += fn
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.LECTERN, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.LECTERN, this.title))
 
     override fun handleButtonClick(player: Player, index: Int) {
         val action = when {

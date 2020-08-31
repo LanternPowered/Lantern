@@ -15,6 +15,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonNull
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
+import org.lanternpowered.api.key.resolveNamespacedKey
 import org.lanternpowered.api.util.gson.fromJson
 import java.io.BufferedReader
 import java.io.IOException
@@ -26,7 +27,7 @@ object InternalRegistries {
     private val gson = Gson()
 
     @JvmStatic
-    fun load(registryName: String) = load(registryName) { key, _ -> key }
+    fun load(registryName: String) = load(registryName) { key, _ -> resolveNamespacedKey(key) }
 
     @JvmStatic
     fun <T : Any> load(registryName: String, objectConstructor: (String) -> T) = load(registryName) { key, _ -> objectConstructor(key) }

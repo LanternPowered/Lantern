@@ -10,23 +10,26 @@
  */
 package org.lanternpowered.api.item.inventory.container.layout
 
+import org.spongepowered.api.entity.Entity
+
 /**
- * Represents the top container layout of a cartography table.
+ * Represents the top container layout of a horse.
  */
-interface CartographyContainerLayout : ContainerLayout {
+interface HorseContainerLayout : EntityContainerLayout {
 
     /**
-     * The map input slot.
+     * The saddle slot.
      */
-    val map: ContainerSlot
+    val saddle: ContainerSlot
 
     /**
-     * The paper input slot.
+     * The armor slot.
      */
-    val paper: ContainerSlot
+    val armor: ContainerSlot
 
     /**
-     * The output slot.
+     * The horse entity of this container layout. Only entities
+     * which are "regular horses" will be displayed.
      */
-    val output: ContainerSlot
+    override var entity: Entity?
 }

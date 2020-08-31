@@ -14,10 +14,13 @@ import org.lanternpowered.api.item.inventory.container.layout.AnvilContainerLayo
 import org.lanternpowered.api.item.inventory.container.layout.BeaconContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.BrewingContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.CartographyContainerLayout
+import org.lanternpowered.api.item.inventory.container.layout.DonkeyContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.LecternContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.SmeltingContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.GridContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.GrindstoneContainerLayout
+import org.lanternpowered.api.item.inventory.container.layout.HorseContainerLayout
+import org.lanternpowered.api.item.inventory.container.layout.LlamaContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.LoomContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.TopBottomContainerLayout
 import org.lanternpowered.api.item.inventory.container.layout.MerchantContainerLayout
@@ -45,6 +48,22 @@ object ContainerTypes {
 
     val Generic3x3: ExtendedContainerType<TopBottomContainerLayout<GridContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("generic_3x3")).fixWithLayout()
+
+    /**
+     * Gets a generic 9xN container layout for the given number of rows.
+     *
+     * Rows must be between 1 and 6 (inclusive).
+     */
+    fun generic9xN(rows: Int): ExtendedContainerType<TopBottomContainerLayout<GridContainerLayout>> =
+            when (rows) {
+                1 -> Generic9x1
+                2 -> Generic9x2
+                3 -> Generic9x3
+                4 -> Generic9x4
+                5 -> Generic9x5
+                6 -> Generic9x6
+                else -> throw IllegalArgumentException("No generic layout with $rows rows.")
+            }
 
     val Generic9x1: ExtendedContainerType<TopBottomContainerLayout<GridContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("generic_9x1")).fixWithLayout()
@@ -94,4 +113,46 @@ object ContainerTypes {
     val Anvil: ExtendedContainerType<TopBottomContainerLayout<AnvilContainerLayout>> =
             CatalogRegistry.require<ContainerType>(minecraftKey("anvil")).fixWithLayout()
 
+    val Horse: ExtendedContainerType<TopBottomContainerLayout<HorseContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("horse")).fixWithLayout()
+
+    val Donkey: ExtendedContainerType<TopBottomContainerLayout<DonkeyContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("donkey")).fixWithLayout()
+
+    val DonkeyChested: ExtendedContainerType<TopBottomContainerLayout<DonkeyContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("donkey_chested")).fixWithLayout()
+
+    val Llama: ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("llama")).fixWithLayout()
+
+    val LlamaChested1x3: ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("llama_chested_1x3")).fixWithLayout()
+
+    val LlamaChested2x3: ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("llama_chested_2x3")).fixWithLayout()
+
+    val LlamaChested3x3: ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("llama_chested_3x3")).fixWithLayout()
+
+    val LlamaChested4x3: ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("llama_chested_4x3")).fixWithLayout()
+
+    val LlamaChested5x3: ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            CatalogRegistry.require<ContainerType>(minecraftKey("llama_chested_5x3")).fixWithLayout()
+
+    /**
+     * Gets a chested llama container layout for the given number of columns.
+     *
+     * Columns must be between 0 and 5 (inclusive).
+     */
+    fun llamaChested(columns: Int): ExtendedContainerType<TopBottomContainerLayout<LlamaContainerLayout>> =
+            when (columns) {
+                0 -> Llama
+                1 -> LlamaChested1x3
+                2 -> LlamaChested2x3
+                3 -> LlamaChested3x3
+                4 -> LlamaChested4x3
+                5 -> LlamaChested5x3
+                else -> throw IllegalArgumentException("No chested llama layout with $columns columns.")
+            }
 }

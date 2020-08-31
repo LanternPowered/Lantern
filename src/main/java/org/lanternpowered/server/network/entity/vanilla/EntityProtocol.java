@@ -358,26 +358,26 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private byte packFlags() {
         byte flags = 0;
         if (this.entity.get(Keys.FIRE_TICKS).orElse(0) > 0) {
-            flags |= 0x01;
+            flags |= EntityParameters.Base.Flags.IS_ON_FIRE;
         }
         final Pose pose = getPose();
         if (pose == Pose.SNEAKING) {
-            flags |= 0x02;
+            flags |= EntityParameters.Base.Flags.IS_SNEAKING;
         }
         if (isSprinting()) {
-            flags |= 0x08;
+            flags |= EntityParameters.Base.Flags.IS_SPRINTING;
         }
         if (pose == Pose.SWIMMING) {
-            flags |= 0x10;
+            flags |= EntityParameters.Base.Flags.IS_SWIMMING;
         }
         if (this.entity.get(Keys.IS_INVISIBLE).orElse(false)) {
-            flags |= 0x20;
+            flags |= EntityParameters.Base.Flags.IS_INVISIBLE;
         }
         if (this.entity.get(Keys.IS_GLOWING).orElse(false)) {
-            flags |= 0x40;
+            flags |= EntityParameters.Base.Flags.IS_GLOWING;
         }
         if (this.entity.get(Keys.IS_ELYTRA_FLYING).orElse(false)) {
-            flags |= 0x80;
+            flags |= EntityParameters.Base.Flags.IS_ELYTRA_FlYING;
         }
         return flags;
     }

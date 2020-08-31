@@ -34,7 +34,9 @@ class RootStoneCutterContainerLayout : LanternTopBottomContainerLayout<StoneCutt
         private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.STONE_CUTTER, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.STONE_CUTTER, this.title))
+
     override val top: StoneCutterContainerLayout = SubStoneCutterContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     // TODO: Add recipes and which recipe was selected

@@ -42,7 +42,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
         double pitch = rot.getX();
 
         context.sendToAllExceptSelf(() -> new SpawnObjectPacket(entityId, this.entity.getUniqueId(),
-                NetworkIDs.REGISTRY.require(getObjectType()), getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
+                EntityNetworkIDs.REGISTRY.require(getObjectType()), getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
         spawnWithMetadata(context);
     }
 

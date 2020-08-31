@@ -53,4 +53,39 @@ interface LocalKeyRegistration<V : Value<E>, E : Any, H : DataHolder> : KeyRegis
      * @return This registration, for chaining
      */
     fun addChangeListener(listener: TriConsumer<H, E?, E?>): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Adds a listener that will be notified when the value changes.
+     *
+     * @param listener The listener to add
+     * @return This registration, for chaining
+     */
+    @JvmSynthetic
+    fun removeChangeListener(listener: H.(newValue: E?, oldValue: E?) -> Unit): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Adds a listener that will be notified when the value changes.
+     *
+     * @param listener The listener to add
+     * @return This registration, for chaining
+     */
+    @JvmSynthetic
+    fun removeChangeListener(listener: H.(newValue: E?) -> Unit): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Adds a listener that will be notified when the value changes.
+     *
+     * @param listener The listener to add
+     * @return This registration, for chaining
+     */
+    @JvmSynthetic
+    fun removeChangeListener(listener: H.() -> Unit): LocalKeyRegistration<V, E, H>
+
+    /**
+     * Adds a listener that will be notified when the value changes.
+     *
+     * @param listener The listener to add
+     * @return This registration, for chaining
+     */
+    fun removeChangeListener(listener: TriConsumer<H, E?, E?>): LocalKeyRegistration<V, E, H>
 }

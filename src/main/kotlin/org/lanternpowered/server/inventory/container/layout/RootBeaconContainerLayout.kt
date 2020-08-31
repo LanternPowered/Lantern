@@ -48,7 +48,9 @@ class RootBeaconContainerLayout : LanternTopBottomContainerLayout<BeaconContaine
 
     private val onSelectEffects = ArrayList<(Player, PotionEffectType?, PotionEffectType?) -> Unit>()
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.BEACON, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.BEACON, this.title))
+
     override val top: BeaconContainerLayout = SubBeaconContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     var selectedPrimaryEffect: PotionEffectType? = null

@@ -64,6 +64,12 @@ public final class EntityProtocolTypes {
 
     public static final EntityProtocolType<LanternEntity> ZOMBIE_VILLAGER = dummy("ZOMBIE_VILLAGER");
 
+    public static final EntityProtocolType<LanternEntity> HORSE = dummy("HORSE");
+
+    public static final EntityProtocolType<LanternEntity> DONKEY = dummy("DONKEY");
+
+    public static final EntityProtocolType<LanternEntity> LLAMA = dummy("LLAMA");
+
     private static <E extends LanternEntity> EntityProtocolType<E> dummy(String name) {
         //noinspection unchecked
         return DummyObjectProvider.createFor(EntityProtocolType.class, name);

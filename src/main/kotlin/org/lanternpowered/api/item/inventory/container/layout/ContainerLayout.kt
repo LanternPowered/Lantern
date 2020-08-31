@@ -27,16 +27,11 @@ interface ContainerLayout : Iterable<ContainerSlot> {
 
     /**
      * The title of the container.
-     */
-    val title: Text
-
-    /**
-     * Sets the title.
      *
-     * Applying a title to a non root layout will
-     * not have any effect.
+     * Applying a title to a non root layout
+     * doesn't have any effect.
      */
-    fun title(title: Text)
+    var title: Text
 
     /**
      * Sets a fill item that will be displayed in every slot

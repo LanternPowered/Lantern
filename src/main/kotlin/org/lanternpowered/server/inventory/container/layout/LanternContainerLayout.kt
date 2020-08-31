@@ -128,20 +128,6 @@ abstract class LanternContainerLayout(
         const val SILENT_UPDATE = 0x2
     }
 
-    companion object {
-
-        val MAIN_INVENTORY_FLAGS = IntArray(36) { Flags.IS_MAIN_INVENTORY }
-
-        init {
-            for (i in 0..8) {
-                // Apply hotbar flags
-                MAIN_INVENTORY_FLAGS[27 + i] += (i + 1) shl Flags.HOTBAR_SHIFT
-            }
-        }
-    }
-
-    private var _title: Text = title
-
     /**
      * All the viewers of this container layout.
      */
@@ -159,8 +145,11 @@ abstract class LanternContainerLayout(
 
     private val containerSlotsBySlot = HashMultimap.create<Slot, LanternContainerSlot>()
 
-    final override val title: Text
-        get() = this._title
+    final override var title: Text = title
+        set(value) {
+            field = value
+            this.queueCompleteUpdate()
+        }
 
     final override val size: Int
         get() = this.slots.size
@@ -179,7 +168,7 @@ abstract class LanternContainerLayout(
     /**
      * Creates the packet that can be used to open display the container layout.
      */
-    abstract fun createOpenPacket(data: ContainerData): Packet
+    abstract fun createOpenPackets(data: ContainerData): List<Packet>
 
     /**
      * Converts the hotbar slot index (0 - 8) to a slot index
@@ -223,11 +212,6 @@ abstract class LanternContainerLayout(
     ) {
 
         /**
-         * Whether the title of the container was changed.
-         */
-        var titleUpdate = false
-
-        /**
          * All the dirty states of container properties.
          */
         val propertyUpdateFlags = BitSet(propertyCount)
@@ -262,6 +246,12 @@ abstract class LanternContainerLayout(
          */
         var extraUpdateFlags = 0
 
+        /**
+         * Whether a complete update is required, which means resending all
+         * the packets to initialize the container.
+         */
+        var updateCompletely = false
+
         fun queueSlotChange(containerSlot: LanternContainerSlot) =
                 this.queueSlotChange(containerSlot.index)
 
@@ -291,6 +281,11 @@ abstract class LanternContainerLayout(
             if (this.slotUpdateFlags[index] and UpdateFlags.NEEDS_UPDATE == 0)
                 this.slotUpdateFlags[index] = UpdateFlags.NEEDS_UPDATE + UpdateFlags.SILENT_UPDATE
         }
+    }
+
+    fun queueCompleteUpdate() {
+        for (data in this.viewerData)
+            data.updateCompletely = true
     }
 
     override fun queueSlotChange(slot: Slot) {
@@ -380,12 +375,6 @@ abstract class LanternContainerLayout(
                 packets.add(SetWindowPropertyPacket(data.containerId, index, value))
         }
         data.propertyUpdateFlags.clear()
-    }
-
-    override fun title(title: Text) {
-        this._title = title
-        for (value in this.viewers.values)
-            value.titleUpdate = true
     }
 
     override fun range(offset: Int, size: Int): ContainerLayout {

@@ -32,6 +32,8 @@ class RootGeneric3x3ContainerLayout : LanternTopBottomContainerLayout<GridContai
         private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.GENERIC_3x3, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.GENERIC_3x3, this.title))
+
     override val top: GridContainerLayout = SubGridContainerLayout(0, WIDTH, HEIGHT, this)
 }

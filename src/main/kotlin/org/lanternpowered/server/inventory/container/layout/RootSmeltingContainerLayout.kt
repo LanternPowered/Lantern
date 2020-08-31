@@ -14,6 +14,7 @@ import org.lanternpowered.api.item.inventory.container.layout.ContainerSlot
 import org.lanternpowered.api.item.inventory.container.layout.SmeltingContainerLayout
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.server.inventory.container.ClientWindowType
+import org.lanternpowered.server.inventory.container.ClientWindowTypes
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenWindowPacket
 
@@ -46,7 +47,9 @@ abstract class RootSmeltingContainerLayout(title: Text) : LanternTopBottomContai
 
     abstract val windowType: ClientWindowType
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, this.windowType, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, this.windowType, this.title))
+
     override val top: SmeltingContainerLayout = SubSmeltingContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     var smeltProgress: Double = 0.0

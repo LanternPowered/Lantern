@@ -53,6 +53,10 @@ internal open class LanternElementKeyRegistration<V : Value<E>, E : Any, H : Dat
     override fun addChangeListener(listener: H.(newValue: E?) -> Unit) = apply { super.addChangeListener(listener) }
     override fun addChangeListener(listener: H.() -> Unit) = apply { super.addChangeListener(listener) }
     override fun addChangeListener(listener: TriConsumer<H, E?, E?>) = apply { super.addChangeListener(listener) }
+    override fun removeChangeListener(listener: H.(newValue: E?, oldValue: E?) -> Unit) = apply { super.addChangeListener(listener) }
+    override fun removeChangeListener(listener: H.(newValue: E?) -> Unit) = apply { super.removeChangeListener(listener) }
+    override fun removeChangeListener(listener: H.() -> Unit) = apply { super.removeChangeListener(listener) }
+    override fun removeChangeListener(listener: TriConsumer<H, E?, E?>) = apply { super.removeChangeListener(listener) }
 
     protected fun copyTo(copy: LanternElementKeyRegistration<V, E, H>) {
         copy.backing = CopyHelper.copy(this.backing)

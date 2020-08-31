@@ -50,7 +50,7 @@ val ParticleTypeRegistry = catalogTypeRegistry<ParticleType> {
         if (velocity)
             options.put(ParticleOptions.VELOCITY, Vector3d.ZERO)
         options.putAll(extraOptions.toMap())
-        registerEffect(id, particleIds.require(minecraftKey(id).formatted), options.build())
+        registerEffect(id, particleIds.require(minecraftKey(id)), options.build())
     }
 
     registerParticle("ambient_entity_effect", false,

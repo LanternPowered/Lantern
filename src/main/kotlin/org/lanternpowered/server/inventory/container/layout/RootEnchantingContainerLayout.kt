@@ -49,7 +49,9 @@ class RootEnchantingContainerLayout : LanternTopBottomContainerLayout<Enchanting
 
     private val onClickButton = ArrayList<(Player, EnchantingContainerLayout.Button) -> Unit>()
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, ClientWindowTypes.BREWING_STAND, this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, ClientWindowTypes.ENCHANTMENT, this.title))
+
     override val top: EnchantingContainerLayout = SubEnchantingContainerLayout(0, TOP_INVENTORY_FLAGS.size, this)
 
     val buttons: List<EnchantingContainerLayout.Button> = listOf(

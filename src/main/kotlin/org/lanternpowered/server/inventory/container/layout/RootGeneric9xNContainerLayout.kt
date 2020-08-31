@@ -42,6 +42,8 @@ class RootGeneric9xNContainerLayout(val rows: Int) : LanternTopBottomContainerLa
         }
     }
 
-    override fun createOpenPacket(data: ContainerData): Packet = OpenWindowPacket(data.containerId, CLIENT_WINDOW_TYPE[this.rows - 1], this.title)
+    override fun createOpenPackets(data: ContainerData): List<Packet> =
+            listOf(OpenWindowPacket(data.containerId, CLIENT_WINDOW_TYPE[this.rows - 1], this.title))
+
     override val top: GridContainerLayout = SubGridContainerLayout(0, WIDTH, this.rows, this)
 }

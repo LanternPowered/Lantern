@@ -10,8 +10,9 @@
  */
 package org.lanternpowered.server.network.block.vanilla
 
+import org.lanternpowered.api.util.index.requireKey
 import org.lanternpowered.server.network.block.VanillaBlockEntityProtocol
-import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
+import org.lanternpowered.server.registry.type.data.BannerPatternInternalStringIdIndex
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.spongepowered.api.block.entity.BlockEntity
 import org.spongepowered.api.data.Keys
@@ -60,7 +61,7 @@ class BannerBlockEntityProtocol<T : BlockEntity>(tile: T) : VanillaBlockEntityPr
                 return
             dataView[this.layersQuery] = patternLayers.map { layer ->
                 DataContainer.createNew(DataView.SafetyMode.NO_DATA_CLONED)
-                        .set(this.layerIdQuery, BannerPatternShapeRegistry.getId(layer.shape))
+                        .set(this.layerIdQuery, BannerPatternInternalStringIdIndex.requireKey(layer.shape))
                         .set(this.layerColorQuery, 15 - DyeColorRegistry.getId(layer.color))
             }
         }

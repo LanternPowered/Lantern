@@ -13,7 +13,7 @@ package org.lanternpowered.server.data;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.data.meta.LanternPatternLayer;
+import org.lanternpowered.server.data.meta.LanternBannerPatternLayer;
 import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
@@ -76,7 +76,7 @@ public class DataRegistrar {
         DataTranslators.registerSerializers(DataSerializerRegistry.INSTANCE);
 
         // Register the data builders
-        dataManager.registerBuilder(PatternLayer.class, new LanternPatternLayer.Builder(game));
+        dataManager.registerBuilder(PatternLayer.class, new LanternBannerPatternLayer.Builder(game));
         dataManager.registerBuilder(Text.class, new TextConfigSerializer());
         dataManager.registerBuilder(BookView.class, new BookViewConfigSerializer());
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());

@@ -35,7 +35,7 @@ class LanternPlaceholderTextBuilder : PlaceholderTextBuilder {
 
     override fun build(): PlaceholderText {
         val context = checkNotNull(this.context) { "The context must be set" }
-        val parser = checkNotNull(this.parser) { "The context must be set" }
+        val parser = checkNotNull(this.parser) { "The parser must be set" }
         return LanternPlaceholderText(parser, context)
     }
 }

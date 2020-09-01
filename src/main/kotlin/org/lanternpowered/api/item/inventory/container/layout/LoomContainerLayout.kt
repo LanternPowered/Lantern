@@ -10,6 +10,10 @@
  */
 package org.lanternpowered.api.item.inventory.container.layout
 
+import org.lanternpowered.api.entity.player.Player
+import org.spongepowered.api.data.type.BannerPatternShape
+import org.spongepowered.api.data.type.BannerPatternShapes
+
 /**
  * Represents the top container layout of a loom.
  */
@@ -34,4 +38,15 @@ interface LoomContainerLayout : ContainerLayout {
      * The output slot.
      */
     val output: ContainerSlot
+
+    /**
+     * The selected shape. Using [BannerPatternShapes.BASE] will
+     * reset the selected pattern.
+     */
+    var selectedShape: BannerPatternShape
+
+    /**
+     * Is called when a player clicks on one of the shape buttons.
+     */
+    fun onClickShape(fn: (player: Player, shape: BannerPatternShape) -> Unit)
 }

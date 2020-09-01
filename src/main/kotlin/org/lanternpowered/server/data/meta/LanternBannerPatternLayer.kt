@@ -15,6 +15,9 @@ import org.lanternpowered.server.data.AbstractDataSerializable
 import org.lanternpowered.server.registry.type.data.BannerPatternShapeRegistry
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.resolveNamespacedKey
+import org.lanternpowered.api.util.optional.asOptional
+import org.lanternpowered.api.util.optional.emptyOptional
 import org.spongepowered.api.data.meta.BannerPatternLayer
 import org.spongepowered.api.data.persistence.AbstractDataBuilder
 import org.spongepowered.api.data.persistence.DataContainer
@@ -24,7 +27,7 @@ import org.spongepowered.api.data.type.BannerPatternShape
 import org.spongepowered.api.data.type.DyeColor
 import java.util.*
 
-class LanternPatternLayer(
+class LanternBannerPatternLayer(
         private val shape: BannerPatternShape,
         private val color: DyeColor
 ) : AbstractDataSerializable(), BannerPatternLayer {
@@ -47,14 +50,11 @@ class LanternPatternLayer(
         override fun buildContent(container: DataView): Optional<BannerPatternLayer> {
             val bannerShape = container.getString(BANNER_SHAPE).orElse(null)
             val dyeColor = container.getString(DYE_COLOR).orElse(null)
-            if (bannerShape == null || dyeColor == null) {
-                return Optional.empty()
-            }
-            val shape = BannerPatternShapeRegistry[NamespacedKey.resolve(bannerShape)]
+            if (bannerShape == null || dyeColor == null)
+                return emptyOptional()
+            val shape = BannerPatternShapeRegistry[resolveNamespacedKey(bannerShape)]
             val color = DyeColorRegistry[NamespacedKey.resolve(dyeColor)]
-            return if (shape == null || color == null) {
-                Optional.empty()
-            } else Optional.of(LanternPatternLayer(shape, color))
+            return if (shape == null || color == null) emptyOptional() else LanternBannerPatternLayer(shape, color).asOptional()
         }
     }
 

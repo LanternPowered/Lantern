@@ -12,53 +12,59 @@ package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.minecraftKey
+import org.lanternpowered.api.util.index.indexOf
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.lanternpowered.server.registry.customInternalCatalogTypeRegistry
+import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.type.BannerPatternShape
 
-val BannerPatternShapeRegistry = customInternalCatalogTypeRegistry<BannerPatternShape, String> {
-    fun register(internalId: String, id: String) =
-            register(internalId, LanternBannerPatternShape(minecraftKey(id)))
+val BannerPatternShapeRegistry = internalCatalogTypeRegistry<BannerPatternShape> {
+    fun register(internalId: Int, internalStringId: String, id: String) =
+            register(internalId, LanternBannerPatternShape(minecraftKey(id), internalStringId))
 
-    register("b", "base")
-    register("bo", "border")
-    register("bri", "bricks")
-    register("mc", "circle_middle")
-    register("cre", "creeper")
-    register("cr", "cross")
-    register("cbo", "curly_border")
-    register("ld", "diagonal_left")
-    register("lud", "diagonal_left_mirror")
-    register("rd", "diagonal_right")
-    register("rud", "diagonal_right_mirror")
-    register("flo", "flower")
-    register("gra", "gradient")
-    register("gru", "gradient_up")
-    register("hh", "half_horizontal")
-    register("hhb", "half_horizontal_mirror")
-    register("vh", "half_vertical")
-    register("vhr", "half_vertical_mirror")
-    register("moj", "mojang")
-    register("mr", "rhombus_middle")
-    register("sku", "skull")
-    register("bl", "square_bottom_left")
-    register("br", "square_bottom_right")
-    register("tl", "square_top_left")
-    register("tr", "square_top_right")
-    register("sc", "straight_cross")
-    register("bs", "stripe_bottom")
-    register("cs", "stripe_center")
-    register("dls", "stripe_downleft")
-    register("drs", "stripe_downright")
-    register("ls", "stripe_left")
-    register("ms", "stripe_middle")
-    register("rs", "stripe_right")
-    register("ss", "stripe_small")
-    register("ts", "stripe_top")
-    register("bts", "triangles_bottom")
-    register("tts", "triangles_top")
-    register("bt", "triangle_bottom")
-    register("tt", "triangle_top")
+    register(0, "b", "base")
+    register(1, "bl", "square_bottom_left")
+    register(2, "br", "square_bottom_right")
+    register(3, "tl", "square_top_left")
+    register(4, "tr", "square_top_right")
+    register(5, "bs", "stripe_bottom")
+    register(6, "ts", "stripe_top")
+    register(7, "ls", "stripe_left")
+    register(8, "rs", "stripe_right")
+    register(9, "cs", "stripe_center")
+    register(10, "ms", "stripe_middle")
+    register(11, "drs", "stripe_downright")
+    register(12, "dls", "stripe_downleft")
+    register(13, "ss", "small_stripes")
+    register(14, "cr", "cross")
+    register(15, "sc", "straight_cross")
+    register(16, "bt", "triangle_bottom")
+    register(17, "tt", "triangle_top")
+    register(18, "bts", "triangles_bottom")
+    register(19, "tts", "triangles_top")
+    register(20, "ld", "diagonal_left")
+    register(21, "rd", "diagonal_up_right")
+    register(22, "lud", "diagonal_up_left")
+    register(23, "rud", "diagonal_right")
+    register(24, "mc", "circle")
+    register(25, "mr", "rhombus")
+    register(26, "vh", "half_vertical")
+    register(27, "hh", "half_horizontal")
+    register(28, "vhr", "half_vertical_right")
+    register(29, "hhb", "half_horizontal_bottom")
+    register(30, "bo", "border")
+    register(31, "cbo", "curly_border")
+    register(32, "gra", "gradient")
+    register(33, "gru", "gradient_up")
+    register(34, "bri", "bricks")
+    register(35, "gbl", "globe")
+    register(36, "cre", "creeper")
+    register(37, "sku", "skull")
+    register(38, "flo", "flower")
+    register(39, "moj", "mojang")
 }
 
-private class LanternBannerPatternShape(key: NamespacedKey) : DefaultCatalogType(key), BannerPatternShape
+val BannerPatternInternalStringIdIndex = indexOf(BannerPatternShapeRegistry.all) { shape ->
+    (shape as LanternBannerPatternShape).internalStringId
+}
+
+private class LanternBannerPatternShape(key: NamespacedKey, val internalStringId: String) : DefaultCatalogType(key), BannerPatternShape

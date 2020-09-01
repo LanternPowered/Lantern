@@ -33,6 +33,9 @@ import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.scoreboard.ScoreboardBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardObjectiveBuilder
 import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
+import org.lanternpowered.api.text.placeholder.PlaceholderContextBuilder
+import org.lanternpowered.api.text.placeholder.PlaceholderParserBuilder
+import org.lanternpowered.api.text.placeholder.PlaceholderTextBuilder
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.advancement.criteria.AndCriterionFactory
 import org.lanternpowered.server.advancement.criteria.CriterionFactory
@@ -160,6 +163,10 @@ import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder
 import org.lanternpowered.server.text.LanternTextSerializerFactory
 import org.lanternpowered.server.text.SpongeComponentsFactory
+import org.lanternpowered.server.text.placeholder.LanternPlaceholderContextBuilder
+import org.lanternpowered.server.text.placeholder.LanternPlaceholderParserBuilder
+import org.lanternpowered.server.text.placeholder.LanternPlaceholderTextBuilder
+import org.lanternpowered.server.text.placeholder.PlaceholderParserRegistry
 import org.lanternpowered.server.timings.DummyTimingsFactory
 import org.lanternpowered.server.world.LanternBlockChangeFlag
 import org.lanternpowered.server.world.LanternWorldBorderBuilder
@@ -181,9 +188,9 @@ import org.spongepowered.api.fluid.FluidStack
 import org.spongepowered.api.fluid.FluidStackSnapshot
 import org.spongepowered.api.item.enchantment.Enchantment
 import org.spongepowered.api.scheduler.Task
+import org.spongepowered.api.service.ban.Ban
 import org.spongepowered.api.util.ResettableBuilder
 import org.spongepowered.api.util.RespawnLocation
-import org.spongepowered.api.util.ban.Ban
 import org.spongepowered.api.world.LocatableBlock
 import org.spongepowered.api.world.WorldArchetype
 import org.spongepowered.api.world.WorldBorder
@@ -273,6 +280,10 @@ class LanternGameRegistry(
             register<VirtualBiomeType.Builder> { LanternVirtualBiomeTypeBuilder() }
             register<WorldArchetype.Builder> { LanternWorldArchetypeBuilder() }
             register<WorldBorder.Builder> { LanternWorldBorderBuilder() }
+
+            register<PlaceholderContextBuilder> { LanternPlaceholderContextBuilder() }
+            register<PlaceholderParserBuilder> { LanternPlaceholderParserBuilder() }
+            register<PlaceholderTextBuilder> { LanternPlaceholderTextBuilder() }
         }
 
         catalogRegistry.apply {
@@ -385,6 +396,8 @@ class LanternGameRegistry(
             register(SerializationBehaviorRegistry)
             register(UpdatePriorityRegistry)
             register(WorldArchetypeRegistry)
+
+            register(PlaceholderParserRegistry)
         }
 
         // Allow plugins to register their catalog type, builders and factories

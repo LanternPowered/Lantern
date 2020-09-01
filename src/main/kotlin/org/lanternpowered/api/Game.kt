@@ -18,6 +18,7 @@ typealias MinecraftVersion = org.spongepowered.api.MinecraftVersion
 typealias Platform = org.spongepowered.api.Platform
 typealias PlatformComponent = org.spongepowered.api.Platform.Component
 typealias Sponge = org.spongepowered.api.Sponge
+typealias SystemSubject = org.spongepowered.api.SystemSubject
 
 /**
  * The game.

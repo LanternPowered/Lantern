@@ -16,10 +16,10 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.util.ban.Ban.Builder;
-import org.spongepowered.api.util.ban.BanType;
-import org.spongepowered.api.util.ban.BanTypes;
+import org.spongepowered.api.service.ban.Ban;
+import org.spongepowered.api.service.ban.Ban.Builder;
+import org.spongepowered.api.service.ban.BanType;
+import org.spongepowered.api.service.ban.BanTypes;
 
 import java.net.InetAddress;
 import java.time.Instant;

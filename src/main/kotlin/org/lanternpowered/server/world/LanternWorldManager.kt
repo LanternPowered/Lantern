@@ -79,7 +79,7 @@ class LanternWorldManager(
         this.worldStorageService.onDiscover += this::onDiscover
         this.worldStorageService.onRemove += this::onRemove
 
-        val registrations = registerWorlds()
+        val registrations = this.registerWorlds()
         for ((key, archetype) in registrations)
             this.createPropertiesNow(key, archetype)
     }

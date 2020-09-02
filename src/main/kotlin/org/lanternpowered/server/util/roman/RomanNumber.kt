@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.server.util.roman
 
-import com.google.common.base.Preconditions
-import it.unimi.dsi.fastutil.chars.Char2IntMap
 import it.unimi.dsi.fastutil.chars.Char2IntOpenHashMap
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap
 import java.util.Locale
 
-class RomanNumber private constructor(private val roman: String, private val value: Int) : Number() {
+class RomanNumber private constructor(
+        private val roman: String,
+        private val value: Int
+) : Number() {
 
     companion object {
 
@@ -30,14 +30,13 @@ class RomanNumber private constructor(private val roman: String, private val val
          */
         @Throws(IllegalRomanNumberException::class)
         fun toString(value: Int): String {
-            checkIllegalNumber(value)
+            this.checkIllegalNumber(value)
             val builder = StringBuilder()
             var remaining = value
             for (entry in VALUES_TO_STRING.int2ObjectEntrySet()) {
                 val count = remaining / entry.intKey.toLong()
-                for (i in 0 until count) {
+                for (i in 0 until count)
                     builder.append(entry.value)
-                }
                 remaining %= entry.intKey
             }
             return builder.toString()
@@ -52,20 +51,19 @@ class RomanNumber private constructor(private val roman: String, private val val
          */
         @JvmStatic
         fun parse(s: String): RomanNumber {
-            Preconditions.checkNotNull(s)
             var result = 0
             val roman = s.toUpperCase(Locale.ENGLISH)
             for (i in 0 until roman.length - 1) {
-                val value = parseChar(roman, i)
-                val next = parseChar(roman, i + 1)
+                val value = this.parseChar(roman, i)
+                val next = this.parseChar(roman, i + 1)
                 if (value < next) {
                     result -= value
                 } else {
                     result += value
                 }
             }
-            result += parseChar(roman, roman.length - 1)
-            checkIllegalNumber(result)
+            result += this.parseChar(roman, roman.length - 1)
+            this.checkIllegalNumber(result)
             return RomanNumber(roman, result)
         }
 
@@ -82,27 +80,23 @@ class RomanNumber private constructor(private val roman: String, private val val
         }
 
         private fun checkIllegalNumber(value: Int) {
-            if (value <= 0) {
+            if (value <= 0)
                 throw IllegalRomanNumberException("Roman numbers cannot be negative or zero.")
-            }
-            if (value > 3999) {
+            if (value > 3999)
                 throw IllegalRomanNumberException("Roman numbers cannot be greater then 3999.")
-            }
         }
 
         private fun parseChar(string: String, index: Int): Int {
             val c = string[index]
             val v = CHAR_VALUES[c]
-            if (v == INVALID_CHAR) {
-                throw NumberFormatException("Invalid Roman number, illegal character "
-                        + c + " at index " + index + " of input: " + string)
-            }
+            if (v == INVALID_CHAR)
+                throw NumberFormatException("Invalid Roman number, illegal character $c at index $index of input: $string")
             return v
         }
 
-        private val CHAR_VALUES: Char2IntMap = Char2IntOpenHashMap()
+        private val CHAR_VALUES = Char2IntOpenHashMap()
         private const val INVALID_CHAR = -1
-        private val VALUES_TO_STRING: Int2ObjectMap<String> = Int2ObjectLinkedOpenHashMap()
+        private val VALUES_TO_STRING = Int2ObjectLinkedOpenHashMap<String>()
 
         init {
             CHAR_VALUES['M'] = 1000
@@ -166,6 +160,6 @@ class RomanNumber private constructor(private val roman: String, private val val
     override fun toDouble(): Double = this.value.toDouble()
 
     override fun toString(): String = this.roman
-    override fun hashCode(): Int = Integer.hashCode(this.value)
+    override fun hashCode(): Int = this.value
     override fun equals(other: Any?): Boolean = other is RomanNumber && other.value == this.value
 }

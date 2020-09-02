@@ -21,6 +21,7 @@ val SerializationBehaviorRegistry = catalogTypeRegistry<SerializationBehavior> {
 
     register("automatic")
     register("manual")
+    register("metadata_only")
     register("none")
 }
 

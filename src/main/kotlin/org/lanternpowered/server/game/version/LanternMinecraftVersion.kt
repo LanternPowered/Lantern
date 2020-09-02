@@ -11,7 +11,8 @@
 package org.lanternpowered.server.game.version
 
 import org.lanternpowered.api.MinecraftVersion
-import org.lanternpowered.server.network.protocol.Protocol
+import org.lanternpowered.api.util.optional.emptyOptionalInt
+import java.util.OptionalInt
 
 data class LanternMinecraftVersion(
         private val name: String,
@@ -20,6 +21,7 @@ data class LanternMinecraftVersion(
 ) : MinecraftVersion {
 
     override fun getName(): String = this.name
+    override fun getDataVersion(): OptionalInt = emptyOptionalInt()
     override fun isLegacy(): Boolean = this.legacy
 
     override fun compareTo(other: MinecraftVersion): Int =

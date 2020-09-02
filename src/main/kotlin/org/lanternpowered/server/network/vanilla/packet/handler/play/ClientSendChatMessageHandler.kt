@@ -17,6 +17,7 @@ import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.api.util.optional.orNull
@@ -84,10 +85,10 @@ object ClientSendChatMessageHandler : Handler<ClientSendChatMessagePacket> {
     private val urlPattern = Pattern.compile("(?:(https?)://)?([-\\w_.]+\\.\\w{2,})(/\\S*)?")
 
     private fun handleChatMessage(server: LanternServer, player: LanternPlayer, message: String) {
-        var text = textOf(message)
+        var text: Text = textOf(message)
         if (server.config.chat.clickableUrls && player.hasPermission(Permissions.Chat.FORMAT_URLS)) {
             // Make the urls clickable
-            text = text.replace(this.urlPattern) { url -> url.clickEvent(ClickEvent.openUrl(url.content())) }
+            text = text.replaceText(this.urlPattern) { url -> url.clickEvent(ClickEvent.openUrl(url.content())) }
         }
         player.simulateChat(text, CauseStack.currentCause)
     }

@@ -54,7 +54,7 @@ public final class NetworkManager extends AbstractServer {
 
     @Nullable private InetSocketAddress address;
 
-    public NetworkManager(LanternServer server) {
+    public NetworkManager(LanternServer server, EventLoopGroup bossGroup, EventLoopGroup workerGroup) {
         this.server = server;
         ProtocolState.init();
     }

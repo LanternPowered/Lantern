@@ -112,6 +112,9 @@ class ServerConfigObject : ConfigObject() {
     var viewDistance by setting(default = ViewDistance.DEFAULT, name = "view-distance",
             description = "The view distance. The value must be between ${ViewDistance.MINIMUM} and ${ViewDistance.MAXIMUM} (inclusive).")
 
+    var preventProxyConnections by setting(default = false, name = "prevent-proxy-connections",
+            description = "Whether proxy connections should be prevented. This is only supported in the online mode.")
+
     // TODO: Expand explanation of ip based contexts
 
     val proxy by ProxyConfigObject.with(name = "proxy")

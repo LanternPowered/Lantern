@@ -12,7 +12,7 @@ package org.lanternpowered.server.data
 
 import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.cause.CauseStack
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.data.key.ValueKey
 import org.lanternpowered.server.data.key.ValueKeyEventListener
 import org.spongepowered.api.data.DataHolder

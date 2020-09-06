@@ -13,6 +13,7 @@ package org.lanternpowered.server.game.version
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap
+import org.lanternpowered.server.util.gson.fromJson
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -28,7 +29,7 @@ class MinecraftVersionCache {
     }
 
     private fun load(inputStream: InputStream, legacy: Boolean) {
-        val array = BufferedReader(InputStreamReader(inputStream)).use { reader -> Gson().fromJson(reader, JsonArray::class.java) }
+        val array = BufferedReader(InputStreamReader(inputStream)).use { reader -> Gson().fromJson<JsonArray>(reader) }
         for (i in 0 until array.size()) {
             val obj = array[i].asJsonObject
             val json = obj["name"]

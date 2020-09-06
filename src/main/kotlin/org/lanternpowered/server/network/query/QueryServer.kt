@@ -37,7 +37,6 @@ import io.netty.channel.ChannelFuture
 import io.netty.channel.EventLoopGroup
 import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.network.TransportType
-import org.lanternpowered.server.util.ThreadHelper
 import java.net.InetSocketAddress
 import java.net.SocketAddress
 import java.util.concurrent.ConcurrentHashMap
@@ -51,10 +50,10 @@ import kotlin.random.Random
  */
 class QueryServer(
         val server: LanternServer,
-        private val showPlugins: Boolean
+        private val showPlugins: Boolean,
+        private val workerGroup: EventLoopGroup
 ) {
 
-    private lateinit var group: EventLoopGroup
     private lateinit var bootstrap: Bootstrap
     private lateinit var flushTask: ScheduledFuture<*>
 
@@ -66,13 +65,12 @@ class QueryServer(
     fun init(address: SocketAddress): ChannelFuture {
         val transportType = TransportType.findBestType()
 
-        this.group = transportType.eventLoopGroupSupplier(0, ThreadHelper.newThreadFactory())
         this.bootstrap = Bootstrap()
-                .group(this.group)
+                .group(this.workerGroup)
                 .channelFactory(transportType.datagramChannelFactory)
                 .handler(QueryHandler(this, this.showPlugins))
 
-        this.flushTask = this.group.scheduleAtFixedRate({
+        this.flushTask = this.workerGroup.scheduleAtFixedRate({
             flushChallengeTokens()
         }, 30, 30, TimeUnit.MINUTES)
 
@@ -84,7 +82,6 @@ class QueryServer(
      */
     fun shutdown() {
         check(this::bootstrap.isInitialized) { "The query server wasn't initialized." }
-        this.group.shutdownGracefully()
         this.flushTask.cancel(false)
     }
 

@@ -16,7 +16,7 @@ import com.google.gson.JsonObject
 import org.lanternpowered.api.Server
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.type.TypeToken

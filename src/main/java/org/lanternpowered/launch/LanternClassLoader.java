@@ -92,7 +92,7 @@ public final class LanternClassLoader extends URLClassLoader {
             final String fileNameBase = String.format("%s-%s", name, version);
 
             // Attempt to get the url from the path
-            InputStream is = getStream(directoryPath + fileNameBase + ".jar");
+            InputStream is = this.getStream(directoryPath + fileNameBase + ".jar");
             if (is != null) {
                 return is;
             }
@@ -103,13 +103,13 @@ public final class LanternClassLoader extends URLClassLoader {
             }
             // Check if a specific snapshot version is applied
             if (index != version.length() - length) {
-                is = getStream(String.format("%s/%s-%s%s.jar", directoryPath, name,
+                is = this.getStream(String.format("%s/%s-%s%s.jar", directoryPath, name,
                         version.substring(0, index), version.substring(index + length)));
                 if (is != null) {
                     return is;
                 }
             }
-            is = getStream(directoryPath + "maven-metadata.xml");
+            is = this.getStream(directoryPath + "maven-metadata.xml");
             if (is == null) {
                 return null;
             }
@@ -122,12 +122,14 @@ public final class LanternClassLoader extends URLClassLoader {
 
                 // Get the versioning element
                 final Element versioning = (Element) document.getElementsByTagName("versioning").item(0);
-                if (versioning == null) return null;
+                if (versioning == null)
+                    return null;
                 final Element snapshot = (Element) versioning.getElementsByTagName("snapshot").item(0);
-                if (snapshot == null) return null;
+                if (snapshot == null)
+                    return null;
                 final String timestamp = snapshot.getElementsByTagName("timestamp").item(0).getTextContent();
                 final String buildNumber = snapshot.getElementsByTagName("buildNumber").item(0).getTextContent();
-                return getStream(String.format("%s%s-%s-%s-%s.jar", directoryPath, name,
+                return this.getStream(String.format("%s%s-%s-%s-%s.jar", directoryPath, name,
                         version.substring(0, index), timestamp, buildNumber));
             } catch (SAXException | ParserConfigurationException | IOException e) {
                 sneakyThrow(e);
@@ -176,7 +178,7 @@ public final class LanternClassLoader extends URLClassLoader {
         final List<URL> repositoryUrls = new ArrayList<>();
         final Map<String, Dependency> dependencyMap = new HashMap<>();
 
-        for (Dependencies dependencies : dependenciesEntries) {
+        for (final Dependencies dependencies : dependenciesEntries) {
             dependencies.getRepositories().stream().map(Repository::getUrl)
                     .filter(e -> !repositoryUrls.contains(e)).forEach(repositoryUrls::add);
             for (Dependency dependency : dependencies.getDependencies()) {
@@ -220,7 +222,7 @@ public final class LanternClassLoader extends URLClassLoader {
         repositoryUrls.add(0, new File(localRepoPath).toURL());
 
         final List<FileRepository> repositories = new ArrayList<>();
-        for (URL repositoryUrl : repositoryUrls) {
+        for (final URL repositoryUrl : repositoryUrls) {
             if (repositoryUrl.getProtocol().equals("file")) {
                 final File baseFile = new File(repositoryUrl.getFile());
                 repositories.add(path -> {
@@ -291,7 +293,7 @@ public final class LanternClassLoader extends URLClassLoader {
 
         // Download or load all the dependencies
         final Path internalLibrariesPath = Paths.get(".cached-dependencies");
-        for (Dependency dependency : dependencyMap.values()) {
+        for (final Dependency dependency : dependencyMap.values()) {
             final String group = dependency.getGroup();
             final String name = dependency.getName();
             final String version = dependency.getVersion();
@@ -304,7 +306,7 @@ public final class LanternClassLoader extends URLClassLoader {
                 continue;
             }
             InputStream is = null;
-            for (FileRepository repository : repositories) {
+            for (final FileRepository repository : repositories) {
                 is = repository.get(dependency);
                 if (is != null) {
                     break;
@@ -318,8 +320,8 @@ public final class LanternClassLoader extends URLClassLoader {
                 Files.createDirectories(parent);
             }
             System.out.printf("Downloading \"%s\"\n", id);
-            try (ReadableByteChannel i = Channels.newChannel(is);
-                    FileOutputStream o = new FileOutputStream(target.toFile())) {
+            try (final ReadableByteChannel i = Channels.newChannel(is);
+                    final FileOutputStream o = new FileOutputStream(target.toFile())) {
                 o.getChannel().transferFrom(i, 0, Long.MAX_VALUE);
             }
         }
@@ -338,7 +340,7 @@ public final class LanternClassLoader extends URLClassLoader {
                 if (!library.endsWith(".jar") || url.equals(location)) {
                     urls.add(url);
                 }
-            } catch (MalformedURLException ignored) {
+            } catch (final MalformedURLException ignored) {
                 System.out.println("Invalid library found in the class path: " + library);
             }
         }
@@ -353,7 +355,7 @@ public final class LanternClassLoader extends URLClassLoader {
     static {
         try {
             classLoader = load();
-        } catch (IOException e) {
+        } catch (final IOException e) {
             sneakyThrow(e);
             throw new RuntimeException();
         }
@@ -423,7 +425,7 @@ public final class LanternClassLoader extends URLClassLoader {
      */
     public void addTransformerExclusions(Exclusion... exclusions) {
         requireNonNull(exclusions, "exclusions");
-        addTransformerExclusions(Arrays.asList(exclusions));
+        this.addTransformerExclusions(Arrays.asList(exclusions));
     }
 
     /**
@@ -525,7 +527,7 @@ public final class LanternClassLoader extends URLClassLoader {
      */
     public Optional<Class<?>> getLoadedClass(String className) {
         requireNonNull(className, "className");
-        return Optional.ofNullable(findLoadedClass(className));
+        return Optional.ofNullable(this.findLoadedClass(className));
     }
 
     /**
@@ -568,26 +570,26 @@ public final class LanternClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        synchronized (getClassLoadingLock(name)) {
+        synchronized (this.getClassLoadingLock(name)) {
             // First, check if the class has already been loaded
-            Class<?> c = findLoadedClass(name);
+            Class<?> c = this.findLoadedClass(name);
             if (c == null) {
                 // Ignore the launch package, this is the only package that will be loaded
                 // through the system class loader
                 if (name.startsWith("org.lanternpowered.launch.")) {
                     // This has to be found
-                    c = getParent().loadClass(name);
+                    c = this.getParent().loadClass(name);
                 } else {
                     ClassNotFoundException e = null;
                     try {
-                        c = findClass(name);
-                    } catch (ClassNotFoundException ex) {
+                        c = this.findClass(name);
+                    } catch (final ClassNotFoundException ex) {
                         e = ex;
                     }
                     if (c == null) {
                         try {
                             c = getParent().loadClass(name);
-                        } catch (ClassNotFoundException ex) {
+                        } catch (final ClassNotFoundException ex) {
                             // Throw the error generated by this class loader,
                             // it might be more useful
                             throw e;
@@ -596,7 +598,7 @@ public final class LanternClassLoader extends URLClassLoader {
                 }
             }
             if (resolve) {
-                resolveClass(c);
+                this.resolveClass(c);
             }
             return c;
         }
@@ -605,12 +607,10 @@ public final class LanternClassLoader extends URLClassLoader {
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
         // The class loading failed before
-        if (this.invalidClasses.contains(name)) {
+        if (this.invalidClasses.contains(name))
             throw new ClassNotFoundException(name);
-        }
-        if (this.cachedClasses.containsKey(name)) {
+        if (this.cachedClasses.containsKey(name))
             return this.cachedClasses.get(name);
-        }
         final String fileName = name.replace('.', '/').concat(".class");
         // Try the server classes
         URL url = findResource(fileName);
@@ -622,20 +622,20 @@ public final class LanternClassLoader extends URLClassLoader {
                 throw new ClassNotFoundException(name);
             }
             // Just load the library class
-            return defineClass(name, url, false);
+            return this.defineClass(name, url, false);
         }
         if (this.transformers.isEmpty()) {
             // Don't bother if there are no transformers
-            return defineClass(name, url, false);
+            return this.defineClass(name, url, false);
         }
         // Check if the class should be ignored by any kind of transformer
         for (Exclusion exclusion : this.transformerExclusions) {
             if (exclusion.isApplicable(name)) {
                 // Just load the class in this case
-                return defineClass(name, url, false);
+                return this.defineClass(name, url, false);
             }
         }
-        return defineClass(name, url, true);
+        return this.defineClass(name, url, true);
     }
 
     private Class<?> defineClass(String name, URL url, boolean transform) throws ClassNotFoundException {
@@ -686,24 +686,21 @@ public final class LanternClassLoader extends URLClassLoader {
 
     private CodeSource getCodeSource(String name, URL url) {
         // Classes without a jar protocol, nope
-        if (!url.getProtocol().equalsIgnoreCase("jar")) {
+        if (!url.getProtocol().equalsIgnoreCase("jar"))
             return null;
-        }
         final String u = url.toString();
         final String s = "jar:";
-        if (!u.startsWith(s)) {
+        if (!u.startsWith(s))
             return null;
-        }
         // The url should end with the following string, this
         // is pointing to a class inside a jar
         final String e = "!/" + name.replace('.', '/') + ".class";
-        if (!u.endsWith(e)) {
+        if (!u.endsWith(e))
             return null;
-        }
 
         try {
             url = new URL(u.substring(s.length(), u.length() - e.length()));
-        } catch (MalformedURLException ex) {
+        } catch (final MalformedURLException ex) {
             // Malformed, just fail
             return null;
         }
@@ -729,25 +726,24 @@ public final class LanternClassLoader extends URLClassLoader {
                     }
                     final File file = new File(u.getFile());
                     // Fail, maybe it's not a file?
-                    if (!file.exists()) {
+                    if (!file.exists())
                         return null;
-                    }
                     try (JarFile jarFile = new JarFile(file)) {
                         return jarFile.getManifest();
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         // Something went wrong, let's just fail
                         return null;
                     }
                 });
             }
             if (manifest != null) {
-                definePackage(packageName, manifest, source.getLocation());
+                this.definePackage(packageName, manifest, source.getLocation());
             } else {
-                definePackage(packageName, null, null, null, null, null, null, null);
+                this.definePackage(packageName, null, null, null, null, null, null, null);
             }
         }
 
-        final Class<?> clazz = defineClass(name, b, off, len);
+        final Class<?> clazz = this.defineClass(name, b, off, len);
         this.cachedClasses.put(name, clazz);
         return clazz;
     }

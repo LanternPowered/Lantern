@@ -16,7 +16,7 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
 import org.apache.logging.log4j.Logger
 import org.lanternpowered.api.cause.causeOf
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.text.toText

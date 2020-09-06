@@ -13,7 +13,7 @@ package org.lanternpowered.server.entity
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.item.inventory.stack.isSimilarTo
 import org.lanternpowered.api.util.duration.max
 import org.lanternpowered.api.util.optional.orNull

@@ -21,6 +21,7 @@ import org.lanternpowered.api.key.resolveNamespacedKey
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.util.collections.toImmutableMap
 import org.lanternpowered.server.item.LanternItemType
+import org.lanternpowered.server.util.gson.fromJson
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
@@ -45,7 +46,7 @@ object NetworkItemTypeRegistry {
         val input = InputStreamReader(NetworkItemTypeRegistry::class.java
                 .getResourceAsStream("/internal/registries/item.json"))
         BufferedReader(input).use { reader ->
-            val jsonArray = gson.fromJson(reader, JsonArray::class.java)
+            val jsonArray = gson.fromJson<JsonArray>(reader)
             for (index in 0 until jsonArray.size()) {
                 val element = jsonArray.get(index)
                 var maxStackSize = 64

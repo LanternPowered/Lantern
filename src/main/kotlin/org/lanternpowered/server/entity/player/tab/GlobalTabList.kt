@@ -19,15 +19,15 @@ object GlobalTabList {
     private val entries = concurrentHashMapOf<UUID, GlobalTabListEntry>()
 
     fun add(entry: GlobalTabListEntry) {
-        entries[entry.profile.uniqueId] = entry
+        this.entries[entry.profile.uniqueId] = entry
     }
 
     operator fun get(gameProfile: GameProfile): GlobalTabListEntry? =
-            entries[gameProfile.uniqueId]
+            this.entries[gameProfile.uniqueId]
 
     fun getOrCreate(gameProfile: GameProfile): GlobalTabListEntry =
-            entries.computeIfAbsent(gameProfile.uniqueId) { GlobalTabListEntry(this, gameProfile) }
+            this.entries.computeIfAbsent(gameProfile.uniqueId) { GlobalTabListEntry(this, gameProfile) }
 
     fun remove(gameProfile: GameProfile): GlobalTabListEntry? =
-            entries.remove(gameProfile.uniqueId)
+            this.entries.remove(gameProfile.uniqueId)
 }

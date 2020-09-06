@@ -73,9 +73,8 @@ object SetCommandsCodec : PacketEncoder<SetCommandsPacket> {
             for (child in children)
                 buf.writeVarInt(nodeToIndexMap.getInt(child))
             // Write the redirect node index
-            if (redirect != null) {
+            if (redirect != null)
                 buf.writeVarInt(nodeToIndexMap.getInt(redirect))
-            }
             if (node is ArgumentNode) {
                 val argumentAndType = node.argumentAndType.uncheckedCast<ArgumentAndType<Argument>>()
                 buf.writeString(node.name)

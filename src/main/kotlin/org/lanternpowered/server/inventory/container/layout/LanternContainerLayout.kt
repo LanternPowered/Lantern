@@ -26,7 +26,6 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.inventory.SlotChangeTracker
 import org.lanternpowered.server.inventory.behavior.MouseButton
-import org.lanternpowered.server.inventory.client.ClientItemStackSizes
 import org.lanternpowered.server.network.item.NetworkItemTypeRegistry
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket
@@ -606,7 +605,7 @@ abstract class LanternContainerLayout(
     private fun queueDoubleClickChanges(data: ContainerData, slotIndex: Int) {
         val doubleClickItem = data.doubleClickItem
         if (doubleClickItem != null) {
-            val maxStack = ClientItemStackSizes.getOriginalMaxSize(doubleClickItem.type)
+            val maxStack = NetworkItemTypeRegistry.getByType(doubleClickItem.type)!!.originalMaxStackSize
             val flags = slotFlags
             for (i in flags.indices) {
                 // The stack is full, stop

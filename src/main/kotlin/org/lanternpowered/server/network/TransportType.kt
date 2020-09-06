@@ -67,13 +67,15 @@ internal sealed class TransportType(
                             Lantern.getLogger().info("KQueue is available.")
                         return KQueue
                     } else if (!this.logged)
-                        Lantern.getLogger().info("KQueue is unavailable: {}", getMessage(NettyKQueue.unavailabilityCause()))
+                        Lantern.getLogger().info("KQueue is unavailable: {}",
+                                this.getMessage(NettyKQueue.unavailabilityCause()))
                     if (NettyEpoll.isAvailable()) {
                         if (!this.logged)
                             Lantern.getLogger().info("Epoll is available.")
                         return Epoll
                     } else if (!this.logged)
-                        Lantern.getLogger().info("Epoll is unavailable: {}", getMessage(NettyEpoll.unavailabilityCause()))
+                        Lantern.getLogger().info("Epoll is unavailable: {}",
+                                this.getMessage(NettyEpoll.unavailabilityCause()))
                 }
                 return Nio
             } finally {

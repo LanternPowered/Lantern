@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.plus
 import org.lanternpowered.api.text.textOf

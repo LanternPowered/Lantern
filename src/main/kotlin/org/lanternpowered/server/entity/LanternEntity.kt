@@ -22,7 +22,7 @@ import org.lanternpowered.api.effect.sound.soundEffectOf
 import org.lanternpowered.api.entity.Entity
 import org.lanternpowered.api.entity.ExtendedEntity
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.text.emptyText
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.util.AABB

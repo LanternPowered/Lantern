@@ -19,7 +19,7 @@ public final class Repository {
     private final URL url;
     private final String name;
 
-    public Repository(URL url, String name) {
+    public Repository(final URL url, final String name) {
         this.url = requireNonNull(url, "url");
         this.name = name;
     }

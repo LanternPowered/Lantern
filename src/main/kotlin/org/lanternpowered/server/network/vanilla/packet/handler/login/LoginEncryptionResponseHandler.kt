@@ -12,15 +12,10 @@ package org.lanternpowered.server.network.vanilla.packet.handler.login
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.future.asCompletableFuture
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
 import org.lanternpowered.api.text.translatableTextOf
-import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.WrappedServerSideConnection
@@ -34,9 +29,8 @@ import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.InetAddressHelper
 import org.lanternpowered.server.util.UUIDHelper
 import org.lanternpowered.server.util.future.thenAsync
-import java.io.InputStreamReader
+import org.lanternpowered.server.util.gson.fromJson
 import java.io.UnsupportedEncodingException
-import java.net.URL
 import java.net.URLEncoder
 import java.util.concurrent.CompletableFuture
 import javax.crypto.spec.SecretKeySpec
@@ -58,12 +52,12 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
 
         val decryptedSharedSecret = EncryptionHelper.decryptRsa(keyPair, packet.sharedSecret)
         val serverId = EncryptionHelper.generateServerId(decryptedSharedSecret, keyPair.public)
-        val preventProxiesIp = preventProxiesIp(context.session)
+        val preventProxiesIp = this.preventProxiesIp(context.session)
 
         val secretKey = SecretKeySpec(decryptedSharedSecret, "AES")
         val connection = WrappedServerSideConnection(context.session)
 
-        requestAuthAsync(authData.username, serverId, preventProxiesIp)
+        this.requestAuth(context, authData.username, serverId, preventProxiesIp)
                 .thenAsync(session.server.syncExecutor) { profile ->
                     val cause = causeOf(session, profile)
                     val originalMessage = translatableTextOf("multiplayer.disconnect.not_allowed_to_join")
@@ -81,14 +75,14 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
                 .thenAsync(context.channel.eventLoop()) { profile ->
                     if (profile == null)
                         return@thenAsync
-                    session.channel.pipeline().replace(NetworkSession.ENCRYPTION, NetworkSession.ENCRYPTION,
+                    context.channel.pipeline().replace(NetworkSession.ENCRYPTION, NetworkSession.ENCRYPTION,
                             PacketEncryptionHandler(secretKey))
-                    session.queueReceivedMessage(LoginFinishPacket(profile))
+                    session.packetReceived(LoginFinishPacket(profile))
                 }
     }
 
     private fun preventProxiesIp(session: NetworkSession): String? {
-        if (!Lantern.getGame().globalConfig.shouldPreventProxyConnections())
+        if (!session.server.config.server.preventProxyConnections)
             return null
         val address = session.address.address
         // Ignore local addresses, they will always fail
@@ -101,19 +95,19 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
         }
     }
 
-    private fun requestAuthAsync(username: String, serverId: String, preventProxiesIp: String?): CompletableFuture<LanternGameProfile> {
-        val postUrl = "$authBaseUrl?username=$username&serverId=$serverId" +
-                if (preventProxiesIp == null) "" else "?ip=$preventProxiesIp"
-        return GlobalScope.async(Dispatchers.IO) {
-            val connection = URL(postUrl).openConnection()
-            val json = connection.getInputStream().use { input ->
-                if (input.available() == 0)
-                    throw IllegalStateException("Invalid username or session id.")
-                try {
-                    gson.fromJson(InputStreamReader(input), JsonObject::class.java)
-                } catch (e: Exception) {
-                    throw IllegalStateException("Username $username failed to authenticate.")
-                }
+    private fun requestAuth(
+            context: NetworkContext, username: String, serverId: String, preventProxiesIp: String?
+    ): CompletableFuture<LanternGameProfile> {
+        var url = "$authBaseUrl?username=$username&serverId=$serverId"
+        if (preventProxiesIp != null)
+            url += "?ip=$preventProxiesIp"
+        return context.server.httpClient.get(url, context.channel.eventLoop()).thenApply { response ->
+            if (response.body.isEmpty())
+                throw IllegalStateException("Invalid username or session id.")
+            val json = try {
+                gson.fromJson<JsonObject>(response.body)
+            } catch (e: Exception) {
+                throw IllegalStateException("Username $username failed to authenticate.")
             }
 
             val name = json["name"].asString
@@ -125,9 +119,9 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
                 throw IllegalStateException("Received an invalid uuid: $id")
             }
 
-            val properties = LanternProfileProperty
-                    .createPropertiesMapFromJson(json.getAsJsonArray("properties"))
+            val properties = LanternProfileProperty.createPropertiesMapFromJson(
+                    json.getAsJsonArray("properties"))
             LanternGameProfile(uniqueId, name, properties)
-        }.asCompletableFuture()
+        }
     }
 }

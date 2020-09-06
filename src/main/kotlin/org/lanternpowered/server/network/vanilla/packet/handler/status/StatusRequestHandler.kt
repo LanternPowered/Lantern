@@ -15,7 +15,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.version.LanternMinecraftVersion

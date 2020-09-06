@@ -16,7 +16,7 @@ import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.entity.Entity
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.util.collections.asNonNullList
 import org.lanternpowered.api.world.getIntersectingEntities
 import org.lanternpowered.server.effect.entity.EntityEffectCollection

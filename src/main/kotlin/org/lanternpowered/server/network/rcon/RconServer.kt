@@ -33,61 +33,69 @@
 package org.lanternpowered.server.network.rcon
 
 import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.ChannelFuture
+import io.netty.channel.Channel
 import io.netty.channel.ChannelInitializer
 import io.netty.channel.EventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import org.lanternpowered.api.util.collections.concurrentHashMapOf
 import org.lanternpowered.server.network.TransportType
-import org.lanternpowered.server.util.ThreadHelper
 import org.lanternpowered.server.util.executor.LanternExecutorService
+import org.lanternpowered.server.util.netty.addChannelFutureListener
 import org.spongepowered.api.service.rcon.RconService
 import java.io.Closeable
 import java.net.InetSocketAddress
 import java.net.SocketAddress
+import java.util.concurrent.CompletableFuture
 
 class RconServer(
         private val password: String,
-        val syncExecutor: LanternExecutorService
+        val syncExecutor: LanternExecutorService,
+        private val bossGroup: EventLoopGroup,
+        private val workerGroup: EventLoopGroup
 ) : RconService, Closeable {
 
     private val connectionByHostname = concurrentHashMapOf<String, LanternRconConnection>()
-
     private lateinit var bootstrap: ServerBootstrap
-    private lateinit var bossGroup: EventLoopGroup
-    private lateinit var workerGroup: EventLoopGroup
+    private var endpoint: Channel? = null
 
     lateinit var address: InetSocketAddress
         private set
 
-    fun init(address: SocketAddress): ChannelFuture {
+    fun init(address: SocketAddress): CompletableFuture<Boolean> {
         val transportType = TransportType.findBestType()
-        val threadFactory = ThreadHelper.newThreadFactory()
 
         this.address = address as InetSocketAddress
         this.bootstrap = ServerBootstrap()
-        this.bossGroup = transportType.eventLoopGroupSupplier( 0, threadFactory)
-        this.workerGroup = transportType.eventLoopGroupSupplier( 0, threadFactory)
+                .group(this.bossGroup, this.workerGroup)
+                .channelFactory(transportType.serverSocketChannelFactory)
+                .childHandler(object : ChannelInitializer<SocketChannel>() {
+                    public override fun initChannel(ch: SocketChannel) {
+                        ch.pipeline()
+                                .addLast(RconFramingHandler())
+                                .addLast(RconHandler(this@RconServer, password))
+                    }
+                })
 
-        this.bootstrap.apply {
-            group(bossGroup, workerGroup)
-            channelFactory(transportType.serverSocketChannelFactory)
-            childHandler(object : ChannelInitializer<SocketChannel>() {
-                public override fun initChannel(ch: SocketChannel) {
-                    ch.pipeline()
-                            .addLast(RconFramingHandler())
-                            .addLast(RconHandler(this@RconServer, password))
+        val result = CompletableFuture<Boolean>()
+        this.bootstrap.bind(address)
+                .addChannelFutureListener { future ->
+                    if (future.isSuccess) {
+                        this.endpoint = future.channel()
+                        result.complete(true)
+                    } else {
+                        result.complete(false)
+                    }
                 }
-            })
-        }
-
-        return this.bootstrap.bind(address)
+        return result
     }
 
     override fun close() {
         check(this::bootstrap.isInitialized) { "The rcon server wasn't initialized." }
-        this.workerGroup.shutdownGracefully()
-        this.bossGroup.shutdownGracefully()
+        // Don't allow any new connections
+        this.endpoint?.close()
+        // Close all open connections
+        for (connection in this.connectionByHostname.values)
+            connection.close()
     }
 
     fun add(connection: LanternRconConnection) {

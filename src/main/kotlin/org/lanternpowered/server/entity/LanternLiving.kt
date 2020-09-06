@@ -19,7 +19,7 @@ import org.lanternpowered.api.effect.potion.PotionEffectTypes
 import org.lanternpowered.api.entity.spawn.EntitySpawnEntry
 import org.lanternpowered.api.entity.spawn.SpawnEventProvider
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.registry.builderOf
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.textOf

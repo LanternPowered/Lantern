@@ -13,6 +13,7 @@ package org.lanternpowered.server.inventory.query
 import org.lanternpowered.api.item.inventory.EmptyInventory
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.Inventory
+import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.query.NoParamQueryType
 import org.lanternpowered.api.item.inventory.query.OneParamQueryType
 import org.lanternpowered.api.item.inventory.query.Query

@@ -39,7 +39,7 @@ import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.channel.socket.DatagramPacket
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.plugin.version
 import org.lanternpowered.api.text.toPlain

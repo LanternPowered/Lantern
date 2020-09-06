@@ -23,6 +23,7 @@ import org.lanternpowered.server.network.vanilla.advancement.NetworkAdvancementD
 import org.lanternpowered.server.network.vanilla.packet.type.play.AdvancementsPacket
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
+import org.lanternpowered.server.util.gson.fromJson
 import org.spongepowered.api.advancement.Advancement
 import org.spongepowered.api.advancement.AdvancementTree
 import org.spongepowered.api.advancement.DisplayInfo
@@ -68,7 +69,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
         val file = savePath
         if (Files.exists(file)) {
             try {
-                Files.newBufferedReader(file).use { reader -> loadProgressFromJson(GSON.fromJson(reader, JsonObject::class.java)) }
+                Files.newBufferedReader(file).use { reader -> loadProgressFromJson(gson.fromJson(reader)) }
             } catch (e: IOException) {
                 Lantern.getLogger().error("Failed to load the advancements progress for the player: " + player.uniqueId, e)
             }
@@ -87,7 +88,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
             if (!Files.exists(parent)) {
                 Files.createDirectories(parent)
             }
-            Files.newBufferedWriter(file).use { writer -> GSON.toJson(saveProgressToJson(), writer) }
+            Files.newBufferedWriter(file).use { writer -> gson.toJson(saveProgressToJson(), writer) }
         } catch (e: IOException) {
             Lantern.getLogger().error("Failed to save the advancements progress for the player: ${player.uniqueId}", e)
         }
@@ -345,7 +346,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
 
     companion object {
 
-        private val GSON = GsonBuilder().setPrettyPrinting().create()
+        private val gson = GsonBuilder().setPrettyPrinting().create()
         private val DATE_TIME_FORMATTER = SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z")
 
         fun createCriteria(criterion: AdvancementCriterion): Pair<List<AdvancementCriterion>, Array<Array<String>>> {

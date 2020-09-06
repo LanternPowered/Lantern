@@ -21,7 +21,7 @@ import org.lanternpowered.api.effect.sound.SoundEffect
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.entity.player.chat.ChatVisibilities
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.api.key.asNamespacedKey
 import org.lanternpowered.api.scoreboard.Scoreboard
@@ -107,7 +107,7 @@ import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.util.AABB
-import org.spongepowered.api.util.ban.Ban
+import org.spongepowered.api.service.ban.Ban
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.gamerule.GameRules
 import org.spongepowered.math.vector.Vector2i

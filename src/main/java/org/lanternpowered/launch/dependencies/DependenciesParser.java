@@ -25,7 +25,7 @@ import java.util.List;
 
 public final class DependenciesParser extends Exception {
 
-    public static Dependencies read(Reader reader) throws IOException, ParseException {
+    public static Dependencies read(final Reader reader) throws IOException, ParseException {
         final JSONParser parser = new JSONParser();
         final JSONObject object = (JSONObject) parser.parse(reader);
         final List<Repository> repositories = new ArrayList<>();

@@ -15,6 +15,7 @@ import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
+import org.lanternpowered.server.util.gson.fromJson
 
 object LanternJsonTextSerializer : JsonTextSerializer {
 
@@ -24,7 +25,7 @@ object LanternJsonTextSerializer : JsonTextSerializer {
             this.serializer.serializer().toJsonTree(text)
 
     override fun deserializeFromTree(element: JsonElement): Text =
-            this.serializer.serializer().fromJson(element, Text::class.java)
+            this.serializer.serializer().fromJson(element)
 
     override fun serialize(text: Text, locale: Locale): String =
             this.serializer.serialize(text)

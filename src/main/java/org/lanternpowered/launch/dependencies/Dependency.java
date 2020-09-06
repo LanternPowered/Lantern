@@ -20,7 +20,7 @@ public final class Dependency {
     private final String name;
     private final String version;
 
-    public Dependency(String group, String name, String version) {
+    public Dependency(final String group, final String name, final String version) {
         this.version = requireNonNull(version, "version");
         this.group = requireNonNull(group, "group");
         this.name = requireNonNull(name, "name");

@@ -27,7 +27,7 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.cause.withContext
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.service.serviceOf
@@ -43,7 +43,6 @@ import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.LanternServer
-import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.entity.player.tab.GlobalTabList
 import org.lanternpowered.server.event.message.sendMessage
@@ -138,7 +137,7 @@ class NetworkSession(
      * A queue of incoming messages that must be handled on
      * the synchronous thread.
      */
-    private val messageQueue: Queue<HandlerPacket<*>> = ConcurrentLinkedDeque()
+    private val packetQueue: Queue<HandlerPacket<*>> = ConcurrentLinkedDeque()
 
     /**
      * The virtual host address.
@@ -343,9 +342,9 @@ class NetworkSession(
      * Handles the inbound [Packet] with the specified [Handler].
      *
      * @param handler The handler
-     * @param packet The message
+     * @param packet The packet
      */
-    private fun handleMessage(handler: Handler<*>, packet: Packet) {
+    private fun handlePacket(handler: Handler<*>, packet: Packet) {
         try {
             @Suppress("UNCHECKED_CAST")
             (handler as Handler<Packet>).handle(this.networkContext, packet)
@@ -357,12 +356,12 @@ class NetworkSession(
     }
 
     /**
-     * Called when the server received a message from the client.
+     * Called when the server received a packet from the client.
      *
-     * @param packet The message
+     * @param packet The packet
      */
     @NettyThreadOnly
-    private fun packetReceived(packet: Packet) {
+    public fun packetReceived(packet: Packet) {
         if (packet == UnknownPacket)
             return
         when (packet) {
@@ -375,22 +374,22 @@ class NetworkSession(
             }
             is HandlerPacket<*> -> {
                 when (packet.handleThread) {
-                    HandlerPacket.HandleThread.NETTY -> handleMessage(packet.handler, packet.packet)
-                    HandlerPacket.HandleThread.ASYNC -> this.server.asyncExecutor.execute { handleMessage(packet.handler, packet.packet) }
-                    else -> this.messageQueue.add(packet)
+                    HandlerPacket.HandleThread.NETTY -> handlePacket(packet.handler, packet.packet)
+                    HandlerPacket.HandleThread.ASYNC -> this.server.asyncExecutor.execute { handlePacket(packet.handler, packet.packet) }
+                    else -> this.packetQueue.add(packet)
                 }
             }
             else -> {
                 val messageClass: Class<out Packet> = packet.javaClass
                 val registration: MessageRegistration<*> = this.protocol.inbound().findByMessageType(messageClass).orElse(null)
-                        ?: throw DecoderException("Failed to find a message registration for ${messageClass.name}!")
+                        ?: throw DecoderException("Failed to find a packet registration for ${messageClass.name}!")
                 registration.handler.ifPresent { handler: Any ->
                     @Suppress("UNCHECKED_CAST")
                     handler as Handler<Packet>
                     if (isHandlerNettyThreadOnly(handler.javaClass)) {
-                        this.handleMessage(handler, packet)
+                        this.handlePacket(handler, packet)
                     } else {
-                        this.messageQueue.add(HandlerPacket(packet, handler))
+                        this.packetQueue.add(HandlerPacket(packet, handler))
                     }
                 }
             }

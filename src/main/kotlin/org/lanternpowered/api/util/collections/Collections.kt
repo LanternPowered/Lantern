@@ -159,6 +159,9 @@ fun <K, V> MutableMap<K, V>.removeAll(map: Map<out K, V>): Boolean {
     return modified
 }
 
+fun <E> MutableCollection<E>.removeFirst(predicate: (E) -> Boolean): E =
+        this.removeFirstOrNull(predicate) ?: throw NoSuchElementException()
+
 fun <E> MutableCollection<E>.removeFirstOrNull(predicate: (E) -> Boolean): E? {
     val it = this.iterator()
     while (it.hasNext()) {

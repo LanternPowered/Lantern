@@ -62,6 +62,9 @@ dependencies {
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
 
+    // Completable futures
+    compile 'com.spotify:completable-futures:0.3.3'
+
     // Useful libraries
     compile 'org.apache.commons:commons-lang3:3.5'
     compile 'com.google.guava:guava:29.0-jre'
@@ -73,7 +76,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
 
     // Network
-    compile 'io.netty:netty-all:4.1.24.Final'
+    compile 'io.netty:netty-all:4.1.51.Final'
 
     // Lambda generation
     compile 'org.lanternpowered:lmbda:2.0.0-SNAPSHOT'

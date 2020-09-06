@@ -21,10 +21,10 @@ open class LanternInventoryColumn : AbstractInventory2D(), ExtendedInventoryColu
     override val width: Int
         get() = 1
 
-    override fun init(children: List<AbstractMutableInventory>, slots: List<AbstractSlot>) =
+    override fun init(children: List<AbstractInventory>, slots: List<AbstractSlot>) =
             super.init(children, slots, width = 1, height = slots.size)
 
-    override fun init(children: List<AbstractMutableInventory>) =
+    override fun init(children: List<AbstractInventory>) =
             this.init(children, children.asSequence().slots().toImmutableList())
 
     override fun slotOrNull(position: Vector2i): ExtendedSlot? {

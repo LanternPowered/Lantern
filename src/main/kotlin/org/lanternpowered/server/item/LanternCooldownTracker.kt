@@ -13,7 +13,7 @@ package org.lanternpowered.server.item
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
 import org.lanternpowered.api.util.optional.asOptionalDouble

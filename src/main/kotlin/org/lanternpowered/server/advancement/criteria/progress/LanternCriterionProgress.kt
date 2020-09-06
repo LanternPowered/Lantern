@@ -13,7 +13,7 @@ package org.lanternpowered.server.advancement.criteria.progress
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.server.advancement.LanternAdvancementProgress

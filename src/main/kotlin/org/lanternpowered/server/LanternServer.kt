@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server
 
+import io.netty.channel.EventLoopGroup
 import joptsimple.OptionSet
 import kotlinx.coroutines.Dispatchers
 import org.apache.logging.log4j.Logger
@@ -21,6 +22,7 @@ import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.plugin.version
 import org.lanternpowered.api.scoreboard.Scoreboard
+import org.lanternpowered.api.service.profile.GameProfileService
 import org.lanternpowered.api.service.user.UserStorageService
 import org.lanternpowered.api.service.world.WorldStorageService
 import org.lanternpowered.api.text.Text
@@ -40,17 +42,22 @@ import org.lanternpowered.server.event.lifecycle.LanternStartingServerEvent
 import org.lanternpowered.server.event.lifecycle.LanternStoppingServerEvent
 import org.lanternpowered.server.network.NetworkManager
 import org.lanternpowered.server.network.ProxyType
+import org.lanternpowered.server.network.TransportType
+import org.lanternpowered.server.network.http.NettyHttpClient
 import org.lanternpowered.server.network.query.QueryServer
 import org.lanternpowered.server.network.rcon.EmptyRconService
 import org.lanternpowered.server.network.rcon.RconServer
+import org.lanternpowered.server.profile.LanternGameProfileManager
 import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.scoreboard.LanternScoreboard
+import org.lanternpowered.server.service.profile.LanternGameProfileService
 import org.lanternpowered.server.service.user.DefaultUserStorageService
 import org.lanternpowered.server.service.world.DefaultWorldStorageService
 import org.lanternpowered.server.user.LanternUserManager
 import org.lanternpowered.server.util.EncryptionHelper
 import org.lanternpowered.server.util.ShutdownMonitorThread
 import org.lanternpowered.server.util.SyncLanternThread
+import org.lanternpowered.server.util.ThreadHelper
 import org.lanternpowered.server.util.coroutines.asScheduledExecutorService
 import org.lanternpowered.server.util.executor.LanternExecutorService
 import org.lanternpowered.server.util.executor.LanternScheduledExecutorService
@@ -121,9 +128,14 @@ class LanternServer : Server {
     lateinit var userManager: LanternUserManager
         private set
 
-
     private val playersByUniqueId = concurrentHashMapOf<UUID, LanternPlayer>()
     private val playersByName = concurrentHashMapOf<String, LanternPlayer>()
+
+    private lateinit var nettyBossGroup: EventLoopGroup
+    private lateinit var nettyWorkerGroup: EventLoopGroup
+
+    lateinit var httpClient: NettyHttpClient
+        private set
 
     /**
      * A live view of all the online players.
@@ -188,6 +200,18 @@ class LanternServer : Server {
             this.game.lanternPlugin to DefaultUserStorageService(usersDirectory)
         }
 
+        val transportType = TransportType.findBestType()
+        val threadFactory = ThreadHelper.newThreadFactory()
+
+        this.nettyBossGroup = transportType.eventLoopGroupSupplier( 0, threadFactory)
+        this.nettyWorkerGroup = transportType.eventLoopGroupSupplier( 0, threadFactory)
+
+        this.httpClient = NettyHttpClient("lantern/${this.game.lanternPlugin.version}", this.nettyWorkerGroup)
+        val gameProfileService = this.game.serviceProvider.register<GameProfileService> {
+            this.game.lanternPlugin to LanternGameProfileService(this.httpClient)
+        }
+
+        this.gameProfileManager = LanternGameProfileManager(this.asyncExecutor, gameProfileService)
         this.userManager = LanternUserManager(this, this.userStorageService, this.gameProfileManager)
 
         this.syncExecutor = mainExecutor.asLanternExecutorService()
@@ -214,7 +238,7 @@ class LanternServer : Server {
         this.game.serviceProvider.register { this.game.lanternPlugin to startRconServer() }
 
         // Start the Query server, if enabled
-        this.queryServer = startQueryServer()
+        this.queryServer = this.startQueryServer()
 
         this.loadFavicon()
         this.loadDefaultResourcePack()
@@ -248,9 +272,9 @@ class LanternServer : Server {
 
     private fun tryBindServer() {
         val config = this.config.server
-        val address = getBindAddress(config.ip, config.port)
+        val address = this.getBindAddress(config.ip, config.port)
 
-        this.networkManager = NetworkManager(this)
+        this.networkManager = NetworkManager(this, this.nettyBossGroup, this.nettyWorkerGroup)
 
         val future = this.networkManager.init(address)
         val channel = future.awaitUninterruptibly().channel()
@@ -282,8 +306,8 @@ class LanternServer : Server {
         if (!config.enabled)
             return null
 
-        val server = QueryServer(this, config.showPlugins)
-        val address = getBindAddress(config.ip, config.port)
+        val server = QueryServer(this, config.showPlugins, this.nettyWorkerGroup)
+        val address = this.getBindAddress(config.ip, config.port)
 
         this.logger.info("Starting query server and binding it to: $address...")
 
@@ -305,14 +329,12 @@ class LanternServer : Server {
         if (!config.enabled)
             return EmptyRconService(config.password)
 
-        val server = RconServer(config.password, this.syncExecutor)
-        val address = getBindAddress(config.ip, config.port)
+        val server = RconServer(config.password, this.syncExecutor,
+                this.nettyBossGroup, this.nettyWorkerGroup)
+        val address = this.getBindAddress(config.ip, config.port)
 
         this.logger.info("Starting rcon server and binding it to: $address...")
-
-        val future = server.init(address)
-        val channel = future.awaitUninterruptibly().channel()
-        if (!channel.isActive) {
+        if (!server.init(address).get()) {
             this.logger.warn("Failed to bind rcon. Address already in use?")
             return EmptyRconService(config.password)
         }

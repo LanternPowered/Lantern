@@ -20,7 +20,7 @@ public final class Dependencies {
     private final List<Repository> repositories;
     private final List<Dependency> dependencies;
 
-    public Dependencies(List<Repository> repositories, List<Dependency> dependencies) {
+    public Dependencies(final List<Repository> repositories, final List<Dependency> dependencies) {
         this.repositories = Collections.unmodifiableList(new ArrayList<>(repositories));
         this.dependencies = Collections.unmodifiableList(new ArrayList<>(dependencies));
     }

@@ -12,7 +12,7 @@ package org.lanternpowered.server.advancement.layout
 
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.api.event.LanternEventFactory
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.immutableListBuilderOf
 import org.lanternpowered.api.util.optional.asOptional

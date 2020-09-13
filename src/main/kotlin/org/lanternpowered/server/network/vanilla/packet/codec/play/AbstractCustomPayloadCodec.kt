@@ -16,7 +16,7 @@ import com.google.common.collect.Sets
 import io.netty.handler.codec.CodecException
 import io.netty.handler.codec.DecoderException
 import io.netty.util.AttributeKey
-import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator
 import org.lanternpowered.server.network.packet.Packet
@@ -74,7 +74,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
         val content = buf.slice()
         val packet = decode0(context, content, channel)
         if (content.available() > 0) {
-            Lantern.getLogger().warn("Trailing bytes {}b after decoding with custom payload message codec {} with channel {}!\n{}",
+            LanternGame.logger.warn("Trailing bytes {}b after decoding with custom payload message codec {} with channel {}!\n{}",
                     content.available(), javaClass.name, channel, packet)
         }
         // Skip all the bytes, we already processed them

@@ -22,6 +22,7 @@ import org.spongepowered.api.adventure.SpongeComponents
 import org.spongepowered.api.command.CommandCause
 
 typealias LiteralText = net.kyori.adventure.text.TextComponent
+typealias LiteralTextBuilder = net.kyori.adventure.text.TextComponent.Builder
 typealias ScoreText = net.kyori.adventure.text.ScoreComponent
 typealias SelectorText = net.kyori.adventure.text.SelectorComponent
 typealias KeybindText = net.kyori.adventure.text.KeybindComponent

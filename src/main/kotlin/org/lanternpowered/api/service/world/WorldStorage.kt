@@ -13,6 +13,7 @@ package org.lanternpowered.api.service.world
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataView
+import org.lanternpowered.api.service.world.chunk.ChunkStorage
 import org.lanternpowered.api.util.Identifiable
 import org.lanternpowered.api.world.WorldProperties
 import java.nio.file.Path

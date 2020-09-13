@@ -8,12 +8,10 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.network.http
+package org.lanternpowered.api.data.structure.chunk
 
-object HttpCode {
+import org.spongepowered.api.data.persistence.DataSerializable
 
-    const val Ok = 200
-    const val NoContent = 204
-    const val BadRequest = 400
-    const val NotFound = 404
+class BlockEntityData : DataSerializable {
+
 }

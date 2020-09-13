@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.api.world.scheduler
 
-import org.lanternpowered.api.world.BlockPosition
 import org.lanternpowered.api.world.World
+import org.spongepowered.math.vector.Vector3i
 
 /**
  * Represents a scheduled update in a world.
@@ -28,5 +28,5 @@ interface ScheduledUpdate<T : Any> : org.spongepowered.api.scheduler.ScheduledUp
      * The block position at which the
      * update is occurring.
      */
-    val position: BlockPosition
+    val position: Vector3i
 }

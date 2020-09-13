@@ -18,6 +18,11 @@ typealias DataViewSafetyMode = org.spongepowered.api.data.persistence.DataView.S
 typealias DataContainer = org.spongepowered.api.data.persistence.DataContainer
 
 /**
+ * Constructs a new [DataQuery] with the given [parts].
+ */
+fun dataQueryOf(vararg parts: String): DataQuery = DataQuery.of(*parts)
+
+/**
  * Gets or creates a [DataView] at the given path.
  */
 fun DataView.getOrCreateView(path: DataQuery): DataView =

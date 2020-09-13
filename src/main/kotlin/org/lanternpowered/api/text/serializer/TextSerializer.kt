@@ -17,7 +17,7 @@ import org.lanternpowered.api.text.Text
 
 interface TextSerializer : ComponentSerializer<Text, Text, String> {
 
-    override fun serialize(text: Text): String = serialize(text, Locales.DEFAULT)
+    override fun serialize(text: Text): String = this.serialize(text, Locales.DEFAULT)
 
     /**
      * Returns a string representation of the provided [Text] in a format

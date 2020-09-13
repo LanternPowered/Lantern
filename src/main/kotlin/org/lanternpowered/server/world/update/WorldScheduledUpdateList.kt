@@ -13,33 +13,47 @@ package org.lanternpowered.server.world.update
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.scheduler.ScheduledUpdate
 import org.lanternpowered.api.world.scheduler.UpdatePriority
+import org.lanternpowered.server.world.chunk.Chunks
+import org.spongepowered.math.vector.Vector3i
 
 class WorldScheduledUpdateList<T : Any>(
         val world: World,
-        val lookup: (Int, Int) -> AbstractScheduledUpdateList<T>
+        val lookup: (Int, Int, Int) -> AbstractScheduledUpdateList<T>
 ) : AbstractScheduledUpdateList<T>() {
 
+    override fun isScheduled(pos: Vector3i, target: T): Boolean =
+            this.isScheduled(pos.x, pos.y, pos.z, target)
+
+    override fun getScheduledAt(pos: Vector3i): Collection<ScheduledUpdate<T>> =
+            this.getScheduledAt(pos.x, pos.y, pos.z)
+
     override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Long, priority: UpdatePriority): ScheduledUpdate<T> {
-        val chunkX = x shr 4
-        val chunkZ = z shr 4
-        val localX = x and 0xf
-        val localZ = z and 0xf
-        return this.lookup(chunkX, chunkZ).schedule(localX, y, localZ, target, delay, priority)
+        val chunkX = Chunks.toChunk(x)
+        val chunkY = Chunks.toChunk(y)
+        val chunkZ = Chunks.toChunk(z)
+        val localX = Chunks.toLocal(x)
+        val localY = Chunks.toLocal(y)
+        val localZ = Chunks.toLocal(z)
+        return this.lookup(chunkX, chunkY, chunkZ).schedule(localX, localY, localZ, target, delay, priority)
     }
 
     override fun isScheduled(x: Int, y: Int, z: Int, target: T): Boolean {
-        val chunkX = x shr 4
-        val chunkZ = z shr 4
-        val localX = x and 0xf
-        val localZ = z and 0xf
-        return this.lookup(chunkX, chunkZ).isScheduled(localX, y, localZ, target)
+        val chunkX = Chunks.toChunk(x)
+        val chunkY = Chunks.toChunk(y)
+        val chunkZ = Chunks.toChunk(z)
+        val localX = Chunks.toLocal(x)
+        val localY = Chunks.toLocal(y)
+        val localZ = Chunks.toLocal(z)
+        return this.lookup(chunkX, chunkY, chunkZ).isScheduled(localX, localY, localZ, target)
     }
 
     override fun getScheduledAt(x: Int, y: Int, z: Int): Collection<ScheduledUpdate<T>> {
-        val chunkX = x shr 4
-        val chunkZ = z shr 4
-        val localX = x and 0xf
-        val localZ = z and 0xf
-        return this.lookup(chunkX, chunkZ).getScheduledAt(localX, y, localZ)
+        val chunkX = Chunks.toChunk(x)
+        val chunkY = Chunks.toChunk(y)
+        val chunkZ = Chunks.toChunk(z)
+        val localX = Chunks.toLocal(x)
+        val localY = Chunks.toLocal(y)
+        val localZ = Chunks.toLocal(z)
+        return this.lookup(chunkX, chunkY, chunkZ).getScheduledAt(localX, localY, localZ)
     }
 }

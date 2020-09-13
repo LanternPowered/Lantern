@@ -14,10 +14,9 @@ package org.lanternpowered.server.service.world.anvil
 
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.game.Lantern
-import org.lanternpowered.server.util.LongPacker
+import org.lanternpowered.api.service.world.chunk.ChunkGroupPosition
+import org.lanternpowered.server.world.chunk.ChunkPositionHelper
 import org.slf4j.MarkerFactory
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -45,17 +44,17 @@ class AnvilRegionFile(
     private val lock = Any()
 
     init {
-        val offsetAndTimestamp = ChunkSector(0, 2)
+        val offsetAndTimestamp = ChunkGroupSector(0, 2)
 
         // Allocate the first two sector blocks for the offset and timestamp
-        this.usedSectors.allocateChunkSector(offsetAndTimestamp)
+        this.usedSectors.allocateSector(offsetAndTimestamp)
         this.growIfNeeded(offsetAndTimestamp)
 
         // Read the offset table
         this.file.seek(offsetAndTimestamp)
         for (i in this.sectors.indices) {
-            val sector = ChunkSector(this.file.readInt())
-            this.usedSectors.allocateChunkSector(sector)
+            val sector = ChunkGroupSector(this.file.readInt())
+            this.usedSectors.allocateSector(sector)
             this.sectors[i] = sector.packed
         }
     }
@@ -63,37 +62,37 @@ class AnvilRegionFile(
     /**
      * Gets all the chunk positions that have data.
      */
-    val all: Collection<ChunkPosition>
+    val all: Collection<ChunkGroupPosition>
         get() {
             synchronized(this.lock) {
                 return this.allUnsafe()
             }
         }
 
-    private fun allUnsafe(): Collection<ChunkPosition> {
-        val list = mutableListOf<ChunkPosition>()
+    private fun allUnsafe(): Collection<ChunkGroupPosition> {
+        val list = mutableListOf<ChunkGroupPosition>()
         for (index in this.sectors.indices) {
-            val localPosition = LocalChunkPosition(index)
+            val localPosition = LocalChunkGroupPosition(index)
             if (this.getChunkSector(localPosition).exists)
-                list += chunkPositionOf(this.position, localPosition)
+                list += chunkGroupPositionOf(this.position, localPosition)
         }
         return list
     }
 
-    fun delete(position: ChunkPosition): Boolean {
+    fun delete(position: ChunkGroupPosition): Boolean {
         synchronized(this.lock) {
             return this.deleteUnsafe(position)
         }
     }
 
-    private fun deleteUnsafe(position: ChunkPosition): Boolean {
-        val locationPosition = position.toLocal()
-        val sector = this.getChunkSector(locationPosition)
+    private fun deleteUnsafe(position: ChunkGroupPosition): Boolean {
+        val local = position.toLocal()
+        val sector = this.getChunkSector(local)
         if (!sector.exists)
             return false
-        this.usedSectors.freeChunkSector(sector)
-        setChunkSector(locationPosition, ChunkSector.NONE)
-        setTimestamp(locationPosition, getTimestamp())
+        this.usedSectors.freeSector(sector)
+        this.setChunkSector(local, ChunkGroupSector.NONE)
+        this.setTimestamp(local, getTimestamp())
         Files.deleteIfExists(position.getExternalFile())
         return true
     }
@@ -103,23 +102,23 @@ class AnvilRegionFile(
     /**
      * Gets whether data exists at the given [ChunkPosition].
      */
-    fun exists(position: ChunkPosition): Boolean {
+    fun exists(position: ChunkGroupPosition): Boolean {
         synchronized(this.lock) {
-            return existsUnsafe(position)
+            return this.existsUnsafe(position)
         }
     }
 
-    private fun existsUnsafe(position: ChunkPosition): Boolean {
+    private fun existsUnsafe(position: ChunkGroupPosition): Boolean {
         val locationPosition = position.toLocal()
         val sector = this.getChunkSector(locationPosition)
         return sector.exists
     }
 
     /**
-     * Gets an input stream to read data for the given [ChunkPosition],
+     * Gets an input stream to read data for the given [ChunkGroupPosition],
      * if the chunk exists.
      */
-    fun getInputStream(position: ChunkPosition): InputStream? {
+    fun getInputStream(position: ChunkGroupPosition): InputStream? {
         synchronized(this.lock) {
             return this.getInputStreamUnsafe(position)
         }
@@ -137,12 +136,12 @@ class AnvilRegionFile(
         for (block in 0 until blocks) {
             if (this.usedSectors.get(block))
                 continue
-            this.file.seek(ChunkSector(block, 1))
+            this.file.seek(ChunkGroupSector(block, 1))
             this.file.write(EMPTY_SECTOR_BLOCK)
         }
     }
 
-    private fun getInputStreamUnsafe(position: ChunkPosition): InputStream? {
+    private fun getInputStreamUnsafe(position: ChunkGroupPosition): InputStream? {
         val locationPosition = position.toLocal()
 
         val sector = this.getChunkSector(locationPosition)
@@ -190,17 +189,17 @@ class AnvilRegionFile(
         }
 
         val input = ByteArrayInputStream(data)
-        return BufferedInputStream(format.inputTransformer(input))
+        return format.inputTransformer(input)
     }
 
     /**
      * Gets an output stream to write data for the given [ChunkPosition].
      */
-    fun getOutputStream(position: ChunkPosition, format: AnvilChunkSectorFormat = AnvilChunkSectorFormat.Zlib): OutputStream =
-            BufferedOutputStream(format.outputTransformer(ChunkBuffer(position, format.id)))
+    fun getOutputStream(position: ChunkGroupPosition, format: AnvilChunkSectorFormat = AnvilChunkSectorFormat.Zlib): OutputStream =
+            format.outputTransformer(ChunkBuffer(position, format.id))
 
     private inner class ChunkBuffer internal constructor(
-            private val position: ChunkPosition,
+            private val position: ChunkGroupPosition,
             private val format: Int
     ) : ByteArrayOutputStream(8192) {
 
@@ -215,7 +214,7 @@ class AnvilRegionFile(
         }
     }
 
-    private fun write(position: ChunkPosition, format: Int, data: ByteArray, length: Int) {
+    private fun write(position: ChunkGroupPosition, format: Int, data: ByteArray, length: Int) {
         // Convert to local coordinates
         val localPosition = position.toLocal()
 
@@ -227,15 +226,15 @@ class AnvilRegionFile(
 
         // The sector size is too big, > 1MB, chunks that are
         // too big will be written to a separate file.
-        val sector: ChunkSector
+        val sector: ChunkGroupSector
         val cleanup: () -> Unit
         if (neededSectorSize >= 256) {
             // Allocate one section to store the header
-            sector = this.usedSectors.allocateChunkSector(1)
+            sector = this.usedSectors.allocateSector(1)
             this.writeExternal(position, sector, format, data, length)
             cleanup = {}
         } else {
-            sector = this.usedSectors.allocateChunkSector(neededSectorSize)
+            sector = this.usedSectors.allocateSector(neededSectorSize)
             cleanup = this.writeLocal(position, sector, format, data, length)
         }
 
@@ -244,20 +243,20 @@ class AnvilRegionFile(
 
         // Everything was successful, so cleanup
         cleanup()
-        this.usedSectors.freeChunkSector(oldSector)
+        this.usedSectors.freeSector(oldSector)
     }
 
     /**
      * Moves the file pointer to the given chunk sector.
      */
-    private fun RandomAccessFile.seek(sector: ChunkSector) {
+    private fun RandomAccessFile.seek(sector: ChunkGroupSector) {
         this.seek(sector.index * SECTOR_BLOCK_BYTES.toLong())
     }
 
     /**
      * Writes chunk data to an external file.
      */
-    private fun writeExternal(position: ChunkPosition, chunkSector: ChunkSector, format: Int, data: ByteArray, length: Int) {
+    private fun writeExternal(position: ChunkGroupPosition, chunkSector: ChunkGroupSector, format: Int, data: ByteArray, length: Int) {
         this.growIfNeeded(chunkSector)
 
         this.file.seek(chunkSector)
@@ -280,7 +279,7 @@ class AnvilRegionFile(
     /**
      * Writes chunk data at the given chunk sector.
      */
-    private fun writeLocal(position: ChunkPosition, chunkSector: ChunkSector, format: Int, data: ByteArray, length: Int): () -> Unit {
+    private fun writeLocal(position: ChunkGroupPosition, chunkSector: ChunkGroupSector, format: Int, data: ByteArray, length: Int): () -> Unit {
         this.growIfNeeded(chunkSector)
 
         this.file.seek(chunkSector)
@@ -298,12 +297,19 @@ class AnvilRegionFile(
     /**
      * Gets the path for the external file of the chunk position.
      */
-    private fun ChunkPosition.getExternalFile(): Path = directory.resolve("c.$x.$z.$EXTERNAL_FILE_EXTENSION")
+    private fun ChunkGroupPosition.getExternalFile(): Path {
+        var path = "c.$x.$z."
+        // Only use y if it's not 0 to support vanilla worlds.
+        if (this.y != 0)
+            path += "$y."
+        path += EXTERNAL_FILE_EXTENSION
+        return directory.resolve(path)
+    }
 
     /**
      * Grows the file if it's needed.
      */
-    private fun growIfNeeded(chunkSector: ChunkSector) {
+    private fun growIfNeeded(chunkSector: ChunkGroupSector) {
         val endIndex = (chunkSector.index + chunkSector.size) * SECTOR_BLOCK_BYTES.toLong()
 
         // Grow the file, it's not big enough
@@ -328,13 +334,13 @@ class AnvilRegionFile(
     /**
      * Gets the chunk sector for the given local coordinates.
      */
-    private fun getChunkSector(position: LocalChunkPosition): ChunkSector =
-            ChunkSector(this.sectors[position.packed])
+    private fun getChunkSector(position: LocalChunkGroupPosition): ChunkGroupSector =
+            ChunkGroupSector(this.sectors[position.packed])
 
     /**
      * Sets the chunk sector for the chunk at the given coordinates.
      */
-    private fun setChunkSector(position: LocalChunkPosition, sector: ChunkSector) {
+    private fun setChunkSector(position: LocalChunkGroupPosition, sector: ChunkGroupSector) {
         this.sectors[position.packed] = sector.packed
         this.file.seek(position.packed * Int.SIZE_BYTES.toLong())
         this.file.writeInt(sector.packed)
@@ -343,7 +349,7 @@ class AnvilRegionFile(
     /**
      * Sets the timestamp for the chunk at the given coordinates.
      */
-    private fun setTimestamp(position: LocalChunkPosition, value: Int) {
+    private fun setTimestamp(position: LocalChunkGroupPosition, value: Int) {
         this.file.seek(SECTOR_BLOCK_BYTES + position.packed * Int.SIZE_BYTES.toLong())
         this.file.writeInt(value)
     }
@@ -363,9 +369,12 @@ class AnvilRegionFile(
     companion object {
 
         const val REGION_FILE_EXTENSION = "mca"
-        const val REGION_COORDINATE_BITS = 5
-        private const val REGION_SIZE = 1 shl REGION_COORDINATE_BITS
-        const val REGION_MASK = REGION_SIZE - 1
+        const val REGION_COORDINATE_XZ_BITS = 5
+        const val REGION_XZ_SIZE = 1 shl REGION_COORDINATE_XZ_BITS
+        const val REGION_XZ_MASK = REGION_XZ_SIZE - 1
+        const val REGION_COORDINATE_Y_BITS = 4
+        const val REGION_Y_SIZE = 1 shl REGION_COORDINATE_Y_BITS
+        const val REGION_Y_MASK = REGION_Y_SIZE - 1
         const val EXTERNAL_FILE_MASK = 0x80
         const val EXTERNAL_FILE_EXTENSION = "mcc"
 
@@ -379,27 +388,27 @@ class AnvilRegionFile(
 }
 
 /**
- * Converts the chunk position to a local chunk position.
+ * Converts the chunk group position to a local chunk position.
  */
-private fun ChunkPosition.toLocal(): LocalChunkPosition {
-    val localX = this.x and AnvilRegionFile.REGION_MASK
-    val localZ = this.z and AnvilRegionFile.REGION_MASK
-    return LocalChunkPosition(localX, localZ)
+private fun ChunkGroupPosition.toLocal(): LocalChunkGroupPosition {
+    val localX = this.x and AnvilRegionFile.REGION_XZ_MASK
+    val localZ = this.z and AnvilRegionFile.REGION_XZ_MASK
+    return LocalChunkGroupPosition(localX, localZ)
 }
 
 /**
- * Allocates a chunk sector.
+ * Allocates a chunk group sector.
  */
-private fun BitSet.allocateChunkSector(size: Int): ChunkSector {
-    val sector = findFreeChunkSector(size)
-    allocateChunkSector(sector)
+private fun BitSet.allocateSector(size: Int): ChunkGroupSector {
+    val sector = this.findFreeSector(size)
+    this.allocateSector(sector)
     return sector
 }
 
 /**
- * Allocates the chunk sector.
+ * Allocates the chunk group sector.
  */
-private fun BitSet.allocateChunkSector(sector: ChunkSector) {
+private fun BitSet.allocateSector(sector: ChunkGroupSector) {
     if (!sector.exists)
         return
     val (index, size) = sector
@@ -407,9 +416,9 @@ private fun BitSet.allocateChunkSector(sector: ChunkSector) {
 }
 
 /**
- * Clears a chunk sector.
+ * Clears a chunk group sector.
  */
-private fun BitSet.freeChunkSector(sector: ChunkSector) {
+private fun BitSet.freeSector(sector: ChunkGroupSector) {
     if (!sector.exists)
         return
     val (index, size) = sector
@@ -417,30 +426,30 @@ private fun BitSet.freeChunkSector(sector: ChunkSector) {
 }
 
 /**
- * Finds the start index of a sector that's free and big enough.
+ * Finds the start index of a chunk group sector that's free and big enough.
  */
-private tailrec fun BitSet.findFreeChunkSector(size: Int, offset: Int = 0): ChunkSector {
+private tailrec fun BitSet.findFreeSector(size: Int, offset: Int = 0): ChunkGroupSector {
     val start = nextClearBit(offset)
     val end = nextSetBit(start + 1)
-    return if (end == -1 || end - start >= size) ChunkSector(start, size) else findFreeChunkSector(size, end)
+    return if (end == -1 || end - start >= size) ChunkGroupSector(start, size) else findFreeSector(size, end)
 }
 
 /**
- * Converts the chunk position to a chunk region position.
+ * Converts the chunk group position to a chunk region position.
  */
-fun ChunkPosition.toRegion(): ChunkRegionPosition {
-    val regionX = this.x shr AnvilRegionFile.REGION_COORDINATE_BITS
-    val regionZ = this.z shr AnvilRegionFile.REGION_COORDINATE_BITS
-    return ChunkRegionPosition(regionX, regionZ)
+fun ChunkGroupPosition.toRegion(): ChunkRegionPosition {
+    val regionX = this.x shr AnvilRegionFile.REGION_COORDINATE_XZ_BITS
+    val regionZ = this.z shr AnvilRegionFile.REGION_COORDINATE_XZ_BITS
+    return ChunkRegionPosition(regionX, this.y, regionZ)
 }
 
 /**
- * Constructs a new chunk position.
+ * Constructs a new chunk group position.
  */
-private fun chunkPositionOf(regionPosition: ChunkRegionPosition, localPosition: LocalChunkPosition): ChunkPosition {
-    val x = (regionPosition.x shl AnvilRegionFile.REGION_COORDINATE_BITS) or localPosition.x
-    val z = (regionPosition.z shl AnvilRegionFile.REGION_COORDINATE_BITS) or localPosition.z
-    return ChunkPosition(x, z)
+private fun chunkGroupPositionOf(regionPosition: ChunkRegionPosition, localPosition: LocalChunkGroupPosition): ChunkGroupPosition {
+    val x = (regionPosition.x shl AnvilRegionFile.REGION_COORDINATE_XZ_BITS) or localPosition.x
+    val z = (regionPosition.z shl AnvilRegionFile.REGION_COORDINATE_XZ_BITS) or localPosition.z
+    return ChunkGroupPosition(x, regionPosition.y, z)
 }
 
 /**
@@ -451,43 +460,49 @@ inline class ChunkRegionPosition(val packed: Long) {
     /**
      * Constructs a new local chunk position.
      */
-    constructor(x: Int, z: Int) : this(LongPacker.pack(x, z))
+    constructor(x: Int, y: Int, z: Int) : this(ChunkPositionHelper.pack(x, y, z))
 
     /**
      * The x coordinate.
      */
-    val x: Int get() = LongPacker.unpackInt1(this.packed)
+    val x: Int get() = ChunkPositionHelper.unpackX(this.packed)
+
+    /**
+     * The y coordinate.
+     */
+    val y: Int get() = ChunkPositionHelper.unpackY(this.packed)
 
     /**
      * The z coordinate.
      */
-    val z: Int get() = LongPacker.unpackInt2(this.packed)
+    val z: Int get() = ChunkPositionHelper.unpackZ(this.packed)
 
     inline operator fun component1(): Int = this.x
-    inline operator fun component2(): Int = this.z
+    inline operator fun component2(): Int = this.y
+    inline operator fun component3(): Int = this.z
 
-    override fun toString(): String = "($x, $z)"
+    override fun toString(): String = "($x, $y, $z)"
 }
 
 /**
- * Represents a chunk position within a region file.
+ * Represents a chunk group position within a region file.
  */
-private inline class LocalChunkPosition(val packed: Int) {
+private inline class LocalChunkGroupPosition(val packed: Int) {
 
     /**
      * Constructs a new local chunk position.
      */
-    constructor(x: Int, z: Int) : this(x or (z shl AnvilRegionFile.REGION_COORDINATE_BITS))
+    constructor(x: Int, z: Int) : this(x or (z shl AnvilRegionFile.REGION_COORDINATE_XZ_BITS))
 
     /**
      * The x coordinate.
      */
-    val x: Int get() = this.packed and AnvilRegionFile.REGION_MASK
+    val x: Int get() = this.packed and AnvilRegionFile.REGION_XZ_MASK
 
     /**
      * The z coordinate.
      */
-    val z: Int get() = this.packed shr AnvilRegionFile.REGION_COORDINATE_BITS
+    val z: Int get() = this.packed shr AnvilRegionFile.REGION_COORDINATE_XZ_BITS
 
     inline operator fun component1(): Int = this.x
     inline operator fun component2(): Int = this.z
@@ -499,10 +514,10 @@ private inline class LocalChunkPosition(val packed: Int) {
  * Represents a chunk sector. This sector start position and
  * the number of sectors being used for the chunk.
  */
-private inline class ChunkSector(val packed: Int) {
+private inline class ChunkGroupSector(val packed: Int) {
 
     /**
-     * Constructs a new [ChunkSector].
+     * Constructs a new [ChunkGroupSector].
      */
     constructor(index: Int, size: Int) : this((index shl 8) or size)
 
@@ -528,6 +543,6 @@ private inline class ChunkSector(val packed: Int) {
 
     companion object {
 
-        val NONE = ChunkSector(0)
+        val NONE = ChunkGroupSector(0)
     }
 }

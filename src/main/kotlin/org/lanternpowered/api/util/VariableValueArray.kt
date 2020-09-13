@@ -113,7 +113,7 @@ class VariableValueArray {
      * Gets a value at the given [index].
      */
     operator fun get(index: Int): Int {
-        return perform(index) { longIndex, indexInLong ->
+        return this.perform(index) { longIndex, indexInLong ->
             ((this.backing[longIndex] ushr indexInLong) and this.valueMask).toInt()
         }
     }
@@ -125,7 +125,7 @@ class VariableValueArray {
         require(value >= 0) { "value ($value) must not be negative" }
         require(value <= this.valueMask) { "value ($value) must not be greater than $valueMask" }
 
-        perform(index) { longIndex, indexInLong ->
+        this.perform(index) { longIndex, indexInLong ->
             // Remove the old value
             val cleaned = this.backing[longIndex] and (this.valueMask shl indexInLong).inv()
             // Update the new value
@@ -141,7 +141,7 @@ class VariableValueArray {
             var index = 0
             override fun hasNext(): Boolean = this.index < size
             override fun nextInt(): Int {
-                if (!hasNext())
+                if (!this.hasNext())
                     throw NoSuchElementException()
                 return get(this.index++)
             }

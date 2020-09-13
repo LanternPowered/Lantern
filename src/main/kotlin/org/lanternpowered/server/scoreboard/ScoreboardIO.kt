@@ -18,13 +18,13 @@ import org.lanternpowered.api.text.serializer.LegacyTextSerializer
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.index.requireKey
 import org.lanternpowered.api.util.index.requireValue
-import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.registry.type.scoreboard.CollisionRuleRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ScoreboardCriterionRegistry
 import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.server.LanternGame
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.scoreboard.Score
 import org.spongepowered.api.scoreboard.Scoreboard
@@ -80,7 +80,7 @@ object ScoreboardIO {
                 val criterionName = entry.getString(CRITERION_NAME).get()
                 val criterion = ScoreboardCriterionRegistry[NamespacedKey.resolve(criterionName)]
                 if (criterion == null) {
-                    Lantern.getLogger().warn("Unable to find a criterion with id: $criterionName, default to dummy.")
+                    LanternGame.logger.warn("Unable to find a criterion with id: $criterionName, default to dummy.")
                     builder.criterion(Criteria.DUMMY)
                 } else {
                     builder.criterion(criterion)
@@ -89,7 +89,7 @@ object ScoreboardIO {
                 val displayModeName = entry.getString(DISPLAY_MODE).get()
                 val displayMode = ObjectiveDisplayModeRegistry[NamespacedKey.resolve(displayModeName)]
                 if (displayMode == null) {
-                    Lantern.getLogger().warn("Unable to find a display mode with id: $displayModeName, default to integer.")
+                    LanternGame.logger.warn("Unable to find a display mode with id: $displayModeName, default to integer.")
                     builder.objectiveDisplayMode(ObjectiveDisplayModes.INTEGER)
                 } else {
                     builder.objectiveDisplayMode(displayMode)

@@ -10,8 +10,8 @@
  */
 package org.lanternpowered.server.world.gamerule
 
-import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.spongepowered.api.world.gamerule.GameRule
 

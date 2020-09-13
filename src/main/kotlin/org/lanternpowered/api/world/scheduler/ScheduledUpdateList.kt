@@ -10,8 +10,6 @@
  */
 package org.lanternpowered.api.world.scheduler
 
-import org.lanternpowered.api.util.math.toBlockPosition
-import org.lanternpowered.api.world.BlockPosition
 import org.spongepowered.api.scheduler.TaskPriority
 import org.spongepowered.math.vector.Vector3i
 import java.time.Duration
@@ -27,18 +25,11 @@ import java.util.function.Supplier
  */
 interface ScheduledUpdateList<T : Any> : org.spongepowered.api.scheduler.ScheduledUpdateList<T> {
 
-    fun getScheduledAt(position: BlockPosition): Collection<ScheduledUpdate<T>> = getScheduledAt(position.x, position.y, position.z)
+    @JvmDefault
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: UpdatePriority): ScheduledUpdate<T>
 
-    fun isScheduled(position: BlockPosition, target: T): Boolean = isScheduled(position.x, position.y, position.z, target)
-
-    fun schedule(position: BlockPosition, target: T, delay: Duration):
-            ScheduledUpdate<T> = schedule(position.x, position.y, position.z, target, delay)
-
-    fun schedule(position: BlockPosition, target: T, delay: Duration, priority: UpdatePriority):
-            ScheduledUpdate<T> = schedule(position.x, position.y, position.z, target, delay, priority)
-
-    fun schedule(position: BlockPosition, target: T, delay: Duration, priority: Supplier<out UpdatePriority>):
-            ScheduledUpdate<T> = schedule(position.x, position.y, position.z, target, delay, priority.get())
+    @JvmDefault
+    override fun schedule(pos: Vector3i, target: T, delay: Duration, priority: TaskPriority): ScheduledUpdate<T>
 
     @JvmDefault
     override fun isScheduled(x: Int, y: Int, z: Int, target: T): Boolean
@@ -47,52 +38,40 @@ interface ScheduledUpdateList<T : Any> : org.spongepowered.api.scheduler.Schedul
     override fun getScheduledAt(x: Int, y: Int, z: Int): Collection<ScheduledUpdate<T>>
 
     @JvmDefault
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit, priority: Supplier<out TaskPriority>):
-            ScheduledUpdate<T> = schedule(BlockPosition(x, y, z), target, Duration.of(delay.toLong(), temporalUnit), priority.get())
+    override fun schedule(
+            x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit, priority: Supplier<out UpdatePriority>
+    ): ScheduledUpdate<T> = this.schedule(x, y, z, target, Duration.of(delay.toLong(), temporalUnit), priority.get())
 
     @JvmDefault
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration):
-            ScheduledUpdate<T> = schedule(BlockPosition(x, y, z), target, delay)
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration): ScheduledUpdate<T> =
+            this.schedule(Vector3i(x, y, z), target, delay, UpdatePriorities.NORMAL)
 
     @JvmDefault
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: Supplier<out TaskPriority>):
-            ScheduledUpdate<T> = schedule(BlockPosition(x, y, z), target, delay, priority)
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: Supplier<out UpdatePriority>): ScheduledUpdate<T> =
+            this.schedule(x, y, z, target, delay, priority.get())
 
     @JvmDefault
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit):
-            ScheduledUpdate<T> = schedule(BlockPosition(x, y, z), target, Duration.of(delay.toLong(), temporalUnit))
+    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Int, temporalUnit: TemporalUnit): ScheduledUpdate<T> =
+            this.schedule(x, y, z, target, Duration.of(delay.toLong(), temporalUnit))
 
     @JvmDefault
-    override fun schedule(x: Int, y: Int, z: Int, target: T, delay: Duration, priority: UpdatePriority):
-            ScheduledUpdate<T> = schedule(BlockPosition(x, y, z), target, delay, priority)
+    override fun schedule(pos: Vector3i, target: T, delay: Duration, priority: Supplier<out TaskPriority>): ScheduledUpdate<T> =
+            this.schedule(pos, target, delay, priority.get())
 
     @JvmDefault
-    override fun schedule(pos: Vector3i, target: T, delay: Duration, priority: TaskPriority):
-            ScheduledUpdate<T> = schedule(pos.toBlockPosition(), target, delay, priority)
+    override fun schedule(pos: Vector3i, target: T, delay: Duration): ScheduledUpdate<T> =
+            this.schedule(pos, target, delay, UpdatePriorities.NORMAL)
 
     @JvmDefault
-    override fun schedule(pos: Vector3i, target: T, delay: Duration, priority: Supplier<out TaskPriority>):
-            ScheduledUpdate<T> = schedule(pos, target, delay, priority.get())
+    override fun schedule(pos: Vector3i, target: T, delay: Int, temporalUnit: TemporalUnit): ScheduledUpdate<T> =
+            this.schedule(pos, target, Duration.of(delay.toLong(), temporalUnit))
 
     @JvmDefault
-    override fun schedule(pos: Vector3i, target: T, delay: Duration):
-            ScheduledUpdate<T> = schedule(pos.toBlockPosition(), target, delay)
+    override fun schedule(pos: Vector3i, target: T, delay: Int, temporalUnit: TemporalUnit, priority: TaskPriority): ScheduledUpdate<T> =
+            this.schedule(pos, target, Duration.of(delay.toLong(), temporalUnit), priority)
 
     @JvmDefault
-    override fun schedule(pos: Vector3i, target: T, delay: Int, temporalUnit: TemporalUnit):
-            ScheduledUpdate<T> = schedule(pos.toBlockPosition(), target, Duration.of(delay.toLong(), temporalUnit))
-
-    @JvmDefault
-    override fun schedule(pos: Vector3i, target: T, delay: Int, temporalUnit: TemporalUnit, priority: TaskPriority):
-            ScheduledUpdate<T> = schedule(pos.toBlockPosition(), target, Duration.of(delay.toLong(), temporalUnit), priority)
-
-    @JvmDefault
-    override fun schedule(pos: Vector3i, target: T, delay: Int, temporalUnit: TemporalUnit, priority: Supplier<out TaskPriority>):
-            ScheduledUpdate<T> = schedule(pos.toBlockPosition(), target, Duration.of(delay.toLong(), temporalUnit), priority.get())
-
-    @JvmDefault
-    override fun isScheduled(pos: Vector3i, target: T): Boolean = isScheduled(pos.toBlockPosition(), target)
-
-    @JvmDefault
-    override fun getScheduledAt(pos: Vector3i): Collection<ScheduledUpdate<T>> = getScheduledAt(pos.toBlockPosition())
+    override fun schedule(
+            pos: Vector3i, target: T, delay: Int, temporalUnit: TemporalUnit, priority: Supplier<out TaskPriority>
+    ): ScheduledUpdate<T> = this.schedule(pos, target, Duration.of(delay.toLong(), temporalUnit), priority.get())
 }

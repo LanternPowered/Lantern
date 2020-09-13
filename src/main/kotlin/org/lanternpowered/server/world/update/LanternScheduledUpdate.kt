@@ -11,26 +11,26 @@
 package org.lanternpowered.server.world.update
 
 import org.lanternpowered.api.util.ToStringHelper
-import org.lanternpowered.api.world.BlockPosition
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.scheduler.ScheduledUpdate
 import org.lanternpowered.api.world.scheduler.ScheduledUpdateState
 import org.lanternpowered.api.world.scheduler.UpdatePriority
 import org.lanternpowered.server.world.LanternLocation
+import org.spongepowered.math.vector.Vector3i
 import java.time.Duration
 import java.util.Objects
 
 class LanternScheduledUpdate<T : Any>(
         private val list: ChunkScheduledUpdateList<T>,
-        override val position: BlockPosition,
+        override val position: Vector3i,
         private val target: T,
         private val priority: LanternUpdatePriority,
         val updateId: Long,
         private val scheduledTime: Long
 ) : ScheduledUpdate<T>, Comparable<LanternScheduledUpdate<T>> {
 
-    private val theLocation by lazy { LanternLocation(this.list.world, this.position.toVector3i()) }
+    private val theLocation by lazy { LanternLocation(this.list.world, this.position) }
 
     // The state of the scheduled task
     private var state = ScheduledUpdateState.WAITING
@@ -78,7 +78,7 @@ class LanternScheduledUpdate<T : Any>(
         return when {
             this.scheduledTime < scheduledTime -> -1
             this.scheduledTime > scheduledTime -> 1
-            this.priority !== priority -> this.priority.value - priority.value
+            this.priority != priority -> this.priority.value - priority.value
             this.updateId < updateId -> -1
             this.updateId > updateId -> 1
             else -> 0

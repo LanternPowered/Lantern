@@ -8,12 +8,15 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.server.network.http
+package org.lanternpowered.server.world.chunk
 
-object HttpCode {
+import org.lanternpowered.api.service.world.chunk.ChunkStorage
 
-    const val Ok = 200
-    const val NoContent = 204
-    const val BadRequest = 400
-    const val NotFound = 404
+/**
+ * Represents a group of chunks which have to be managed together because
+ * they are saved together. The size of a group will be determined by the
+ * [ChunkStorage] this chunk belongs to.
+ */
+class ChunkGroup {
+
 }

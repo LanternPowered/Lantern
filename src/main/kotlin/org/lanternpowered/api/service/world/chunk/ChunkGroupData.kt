@@ -8,13 +8,17 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
-package org.lanternpowered.api.world.chunk
+package org.lanternpowered.api.service.world.chunk
 
-typealias Chunk = org.spongepowered.api.world.chunk.Chunk
-typealias ChunkState = org.spongepowered.api.world.chunk.ChunkState
+import org.lanternpowered.api.data.persistence.DataContainer
 
 /**
- * The position of a chunk.
+ * Represents the data of a chunk group.
  */
-val Chunk.position: ChunkPosition
-    get() = ChunkPosition(this.chunkPosition.x, this.chunkPosition.y, this.chunkPosition.z)
+interface ChunkGroupData {
+
+    /**
+     * Gets the data of a chunk using the local group coordinates.
+     */
+    operator fun get(x: Int, y: Int, z: Int): DataContainer
+}

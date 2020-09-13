@@ -64,6 +64,7 @@ import org.lanternpowered.server.util.executor.LanternScheduledExecutorService
 import org.lanternpowered.server.util.executor.asLanternExecutorService
 import org.lanternpowered.server.world.LanternTeleportHelper
 import org.lanternpowered.server.world.LanternWorldManager
+import org.lanternpowered.server.world.chunk.LanternChunkLayout
 import org.spongepowered.api.network.status.Favicon
 import org.spongepowered.api.profile.GameProfileManager
 import org.spongepowered.api.resourcepack.ResourcePack
@@ -446,6 +447,7 @@ class LanternServer : Server {
     override fun getScheduler(): Scheduler = this.syncScheduler
     override fun getGameProfileManager(): GameProfileManager = this.gameProfileManager
     override fun getUserManager(): UserManager = this.userManager
+    override fun getChunkLayout(): ChunkLayout = LanternChunkLayout
 
     override fun getMaxPlayers(): Int = this.config.server.maxPlayers
     override fun getMotd(): Text = this.config.server.messageOfTheDay
@@ -493,9 +495,5 @@ class LanternServer : Server {
     fun removePlayer(player: LanternPlayer) {
         this.playersByName.remove(player.name)
         this.playersByUniqueId.remove(player.uniqueId)
-    }
-
-    override fun getChunkLayout(): ChunkLayout {
-        TODO("Not yet implemented")
     }
 }

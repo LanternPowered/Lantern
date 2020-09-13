@@ -12,6 +12,8 @@ package org.lanternpowered.server.world
 
 import org.lanternpowered.api.world.chunk.Chunk
 import org.lanternpowered.api.world.chunk.ChunkPosition
+import org.lanternpowered.server.world.chunk.Chunks
+import org.lanternpowered.server.world.chunk.LanternChunkLayout
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.block.entity.BlockEntity
@@ -36,7 +38,14 @@ class LanternChunk(val position: ChunkPosition) : Chunk {
 
     var region: WorldRegion? = null
 
-    override fun getChunkPosition(): Vector3i = Vector3i(this.position.x, 0, this.position.z)
+    private val blockMin = Chunks.toGlobal(this.position)
+    private val blockMax = this.blockMin.add(LanternChunkLayout.chunkSize.sub(1, 1, 1))
+
+    override fun getChunkPosition(): Vector3i = this.position.toVector()
+
+    override fun getBlockMin(): Vector3i = this.blockMin
+    override fun getBlockMax(): Vector3i = this.blockMax
+    override fun getBlockSize(): Vector3i = LanternChunkLayout.chunkSize
 
     override fun setInhabitedTime(newInhabitedTime: Long) {
         TODO("Not yet implemented")
@@ -47,10 +56,6 @@ class LanternChunk(val position: ChunkPosition) : Chunk {
     }
 
     override fun getScheduledBlockUpdates(): ScheduledUpdateList<BlockType> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getBlockMin(): Vector3i {
         TODO("Not yet implemented")
     }
 
@@ -107,10 +112,6 @@ class LanternChunk(val position: ChunkPosition) : Chunk {
     }
 
     override fun addEntity(entity: Entity?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getBlockSize(): Vector3i {
         TODO("Not yet implemented")
     }
 
@@ -171,10 +172,6 @@ class LanternChunk(val position: ChunkPosition) : Chunk {
     }
 
     override fun getValues(x: Int, y: Int, z: Int): MutableSet<Value.Immutable<*>> {
-        TODO("Not yet implemented")
-    }
-
-    override fun getBlockMax(): Vector3i {
         TODO("Not yet implemented")
     }
 

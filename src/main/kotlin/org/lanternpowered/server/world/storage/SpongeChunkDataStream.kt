@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.world.storage
 
-import org.lanternpowered.api.service.world.ChunkStorage
+import org.lanternpowered.api.service.world.chunk.ChunkStorage
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.world.storage.ChunkDataStream
 
@@ -21,14 +21,31 @@ class SpongeChunkDataStream(
         private val chunkStorage: ChunkStorage
 ) : ChunkDataStream {
 
-    private var sequence = this.chunkStorage.sequence().iterator()
+    private fun sequence(): Iterator<DataContainer> = this.chunkStorage.sequence()
+            .flatMap { entry ->
+                val size = this.chunkStorage.groupSize
+                val data = entry.load()
+                        ?: return@flatMap emptySequence<DataContainer>()
+                sequence {
+                    for (localX in 0 until size.x) {
+                        for (localY in 0 until size.y) {
+                            for (localZ in 0 until size.z)
+                                yield(data[localX, localY, localZ])
+                        }
+                    }
+                }
+            }
+            .iterator()
+
+    private var sequence = this.sequence()
+
     private var read = 0
     private var available = UNKNOWN
 
     override fun next(): DataContainer? {
         val entry = this.sequence.next()
         try {
-            return entry.load()
+            return entry
         } finally {
             this.read++
         }
@@ -37,8 +54,10 @@ class SpongeChunkDataStream(
     override fun available(): Int {
         // This will be an estimate, the stream can still change
         // if chunks are being saved in the meantime
-        if (this.available == UNKNOWN)
-            this.available = this.chunkStorage.sequence().count()
+        if (this.available == UNKNOWN) {
+            val size = this.chunkStorage.groupSize
+            this.available = this.chunkStorage.sequence().count() * (size.x * size.y * size.z)
+        }
         return this.available - this.read
     }
 
@@ -46,7 +65,7 @@ class SpongeChunkDataStream(
 
     override fun reset() {
         // Restart the sequence
-        this.sequence = this.chunkStorage.sequence().iterator()
+        this.sequence = this.sequence()
         this.available = UNKNOWN
         this.read = 0
     }

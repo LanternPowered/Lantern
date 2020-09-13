@@ -38,6 +38,7 @@ import org.lanternpowered.server.registry.LanternGameRegistry
 import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.service.LanternServiceProvider
 import org.lanternpowered.server.service.context.LanternContextCalculator
+import org.lanternpowered.server.service.pagination.LanternPaginationService
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.lanternpowered.server.sql.LanternSqlManager
 import org.lanternpowered.server.text.TranslationRegistries
@@ -182,7 +183,8 @@ object LanternGame : Game {
         // Load the translation files
         TranslationRegistries.init()
 
-        initPermissionService()
+        this.initPermissionService()
+        this.initPaginationService()
 
         // Initialize the console subject
         this.console.resolveSubject()
@@ -230,6 +232,18 @@ object LanternGame : Game {
             applyDefault(Permissions.Login.BYPASS_WHITELIST_LEVEL, Permissions.Login.BYPASS_WHITELIST_PERMISSION)
             applyDefault(Permissions.Chat.FORMAT_URLS_LEVEL, Permissions.Chat.FORMAT_URLS)
             applyDefault(Permissions.Chat.BYPASS_SPAM_CHECK_LEVEL, Permissions.Chat.BYPASS_SPAM_CHECK)
+        }
+    }
+
+    /**
+     * Initializes the pagination service.
+     */
+    private fun initPaginationService() {
+        val service = this.serviceProvider.register<PaginationService> {
+            this.lanternPlugin to LanternPaginationService()
+        }
+        if (service is LanternPaginationService) {
+            // TODO: Register pagination command in the command manager
         }
     }
 

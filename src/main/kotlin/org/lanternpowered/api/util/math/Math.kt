@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.api.util.math
 
-import org.lanternpowered.api.world.BlockPosition
 import org.spongepowered.math.imaginary.Quaterniond
 import org.spongepowered.math.imaginary.Quaternionf
 import org.spongepowered.math.vector.Vector2d
@@ -89,8 +88,6 @@ operator fun Vector3d.plus(value: Vector3i): Vector3d = add(value.x.toDouble(), 
 operator fun Vector3d.unaryMinus(): Vector3d = negate()
 operator fun Vector3d.unaryPlus(): Vector3d = this
 
-fun Vector3d.toBlockPosition() = BlockPosition(this.floorX, this.floorY, this.floorZ)
-
 operator fun Vector3f.component1(): Float = this.x
 operator fun Vector3f.component2(): Float = this.y
 operator fun Vector3f.component3(): Float = this.z
@@ -109,8 +106,6 @@ operator fun Vector3f.plus(value: Vector3i): Vector3f = add(value.x.toFloat(), v
 operator fun Vector3f.unaryMinus(): Vector3f = negate()
 operator fun Vector3f.unaryPlus(): Vector3f = this
 
-fun Vector3f.toBlockPosition() = BlockPosition(this.floorX, this.floorY, this.floorZ)
-
 operator fun Vector3i.component1(): Int = this.x
 operator fun Vector3i.component2(): Int = this.y
 operator fun Vector3i.component3(): Int = this.z
@@ -128,8 +123,6 @@ operator fun Vector3i.plus(value: Vector3d): Vector3i = add(value.x, value.y, va
 operator fun Vector3i.plus(value: Vector3f): Vector3i = add(value.x.toDouble(), value.y.toDouble(), value.z.toDouble())
 operator fun Vector3i.unaryMinus(): Vector3i = negate()
 operator fun Vector3i.unaryPlus(): Vector3i = this
-
-fun Vector3i.toBlockPosition() = BlockPosition(this.x, this.y, this.z)
 
 operator fun Quaterniond.times(value: Vector3d): Vector3d = rotate(value)
 operator fun Quaterniond.times(value: Vector3f): Vector3d = rotate(value.x, value.y, value.z)

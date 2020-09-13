@@ -190,7 +190,7 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
             is HoverEvent.ShowEntity -> {
                 val name = value.name() ?: return null
                 val text = this.renderIfNeeded(name, context) ?: return null
-                HoverEvent.showEntity(HoverEvent.ShowEntity(value.type(), value.id(), text))
+                HoverEvent.showEntity(HoverEvent.ShowEntity.of(value.type(), value.id(), text))
             }
             is HoverEvent.ShowItem -> null // TODO
             else -> hoverEvent.withRenderedValue(this, context)

@@ -19,7 +19,7 @@ import kotlin.math.ceil
  * out per long value. E.g. if you have 4 bits per value, there
  * will be 64 / 4 values be stored on a single long value. If
  * you use a number that's not the power of two, a few bits will
- * be unused per long, e.g. for bit per value 3, 64 % 3 = 1
+ * be unused per long, e.g. for bits per value 3, 64 % 3 = 1
  *
  * The implementation was changed for minecraft 1.16 changes, prior
  * to this version, values could be spread out over multiple long
@@ -102,10 +102,10 @@ class VariableValueArray {
      */
     fun copyWithBitsPerValue(bitsPerValue: Int): VariableValueArray {
         if (bitsPerValue == this.bitsPerValue)
-            return copy()
+            return this.copy()
         val copy = VariableValueArray(bitsPerValue, this.size)
         for (index in 0 until this.size)
-            copy[index] = get(index)
+            copy[index] = this[index]
         return copy
     }
 
@@ -131,6 +131,24 @@ class VariableValueArray {
             // Update the new value
             this.backing[longIndex] = cleaned or (value.toLong() shl indexInLong)
         }
+    }
+
+    /**
+     * Fills the value at all the possible indexes in this array.
+     */
+    fun fill(value: Int) {
+        require(value >= 0) { "value ($value) must not be negative" }
+        require(value <= this.valueMask) { "value ($value) must not be greater than $valueMask" }
+
+        val valueLong = value.toLong()
+
+        // Compute a single long value which can put in every
+        // backing array element.
+        var long = valueLong
+        for (i in 1 until this.valuesPerLong)
+            long = long or (valueLong shl (i * this.bitsPerValue))
+
+        this.backing.fill(long)
     }
 
     /**

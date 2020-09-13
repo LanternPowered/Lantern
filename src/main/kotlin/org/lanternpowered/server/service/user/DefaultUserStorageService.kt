@@ -64,7 +64,7 @@ class DefaultUserStorageService(private val directory: Path) : UserStorageServic
                     if (!name.endsWith(".dat"))
                         return@map null
                     name = name.substring(0, name.length - ".dat".length)
-                    val uniqueId = UUIDHelper.tryParse(name)
+                    val uniqueId = UUIDHelper.parseOrNull(name)
                             ?: return@map null
                     this.get(uniqueId)
                 }

@@ -11,10 +11,13 @@
 package org.lanternpowered.server.event.message
 
 import org.spongepowered.api.event.Cancellable
+import org.spongepowered.api.event.message.MessageCancellable
 import org.spongepowered.api.event.message.MessageChannelEvent
 
 fun MessageChannelEvent.sendMessage() {
-    if (this.isMessageCancelled || (this is Cancellable && this.isCancelled))
+    if (this is Cancellable && this.isCancelled)
+        return
+    if (this is MessageCancellable && this.isMessageCancelled)
         return
     this.audience.ifPresent { audience -> audience.sendMessage(this.message) }
 }

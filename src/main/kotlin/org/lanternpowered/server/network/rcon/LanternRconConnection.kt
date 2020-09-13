@@ -30,7 +30,7 @@ class LanternRconConnection internal constructor(
     @Volatile private var authorized = false
 
     init {
-        resolveSubject()
+        this.resolveSubject()
     }
 
     override fun getAddress(): InetSocketAddress = this.channel.remoteAddress() as InetSocketAddress

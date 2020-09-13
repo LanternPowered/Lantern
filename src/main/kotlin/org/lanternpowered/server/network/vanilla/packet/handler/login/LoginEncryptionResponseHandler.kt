@@ -114,7 +114,7 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
             val id = json["id"].asString
 
             val uniqueId = try {
-                UUIDHelper.fromFlatString(id)
+                UUIDHelper.parseFlatString(id)
             } catch (e: IllegalArgumentException) {
                 throw IllegalStateException("Received an invalid uuid: $id")
             }

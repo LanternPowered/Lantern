@@ -35,11 +35,17 @@ class LanternServiceProvider(private val game: Game) : ServiceProvider {
         this.onRegister += fn
     }
 
-    inline fun <reified T : Any> register(): T? = register(T::class)
-    inline fun <reified T : Any> register(noinline default: () -> Pair<PluginContainer, T>): T = register(T::class, default)
+    inline fun <reified T : Any> register(): T? =
+            this.register(T::class)
 
-    fun <T : Any> register(serviceClass: KClass<T>): T? = register(serviceClass.java, null)
-    fun <T : Any> register(serviceClass: KClass<T>, default: () -> Pair<PluginContainer, T>): T = register(serviceClass.java, default)!!
+    inline fun <reified T : Any> register(noinline default: () -> Pair<PluginContainer, T>): T =
+            this.register(T::class, default)
+
+    fun <T : Any> register(serviceClass: KClass<T>): T? =
+            this.register(serviceClass.java, null)
+
+    fun <T : Any> register(serviceClass: KClass<T>, default: () -> Pair<PluginContainer, T>): T =
+            this.register(serviceClass.java, default)!!
 
     private fun <T : Any> register(serviceClass: Class<T>, default: (() -> Pair<PluginContainer, T>)? = null): T? {
         val cause = emptyCause()
@@ -72,14 +78,14 @@ class LanternServiceProvider(private val game: Game) : ServiceProvider {
     val registrations: Collection<ServiceRegistration<*>>
         get() = this.registrationMap.values.toImmutableList()
 
-    override fun <T : Any> provide(serviceClass: KClass<T>): T? = provideNullable(serviceClass.java)
-    override fun <T : Any> provide(serviceClass: Class<T>): Optional<T> = provideNullable(serviceClass).asOptional()
+    override fun <T : Any> provide(serviceClass: KClass<T>): T? = this.provideNullable(serviceClass.java)
+    override fun <T : Any> provide(serviceClass: Class<T>): Optional<T> = this.provideNullable(serviceClass).asOptional()
 
     override fun <T : Any> getRegistration(serviceClass: Class<T>): Optional<ServiceRegistration<T>> =
-            getNullableRegistration(serviceClass).asOptional()
+            this.getNullableRegistration(serviceClass).asOptional()
 
     private fun <T : Any> provideNullable(serviceClass: Class<T>): T? =
-            getNullableRegistration(serviceClass)?.service()
+            this.getNullableRegistration(serviceClass)?.service()
 
     @Suppress("UNCHECKED_CAST")
     private fun <T> getNullableRegistration(serviceClass: Class<T>): ServiceRegistration<T>? =

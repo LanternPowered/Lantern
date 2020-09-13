@@ -63,7 +63,7 @@ object HandshakeHandler : Handler<HandshakePacket> {
                 split = split[0].split("\u0000").toTypedArray()
                 if (split.size == 3 || split.size == 4) {
                     virtualAddress = InetSocketAddress(split[1], packet.port)
-                    val uniqueId = UUIDHelper.fromFlatString(split[2])
+                    val uniqueId = UUIDHelper.parseFlatString(split[2])
                     val properties = if (split.size == 4) {
                         try {
                             LanternProfileProperty.createPropertiesMapFromJson(gson.fromJson(split[3]))
@@ -92,7 +92,7 @@ object HandshakeHandler : Handler<HandshakePacket> {
                         return
                     }
                     val name = jsonObject["n"].asString
-                    val uniqueId = UUIDHelper.fromFlatString(jsonObject["u"].asString)
+                    val uniqueId = UUIDHelper.parseFlatString(jsonObject["u"].asString)
                     val properties: Multimap<String, ProfileProperty> = LinkedHashMultimap.create()
                     if (jsonObject.has("p")) {
                         val jsonArray = jsonObject.getAsJsonArray("p")

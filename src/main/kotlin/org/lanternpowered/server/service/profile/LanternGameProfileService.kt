@@ -262,7 +262,7 @@ class LanternGameProfileService(
     }
 
     private fun parseProfile(json: JsonObject): GameProfile {
-        val uniqueId = UUIDHelper.fromFlatString(json["id"].asString)
+        val uniqueId = UUIDHelper.parseFlatString(json["id"].asString)
         val name = json["name"].asString
         val profile = GameProfile.of(uniqueId, name)
 

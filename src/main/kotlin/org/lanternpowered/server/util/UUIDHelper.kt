@@ -20,17 +20,14 @@ object UUIDHelper {
     val regex: Regex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}".toRegex(RegexOption.IGNORE_CASE)
 
     /**
-     * A regex which requires a value to match completely.
-     */
-    private val completeRegex = "^${regex.pattern}$".toRegex(RegexOption.IGNORE_CASE)
-
-    /**
      * Attempts to parse the given [value] as an [UUID].
      */
-    fun tryParse(value: String): UUID? {
-        if (!this.completeRegex.matches(value))
-            return null
-        return UUID.fromString(value)
+    fun parseOrNull(value: String): UUID? {
+        return try {
+            UUID.fromString(value)
+        } catch (ex: Exception) {
+            null
+        }
     }
 
     /**
@@ -40,7 +37,7 @@ object UUIDHelper {
      * @return The uuid
      */
     @JvmStatic
-    fun fromFlatString(flat: String): UUID {
+    fun parseFlatString(flat: String): UUID {
         check(flat.length == 32) { "length must be 32" }
         val most = java.lang.Long.parseLong(flat, 0, 16, 16)
         val least = java.lang.Long.parseLong(flat, 16, 32, 16)
@@ -58,7 +55,7 @@ object UUIDHelper {
         val most = uuid.mostSignificantBits
         val least = uuid.leastSignificantBits
         fun Long.toPart(): String {
-            val s = toString(16)
+            val s = this.toString(16)
             // Guarantee that the length is 16 characters
             return if (s.length != 16) "0".repeat(16 - s.length) + s else s
         }

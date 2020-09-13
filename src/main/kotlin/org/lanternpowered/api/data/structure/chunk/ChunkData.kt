@@ -10,9 +10,12 @@
  */
 package org.lanternpowered.api.data.structure.chunk
 
+import org.lanternpowered.api.block.BlockState
 import org.lanternpowered.api.data.persistence.DataView
 import org.lanternpowered.api.data.persistence.dataQueryOf
+import org.lanternpowered.api.data.structure.block.BlockEntityData
 import org.lanternpowered.api.data.structure.entity.EntityData
+import org.lanternpowered.api.util.palette.SerializedPaletteBasedArray
 import org.lanternpowered.api.world.chunk.Chunk
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataSerializable
@@ -27,7 +30,7 @@ import org.spongepowered.api.data.persistence.DataSerializable
  * @property data Extra data related to chunks
  */
 class ChunkData(
-        val blocks: ChunkBlocksData,
+        val blocks: SerializedPaletteBasedArray<BlockState>,
         val blockEntities: List<BlockEntityData>,
         val blockLight: ByteArray,
         val skylight: ByteArray,

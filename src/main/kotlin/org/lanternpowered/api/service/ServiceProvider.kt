@@ -37,12 +37,14 @@ inline fun <reified T : Any> serviceOf(): T? = ServiceProvider.provide()
  * @param T The type of service
  * @return A provider, if available
  */
-inline fun <reified T : Any> ServiceProvider.provide(): T? = provide(T::class)
+inline fun <reified T : Any> ServiceProvider.provide(): T? = this.provide(T::class)
 
 /**
  * The service provider.
  */
-interface ServiceProvider : org.spongepowered.api.service.ServiceProvider {
+interface ServiceProvider :
+        org.spongepowered.api.service.ServiceProvider.ServerScoped,
+        org.spongepowered.api.service.ServiceProvider.GameScoped {
 
     /**
      * Provides the service represented by the given [KClass].

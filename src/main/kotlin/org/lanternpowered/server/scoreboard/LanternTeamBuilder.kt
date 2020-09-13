@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.scoreboard
 
+import org.lanternpowered.api.scoreboard.ScoreboardTeam
+import org.lanternpowered.api.scoreboard.ScoreboardTeamBuilder
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.emptyText
 import org.lanternpowered.api.text.format.NamedTextColor
@@ -18,11 +20,10 @@ import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.spongepowered.api.scoreboard.CollisionRule
 import org.spongepowered.api.scoreboard.CollisionRules
-import org.spongepowered.api.scoreboard.Team
 import org.spongepowered.api.scoreboard.Visibilities
 import org.spongepowered.api.scoreboard.Visibility
 
-class LanternTeamBuilder : Team.Builder {
+class LanternTeamBuilder : ScoreboardTeamBuilder {
 
     private var name: String? = null
     private var displayName: Text? = null
@@ -53,7 +54,7 @@ class LanternTeamBuilder : Team.Builder {
     override fun collisionRule(rule: CollisionRule): LanternTeamBuilder = apply { this.collisionRule = rule }
     override fun members(members: Set<Text>): LanternTeamBuilder = apply { this.members = members.toImmutableSet() }
 
-    override fun from(value: Team): LanternTeamBuilder = name(value.name)
+    override fun from(value: ScoreboardTeam): LanternTeamBuilder = name(value.name)
             .displayName(value.displayName)
             .color(value.color)
             .allowFriendlyFire(value.allowFriendlyFire())
@@ -76,7 +77,7 @@ class LanternTeamBuilder : Team.Builder {
         this.members = emptySet()
     }
 
-    override fun build(): Team {
+    override fun build(): ScoreboardTeam {
         val name = checkNotNull(this.name) { "The name must be set" }
         val displayName = this.displayName ?: textOf(name)
         val team = LanternTeam(name, this.color, displayName, this.prefix, this.suffix,

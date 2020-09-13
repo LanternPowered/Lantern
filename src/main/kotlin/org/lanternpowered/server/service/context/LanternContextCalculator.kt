@@ -18,12 +18,13 @@ import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.Locatable
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.service.permission.UserSubject
+import org.lanternpowered.server.util.UUIDHelper
+import org.spongepowered.api.network.RconConnection
 import org.spongepowered.api.network.RemoteConnection
 import org.spongepowered.api.service.context.Context
 import org.spongepowered.api.service.context.ContextCalculator
 import org.spongepowered.api.service.context.Contextual
 import java.net.InetAddress
-import java.util.UUID
 
 /**
  * A context calculator handling world contexts.
@@ -36,8 +37,8 @@ class LanternContextCalculator<C : Contextual>(
             Caffeine.newBuilder()
                     .weakKeys()
                     .build<RemoteConnection, IpAddressCacheEntry> { connection ->
-                        val localIp = buildAddressContexts(Context.LOCAL_IP_KEY, connection.virtualHost.address)
-                        val remoteIp = buildAddressContexts(Context.REMOTE_IP_KEY, connection.address.address)
+                        val localIp = this.buildAddressContexts(Context.LOCAL_IP_KEY, connection.virtualHost.address)
+                        val remoteIp = this.buildAddressContexts(Context.REMOTE_IP_KEY, connection.address.address)
                         IpAddressCacheEntry(localIp, remoteIp)
                     }
 
@@ -63,11 +64,7 @@ class LanternContextCalculator<C : Contextual>(
         if (identifier == game.systemSubject.identifier) {
             return game.systemSubject
         } else {
-            val uniqueId = try {
-                 UUID.fromString(identifier)
-            } catch (ex: Exception) {
-                return null
-            }
+            val uniqueId = UUIDHelper.parseOrNull(identifier) ?: return null
             return game.server.getPlayer(uniqueId).orNull()
         }
     }
@@ -82,8 +79,9 @@ class LanternContextCalculator<C : Contextual>(
         var connection: RemoteConnection? = null
         if (source is Player) {
             connection = source.connection
+        } else if (source is RconConnection) {
+            connection = source
         }
-        // TODO: RCON source
         if (connection != null) {
             val ipEntry = this.ipCache.get(connection)!!
             accumulator.addAll(ipEntry.remote)
@@ -105,8 +103,9 @@ class LanternContextCalculator<C : Contextual>(
         var connection: RemoteConnection? = null
         if (source is Player) {
             connection = source.connection
+        } else if (source is RconConnection) {
+            connection = source
         }
-        // TODO: RCON source
         if (connection != null) {
             if (context.key == Context.LOCAL_HOST_KEY)
                 return connection.virtualHost.hostName == context.value

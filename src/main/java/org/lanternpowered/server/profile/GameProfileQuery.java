@@ -119,7 +119,7 @@ final class GameProfileQuery {
         final JsonArray json = GSON.fromJson(new InputStreamReader(uc.getInputStream()), JsonArray.class);
         for (JsonElement element : json) {
             final JsonObject obj = element.getAsJsonObject();
-            results.put(obj.get("name").getAsString(), UUIDHelper.fromFlatString(obj.get("id").getAsString()));
+            results.put(obj.get("name").getAsString(), UUIDHelper.parseFlatString(obj.get("id").getAsString()));
         }
     }
 

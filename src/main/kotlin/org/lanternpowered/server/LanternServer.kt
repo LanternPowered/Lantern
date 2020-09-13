@@ -50,6 +50,7 @@ import org.lanternpowered.server.network.rcon.RconServer
 import org.lanternpowered.server.profile.LanternGameProfileManager
 import org.lanternpowered.server.scheduler.LanternScheduler
 import org.lanternpowered.server.scoreboard.LanternScoreboard
+import org.lanternpowered.server.service.LanternServiceProvider
 import org.lanternpowered.server.service.profile.LanternGameProfileService
 import org.lanternpowered.server.service.user.DefaultUserStorageService
 import org.lanternpowered.server.service.world.DefaultWorldStorageService
@@ -447,6 +448,7 @@ class LanternServer : Server {
     override fun getScheduler(): Scheduler = this.syncScheduler
     override fun getGameProfileManager(): GameProfileManager = this.gameProfileManager
     override fun getUserManager(): UserManager = this.userManager
+    override fun getServiceProvider(): LanternServiceProvider = this.game.serviceProvider
     override fun getChunkLayout(): ChunkLayout = LanternChunkLayout
 
     override fun getMaxPlayers(): Int = this.config.server.maxPlayers

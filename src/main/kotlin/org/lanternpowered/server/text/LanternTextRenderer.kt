@@ -31,13 +31,18 @@ import java.text.MessageFormat
 
 abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
+    companion object {
+        private val Merges = Style.Merge.of(
+                Style.Merge.COLOR, Style.Merge.DECORATIONS, Style.Merge.INSERTION, Style.Merge.FONT)
+    }
+
     protected fun <T : BuildableComponent<T, B>, B : TextBuilder<T, B>> B.applyChildren(text: Text, context: C): B = apply {
         for (child in text.children())
             this.append(render(child, context))
     }
 
     protected fun <T : BuildableComponent<T, B>, B : TextBuilder<T, B>> B.applyStyle(text: Text, context: C): B = apply {
-        this.mergeStyle(text, Style.Merge.colorAndDecorations())
+        this.mergeStyle(text, Merges)
         this.clickEvent(text.clickEvent())
         this.insertion(text.insertion())
         this.hoverEvent(renderHoverEventIfNeeded(text.hoverEvent(), context) ?: text.hoverEvent())

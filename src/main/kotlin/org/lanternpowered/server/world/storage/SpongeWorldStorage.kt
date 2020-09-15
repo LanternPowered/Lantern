@@ -14,7 +14,8 @@ import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.service.world.WorldStorage
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.world.WorldProperties
-import org.lanternpowered.api.world.chunk.ChunkPosition
+import org.lanternpowered.server.world.chunk.getChunkGroupPosition
+import org.lanternpowered.server.world.chunk.getLocalChunkPosition
 import org.spongepowered.api.world.storage.ChunkDataStream
 import org.spongepowered.math.vector.Vector3i
 import java.util.Optional
@@ -33,11 +34,17 @@ class SpongeWorldStorage(
 
     override fun getWorldProperties(): WorldProperties = this.properties
 
-    override fun doesChunkExist(chunkCoords: Vector3i): CompletableFuture<Boolean> = CompletableFuture.supplyAsync(
-            Supplier { this.worldStorage.chunks.exists(ChunkPosition(chunkCoords.x, chunkCoords.z)) }, this.executorService)
+    override fun doesChunkExist(chunkCoords: Vector3i): CompletableFuture<Boolean> {
+        val group = this.worldStorage.chunks.getChunkGroupPosition(chunkCoords)
+        return CompletableFuture.supplyAsync(Supplier { this.worldStorage.chunks.exists(group) }, this.executorService)
+    }
 
-    override fun getChunkData(chunkCoords: Vector3i): CompletableFuture<Optional<DataContainer>> = CompletableFuture.supplyAsync(
-            Supplier { this.worldStorage.chunks.load(ChunkPosition(chunkCoords.x, chunkCoords.z)).asOptional() }, this.executorService)
+    override fun getChunkData(chunkCoords: Vector3i): CompletableFuture<Optional<DataContainer>> {
+        val group = this.worldStorage.chunks.getChunkGroupPosition(chunkCoords)
+        val local = this.worldStorage.chunks.getLocalChunkPosition(chunkCoords)
+        return CompletableFuture.supplyAsync(
+                Supplier { this.worldStorage.chunks.load(group)?.get(local).asOptional() }, this.executorService)
+    }
 
     override fun getGeneratedChunks(): ChunkDataStream = SpongeChunkDataStream(this.worldStorage.chunks)
 }

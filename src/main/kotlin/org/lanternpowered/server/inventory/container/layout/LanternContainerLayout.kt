@@ -701,7 +701,7 @@ abstract class LanternContainerLayout(
                 }
             }
         } else if (cursor) {
-            this.queueSlotChange(this.cursor)
+            data.queueSlotChange(this.cursor)
         }
     }
 

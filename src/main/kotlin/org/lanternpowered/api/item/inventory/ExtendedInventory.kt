@@ -181,10 +181,25 @@ fun <T : Inventory> Iterable<T>.where(fn: InventoryFilterBuilderFunction<T>): Li
         this.filter(fn.build())
 
 /**
+ * Filters the [Sequence] of inventories. Only inventories that match the
+ * filter will be in the resulting sequence.
+ */
+@JvmName("whereSlots")
+fun Iterable<Slot>.where(fn: InventoryFilterBuilderFunction<ExtendedSlot>): List<ExtendedSlot> =
+        this.fix().where(fn)
+
+/**
  * Returns `true` if all elements match the given filter.
  */
 fun <T : Inventory> Iterable<T>.whereAll(fn: InventoryFilterBuilderFunction<T>): Boolean =
         this.all(fn.build())
+
+/**
+ * Returns `true` if all elements match the given filter.
+ */
+@JvmName("whereAllSlots")
+fun Iterable<Slot>.whereAll(fn: InventoryFilterBuilderFunction<ExtendedSlot>): Boolean =
+        this.fix().whereAll(fn)
 
 /**
  * Joins the iterable of inventories into a single inventory.

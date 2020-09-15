@@ -91,13 +91,13 @@ internal class PaginationCalculator(val linesPerPage: Int) {
         } else if (UNICODE_CHAR_WIDTHS[codePoint].toInt() != 0) {
             // from 1.9 & 255 to avoid strange signed int math ruining things.
             // https://bugs.mojang.com/browse/MC-7181
-            val temp = UNICODE_CHAR_WIDTHS[codePoint].toInt() and 255
+            val temp = UNICODE_CHAR_WIDTHS[codePoint].toInt() and 0xff
             // Split into high and low nibbles.
             // bit digits
             // 87654321 >>> 4 = 00008765
             val startColumn = temp ushr 4
             // 87654321 & 00001111 = 00004321
-            val endColumn = temp and 15
+            val endColumn = temp and 0xf
             width = (endColumn + 1) - startColumn
             // Why does this scaling happen?
             // I believe it makes unicode fonts skinnier to better match the character widths of the default Minecraft

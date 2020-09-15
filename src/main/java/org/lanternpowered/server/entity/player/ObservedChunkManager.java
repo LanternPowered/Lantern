@@ -123,13 +123,18 @@ public final class ObservedChunkManager implements WorldEventListener {
         }
     }
 
-    void addObserver(Vector2i coords, LanternPlayer observer) {
+    void addObserver(Vector3i coords, LanternPlayer observer) {
+        // TODO
+        /*
         final long key = LanternChunk.key(coords.getX(), coords.getY());
         final ObservedChunk observedChunk = this.observedChunks.computeIfAbsent(key, key1 -> new ObservedChunk(coords));
         observedChunk.addObserver(observer);
+        */
     }
 
-    void removeObserver(Vector2i coords, LanternPlayer observer, boolean updateClient) {
+    void removeObserver(Vector3i coords, LanternPlayer observer, boolean updateClient) {
+        // TODO
+        /*
         final long key = LanternChunk.key(coords.getX(), coords.getY());
         final ObservedChunk observedChunk = this.observedChunks.get(key);
         if (observedChunk != null) {
@@ -137,7 +142,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             if (observedChunk.observers.isEmpty()) {
                 this.observedChunks.remove(key);
             }
-        }
+        }*/
     }
 
     private static final VariableValueArray EMPTY_SECTION_TYPES = new VariableValueArray(4, CHUNK_SECTION_VOLUME);

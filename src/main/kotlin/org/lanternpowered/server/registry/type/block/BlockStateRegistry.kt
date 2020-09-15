@@ -17,9 +17,7 @@ import org.lanternpowered.api.block.BlockState
 import org.lanternpowered.api.block.BlockType
 import org.lanternpowered.api.block.BlockTypes
 import org.lanternpowered.api.registry.CatalogTypeRegistry
-import org.lanternpowered.server.game.registry.InternalRegistries
 import org.lanternpowered.server.game.registry.InternalRegistries.readJsonArray
-import org.lanternpowered.server.registry.MutableInternalCatalogTypeRegistry
 import org.lanternpowered.server.registry.mutableInternalCatalogTypeRegistry
 import org.lanternpowered.server.state.IState
 import org.lanternpowered.server.util.palette.asPalette

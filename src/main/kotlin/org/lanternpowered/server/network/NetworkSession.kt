@@ -119,6 +119,12 @@ class NetworkSession(
     }
 
     /**
+     * Whether the session is closed.
+     */
+    val isClosed: Boolean
+        get() = !this.channel.isActive
+
+    /**
      * The game profile of the player that owns this connection.
      */
     private var _profile: LanternGameProfile? = null
@@ -547,8 +553,12 @@ class NetworkSession(
     }
 
     override fun close(reason: Text) {
+        this.tryClose(reason)
+    }
+
+    fun tryClose(reason: Text): Boolean {
         if (this.disconnectReason != null)
-            return
+            return false
         this.disconnectReason = reason
         if (this.channel.isActive &&
                 (this.protocolState == ProtocolState.PLAY || this.protocolState == ProtocolState.LOGIN)) {
@@ -556,6 +566,7 @@ class NetworkSession(
         } else {
             this.channel.close()
         }
+        return true
     }
 
     /**

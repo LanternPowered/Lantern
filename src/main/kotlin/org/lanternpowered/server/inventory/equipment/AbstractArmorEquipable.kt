@@ -13,11 +13,14 @@ package org.lanternpowered.server.inventory.equipment
 import org.lanternpowered.api.data.type.hand.getEquipmentType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.emptyItemStack
+import org.lanternpowered.api.item.inventory.equipment.EquipmentInventory
 import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.item.inventory.ArmorEquipable
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 
 interface AbstractArmorEquipable : AbstractEquipable, ArmorEquipable {
+
+    override fun getEquipment(): EquipmentInventory
 
     override fun getHead(): ItemStack =
             this.getEquipped(EquipmentTypes.HEAD).orElseGet(::emptyItemStack)

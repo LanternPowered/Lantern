@@ -21,8 +21,8 @@ import org.lanternpowered.api.effect.sound.SoundEffect
 import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.entity.player.chat.ChatVisibilities
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.item.inventory.itemStackOf
+import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.api.key.asNamespacedKey
 import org.lanternpowered.api.scoreboard.Scoreboard
 import org.lanternpowered.api.service.serviceOf
@@ -36,6 +36,7 @@ import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.chunk.ChunkLoadingTicket
 import org.lanternpowered.api.world.chunk.ChunkPosition
+import org.lanternpowered.api.world.dimension.DimensionType
 import org.lanternpowered.api.world.getGameRule
 import org.lanternpowered.server.advancement.LanternPlayerAdvancements
 import org.lanternpowered.server.config.ViewDistance
@@ -50,11 +51,11 @@ import org.lanternpowered.server.entity.EntityBodyPosition
 import org.lanternpowered.server.entity.LanternLiving
 import org.lanternpowered.server.entity.event.SpectateEntityEvent
 import org.lanternpowered.server.entity.player.tab.LanternTabList
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.inventory.AbstractChildrenInventory
 import org.lanternpowered.server.inventory.AbstractContainer
 import org.lanternpowered.server.inventory.IContainerProvidedInventory
-import org.lanternpowered.server.inventory.LanternItemStackSnapshot
 import org.lanternpowered.server.inventory.PlayerInventoryContainer
 import org.lanternpowered.server.inventory.PlayerInventoryContainerSession
 import org.lanternpowered.server.inventory.PlayerTopBottomContainer
@@ -81,6 +82,7 @@ import org.lanternpowered.server.text.title.toPackets
 import org.lanternpowered.server.user.LanternUser
 import org.lanternpowered.server.world.LanternWorldBorder
 import org.lanternpowered.server.world.LanternWorldNew
+import org.lanternpowered.server.world.chunk.Chunks
 import org.spongepowered.api.advancement.Advancement
 import org.spongepowered.api.advancement.AdvancementProgress
 import org.spongepowered.api.advancement.AdvancementTree
@@ -105,12 +107,11 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.inventory.type.ViewableInventory
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.resourcepack.ResourcePack
+import org.spongepowered.api.service.ban.Ban
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.util.AABB
-import org.spongepowered.api.service.ban.Ban
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.gamerule.GameRules
-import org.spongepowered.math.vector.Vector2i
 import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3i
 import java.util.Optional
@@ -204,8 +205,13 @@ class LanternPlayer(
     override fun getWorld(): LanternWorldNew = super<AbstractPlayer>.getWorld()
     override fun getUser(): User = this._user
 
-    override fun kick() = this.connection.close()
-    override fun kick(reason: Text) = this.connection.close(reason)
+    override fun kick(): Boolean = this.kick(textOf("Unknown reason."))
+
+    override fun kick(reason: Text): Boolean {
+        if (this.connection.isClosed)
+            return false
+        return this.connection.tryClose(reason)
+    }
 
     override fun handleDeath(causeStack: CauseStack) {
         // Call the harvest event
@@ -222,7 +228,7 @@ class LanternPlayer(
                 for (slot in this.inventory.slots()) {
                     val stack = slot.peek()
                     if (!stack.isEmpty)
-                        drops.add(LanternItemStackSnapshot.wrap(stack))
+                        drops.add(stack.asSnapshot())
                 }
             }
             if (!harvestEvent.keepsLevel())
@@ -595,11 +601,15 @@ class LanternPlayer(
         this.networkId = id
     }
 
+    override fun sendEnvironment(dimensionType: DimensionType) {
+        TODO("Not yet implemented")
+    }
+
     // region Chunk Loading
 
     private val loadingTicket: ChunkLoadingTicket? = null
-    private var lastChunkPos: Vector2i? = null
-    private val knownChunks = mutableSetOf<Vector2i>()
+    private var lastChunkPos: ChunkPosition? = null
+    private val knownChunks = mutableSetOf<ChunkPosition>()
 
     private fun updateChunkChanges() {
         var loadingTicket = this.loadingTicket
@@ -609,25 +619,32 @@ class LanternPlayer(
 
         val position = this.position
         val xPos = position.x
+        val yPos = position.y
         val zPos = position.z
         val centralX = xPos.toInt() shr 4
+        val centralY = yPos.toInt() shr 4
         val centralZ = zPos.toInt() shr 4
+
+        val chunkPos = ChunkPosition(centralX, centralY, centralZ)
 
         // Fail fast if the player hasn't moved a chunk
         val lastChunkPos = this.lastChunkPos
-        if (lastChunkPos != null && lastChunkPos.x == centralX && lastChunkPos.y == centralZ) {
+        if (lastChunkPos != null && lastChunkPos != chunkPos)
             return
-        }
-        this.lastChunkPos = Vector2i(centralX, centralZ)
+
+        this.lastChunkPos = chunkPos
         this.connection.send(UpdateViewPositionPacket(centralX, centralZ))
+
         val previousChunks = this.knownChunks.toMutableSet()
-        val newChunks = mutableListOf<Vector2i>()
+        val newChunks = mutableListOf<ChunkPosition>()
         val viewDistance = this.world.properties.viewDistance
         for (x in centralX - viewDistance..centralX + viewDistance) {
-            for (z in centralZ - viewDistance..centralZ + viewDistance) {
-                val coords = Vector2i(x, z)
-                if (!previousChunks.remove(coords))
-                    newChunks.add(coords)
+            for (y in centralY - viewDistance..centralY + viewDistance) {
+                for (z in centralZ - viewDistance..centralZ + viewDistance) {
+                    val coords = ChunkPosition(x, y, z)
+                    if (!previousChunks.remove(coords))
+                        newChunks.add(coords)
+                }
             }
         }
 
@@ -636,27 +653,29 @@ class LanternPlayer(
             return
 
         // Sort chunks by distance from player - closer chunks are sent/forced first
-        newChunks.sortedWith(Comparator { a: Vector2i, b: Vector2i ->
-            var dx = 16 * a.x + 8 - xPos
-            var dz = 16 * a.y + 8 - zPos
-            val da = dx * dx + dz * dz
-            dx = 16 * b.x + 8 - xPos
-            dz = 16 * b.y + 8 - zPos
-            val db = dx * dx + dz * dz
+        newChunks.sortedWith(Comparator { a: ChunkPosition, b: ChunkPosition ->
+            var dx = Chunks.Size * a.x + Chunks.HalfSize - xPos
+            var dy = Chunks.Size * a.y + Chunks.HalfSize - yPos
+            var dz = Chunks.Size * a.z + Chunks.HalfSize - zPos
+            val da = dx * dx + dy * dy + dz * dz
+            dx = Chunks.Size * b.x + Chunks.HalfSize - xPos
+            dy = Chunks.Size * b.y + Chunks.HalfSize - yPos
+            dz = Chunks.Size * b.z + Chunks.HalfSize - zPos
+            val db = dx * dx + dy * dy + dz * dz
             da.compareTo(db)
         })
 
         val observedChunkManager = this.world.observedChunkManager
         // Force all the new chunks to be loaded and track the changes
-        newChunks.forEach { coords: Vector2i ->
-            observedChunkManager.addObserver(coords, this)
-            loadingTicket.acquire(ChunkPosition(coords.x, coords.y))
+        newChunks.forEach { coords: ChunkPosition ->
+            observedChunkManager.addObserver(coords.toVector(), this)
+            loadingTicket.acquire(coords)
         }
 
         // Unforce old chunks so they can unload and untrack the chunk
-        previousChunks.forEach { coords: Vector2i ->
-            observedChunkManager.removeObserver(coords, this, true)
-            loadingTicket.release(ChunkPosition(coords.x, coords.y))
+        previousChunks.forEach { coords: ChunkPosition ->
+            observedChunkManager.removeObserver(coords.toVector(), this, true)
+            loadingTicket.release(coords)
         }
 
         this.knownChunks.removeAll(previousChunks)

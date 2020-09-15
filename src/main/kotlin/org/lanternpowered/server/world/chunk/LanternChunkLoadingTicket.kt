@@ -27,13 +27,13 @@ class LanternChunkLoadingTicket(private val chunkManager: ChunkManager) : ChunkL
         get() = this.chunkManager.world
 
     override val chunks: Set<ChunkPosition>
-        get() = withLock { this.set.asSequence().map { ChunkPosition(it) }.toImmutableSet() }
+        get() = this.withLock { this.set.asSequence().map { ChunkPosition(it) }.toImmutableSet() }
 
     override val isEmpty: Boolean
-        get() = withLock { this.set.isEmpty() }
+        get() = this.withLock { this.set.isEmpty() }
 
     override fun acquire(position: ChunkPosition): Boolean {
-        withLock {
+        this.withLock {
             if (this.set.add(position.packed)) {
                 this.chunkManager.acquireReference(position)
                 if (this.set.size == 1)
@@ -55,13 +55,13 @@ class LanternChunkLoadingTicket(private val chunkManager: ChunkManager) : ChunkL
     }
 
     override fun release(position: ChunkPosition): Boolean {
-        withLock {
+        this.withLock {
             return this.release0(position)
         }
     }
 
     override fun releaseAll(positions: Iterable<ChunkPosition>): Boolean {
-        withLock {
+        this.withLock {
             var change = false
             if (positions is ChunkPositionCollection) {
                 val itr = positions.iterator()
@@ -76,7 +76,7 @@ class LanternChunkLoadingTicket(private val chunkManager: ChunkManager) : ChunkL
     }
 
     override fun releaseAll() {
-        withLock {
+        this.withLock {
             this.set.forEachLong { packed ->
                 val position = ChunkPosition(packed)
                 this.chunkManager.releaseReference(position)

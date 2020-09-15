@@ -65,10 +65,7 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
                             cause, originalMessage, originalMessage, connection, false)
                     EventManager.post(event)
                     if (event.isCancelled) {
-                        val disconnectMessage = if (event.isMessageCancelled) {
-                            translatableTextOf("multiplayer.disconnect.generic")
-                        } else event.message
-                        session.close(disconnectMessage)
+                        session.close(event.message)
                         null
                     } else profile
                 }
@@ -112,12 +109,7 @@ object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
 
             val name = json["name"].asString
             val id = json["id"].asString
-
-            val uniqueId = try {
-                UUIDHelper.parseFlatString(id)
-            } catch (e: IllegalArgumentException) {
-                throw IllegalStateException("Received an invalid uuid: $id")
-            }
+            val uniqueId = UUIDHelper.parseFlatStringOrNull(id) ?: error("Received an invalid uuid: $id")
 
             val properties = LanternProfileProperty.createPropertiesMapFromJson(
                     json.getAsJsonArray("properties"))

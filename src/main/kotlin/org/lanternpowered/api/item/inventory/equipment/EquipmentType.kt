@@ -10,5 +10,7 @@
  */
 package org.lanternpowered.api.item.inventory.equipment
 
-typealias Equipable = org.spongepowered.api.item.inventory.Equipable
-typealias ArmorEquipable = org.spongepowered.api.item.inventory.ArmorEquipable
+typealias EquipmentType = org.spongepowered.api.item.inventory.equipment.EquipmentType
+typealias EquipmentTypes = org.spongepowered.api.item.inventory.equipment.EquipmentTypes
+typealias EquipmentGroup = org.spongepowered.api.item.inventory.equipment.EquipmentGroup
+typealias EquipmentGroups = org.spongepowered.api.item.inventory.equipment.EquipmentGroups

@@ -21,7 +21,6 @@ import org.lanternpowered.api.util.optional.emptyOptional
 import org.spongepowered.api.config.ConfigManager
 import org.spongepowered.api.sql.SqlManager
 import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 import java.sql.DriverManager
 import java.sql.SQLException
@@ -130,7 +129,7 @@ class LanternSqlManager(private val configManager: ConfigManager) : SqlManager {
     }
 
     private fun urlDecode(str: String?): String? =
-            if (str == null) null else URLDecoder.decode(str, StandardCharsets.UTF_8)
+            if (str == null) null else URLDecoder.decode(str, Charsets.UTF_8)
 
     override fun getConnectionUrlFromAlias(alias: String): Optional<String> = emptyOptional() // TODO
 

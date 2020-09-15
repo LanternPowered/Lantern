@@ -10,11 +10,11 @@
  */
 package org.lanternpowered.server.item.predicate
 
+import org.lanternpowered.api.item.ItemType
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
 import org.lanternpowered.api.item.inventory.itemStackOf
-import org.lanternpowered.server.inventory.LanternItemStackSnapshot
-import org.spongepowered.api.item.ItemType
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
+import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import java.util.function.Predicate
 
 /**
@@ -28,7 +28,7 @@ interface ItemPredicate {
      * @param stack The item stack
      * @return Whether the stack is valid
      */
-    fun test(stack: ItemStack): Boolean
+    operator fun invoke(stack: ItemStack): Boolean
 
     /**
      * Tests whether the provided [ItemType] is valid.
@@ -36,7 +36,7 @@ interface ItemPredicate {
      * @param type The item type
      * @return Whether the type is valid
      */
-    fun test(type: ItemType): Boolean
+    operator fun invoke(type: ItemType): Boolean
 
     /**
      * Tests whether the provided [ItemStackSnapshot] is valid.
@@ -44,34 +44,28 @@ interface ItemPredicate {
      * @param stack The item stack snapshot
      * @return Whether the stack is valid
      */
-    fun test(stack: ItemStackSnapshot): Boolean
+    operator fun invoke(stack: ItemStackSnapshot): Boolean
 
     /**
      * Gets this [ItemPredicate] as a [ItemStack] [Predicate].
      *
      * @return The predicate
      */
-    fun asStackPredicate(): Predicate<ItemStack> {
-        return Predicate { this.test(it) }
-    }
+    fun asStackPredicate(): (ItemStack) -> Boolean = { this(it) }
 
     /**
      * Gets this [ItemPredicate] as a [ItemStackSnapshot] [Predicate].
      *
      * @return The predicate
      */
-    fun asSnapshotPredicate(): Predicate<ItemStackSnapshot> {
-        return Predicate { this.test(it) }
-    }
+    fun asSnapshotPredicate(): (ItemStackSnapshot) -> Boolean = { this(it) }
 
     /**
      * Gets this [ItemPredicate] as a [ItemType] [Predicate].
      *
      * @return The predicate
      */
-    fun asTypePredicate(): Predicate<ItemType> {
-        return Predicate { this.test(it) }
-    }
+    fun asTypePredicate(): (ItemType) -> Boolean = { this(it) }
 
     /**
      * Combines this [ItemPredicate] with the other one. Both
@@ -84,9 +78,9 @@ interface ItemPredicate {
     fun andThen(itemPredicate: ItemPredicate): ItemPredicate {
         val thisPredicate = this
         return object : ItemPredicate {
-            override fun test(stack: ItemStack) = thisPredicate.test(stack) && itemPredicate.test(stack)
-            override fun test(type: ItemType) = thisPredicate.test(type) && itemPredicate.test(type)
-            override fun test(stack: ItemStackSnapshot) = thisPredicate.test(stack) && itemPredicate.test(stack)
+            override fun invoke(stack: ItemStack) = thisPredicate(stack) && itemPredicate(stack)
+            override fun invoke(type: ItemType) = thisPredicate(type) && itemPredicate(type)
+            override fun invoke(stack: ItemStackSnapshot) = thisPredicate(stack) && itemPredicate(stack)
         }
     }
 
@@ -98,9 +92,9 @@ interface ItemPredicate {
     fun invert(): ItemPredicate {
         val thisPredicate = this
         return object : ItemPredicate {
-            override fun test(stack: ItemStack) = !thisPredicate.test(stack)
-            override fun test(type: ItemType) = !thisPredicate.test(type)
-            override fun test(stack: ItemStackSnapshot) = !thisPredicate.test(stack)
+            override fun invoke(stack: ItemStack) = !thisPredicate(stack)
+            override fun invoke(type: ItemType) = !thisPredicate(type)
+            override fun invoke(stack: ItemStackSnapshot) = !thisPredicate(stack)
         }
     }
 
@@ -114,11 +108,12 @@ interface ItemPredicate {
          * @return The item filter
          */
         @JvmStatic
-        fun ofStackPredicate(predicate: Predicate<ItemStack>): ItemPredicate {
+        fun ofStackPredicate(predicate: (ItemStack) -> Boolean): ItemPredicate {
             return object : ItemPredicate {
-                override fun test(stack: ItemStack) = predicate.test(stack)
-                override fun test(type: ItemType) = predicate.test(itemStackOf(type))
-                override fun test(stack: ItemStackSnapshot) = predicate.test(stack.createStack())
+                override fun asStackPredicate(): (ItemStack) -> Boolean = predicate
+                override fun invoke(stack: ItemStack) = predicate(stack)
+                override fun invoke(type: ItemType) = predicate(itemStackOf(type))
+                override fun invoke(stack: ItemStackSnapshot) = predicate(stack.createStack())
             }
         }
 
@@ -130,11 +125,12 @@ interface ItemPredicate {
          * @return The item filter
          */
         @JvmStatic
-        fun ofSnapshotPredicate(predicate: Predicate<ItemStackSnapshot>): ItemPredicate {
+        fun ofSnapshotPredicate(predicate: (ItemStackSnapshot) -> Boolean): ItemPredicate {
             return object : ItemPredicate {
-                override fun test(stack: ItemStack) = predicate.test(LanternItemStackSnapshot.wrap(stack))
-                override fun test(type: ItemType) = predicate.test(LanternItemStackSnapshot.wrap(itemStackOf(type)))
-                override fun test(stack: ItemStackSnapshot) = predicate.test(stack)
+                override fun asSnapshotPredicate(): (ItemStackSnapshot) -> Boolean = predicate
+                override fun invoke(stack: ItemStack) = predicate(stack.asSnapshot())
+                override fun invoke(type: ItemType) = predicate(itemStackOf(type).asSnapshot())
+                override fun invoke(stack: ItemStackSnapshot) = predicate(stack)
             }
         }
 
@@ -146,11 +142,12 @@ interface ItemPredicate {
          * @return The item filter
          */
         @JvmStatic
-        fun ofTypePredicate(predicate: Predicate<ItemType>): ItemPredicate {
+        fun ofTypePredicate(predicate: (ItemType) -> Boolean): ItemPredicate {
             return object : ItemPredicate {
-                override fun test(stack: ItemStack) = predicate.test(stack.type)
-                override fun test(type: ItemType) = predicate.test(type)
-                override fun test(stack: ItemStackSnapshot) = predicate.test(stack.type)
+                override fun asTypePredicate(): (ItemType) -> Boolean = predicate
+                override fun invoke(stack: ItemStack) = predicate(stack.type)
+                override fun invoke(type: ItemType) = predicate(type)
+                override fun invoke(stack: ItemStackSnapshot) = predicate(stack.type)
             }
         }
     }

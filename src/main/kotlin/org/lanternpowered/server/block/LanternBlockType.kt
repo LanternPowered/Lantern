@@ -39,6 +39,8 @@ class LanternBlockType(
         override val keyRegistry: LocalKeyRegistry<BlockType>
 ) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalImmutableDataHolder<BlockType> {
 
+    val isAir: Boolean = this.key.formatted.contains("air")
+
     private val defaultSoundGroup: BlockSoundGroup = this.get(LanternKeys.BLOCK_SOUND_GROUP).orElse(BlockSoundGroups.STONE)
 
     private var updateRandomly: Boolean = false

@@ -33,6 +33,7 @@ import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.World
+import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.data.DataHelper
 import org.lanternpowered.server.data.DataQueries
 import org.lanternpowered.server.data.LocalDataHolder
@@ -98,6 +99,8 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     private var scale = Vector3d.ONE
     private var position = Vector3d.ZERO
     private var rotation = Vector3d.ZERO
+
+    var chunkPosition: ChunkPosition = ChunkPosition.None
 
     private var _protocolType: EntityProtocolType<*>? = null
 

@@ -31,6 +31,21 @@ object UUIDHelper {
     }
 
     /**
+     * Attempts to parse the [UUID] from a flat string (without dashes).
+     *
+     * @param flat The flat string
+     * @return The uuid
+     */
+    @JvmStatic
+    fun parseFlatStringOrNull(flat: String): UUID? {
+        return try {
+            this.parseFlatString(flat)
+        } catch (ex: Exception) {
+            null
+        }
+    }
+
+    /**
      * Parses the [UUID] from a flat string (without dashes).
      *
      * @param flat The flat string

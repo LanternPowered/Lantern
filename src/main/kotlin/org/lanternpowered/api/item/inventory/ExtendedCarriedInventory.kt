@@ -12,42 +12,50 @@
 
 package org.lanternpowered.api.item.inventory
 
-import org.spongepowered.api.item.inventory.Carrier
-import org.spongepowered.api.item.inventory.type.CarriedInventory
 import java.util.Optional
 import kotlin.contracts.contract
+
+typealias Carrier = org.spongepowered.api.item.inventory.Carrier
+typealias SpongeCarriedInventory<C> = org.spongepowered.api.item.inventory.type.CarriedInventory<C>
 
 /**
  * Gets the normal carried inventory as an extended carried inventory.
  */
-inline fun <C : Carrier> CarriedInventory<C>.fix(): ExtendedCarriedInventory<C> {
-    contract { returns() implies (this@fix is ExtendedCarriedInventory) }
-    return this as ExtendedCarriedInventory
+inline fun <C : Carrier> SpongeCarriedInventory<C>.fix(): ExtendedSpongeCarriedInventory<C> {
+    contract { returns() implies (this@fix is ExtendedSpongeCarriedInventory) }
+    return this as ExtendedSpongeCarriedInventory
 }
 
 /**
  * Gets the normal carried inventory as an extended carried inventory.
  */
 @Deprecated(message = "Redundant call.", replaceWith = ReplaceWith(""))
-inline fun <C : Carrier> ExtendedCarriedInventory<C>.fix(): ExtendedCarriedInventory<C> = this
+inline fun <C : Carrier> ExtendedSpongeCarriedInventory<C>.fix(): ExtendedSpongeCarriedInventory<C> = this
 
 /**
  * Gets the carrier of this inventory.
  */
-inline fun <C : Carrier> CarriedInventory<C>.carrierOrNull(): C? {
-    contract { returns() implies (this@carrierOrNull is ExtendedCarriedInventory) }
-    return (this as ExtendedCarriedInventory).carrierOrNull()
+inline fun <C : Carrier> SpongeCarriedInventory<C>.carrierOrNull(): C? {
+    contract { returns() implies (this@carrierOrNull is ExtendedSpongeCarriedInventory) }
+    return (this as ExtendedSpongeCarriedInventory).carrierOrNull()
 }
 
 /**
- * An extended version of [CarriedInventory].
+ * Represents an inventory carried by a carrier of type [C].
  */
-interface ExtendedCarriedInventory<C : Carrier> : ExtendedInventory, CarriedInventory<C> {
+interface CarriedInventory<C : Any> : ExtendedInventory {
 
     /**
-     * Gets the carrier of this inventory.
+     * Gets the carrier of this inventory. Returns
+     * `null` if there is no carrier.
      */
     fun carrierOrNull(): C?
+}
+
+/**
+ * An extended version of [SpongeCarriedInventory].
+ */
+interface ExtendedSpongeCarriedInventory<C : Carrier> : ExtendedInventory, CarriedInventory<C>, SpongeCarriedInventory<C> {
 
     @Deprecated(message = "Prefer to use carrierOrNull()")
     override fun getCarrier(): Optional<C>

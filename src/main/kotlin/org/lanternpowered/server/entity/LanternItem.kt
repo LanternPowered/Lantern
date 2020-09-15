@@ -13,6 +13,7 @@ package org.lanternpowered.server.entity
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.item.inventory.stack.isSimilarTo
 import org.lanternpowered.api.util.duration.max
@@ -293,7 +294,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
                 newOtherItem.quantity = otherQuantity
 
                 // The snapshot can be wrapped
-                other.offer(Keys.ITEM_STACK_SNAPSHOT, LanternItemStackSnapshot.wrap(newOtherItem))
+                other.offer(Keys.ITEM_STACK_SNAPSHOT, newOtherItem.asSnapshot())
             } else {
                 // The other entity is completely drained and will be removed
                 other.offer(Keys.ITEM_STACK_SNAPSHOT, ItemStackSnapshot.empty())
@@ -314,7 +315,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
         }
         causeStack.popCauseFrame(frame)
         if (newItem != null) {
-            this.offer(Keys.ITEM_STACK_SNAPSHOT, LanternItemStackSnapshot.wrap(newItem))
+            this.offer(Keys.ITEM_STACK_SNAPSHOT, newItem.asSnapshot())
             return CombineData(newPickupDelay, newDespawnDelay)
         }
         return null

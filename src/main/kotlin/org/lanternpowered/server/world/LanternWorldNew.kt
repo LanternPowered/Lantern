@@ -401,7 +401,7 @@ class LanternWorldNew(
         TODO("Not yet implemented")
     }
 
-    override fun createEntityNaturally(type: EntityType<*>, position: Vector3d): Entity {
+    override fun <E : Entity> createEntityNaturally(type: EntityType<E>, position: Vector3d): E {
         TODO("Not yet implemented")
     }
 
@@ -445,7 +445,7 @@ class LanternWorldNew(
         TODO("Not yet implemented")
     }
 
-    override fun createEntity(type: EntityType<*>, position: Vector3d): Entity {
+    override fun <E : Entity> createEntity(type: EntityType<E>, position: Vector3d): E {
         TODO("Not yet implemented")
     }
 

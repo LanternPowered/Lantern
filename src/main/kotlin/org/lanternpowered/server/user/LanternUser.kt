@@ -28,6 +28,7 @@ import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.entity.UserInventory
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.permission.Subject
@@ -126,6 +127,7 @@ class LanternUser(
         return userInventory
     }
 
+    override fun getEquipment(): EquipmentInventory = this.resolvePlayer().equipment
     override fun canEquip(type: EquipmentType): Boolean = this.resolvePlayer().canEquip(type)
     override fun canEquip(type: EquipmentType, equipment: ItemStack): Boolean = this.resolvePlayer().canEquip(type, equipment)
     override fun getEquipped(type: EquipmentType): Optional<ItemStack> = this.resolvePlayer().getEquipped(type)

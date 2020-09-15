@@ -30,5 +30,5 @@ open class LanternZombie(creationData: EntityCreationData) : LanternAgent(creati
         }
     }
 
-    override fun getInventory(): EquipmentInventory = this.equipmentInventory
+    override fun getEquipment(): EquipmentInventory = this.equipmentInventory
 }

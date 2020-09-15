@@ -27,7 +27,9 @@ import org.spongepowered.api.data.Keys
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import java.util.Optional
 
-interface AbstractEquipmentInventory : AbstractCarriedInventory<Equipable>, ExtendedEquipmentInventory {
+interface AbstractEquipmentInventory<C : Equipable> : AbstractCarriedInventory<C>, ExtendedEquipmentInventory<C> {
+
+    override fun getCarrier(): Optional<Equipable> = this.carrierOrNull().asOptional()
 
     fun slots(type: EquipmentType): Sequence<ExtendedSlot> =
             this.slots().asSequence().where { Keys.EQUIPMENT_TYPE eq type }

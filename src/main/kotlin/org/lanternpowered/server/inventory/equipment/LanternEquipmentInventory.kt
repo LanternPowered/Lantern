@@ -13,8 +13,10 @@ package org.lanternpowered.server.inventory.equipment
 import org.lanternpowered.server.inventory.AbstractChildrenInventory
 import org.lanternpowered.server.inventory.AbstractMutableInventory
 import org.lanternpowered.server.inventory.InventoryView
+import org.spongepowered.api.item.inventory.ArmorEquipable
 
-class LanternEquipmentInventory(children: List<AbstractMutableInventory>) : AbstractChildrenInventory(), AbstractEquipmentInventory {
+class LanternEquipmentInventory(children: List<AbstractMutableInventory>) : AbstractChildrenInventory(),
+        AbstractEquipmentInventory<ArmorEquipable> {
 
     init {
         this.init(children)

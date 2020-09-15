@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.util.palette
 
+import org.lanternpowered.api.Lantern
 import org.lanternpowered.api.util.VariableValueArray
 
 interface PaletteBasedArrayFactory {
@@ -49,4 +50,6 @@ interface PaletteBasedArrayFactory {
             deserialize(data, globalPalette) { globalPalette.default }
 
     fun <T : Any> deserialize(data: SerializedPaletteBasedArray<T>, globalPalette: GlobalPalette<T>, default: () -> T): PaletteBasedArray<T>
+
+    companion object : PaletteBasedArrayFactory by Lantern.game.paletteBasedArrayFactory
 }

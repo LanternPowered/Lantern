@@ -34,7 +34,7 @@ class GlobalTabListEntry internal constructor(
         val empty = this.entries.isEmpty()
         this.entries.add(tabListEntry)
         if (empty)
-            GlobalTabList.add(this)
+            this.tabList.add(this)
     }
 
     /**
@@ -45,7 +45,7 @@ class GlobalTabListEntry internal constructor(
     fun removeEntry(entry: LanternTabListEntry) {
         this.entries.remove(entry)
         if (this.entries.isEmpty())
-            GlobalTabList.remove(this.profile)
+            this.tabList.remove(this.profile)
     }
 
     /**
@@ -60,7 +60,7 @@ class GlobalTabListEntry internal constructor(
             entry.list.player.connection.send(packet)
         }
         this.entries.clear()
-        GlobalTabList.remove(this.profile)
+        this.tabList.remove(this.profile)
     }
 
     fun setDisplayName(displayName: Text?) {

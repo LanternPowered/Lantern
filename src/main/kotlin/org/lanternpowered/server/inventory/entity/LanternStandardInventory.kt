@@ -27,12 +27,13 @@ import org.lanternpowered.server.inventory.AbstractSlot
 import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentInventory
 import org.spongepowered.api.data.Keys
+import org.spongepowered.api.item.inventory.ArmorEquipable
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroups
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 
 class LanternStandardInventory : AbstractChildrenInventory(), ExtendedStandardInventory {
 
-    private lateinit var armor: ExtendedEquipmentInventory
+    private lateinit var armor: ExtendedEquipmentInventory<ArmorEquipable>
     private lateinit var primary: ExtendedPrimaryPlayerInventory
     private lateinit var offhand: ExtendedSlot
 
@@ -52,7 +53,7 @@ class LanternStandardInventory : AbstractChildrenInventory(), ExtendedStandardIn
         val armorSlotsFilter: (Slot) -> Boolean = { slot -> slot.get(Keys.EQUIPMENT_TYPE).orNull()?.group eq EquipmentGroups.WORN }
         val armorSlots = this.slots().filter(armorSlotsFilter)
         // Find a dedicated inventory for armor, if there is any
-        var armor = this.query<ExtendedEquipmentInventory>()
+        var armor = this.query<ExtendedEquipmentInventory<ArmorEquipable>>()
                 .filter { inventory -> inventory.slots().contentEquals(armorSlots) }
                 .firstOrNull()
         if (armor == null) {
@@ -62,10 +63,10 @@ class LanternStandardInventory : AbstractChildrenInventory(), ExtendedStandardIn
     }
 
     override fun getPrimary(): ExtendedPrimaryPlayerInventory = this.primary
-    override fun getArmor(): ExtendedEquipmentInventory = this.armor
+    override fun getArmor(): ExtendedEquipmentInventory<ArmorEquipable> = this.armor
     override fun getOffhand(): ExtendedSlot = this.offhand
 
-    override fun getEquipment(): ExtendedEquipmentInventory {
+    override fun getEquipment(): ExtendedEquipmentInventory<ArmorEquipable> {
         TODO("Not yet implemented")
     }
 

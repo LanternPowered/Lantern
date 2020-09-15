@@ -227,8 +227,8 @@ final class LanternWorldPropertiesIO {
         final LanternWorldBorder border = properties.getWorldBorder();
         dataView.getDouble(BORDER_CENTER_X).ifPresent(v -> border.centerX = v);
         dataView.getDouble(BORDER_CENTER_Z).ifPresent(v -> border.centerZ = v);
-        dataView.getDouble(BORDER_SIZE_START).ifPresent(v -> border.diameterStart = v);
-        dataView.getDouble(BORDER_SIZE_END).ifPresent(v -> border.diameterEnd = v);
+        dataView.getDouble(BORDER_SIZE_START).ifPresent(v -> border.startDiameter = v);
+        dataView.getDouble(BORDER_SIZE_END).ifPresent(v -> border.endDiameter = v);
         dataView.getLong(BORDER_SIZE_LERP_TIME).ifPresent(v -> border.lerpTime = v);
         dataView.getDouble(BORDER_DAMAGE).ifPresent(v -> border.damage = v);
         dataView.getDouble(BORDER_DAMAGE_THRESHOLD).ifPresent(v -> border.damageThreshold = v);
@@ -500,7 +500,7 @@ final class LanternWorldPropertiesIO {
         dataView.set(BORDER_CENTER_Z, border.centerZ);
         dataView.set(BORDER_DAMAGE, border.damage);
         dataView.set(BORDER_DAMAGE_THRESHOLD, border.damageThreshold);
-        dataView.set(BORDER_SIZE_END, border.diameterEnd);
+        dataView.set(BORDER_SIZE_END, border.endDiameter);
         dataView.set(BORDER_SIZE_START, border.getDiameter());
         dataView.set(BORDER_SIZE_LERP_TIME, border.getTimeRemainingMillis());
         dataView.set(BORDER_WARNING_BLOCKS, border.getRoundedWarningDistance());

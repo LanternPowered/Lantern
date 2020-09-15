@@ -13,13 +13,13 @@ package org.lanternpowered.server.entity.player
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.server.data.key.LanternKeys
-import org.lanternpowered.server.inventory.equipment.AbstractArmorEquipable
 import org.lanternpowered.server.entity.EntityCreationData
 import org.lanternpowered.server.entity.LanternLiving
 import org.lanternpowered.server.entity.Pose
 import org.lanternpowered.server.entity.player.gamemode.LanternGameMode
 import org.lanternpowered.server.entity.player.tab.GlobalTabList
 import org.lanternpowered.server.game.Lantern
+import org.lanternpowered.server.inventory.equipment.AbstractArmorEquipable
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory
@@ -32,6 +32,7 @@ import org.spongepowered.api.data.type.HandPreferences
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.item.inventory.Carrier
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.permission.Subject
@@ -134,6 +135,7 @@ abstract class AbstractPlayer(private val profile: GameProfile) : LanternLiving(
         get() = this.world.key
 
     override fun getInventory(): LanternPlayerInventory = this.playerInventory
+    override fun getEquipment(): EquipmentInventory = this.inventory.equipment
 
     override var internalSubject: SubjectReference? = null
 

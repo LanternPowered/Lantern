@@ -38,9 +38,23 @@ inline fun List<Slot>.fix(): List<ExtendedSlot> =
 /**
  * Gets the normal slots as an extended slots.
  */
+inline fun Iterable<Slot>.fix(): Iterable<ExtendedSlot> =
+        this.uncheckedCast()
+
+/**
+ * Gets the normal slots as an extended slots.
+ */
 @JvmName("fixExtendedSlots")
 @Deprecated(message = "Redundant call.", replaceWith = ReplaceWith(""))
 inline fun List<ExtendedSlot>.fix(): List<ExtendedSlot> =
+        this.uncheckedCast()
+
+/**
+ * Gets the normal slots as an extended slots.
+ */
+@JvmName("fixExtendedSlots")
+@Deprecated(message = "Redundant call.", replaceWith = ReplaceWith(""))
+inline fun Iterable<ExtendedSlot>.fix(): Iterable<ExtendedSlot> =
         this.uncheckedCast()
 
 /**

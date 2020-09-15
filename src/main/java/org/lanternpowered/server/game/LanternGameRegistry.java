@@ -89,7 +89,6 @@ import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeL
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTreeRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.AdvancementTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.advancement.TriggerRegistryModule;
-import org.lanternpowered.server.game.registry.type.block.BlockEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;

@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.api.util.math
 
+import org.lanternpowered.api.world.chunk.ChunkPosition
+import org.spongepowered.math.GenericMath
 import org.spongepowered.math.imaginary.Quaterniond
 import org.spongepowered.math.imaginary.Quaternionf
 import org.spongepowered.math.vector.Vector2d
@@ -18,6 +20,7 @@ import org.spongepowered.math.vector.Vector2i
 import org.spongepowered.math.vector.Vector3d
 import org.spongepowered.math.vector.Vector3f
 import org.spongepowered.math.vector.Vector3i
+import kotlin.math.ceil
 
 operator fun Vector2d.component1(): Double = this.x
 operator fun Vector2d.component2(): Double = this.y
@@ -129,3 +132,9 @@ operator fun Quaterniond.times(value: Vector3f): Vector3d = rotate(value.x, valu
 
 operator fun Quaternionf.times(value: Vector3f): Vector3f = rotate(value)
 operator fun Quaternionf.times(value: Vector3d): Vector3f = rotate(value.x, value.y, value.z)
+
+fun Double.floorToInt(): Int =
+        GenericMath.floor(this)
+
+fun Double.ceilToInt(): Int =
+        ceil(this).toInt()

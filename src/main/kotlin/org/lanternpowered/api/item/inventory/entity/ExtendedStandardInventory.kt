@@ -15,6 +15,7 @@ package org.lanternpowered.api.item.inventory.entity
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.item.inventory.equipment.ExtendedEquipmentInventory
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
+import org.spongepowered.api.item.inventory.ArmorEquipable
 
 typealias StandardInventory = org.spongepowered.api.item.inventory.entity.StandardInventory
 
@@ -23,9 +24,9 @@ typealias StandardInventory = org.spongepowered.api.item.inventory.entity.Standa
  */
 interface ExtendedStandardInventory : ExtendedInventory, StandardInventory {
 
-    override fun getArmor(): ExtendedEquipmentInventory
+    override fun getArmor(): ExtendedEquipmentInventory<ArmorEquipable>
 
-    override fun getEquipment(): ExtendedEquipmentInventory
+    override fun getEquipment(): ExtendedEquipmentInventory<ArmorEquipable>
 
     override fun getOffhand(): ExtendedSlot
 

@@ -44,6 +44,12 @@ inline class ChunkPosition @PublishedApi internal constructor(
     val z: Int
         get() = ChunkPositionHelper.unpackZ(this.packed)
 
+    /**
+     * The column this position belongs to.
+     */
+    val column: ChunkColumnPosition
+        get() = ChunkColumnPosition(this.x, this.z)
+
     fun offset(xOffset: Int, yOffset: Int, zOffset: Int): ChunkPosition =
             ChunkPosition(this.x + xOffset, this.y + yOffset, this.z + zOffset)
 
@@ -68,4 +74,9 @@ inline class ChunkPosition @PublishedApi internal constructor(
     fun toVector(): Vector3i = Vector3i(this.x, this.y, this.z)
 
     override fun toString(): String = "($x, $y, $z)"
+
+    companion object {
+
+        val None = ChunkPosition(Long.MAX_VALUE)
+    }
 }

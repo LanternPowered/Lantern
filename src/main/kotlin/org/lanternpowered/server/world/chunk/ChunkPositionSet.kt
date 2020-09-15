@@ -14,7 +14,6 @@ import it.unimi.dsi.fastutil.longs.LongIterator
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
 import it.unimi.dsi.fastutil.longs.LongSet
 import org.lanternpowered.api.world.chunk.ChunkPosition
-import java.util.function.Consumer
 
 /**
  * Represents an iterator of [ChunkPosition]s.
@@ -87,18 +86,22 @@ class MinMaxChunkPositionCollection(
         private val max: ChunkPosition
 ) : ChunkPositionCollection {
 
-    override val size: Int = (this.min.x - this.max.x + 1) * (this.min.z - this.max.z + 1)
+    override val size: Int = (this.min.x - this.max.x + 1) * (this.min.y - this.max.y + 1) * (this.min.z - this.max.z + 1)
 
     override fun containsAny(collection: Collection<ChunkPosition>): Boolean {
         return if (collection is MinMaxChunkPositionCollection) {
             val oMin = collection.min
             val oMax = collection.max
-            this.max.x >= oMin.x && oMax.x >= this.min.x && this.max.z >= oMin.z && oMax.z >= this.min.z
+            this.max.x >= oMin.x && oMax.x >= this.min.x &&
+                    this.max.y >= oMin.y && oMax.y >= this.min.y &&
+                    this.max.z >= oMin.z && oMax.z >= this.min.z
         } else collection.any { contains(it) }
     }
 
     override fun contains(element: ChunkPosition): Boolean =
-            element.x in this.min.x..this.max.x && element.z in this.min.z..this.max.z
+            element.x in this.min.x..this.max.x &&
+                    element.y in this.min.y..this.max.y &&
+                    element.z in this.min.z..this.max.z
 
     override fun containsAll(elements: Collection<ChunkPosition>): Boolean = elements.all { contains(it) }
 
@@ -107,8 +110,10 @@ class MinMaxChunkPositionCollection(
     override fun iterator(): ChunkPositionIterator {
         val it = sequence {
             for (x in min.x..max.x) {
-                for (z in min.z..max.z) {
-                    yield(ChunkPosition(x, z))
+                for (y in min.y..max.y) {
+                    for (z in min.z..max.z) {
+                        yield(ChunkPosition(x, y, z))
+                    }
                 }
             }
         }.iterator()

@@ -153,7 +153,7 @@ class ChunkManager(
         entry.lock.write {
             entry.references++
             if (entry.references == 1)
-                queueLoad(entry)
+                this.queueLoad(entry)
         }
     }
 
@@ -167,7 +167,7 @@ class ChunkManager(
         entry.lock.write {
             entry.references--
             if (entry.references == 0)
-                queueUnload(entry)
+                this.queueUnload(entry)
         }
     }
 

@@ -180,7 +180,7 @@ open class LanternSlot : AbstractSlot() {
             this.rawItem.isNotEmpty && predicate(this.rawItem.asSnapshot())
 
     override fun canContain(stack: ItemStack): Boolean =
-            this.filter?.test(stack) ?: true
+            this.filter?.invoke(stack) ?: true
 
     override fun clear() {
         if (this.rawItem.isEmpty)

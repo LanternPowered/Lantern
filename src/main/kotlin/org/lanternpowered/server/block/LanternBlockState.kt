@@ -20,7 +20,6 @@ import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.fluid.FluidState
@@ -33,7 +32,7 @@ class LanternBlockState(
 
     private val serialized: DataContainer = toContainer()
 
-    override fun getType() = this.stateContainer
+    override fun getType(): LanternBlockType = this.stateContainer as LanternBlockType
 
     override fun snapshotFor(location: Location): BlockSnapshot {
         TODO("not implemented") // To change body of created functions use File | Settings | File Templates.
@@ -43,7 +42,7 @@ class LanternBlockState(
         TODO("Not yet implemented")
     }
 
-    override fun validateRawData(container: DataView?): Boolean {
+    override fun validateRawData(container: DataView): Boolean {
         TODO("Not yet implemented")
     }
 
@@ -65,10 +64,10 @@ class LanternBlockState(
          * modifying.
          *
          * {
-         * Name: "minecraft:furnace",
-         * Properties: {
-         * "lit": "true"
-         * }
+         *   Name: "minecraft:furnace",
+         *   Properties: {
+         *     "lit": "true"
+         *   }
          * }
          *
          * @param blockState The block state to serialize
@@ -82,10 +81,10 @@ class LanternBlockState(
          * used by [BlockPalette] to store block states.
          *
          * {
-         * Name: "minecraft:furnace",
-         * Properties: {
-         * "lit": "true"
-         * }
+         *   Name: "minecraft:furnace",
+         *   Properties: {
+         *     "lit": "true"
+         *   }
          * }
          *
          * @param dataView The data view to deserialize

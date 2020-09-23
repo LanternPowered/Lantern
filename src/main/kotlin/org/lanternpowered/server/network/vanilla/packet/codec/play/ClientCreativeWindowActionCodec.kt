@@ -11,16 +11,16 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientCreativeWindowActionPacket
 
 object ClientCreativeWindowActionCodec : PacketDecoder<ClientCreativeWindowActionPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientCreativeWindowActionPacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientCreativeWindowActionPacket {
         val slot = buf.readShort().toInt()
-        val item = context.read(buf, ContextualValueTypes.ITEM_STACK)
+        val item = NetworkItemStack.read(ctx, buf)
         return ClientCreativeWindowActionPacket(slot, item)
     }
 }

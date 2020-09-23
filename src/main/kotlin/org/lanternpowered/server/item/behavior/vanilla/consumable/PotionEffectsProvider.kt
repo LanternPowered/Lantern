@@ -14,7 +14,7 @@ import org.lanternpowered.api.effect.potion.merge
 import org.lanternpowered.api.util.collections.immutableSetOf
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.orNull
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.effect.potion.PotionEffect
 import org.spongepowered.api.item.inventory.ItemStack
 

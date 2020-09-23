@@ -11,20 +11,19 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetEntityPassengersPacket
 
-class SetEntityPassengersCodec : Codec<SetEntityPassengersPacket> {
+object SetEntityPassengersCodec : PacketEncoder<SetEntityPassengersPacket> {
 
-    override fun encode(context: CodecContext, packet: SetEntityPassengersPacket): ByteBuffer {
-        val buf = context.byteBufAlloc().buffer()
+    override fun encode(ctx: CodecContext, packet: SetEntityPassengersPacket): ByteBuffer {
+        val buf = ctx.byteBufAlloc().buffer()
         buf.writeVarInt(packet.entityId)
         val passengersIds = packet.passengersIds
         buf.writeVarInt(passengersIds.size)
-        for (entityId in passengersIds) {
+        for (entityId in passengersIds)
             buf.writeVarInt(entityId)
-        }
         return buf
     }
 }

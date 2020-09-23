@@ -14,7 +14,7 @@ import org.lanternpowered.server.block.entity.BlockEntityCreationData
 import org.lanternpowered.server.block.entity.LanternBlockEntity
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
 import org.spongepowered.api.block.entity.Banner
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.type.DyeColors
 
 class LanternBanner(creationData: BlockEntityCreationData) : LanternBlockEntity(creationData), Banner {

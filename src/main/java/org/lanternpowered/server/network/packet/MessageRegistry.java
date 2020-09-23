@@ -15,7 +15,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.network.packet.codec.Codec;
-import org.lanternpowered.server.network.packet.handler.Handler;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -163,7 +162,7 @@ public final class MessageRegistry {
 
     /**
      * Binds a {@link Packet} type to this registry and
-     * attaches the {@link Handler} to it.
+     * attaches the {@link PacketHandler} to it.
      *
      * @param messageType The message type
      * @param handler The handler
@@ -171,7 +170,7 @@ public final class MessageRegistry {
      * @param <H> The type of the handler
      * @return The registration
      */
-    public <M extends Packet, H extends Handler<? super M>> MessageRegistration<M> bindHandler(Class<M> messageType, H handler) {
+    public <M extends Packet, H extends PacketHandler<? super M>> MessageRegistration<M> bindHandler(Class<M> messageType, H handler) {
         final MessageRegistration<M> registration = bindMessage(messageType);
         registration.bindHandler(handler);
         return registration;

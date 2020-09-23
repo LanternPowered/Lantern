@@ -16,7 +16,7 @@ import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.entity.player.gamemode.LanternGameMode
 import org.lanternpowered.server.registry.internalCatalogTypeRegistry
 import org.spongepowered.api.data.DataHolder
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.entity.living.player.gamemode.GameMode
 
 @get:JvmName("get")

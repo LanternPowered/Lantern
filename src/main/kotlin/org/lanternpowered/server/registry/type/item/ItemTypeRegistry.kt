@@ -41,7 +41,7 @@ import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsP
 import org.lanternpowered.server.item.itemTypeOf
 import org.lanternpowered.server.item.property.BowProjectile
 import org.lanternpowered.server.registry.type.block.BlockTypeRegistry
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.type.ArmorMaterial
 import org.spongepowered.api.data.type.ArmorMaterials
 import org.spongepowered.api.data.type.DyeColor

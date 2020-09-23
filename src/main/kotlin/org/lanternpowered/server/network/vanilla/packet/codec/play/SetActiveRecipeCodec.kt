@@ -17,8 +17,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SetActiveRecip
 
 object SetActiveRecipeCodec : PacketEncoder<SetActiveRecipePacket> {
 
-    override fun encode(context: CodecContext, packet: SetActiveRecipePacket): ByteBuffer {
-        val buf = context.byteBufAlloc().buffer()
+    override fun encode(ctx: CodecContext, packet: SetActiveRecipePacket): ByteBuffer {
+        val buf = ctx.byteBufAlloc().buffer()
         buf.writeByte(packet.windowId.toByte())
         buf.writeString(packet.recipeId)
         return buf

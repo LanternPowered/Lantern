@@ -16,7 +16,7 @@ import org.lanternpowered.api.world.chunk.ChunkColumnPosition
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.spongepowered.math.vector.Vector3i
 
-object Chunks {
+internal object Chunks {
 
     /**
      * The amount of bits used by a chunk.
@@ -140,6 +140,12 @@ object Chunks {
     /**
      * Converts the x, y, z to global coordinates.
      */
+    fun toGlobal(chunk: ChunkPosition, local: LocalPosition): Vector3i =
+            this.toGlobal(chunk.x, chunk.y, chunk.z, local.x, local.y, local.z)
+
+    /**
+     * Converts the x, y, z to global coordinates.
+     */
     fun toGlobal(chunk: ChunkPosition, localX: Int, localY: Int, localZ: Int): Vector3i =
             this.toGlobal(chunk.x, chunk.y, chunk.z, localX, localY, localZ)
 
@@ -158,4 +164,12 @@ object Chunks {
      * the value ranges between 0 and (1 shl 12) - 1.
      */
     fun localIndex(localX: Int, localY: Int, localZ: Int): Int = (localY shl 8) or (localZ shl 4) or localX
+
+    /**
+     * Performs the given [function] for each [LocalPosition] of a chunk.
+     */
+    inline fun forEachLocalPosition(function: (LocalPosition) -> Unit) {
+        for (i in 0 until Volume)
+            function(LocalPosition(i))
+    }
 }

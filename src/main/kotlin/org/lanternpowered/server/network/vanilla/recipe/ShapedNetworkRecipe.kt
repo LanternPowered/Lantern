@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.spongepowered.api.item.inventory.ItemStack
 
@@ -22,17 +22,16 @@ class ShapedNetworkRecipe(
         private val ingredients: Array<Array<NetworkIngredient>>
 ) : GroupedNetworkRecipe(id, NetworkRecipeTypes.CRAFTING_SHAPED, group) {
 
-    override fun write(ctx: CodecContext, buf: ByteBuffer) {
+    override fun writeProperties(ctx: CodecContext, buf: ByteBuffer) {
         val width = this.ingredients.size
         val height = this.ingredients[0].size
         buf.writeVarInt(width)
         buf.writeVarInt(height)
-        super.write(ctx, buf)
+        super.writeProperties(ctx, buf)
         for (j in 0 until height) {
-            for (i in 0 until width) {
+            for (i in 0 until width)
                 this.ingredients[i][j].write(ctx, buf)
-            }
         }
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.result)
+        NetworkItemStack.write(ctx, buf, this.result)
     }
 }

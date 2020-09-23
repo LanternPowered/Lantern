@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class NetworkIngredient(private val items: Collection<ItemStack>) {
@@ -21,8 +21,7 @@ class NetworkIngredient(private val items: Collection<ItemStack>) {
 
     fun write(ctx: CodecContext, buf: ByteBuffer) {
         buf.writeVarInt(this.items.size)
-        for (itemStack in this.items) {
-            ctx.write(buf, ContextualValueTypes.ITEM_STACK, itemStack)
-        }
+        for (itemStack in this.items)
+            NetworkItemStack.write(ctx, buf, itemStack)
     }
 }

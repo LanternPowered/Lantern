@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.TheEndPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket
 
-class TheEndMessageProcessor : PacketProcessor<TheEndPacket> {
+object TheEndMessageProcessor : PacketProcessor<TheEndPacket> {
 
     override fun process(context: CodecContext, packet: TheEndPacket, output: MutableList<Packet>) {
         output.add(ChangeGameStatePacket(4, if (packet.playCredits) 1f else 0f))

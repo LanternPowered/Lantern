@@ -13,7 +13,7 @@ package org.lanternpowered.server.entity.player
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.world.Location
 import org.lanternpowered.api.world.locationOf
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.profile.GameProfile
 
 class OfflinePlayer(profile: GameProfile) : AbstractPlayer(profile) {

@@ -13,6 +13,7 @@ package org.lanternpowered.server.network.vanilla.advancement
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.contentToString
 import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.value.ContextualValueCodec
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class NetworkAdvancement(
@@ -23,21 +24,28 @@ class NetworkAdvancement(
         private val requirements: Array<Array<String>>
 ) {
 
-    fun write(ctx: CodecContext, buf: ByteBuffer) {
-        buf.writeString(this.id)
-        buf.writeBoolean(this.parentId != null)
-        if (this.parentId != null)
-            buf.writeString(this.parentId)
-        buf.writeBoolean(this.display != null)
-        this.display?.write(ctx, buf)
-        buf.writeVarInt(this.criteria.size)
-        this.criteria.forEach { criterion -> buf.writeString(criterion) }
-        buf.writeVarInt(this.requirements.size)
-        for (requirements in this.requirements) {
-            buf.writeVarInt(requirements.size)
-            for (requirement in requirements)
-                buf.writeString(requirement)
+    companion object : ContextualValueCodec<NetworkAdvancement> {
+
+        override fun write(ctx: CodecContext, buf: ByteBuffer, value: NetworkAdvancement) {
+            buf.writeString(value.id)
+            buf.writeBoolean(value.parentId != null)
+            if (value.parentId != null)
+                buf.writeString(value.parentId)
+            buf.writeBoolean(value.display != null)
+            if (value.display != null)
+                NetworkAdvancementDisplay.write(ctx, buf, value.display)
+            buf.writeVarInt(value.criteria.size)
+            for (criterion in value.criteria)
+                buf.writeString(criterion)
+            buf.writeVarInt(value.requirements.size)
+            for (requirements in value.requirements) {
+                buf.writeVarInt(requirements.size)
+                for (requirement in requirements)
+                    buf.writeString(requirement)
+            }
         }
+
+        override fun read(ctx: CodecContext, buf: ByteBuffer): NetworkAdvancement = throw UnsupportedOperationException()
     }
 
     override fun toString(): String = ToStringHelper(this)

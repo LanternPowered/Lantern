@@ -32,7 +32,7 @@ import org.lanternpowered.server.network.packet.MessageRegistration;
 import org.lanternpowered.server.network.packet.UnknownPacket;
 import org.lanternpowered.server.network.packet.codec.Codec;
 import org.lanternpowered.server.network.packet.codec.CodecContext;
-import org.lanternpowered.server.network.packet.handler.Handler;
+import org.lanternpowered.server.network.packet.PacketHandler;
 import org.lanternpowered.server.network.packet.PacketProcessor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
@@ -139,7 +139,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Pa
                 processor.process(context, packet, output);
             }
         } else {
-            final Optional<Handler> optHandler = messageRegistration.getHandler();
+            final Optional<PacketHandler> optHandler = messageRegistration.getHandler();
             if (optHandler.isPresent()) {
                 // Add the message to the output
                 output.add(new HandlerPacket(packet, optHandler.get()));

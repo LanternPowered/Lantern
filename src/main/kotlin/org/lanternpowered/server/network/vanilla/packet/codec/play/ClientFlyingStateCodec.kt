@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFlyingSt
 
 object ClientFlyingStateCodec : Codec<ClientFlyingStatePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientFlyingStatePacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientFlyingStatePacket {
         val flying = buf.readByte().toInt() and 0x02 != 0
         return ClientFlyingStatePacket(flying)
     }

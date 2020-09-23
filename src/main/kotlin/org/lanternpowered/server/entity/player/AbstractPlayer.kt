@@ -27,7 +27,7 @@ import org.lanternpowered.server.item.recipe.RecipeBookState
 import org.lanternpowered.server.permission.ProxySubject
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.statistic.StatisticMap
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.type.HandPreferences
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.living.player.gamemode.GameModes

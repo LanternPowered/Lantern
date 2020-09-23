@@ -26,7 +26,7 @@ import org.lanternpowered.server.inventory.AbstractMutableInventory
 import org.lanternpowered.server.inventory.AbstractSlot
 import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentInventory
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.item.inventory.ArmorEquipable
 import org.spongepowered.api.item.inventory.equipment.EquipmentGroups
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes

@@ -19,8 +19,8 @@ object ClientEditCommandBlockBlockCodec : PacketDecoder<ClientEditCommandBlockPa
 
     private val modes = ClientEditCommandBlockPacket.Block.Mode.values()
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientEditCommandBlockPacket.Block {
-        val pos = buf.readPosition()
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientEditCommandBlockPacket.Block {
+        val pos = buf.readBlockPosition()
         val command = buf.readString()
         val mode = this.modes[buf.readVarInt()]
         val flags = buf.readByte().toInt()

@@ -17,6 +17,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientChangeTr
 
 object ClientChangeTradeOfferCodec : PacketDecoder<ClientChangeTradeOfferPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientChangeTradeOfferPacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientChangeTradeOfferPacket =
             ClientChangeTradeOfferPacket(buf.readVarInt())
 }

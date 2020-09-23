@@ -27,7 +27,7 @@ import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.inventory.IInventory;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.DefaultParameterList;
+import org.lanternpowered.server.network.entity.parameter.MutableParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket;
@@ -117,7 +117,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     protected void spawnWithMetadata(EntityProtocolUpdateContext context) {
-        final ParameterList parameterList = new DefaultParameterList();
+        final ParameterList parameterList = new MutableParameterList();
         spawn(parameterList);
         if (!parameterList.isEmpty()) {
             context.sendToAll(() -> new EntityMetadataPacket(getRootEntityId(), parameterList));
@@ -223,7 +223,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             this.lastVelZ = vz;
         }
         final ParameterList parameterList = context == EntityProtocolUpdateContext.empty() ?
-                EmptyParameterList.INSTANCE : new DefaultParameterList();
+                EmptyParameterList.INSTANCE : new MutableParameterList();
         update(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
@@ -249,7 +249,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void updateTranslations(EntityProtocolUpdateContext context) {
-        final ParameterList parameterList = new DefaultParameterList();
+        final ParameterList parameterList = new MutableParameterList();
         updateTranslations(parameterList);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
@@ -308,7 +308,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      * @return The byte buffer
      */
     ParameterList fillSpawnParameters() {
-        final ParameterList parameterList = new DefaultParameterList();
+        final ParameterList parameterList = new MutableParameterList();
         spawn(parameterList);
         return parameterList;
     }

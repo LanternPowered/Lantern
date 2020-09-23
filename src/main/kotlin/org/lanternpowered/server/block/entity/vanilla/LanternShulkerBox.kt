@@ -21,7 +21,7 @@ import org.lanternpowered.server.inventory.InventorySnapshot
 import org.lanternpowered.server.inventory.vanilla.VanillaInventoryArchetypes
 import org.lanternpowered.server.inventory.vanilla.block.ChestInventory
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypes
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import kotlin.random.Random
 
 class LanternShulkerBox(creationData: BlockEntityCreationData) : ContainerBlockEntity<ChestInventory>() {

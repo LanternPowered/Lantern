@@ -11,10 +11,10 @@
 package org.lanternpowered.server.network.vanilla.packet.handler.status
 
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.status.StatusPingPacket
 
-class StatusPingHandler : Handler<StatusPingPacket> {
+object StatusPingHandler : PacketHandler<StatusPingPacket> {
 
     override fun handle(context: NetworkContext, packet: StatusPingPacket) {
         context.session.send(packet)

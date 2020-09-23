@@ -12,18 +12,18 @@ package org.lanternpowered.server.network
 
 import com.google.common.reflect.TypeToken
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import java.util.concurrent.ConcurrentHashMap
 
 object NettyThreadOnlyHelper {
 
-    private val map = ConcurrentHashMap<Class<out Handler<out Packet>>, Boolean>()
+    private val map = ConcurrentHashMap<Class<out PacketHandler<out Packet>>, Boolean>()
 
-    fun isHandlerNettyThreadOnly(handlerClass: Class<out Handler<out Packet>>): Boolean {
+    fun isHandlerNettyThreadOnly(handlerClass: Class<out PacketHandler<out Packet>>): Boolean {
         return this.map.computeIfAbsent(handlerClass) { isHandlerNettyThreadOnly0(it) }
     }
 
-    private fun isHandlerNettyThreadOnly0(handlerClass: Class<out Handler<out Packet>>): Boolean {
+    private fun isHandlerNettyThreadOnly0(handlerClass: Class<out PacketHandler<out Packet>>): Boolean {
         for (method in handlerClass.methods) {
             if (method.name != "handle" || method.parameterCount != 2 || method.isSynthetic) {
                 continue
@@ -33,8 +33,8 @@ object NettyThreadOnlyHelper {
                 continue
             }
             val messageType = TypeToken.of(handlerClass)
-                    .getSupertype(Handler::class.java)
-                    .resolveType(Handler::class.java.typeParameters[0])
+                    .getSupertype(PacketHandler::class.java)
+                    .resolveType(PacketHandler::class.java.typeParameters[0])
             if (messageType.rawType != params[1]) {
                 continue
             }

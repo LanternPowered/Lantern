@@ -22,7 +22,7 @@ class ResourcePackStatusCodec : Codec<ResourcePackStatusPacket> {
 
     private val status = Int2ObjectOpenHashMap<ResourcePackStatus>()
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ResourcePackStatusPacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ResourcePackStatusPacket {
         val statusCode = buf.readVarInt()
         val status = this.status[statusCode] ?: throw DecoderException("Unknown status: $statusCode")
         return ResourcePackStatusPacket(status)

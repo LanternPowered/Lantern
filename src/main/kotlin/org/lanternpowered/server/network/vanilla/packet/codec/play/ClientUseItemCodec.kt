@@ -18,6 +18,6 @@ import org.spongepowered.api.data.type.HandTypes
 
 object ClientUseItemCodec : PacketDecoder<ClientUseItemPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientUseItemPacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientUseItemPacket =
             ClientUseItemPacket(if (buf.readVarInt() == 0) HandTypes.MAIN_HAND.get() else HandTypes.OFF_HAND.get())
 }

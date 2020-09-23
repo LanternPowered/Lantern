@@ -18,7 +18,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeAdvancem
 
 object ChangeAdvancementTreeCodec : PacketDecoder<ChangeAdvancementTreePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ChangeAdvancementTreePacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ChangeAdvancementTreePacket {
         val type = buf.readVarInt()
         if (type == 0) {
             val id = buf.readString()

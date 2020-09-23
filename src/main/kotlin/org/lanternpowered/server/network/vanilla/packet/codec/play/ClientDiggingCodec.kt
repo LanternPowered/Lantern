@@ -24,9 +24,9 @@ object ClientDiggingCodec : PacketDecoder<Packet> {
 
     private val diggingActions = ClientDiggingPacket.Action.values()
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): Packet {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): Packet {
         val action = buf.readByte().toInt()
-        val position = buf.readPosition()
+        val position = buf.readBlockPosition()
         val face = buf.readByte().toInt()
         return when (action) {
             0, 1, 2 -> ClientDiggingPacket(this.diggingActions[action], position, CodecUtils.decodeDirection(face))

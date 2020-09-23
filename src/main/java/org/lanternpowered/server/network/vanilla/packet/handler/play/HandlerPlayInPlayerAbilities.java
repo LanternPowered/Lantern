@@ -15,7 +15,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.packet.handler.Handler;
+import org.lanternpowered.server.network.packet.PacketHandler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientFlyingStatePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityVelocityPacket;
 import org.spongepowered.api.data.Keys;
@@ -23,7 +23,7 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.math.vector.Vector3d;
 
-public class HandlerPlayInPlayerAbilities implements Handler<ClientFlyingStatePacket> {
+public class HandlerPlayInPlayerAbilities implements PacketHandler<ClientFlyingStatePacket> {
 
     @Override
     public void handle(NetworkContext context, ClientFlyingStatePacket packet) {

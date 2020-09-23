@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.packet.handler.play
 
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSprintStatePacket
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 
-object ClientSprintStateHandler : Handler<ClientSprintStatePacket> {
+object ClientSprintStateHandler : PacketHandler<ClientSprintStatePacket> {
 
     override fun handle(context: NetworkContext, packet: ClientSprintStatePacket) {
         context.session.player.offer(Keys.IS_SPRINTING, packet.isSprinting)

@@ -49,7 +49,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolType
 import org.lanternpowered.server.util.LanternTransform
 import org.lanternpowered.server.world.LanternLocation
 import org.lanternpowered.server.world.LanternWorldNew
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.effect.sound.SoundType
@@ -354,9 +354,9 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     }
 
     /**
-     * Pulses the entity.
+     * Updates the entity.
      *
-     * @param deltaTime The amount of ticks that passed since the last pulse
+     * @param deltaTime The amount of time that passed since the last update
      */
     protected open fun update(deltaTime: Duration) {
         val vehicle = this.vehicle

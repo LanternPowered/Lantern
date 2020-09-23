@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientClickRec
 
 object ClientClickRecipeCodec : PacketDecoder<ClientClickRecipePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientClickRecipePacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientClickRecipePacket {
         val windowId: Int = buf.readByte().toInt() and 0xff
         val recipe = buf.readString()
         val shift = buf.readBoolean()

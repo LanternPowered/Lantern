@@ -17,6 +17,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSetDispl
 
 object ClientSetDisplayedRecipeCodec : PacketDecoder<ClientSetDisplayedRecipePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientSetDisplayedRecipePacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientSetDisplayedRecipePacket =
             ClientSetDisplayedRecipePacket(buf.readString())
 }

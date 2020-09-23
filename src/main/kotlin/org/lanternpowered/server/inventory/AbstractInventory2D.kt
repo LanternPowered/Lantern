@@ -17,7 +17,7 @@ import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import java.util.Optional
 

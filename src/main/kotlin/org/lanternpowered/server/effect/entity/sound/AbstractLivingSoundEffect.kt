@@ -13,7 +13,7 @@ package org.lanternpowered.server.effect.entity.sound
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect
 import org.lanternpowered.server.entity.EntityBodyPosition
 import org.lanternpowered.server.entity.LanternEntity
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import kotlin.random.Random
 
 abstract class AbstractLivingSoundEffect(position: EntityBodyPosition) : AbstractEntityEffect(position) {

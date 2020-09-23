@@ -17,8 +17,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateWorldSky
 /**
  * This message should not be used directly in the server implementation,
  * this is only for internal purposes used by other message types in the
- * processing. Messages like: [UpdateWorldSkyPacket],
- * [SetGameModePacket], etc.
+ * processing. Messages like: [UpdateWorldSkyPacket], [SetGameModePacket],
+ * etc.
  *
  * @property type the type
  * @property value the value

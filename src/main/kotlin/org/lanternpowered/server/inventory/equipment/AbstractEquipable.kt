@@ -16,7 +16,7 @@ import org.lanternpowered.api.item.inventory.equipment.EquipmentInventory
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.where
 import org.lanternpowered.api.util.optional.asOptional
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import java.util.Optional
 

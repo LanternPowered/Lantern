@@ -11,7 +11,6 @@
 package org.lanternpowered.server.network.packet;
 
 import org.lanternpowered.server.network.packet.codec.Codec;
-import org.lanternpowered.server.network.packet.handler.Handler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +24,7 @@ public final class MessageRegistration<M extends Packet> {
 
     private final Class<M> messageType;
     Optional<CodecRegistration<? super M, Codec<? super M>>> codecRegistration = Optional.empty();
-    private Optional<Handler<? super M>> handler = Optional.empty();
+    private Optional<PacketHandler<? super M>> handler = Optional.empty();
     private List<PacketProcessor<? super M>> processors = new ArrayList<>();
     private List<PacketProcessor<? super M>> unmodifiableProcessors = Collections.unmodifiableList(this.processors);
 
@@ -53,12 +52,12 @@ public final class MessageRegistration<M extends Packet> {
     }
 
     /**
-     * Gets the {@link Handler} that is bound to this message registration,
+     * Gets the {@link PacketHandler} that is bound to this message registration,
      * may be {@link Optional#empty()}.
      *
      * @return The handler, if present
      */
-    public Optional<Handler<? super M>> getHandler() {
+    public Optional<PacketHandler<? super M>> getHandler() {
         return this.handler;
     }
 
@@ -77,7 +76,7 @@ public final class MessageRegistration<M extends Packet> {
      * @param handler The handler
      * @return This message registration, for chaining
      */
-    public MessageRegistration<M> bindHandler(@Nullable Handler<? super M> handler) {
+    public MessageRegistration<M> bindHandler(@Nullable PacketHandler<? super M> handler) {
         this.handler = Optional.ofNullable(handler);
         return this;
     }

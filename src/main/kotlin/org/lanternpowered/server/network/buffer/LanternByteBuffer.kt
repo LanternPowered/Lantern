@@ -405,13 +405,13 @@ class LanternByteBuffer(val delegate: ByteBuf) : ByteBuffer {
     override fun writeVector3i(vector: Vector3i): LanternByteBuffer =
             this.writeVector3i(vector.x, vector.y, vector.z)
 
-    override fun getPosition(index: Int): Vector3i =
-            this.readAt(index) { this.readPosition() }
+    override fun getBlockPosition(index: Int): Vector3i =
+            this.readAt(index) { this.readBlockPosition() }
 
-    override fun setPosition(index: Int, vector: Vector3i): LanternByteBuffer =
-            this.writeAt(index) { this.writePosition(vector) }
+    override fun setBlockPosition(index: Int, vector: Vector3i): LanternByteBuffer =
+            this.writeAt(index) { this.writeBlockPosition(vector) }
 
-    override fun readPosition(): Vector3i {
+    override fun readBlockPosition(): Vector3i {
         val value = delegate.readLong()
         val x = (value shr 38).toInt()
         val y = (value and 0xfff).toInt()
@@ -419,13 +419,13 @@ class LanternByteBuffer(val delegate: ByteBuf) : ByteBuffer {
         return Vector3i(x, y, z)
     }
 
-    override fun writePosition(x: Int, y: Int, z: Int): LanternByteBuffer {
+    override fun writeBlockPosition(x: Int, y: Int, z: Int): LanternByteBuffer {
         this.delegate.writeLong(x.toLong() and 0x3ffffff shl 38 or (z.toLong() and 0x3ffffff shl 12) or (y.toLong() and 0xfff))
         return this
     }
 
-    override fun writePosition(vector: Vector3i): LanternByteBuffer =
-            this.writePosition(vector.x, vector.y, vector.z)
+    override fun writeBlockPosition(vector: Vector3i): LanternByteBuffer =
+            this.writeBlockPosition(vector.x, vector.y, vector.z)
 
     override fun getVector3f(index: Int): Vector3f =
             this.readAt(index) { this.readVector3f() }

@@ -18,7 +18,7 @@ import org.lanternpowered.server.registry.type.potion.PotionEffectTypeRegistry
 
 object ClientAcceptBeaconEffectsCodec : PacketDecoder<ClientAcceptBeaconEffectsPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientAcceptBeaconEffectsPacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientAcceptBeaconEffectsPacket {
         val primary = PotionEffectTypeRegistry.get(buf.readVarInt())
         val secondary = PotionEffectTypeRegistry.get(buf.readVarInt())
         return ClientAcceptBeaconEffectsPacket(primary, secondary)

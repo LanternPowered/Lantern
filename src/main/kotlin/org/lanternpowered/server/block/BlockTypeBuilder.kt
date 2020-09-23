@@ -27,7 +27,7 @@ import org.lanternpowered.server.item.ItemTypeBuilder
 import org.spongepowered.api.block.entity.BlockEntity
 import org.spongepowered.api.block.entity.BlockEntityType
 import org.spongepowered.api.block.entity.BlockEntityTypes
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.state.StateProperty
 import org.spongepowered.math.vector.Vector3d
 import java.util.function.Supplier

@@ -12,7 +12,7 @@ package org.lanternpowered.server.cause.entity.damage.source
 
 import org.lanternpowered.api.value.immutableValueOf
 import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.entity.FallingBlock
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource

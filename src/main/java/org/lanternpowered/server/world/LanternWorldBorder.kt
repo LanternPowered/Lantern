@@ -15,7 +15,6 @@ import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.WorldBorderPacket
 import org.lanternpowered.server.world.chunk.Chunks
-import org.lanternpowered.server.world.chunk.LanternChunkLayout
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.math.vector.Vector3d
 import java.time.Duration
@@ -73,7 +72,7 @@ class LanternWorldBorder : WorldBorder {
     fun addPlayer(player: LanternPlayer) {
         if (!players.add(player))
             return
-        player.connection.send(WorldBorderPacket.Initialize(this.centerX, this.centerZ, this.diameter,
+        player.connection.send(WorldBorderPacket.Init(this.centerX, this.centerZ, this.diameter,
                 this.newDiameter, this.timeRemainingMillis, Boundary, this.roundedWarningDistance, this.warningTimeSeconds))
     }
 

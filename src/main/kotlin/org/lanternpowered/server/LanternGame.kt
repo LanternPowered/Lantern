@@ -69,6 +69,11 @@ import java.util.Locale
 object LanternGame : Game {
 
     /**
+     * The number of ticks per second in vanilla minecraft.
+     */
+    const val MINECRAFT_TICKS_PER_SECOND = 20
+
+    /**
      * The current protocol version number that's supported.
      */
     const val PROTOCOL_VERSION = 714

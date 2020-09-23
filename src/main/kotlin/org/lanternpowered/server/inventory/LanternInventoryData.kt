@@ -15,7 +15,7 @@ import org.lanternpowered.api.item.inventory.slot.Slot
 import org.lanternpowered.api.item.inventory.slotIndex
 import org.lanternpowered.api.item.inventory.slotPosition
 import org.lanternpowered.server.data.GlobalKeyRegistry
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 
 object LanternInventoryData {
 

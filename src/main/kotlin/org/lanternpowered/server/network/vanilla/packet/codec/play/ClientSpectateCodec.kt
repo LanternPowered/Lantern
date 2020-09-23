@@ -17,6 +17,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSpectate
 
 object ClientSpectateCodec : PacketDecoder<ClientSpectatePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientSpectatePacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientSpectatePacket =
             ClientSpectatePacket(buf.readUniqueId())
 }

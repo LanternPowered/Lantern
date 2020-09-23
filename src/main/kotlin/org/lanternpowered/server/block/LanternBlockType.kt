@@ -13,8 +13,10 @@ package org.lanternpowered.server.block
 import net.kyori.adventure.text.Component
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.behavior.Behavior
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline
+import org.lanternpowered.server.block.entity.LanternBlockEntityType
 import org.lanternpowered.server.data.LocalImmutableDataHolder
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.data.key.LanternKeys
@@ -34,12 +36,13 @@ import java.util.Optional
 class LanternBlockType(
         private val key: NamespacedKey,
         private val name: Text,
-        val blockEntityType: BlockEntityType?,
+        blockEntityType: BlockEntityType?,
         stateProperties: Iterable<StateProperty<*>>,
         override val keyRegistry: LocalKeyRegistry<BlockType>
 ) : AbstractStateContainer<BlockState>(key, stateProperties, ::LanternBlockState), BlockType, LocalImmutableDataHolder<BlockType> {
 
-    val isAir: Boolean = this.key.formatted.contains("air")
+    val isAir: Boolean = "^(.+_)?air\$".toRegex().matches(key.value)
+    val blockEntityType: LanternBlockEntityType<BlockEntity>? = blockEntityType.uncheckedCast()
 
     private val defaultSoundGroup: BlockSoundGroup = this.get(LanternKeys.BLOCK_SOUND_GROUP).orElse(BlockSoundGroups.STONE)
 

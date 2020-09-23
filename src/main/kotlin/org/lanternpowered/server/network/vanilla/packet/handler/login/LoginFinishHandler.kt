@@ -13,14 +13,14 @@ package org.lanternpowered.server.network.vanilla.packet.handler.login
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.pipeline.PacketCompressionHandler
 import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginSuccessPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.SetCompressionPacket
 
-class LoginFinishHandler : Handler<LoginFinishPacket> {
+object LoginFinishHandler : PacketHandler<LoginFinishPacket> {
 
     override fun handle(context: NetworkContext, packet: LoginFinishPacket) {
         val gameProfile = packet.gameProfile
@@ -44,8 +44,8 @@ class LoginFinishHandler : Handler<LoginFinishPacket> {
         gameProfileCache.add(gameProfile, true, null)
         session.sendWithFuture(LoginSuccessPacket(gameProfile.uniqueId, gameProfile.name.get()))
                 .addListener {
-                    session.setGameProfile(gameProfile)
-                    session.protocolState = ProtocolState.PLAY
+                    session.profile = gameProfile
+                    session.protocolState = ProtocolState.Play
                     // TODO: Send custom channel registrations
                     session.initPlayer()
                 }

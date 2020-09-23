@@ -15,7 +15,7 @@ import org.lanternpowered.server.network.packet.codec.CodecContext
 
 abstract class GroupedNetworkRecipe(id: String, type: String, private val group: String?) : NetworkRecipe(id, type) {
 
-    override fun write(ctx: CodecContext, buf: ByteBuffer) {
+    override fun writeProperties(ctx: CodecContext, buf: ByteBuffer) {
         buf.writeString(this.group ?: "")
     }
 }

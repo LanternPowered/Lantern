@@ -13,12 +13,12 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.packet.handler.Handler;
+import org.lanternpowered.server.network.packet.PacketHandler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientTabCompletePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.TabCompletePacket;
 import org.spongepowered.api.text.Text;
 
-public final class HandlerPlayInTabComplete implements Handler<ClientTabCompletePacket> {
+public final class HandlerPlayInTabComplete implements PacketHandler<ClientTabCompletePacket> {
 
     @Override
     public void handle(NetworkContext context, ClientTabCompletePacket packet) {

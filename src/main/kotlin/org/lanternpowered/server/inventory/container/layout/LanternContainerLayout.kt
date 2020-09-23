@@ -30,7 +30,7 @@ import org.lanternpowered.server.network.item.NetworkItemTypeRegistry
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowPropertyPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetWindowSlotPacket
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import java.util.Arrays
 import java.util.BitSet

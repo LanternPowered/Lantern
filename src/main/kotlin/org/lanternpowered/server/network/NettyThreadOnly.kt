@@ -10,13 +10,13 @@
  */
 package org.lanternpowered.server.network
 
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 
 /**
  * A annotation that can be applied to methods and
  * fields to mark them as only supported on Netty threads.
  *
- * It can also be used to define whether a specific or [Handler]
+ * It can also be used to define whether a specific or [PacketHandler]
  * method should be handled on the netty thread.
  */
 @Target(AnnotationTarget.FUNCTION,

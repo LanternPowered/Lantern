@@ -12,12 +12,13 @@ package org.lanternpowered.server.profile
 
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
+import org.lanternpowered.api.data.persistence.DataContainer
+import org.lanternpowered.api.data.persistence.DataView
+import org.lanternpowered.api.data.persistence.dataQueryOf
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.contentToString
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.orNull
-import org.spongepowered.api.data.persistence.DataContainer
-import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.profile.GameProfile
 import org.spongepowered.api.profile.property.ProfileProperty
 import java.util.ArrayList
@@ -54,19 +55,16 @@ class LanternGameProfile private constructor(
             container[NAME] = this.name
         if (this.properties.isEmpty)
             return container
-        val propertiesView = container.createView(PROPERTIES)
-        for (key in this.properties.keySet()) {
-            val entries = ArrayList<DataContainer>()
-            for (property in this.properties[key]) {
-                val entry = DataContainer.createNew()
-                        .set(VALUE, property.value)
-                val signature = property.signature.orNull()
-                if (signature != null)
-                    entry[SIGNATURE] = signature
-                entries.add(entry)
-            }
-            propertiesView[DataQuery.of(key)] = entries
+        val properties = ArrayList<DataView>()
+        for (property in this.properties.values()) {
+            val entry = DataContainer.createNew()
+                    .set(VALUE, property.value)
+            val signature = property.signature.orNull()
+            if (signature != null)
+                entry[SIGNATURE] = signature
+            properties.add(entry)
         }
+        container[PROPERTIES] = properties
         return container
     }
 
@@ -84,10 +82,10 @@ class LanternGameProfile private constructor(
 
     companion object {
 
-        val NAME: DataQuery = DataQuery.of("Name")
-        val UNIQUE_ID: DataQuery = DataQuery.of("UniqueId")
-        val PROPERTIES: DataQuery = DataQuery.of("Properties")
-        val VALUE: DataQuery = DataQuery.of("Value")
-        val SIGNATURE: DataQuery = DataQuery.of("Signature")
+        val NAME = dataQueryOf("Name")
+        val UNIQUE_ID = dataQueryOf("UniqueId")
+        val PROPERTIES = dataQueryOf("Properties")
+        val VALUE = dataQueryOf("Value")
+        val SIGNATURE = dataQueryOf("Signature")
     }
 }

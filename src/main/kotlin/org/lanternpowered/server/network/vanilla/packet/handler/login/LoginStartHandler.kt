@@ -37,7 +37,7 @@ import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NettyThreadOnly
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginEncryptionRequestPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginStartPacket
@@ -46,7 +46,14 @@ import org.lanternpowered.server.util.EncryptionHelper
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 
-class LoginStartHandler : Handler<LoginStartPacket> {
+object LoginStartHandler : PacketHandler<LoginStartPacket> {
+
+    // The data that will be used for authentication.
+    val AUTH_DATA: AttributeKey<LoginAuthData> = AttributeKey.valueOf<LoginAuthData>("login-auth-data")
+
+    // The spoofed game profile that may be provided by proxies
+    @JvmField
+    val SPOOFED_GAME_PROFILE: AttributeKey<LanternGameProfile> = AttributeKey.valueOf<LanternGameProfile>("spoofed-game-profile")
 
     @NettyThreadOnly
     override fun handle(context: NetworkContext, packet: LoginStartPacket) {
@@ -77,17 +84,7 @@ class LoginStartHandler : Handler<LoginStartPacket> {
                     LanternGameProfile(uniqueId, username)
                 }
             }
-            session.queueReceivedMessage(LoginFinishPacket(profile))
+            session.packetReceived(LoginFinishPacket(profile))
         }
-    }
-
-    companion object {
-
-        // The data that will be used for authentication.
-        val AUTH_DATA: AttributeKey<LoginAuthData> = AttributeKey.valueOf<LoginAuthData>("login-auth-data")
-
-        // The spoofed game profile that may be provided by proxies
-        @JvmField
-        val SPOOFED_GAME_PROFILE: AttributeKey<LanternGameProfile> = AttributeKey.valueOf<LanternGameProfile>("spoofed-game-profile")
     }
 }

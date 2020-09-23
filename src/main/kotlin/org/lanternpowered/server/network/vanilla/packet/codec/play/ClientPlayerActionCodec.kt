@@ -26,7 +26,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientVehicleJ
 
 object ClientPlayerActionCodec : PacketDecoder<Packet> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): Packet {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): Packet {
         // Normally should this be the entity id, but only the
         // client player will send this, so it won't be used
         buf.readVarInt()
@@ -47,7 +47,7 @@ object ClientPlayerActionCodec : PacketDecoder<Packet> {
             // Horse jump stop
         } else if (action == 6) {
             // Make sure that the vehicle movement message doesn't add the jump message as well
-            context.channel.attr(CANCEL_NEXT_JUMP_MESSAGE).set(true)
+            ctx.channel.attr(CANCEL_NEXT_JUMP_MESSAGE).set(true)
             return ClientVehicleJumpPacket(false, value.toFloat() / 100f)
         } else if (action == 7) {
             return ClientRequestHorseInventoryPacket

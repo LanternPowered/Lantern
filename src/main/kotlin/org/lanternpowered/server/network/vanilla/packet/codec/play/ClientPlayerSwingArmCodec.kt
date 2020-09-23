@@ -18,6 +18,6 @@ import org.spongepowered.api.data.type.HandTypes
 
 object ClientPlayerSwingArmCodec : PacketDecoder<ClientPlayerSwingArmPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientPlayerSwingArmPacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientPlayerSwingArmPacket =
             ClientPlayerSwingArmPacket(if (buf.readVarInt() == 0) HandTypes.MAIN_HAND.get() else HandTypes.OFF_HAND.get())
 }

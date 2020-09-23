@@ -19,11 +19,11 @@ import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.event.impl.LanternChangeSignEvent
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientModifySignPacket
 import org.spongepowered.api.block.entity.Sign
 
-object ClientModifySignHandler : Handler<ClientModifySignPacket> {
+object ClientModifySignHandler : PacketHandler<ClientModifySignPacket> {
 
     override fun handle(context: NetworkContext, packet: ClientModifySignPacket) {
         val player = context.session.player

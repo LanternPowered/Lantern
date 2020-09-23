@@ -131,8 +131,6 @@ import org.lanternpowered.server.game.registry.type.item.EnchantmentTypeRegistry
 import org.lanternpowered.server.game.registry.type.item.ItemStackComparatorRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.ClientContainerRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.inventory.InventoryTransformationRegistryModule;
-import org.lanternpowered.server.game.registry.type.item.inventory.QueryOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;

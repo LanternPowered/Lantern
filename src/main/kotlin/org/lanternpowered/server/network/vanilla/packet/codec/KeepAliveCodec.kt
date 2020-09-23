@@ -11,14 +11,15 @@
 package org.lanternpowered.server.network.vanilla.packet.codec
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketDecoder
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.KeepAlivePacket
 
-class KeepAliveCodec : Codec<KeepAlivePacket> {
+object KeepAliveCodec : PacketEncoder<KeepAlivePacket>, PacketDecoder<KeepAlivePacket> {
 
-    override fun encode(context: CodecContext, packet: KeepAlivePacket): ByteBuffer =
-            context.byteBufAlloc().buffer(Long.SIZE_BYTES).writeLong(packet.time)
+    override fun encode(ctx: CodecContext, packet: KeepAlivePacket): ByteBuffer =
+            ctx.byteBufAlloc().buffer(Long.SIZE_BYTES).writeLong(packet.time)
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): KeepAlivePacket = KeepAlivePacket(buf.readLong())
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): KeepAlivePacket = KeepAlivePacket(buf.readLong())
 }

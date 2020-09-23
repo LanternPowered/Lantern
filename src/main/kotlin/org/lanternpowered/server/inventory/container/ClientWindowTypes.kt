@@ -19,9 +19,9 @@ object ClientWindowTypes {
     private val keyToIdMap = HashMap<NamespacedKey, ClientWindowType>()
 
     init {
-        InternalRegistries.visit("menu") { name, _ ->
+        InternalRegistries.visit("menu") { name, internalId ->
             val key = resolveNamespacedKey(name)
-            this.keyToIdMap[key] = ClientWindowType(key)
+            this.keyToIdMap[key] = ClientWindowType(key, internalId)
         }
     }
 

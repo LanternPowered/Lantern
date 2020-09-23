@@ -23,7 +23,7 @@ import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.server.inventory.AbstractCarriedInventory
 import org.lanternpowered.server.inventory.InventoryTransactionResults
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.item.inventory.equipment.EquipmentType
 import java.util.Optional
 

@@ -17,6 +17,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientItemRena
 
 object ClientItemRenameCodec : PacketDecoder<ClientItemRenamePacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientItemRenamePacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientItemRenamePacket =
             ClientItemRenamePacket(buf.readString())
 }

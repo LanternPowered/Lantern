@@ -14,5 +14,5 @@ import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class SimpleNetworkRecipe(id: String, type: String) : NetworkRecipe(id, type) {
-    override fun write(ctx: CodecContext, buf: ByteBuffer) {}
+    override fun writeProperties(ctx: CodecContext, buf: ByteBuffer) {}
 }

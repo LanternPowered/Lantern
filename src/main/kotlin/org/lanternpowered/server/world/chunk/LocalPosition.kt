@@ -21,6 +21,11 @@ inline class LocalPosition @PublishedApi internal constructor(
 ) {
 
     /**
+     * Constructs a new [LocalPosition] from the given packed value.
+     */
+    constructor(packed: Int) : this(packed.toShort())
+
+    /**
      * Constructs a new [LocalPosition] from the given x, y and z values.
      */
     constructor(x: Int, y: Int, z: Int) : this(LocalPositionHelper.pack(x, y, z))

@@ -19,7 +19,7 @@ import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.WrappedServerSideConnection
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.pipeline.PacketEncryptionHandler
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginEncryptionResponsePacket
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginFinishPacket
@@ -35,7 +35,7 @@ import java.net.URLEncoder
 import java.util.concurrent.CompletableFuture
 import javax.crypto.spec.SecretKeySpec
 
-object LoginEncryptionResponseHandler : Handler<LoginEncryptionResponsePacket> {
+object LoginEncryptionResponseHandler : PacketHandler<LoginEncryptionResponsePacket> {
 
     private const val authBaseUrl = "https://sessionserver.mojang.com/session/minecraft/hasJoined"
     private val gson = Gson()

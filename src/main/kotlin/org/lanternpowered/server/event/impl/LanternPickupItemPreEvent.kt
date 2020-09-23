@@ -12,7 +12,7 @@ package org.lanternpowered.server.event.impl
 
 import org.lanternpowered.api.cause.Cause
 import org.lanternpowered.api.util.optional.asOptional
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.entity.Item
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent
 import org.spongepowered.api.item.inventory.Inventory

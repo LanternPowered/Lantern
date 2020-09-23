@@ -16,7 +16,7 @@ import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
-import org.lanternpowered.server.network.entity.parameter.DefaultParameterList
+import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityNetworkIDs
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
@@ -67,7 +67,7 @@ class RootHorseContainerLayout : LanternTopBottomContainerLayout<HorseContainerL
         val entityId = Int.MAX_VALUE
 
         // No entity was found, so create a fake one
-        val parameters = DefaultParameterList()
+        val parameters = MutableParameterList()
         parameters.add(EntityParameters.Base.FLAGS, EntityParameters.Base.Flags.IS_INVISIBLE.toByte())
 
         packets += SpawnMobPacket(entityId, UUID.randomUUID(), HORSE_NETWORK_TYPE,

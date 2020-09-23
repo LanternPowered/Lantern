@@ -99,7 +99,7 @@ public final class LanternJukebox extends LanternBlockEntity implements Jukebox,
         final Vector3d entityPosition = location.getBlockPosition().toDouble().add(0.5, 0.9, 0.5);
         final Entity item = location.getWorld().createEntity(EntityTypes.ITEM, entityPosition);
         item.offer(Keys.VELOCITY, new Vector3d(0, 0.1, 0));
-        item.offer(Keys.REPRESENTED_ITEM, recordItem.createSnapshot());
+        item.offer(Keys.ITEM_STACK_SNAPSHOT, recordItem.createSnapshot());
         this.inventory.clear();
         updateBlockState();
         return Optional.of(item);

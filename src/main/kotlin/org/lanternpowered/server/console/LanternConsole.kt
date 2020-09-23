@@ -114,14 +114,14 @@ class LanternConsole(
                 try {
                     this.game.commandManager.process(this, command)
                 } catch (e: CommandException) {
-                    sendMessage(textOf("Failed to execute command: $command, reason: ${e.message}"))
+                    this.sendMessage(textOf("Failed to execute command: $command, reason: ${e.message}"))
                 }
             }
         }
         val now = System.currentTimeMillis()
         if (now - this.lastHistoryWrite > historySaveInterval.toMillis()) {
             this.lastHistoryWrite = now
-            saveHistory()
+            this.saveHistory()
         }
     }
 
@@ -138,7 +138,7 @@ class LanternConsole(
             val terminal = TerminalConsoleAppender.getTerminal()
             terminal?.writer()?.println()
             // Now we can safely save the history
-            saveHistory()
+            this.saveHistory()
             // Cleanup
             this.lineReader = null
             this.readerThread = null

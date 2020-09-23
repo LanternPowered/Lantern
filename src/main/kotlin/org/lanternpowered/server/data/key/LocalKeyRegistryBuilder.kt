@@ -14,7 +14,7 @@ import org.lanternpowered.api.effect.potion.PotionEffect
 import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.item.ItemKeys
 import org.spongepowered.api.data.DataHolder
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.util.weighted.WeightedTable
 
 fun <H : DataHolder> LocalKeyRegistry<H>.registerApplicablePotionEffects(vararg effects: PotionEffect) =

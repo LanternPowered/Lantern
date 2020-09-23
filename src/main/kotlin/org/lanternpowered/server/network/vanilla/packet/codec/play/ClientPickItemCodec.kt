@@ -17,6 +17,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPickItem
 
 object ClientPickItemCodec : PacketDecoder<ClientPickItemPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientPickItemPacket =
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientPickItemPacket =
             ClientPickItemPacket(buf.readVarInt())
 }

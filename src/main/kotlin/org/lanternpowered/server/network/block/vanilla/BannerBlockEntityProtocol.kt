@@ -15,7 +15,7 @@ import org.lanternpowered.server.network.block.VanillaBlockEntityProtocol
 import org.lanternpowered.server.registry.type.data.BannerPatternInternalStringIdIndex
 import org.lanternpowered.server.registry.type.data.DyeColorRegistry
 import org.spongepowered.api.block.entity.BlockEntity
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.meta.BannerPatternLayer
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataQuery

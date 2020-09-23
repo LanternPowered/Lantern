@@ -21,7 +21,7 @@ import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.game.version.LanternMinecraftVersion
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.WrappedRemoteConnection
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.status.LanternFavicon
 import org.lanternpowered.server.network.status.LanternStatusClient
 import org.lanternpowered.server.network.status.LanternStatusHelper
@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.status.LanternStatusResponse
 import org.lanternpowered.server.network.vanilla.packet.type.status.StatusRequestPacket
 import org.lanternpowered.server.network.vanilla.packet.type.status.StatusResponsePacket
 
-class StatusRequestHandler : Handler<StatusRequestPacket> {
+object StatusRequestHandler : PacketHandler<StatusRequestPacket> {
 
     private val gson = Gson()
 

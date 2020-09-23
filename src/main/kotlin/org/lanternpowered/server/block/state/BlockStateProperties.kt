@@ -24,7 +24,7 @@ import org.lanternpowered.server.state.property.enumStatePropertyOf
 import org.lanternpowered.server.state.property.intStatePropertyOf
 import org.lanternpowered.server.state.stateKeyValueTransformer
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.util.Direction
 

@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientEditComm
 
 object ClientEditCommandBlockEntityCodec : PacketDecoder<ClientEditCommandBlockPacket.Entity> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientEditCommandBlockPacket.Entity {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientEditCommandBlockPacket.Entity {
         val entityId = buf.readVarInt()
         val command = buf.readString()
         val shouldTrackOutput = buf.readBoolean()

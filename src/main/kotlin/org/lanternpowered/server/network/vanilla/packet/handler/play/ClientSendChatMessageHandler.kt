@@ -27,7 +27,7 @@ import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.attribute.computeIfAbsent
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSendChatMessagePacket
 import org.lanternpowered.server.permission.Permissions
 import org.lanternpowered.server.text.ClickActionCallbacks
@@ -36,7 +36,7 @@ import java.util.regex.Pattern
 import kotlin.math.max
 import kotlin.time.milliseconds
 
-object ClientSendChatMessageHandler : Handler<ClientSendChatMessagePacket> {
+object ClientSendChatMessageHandler : PacketHandler<ClientSendChatMessagePacket> {
 
     override fun handle(context: NetworkContext, packet: ClientSendChatMessagePacket) {
         val session = context.session

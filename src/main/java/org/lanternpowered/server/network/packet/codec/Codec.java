@@ -23,24 +23,24 @@ public interface Codec<P extends Packet> extends PacketEncoder<P>, PacketDecoder
     /**
      * Encodes the message into a byte buffer.
      *
-     * @param context the codec context
+     * @param ctx the codec context
      * @param packet the message
      * @return the byte buffer
      */
     @Override
-    default ByteBuffer encode(CodecContext context, P packet) throws CodecException {
+    default ByteBuffer encode(CodecContext ctx, P packet) throws CodecException {
         throw new EncoderException("Encoding through this codec (" + this.getClass().getName() + ") isn't supported!");
     }
 
     /**
      * Decodes the message from a byte buffer.
      *
-     * @param context the codec context
+     * @param ctx the codec context
      * @param buf the byte buffer
      * @return the message
      */
     @Override
-    default P decode(CodecContext context, ByteBuffer buf) throws CodecException {
+    default P decode(CodecContext ctx, ByteBuffer buf) throws CodecException {
         throw new DecoderException("Decoding through this codec (" + this.getClass().getName() + ") isn't supported!");
     }
 }

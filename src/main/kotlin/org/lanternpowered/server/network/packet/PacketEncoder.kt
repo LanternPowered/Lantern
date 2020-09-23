@@ -18,9 +18,9 @@ interface PacketEncoder<P : Packet> {
     /**
      * Encodes the packet into a byte buffer.
      *
-     * @param context The context
+     * @param ctx The context
      * @param packet The packet to encode
      * @return The encoded byte buffer
      */
-    fun encode(context: CodecContext, packet: P): ByteBuffer
+    fun encode(ctx: CodecContext, packet: P): ByteBuffer
 }

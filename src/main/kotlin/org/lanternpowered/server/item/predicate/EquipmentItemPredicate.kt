@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item.predicate
 
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.item.ItemType
 import org.spongepowered.api.item.inventory.ItemStack
 import org.spongepowered.api.item.inventory.ItemStackSnapshot

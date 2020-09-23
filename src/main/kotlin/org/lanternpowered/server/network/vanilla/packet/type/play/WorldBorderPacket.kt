@@ -14,7 +14,7 @@ import org.lanternpowered.server.network.packet.Packet
 
 sealed class WorldBorderPacket : Packet {
 
-    data class Initialize(
+    data class Init(
             val centerX: Double,
             val centerZ: Double,
             val oldDiameter: Double,

@@ -15,138 +15,138 @@ import org.lanternpowered.server.network.packet.CodecRegistration;
 import org.lanternpowered.server.network.packet.Packet;
 import org.lanternpowered.server.network.packet.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.packet.codec.KeepAliveCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.DisconnectCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.DisconnectEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientAcceptBeaconEffectsCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ChangeAdvancementTreeCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientItemRenameCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientChangeTradeOfferCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientChangeSignCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSendChatMessageCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSendChatMessageDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickRecipeCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickWindowCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSettingsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientStatusCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickWindowDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSettingsDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientStatusDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSetDisplayedRecipeCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientCreativeWindowActionCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientRequestBlockDataCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientRequestEntityDataCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientRequestBlockDataDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientRequestEntityDataDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientEditCommandBlockBlockCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientEditCommandBlockEntityCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickWindowButtonCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientLocksDifficultyCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientModifyBookCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientClickWindowButtonDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientLockDifficultyDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientModifyBookDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CloseWindowCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ConfirmWindowTransactionCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ChannelPayloadCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerHeldItemChangeCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerHeldItemChangeEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPickItemCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientFlyingStateCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerActionCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientBlockPlacementCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientDiggingCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerLookCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerMovementCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerMovementAndLookCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerOnGroundStateCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerLookDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerMovementDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerMovementAndLookDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerOnGroundStateDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerSwingArmCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientUseItemCodec;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientVehicleControlsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerVehicleMovementCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.GenerateJigsawStructureCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientPlayerVehicleMovementDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.GenerateJigsawStructureDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ResourcePackStatusCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSetDifficultyCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSetDifficultyDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientSpectateCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientTabCompleteCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientConfirmTeleportCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientTabCompleteDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientConfirmTeleportDecoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateJigsawBlockMessageCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientUseEntityCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.AddPotionEffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.AdvancementsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockActionCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockBreakAnimationCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockChangeCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.BossBarCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ChangeGameStateCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ChatMessageCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ChunkCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.DataResponseCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCommandsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetRecipesCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.DestroyEntitiesCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ClientUseEntityDecoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.AddPotionEffectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.AdvancementsEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockActionEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockBreakAnimationEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.BlockChangeEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.BossBarEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ChangeGameStateEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ChatMessageEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ChunkInitOrUpdateEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.DataResponseEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCommandsEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetRecipesEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.DestroyEntitiesEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetActiveRecipeCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityAnimationCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityCollectItemCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityEquipmentCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityHeadLookCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityLookCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityLookAndRelativeMoveCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityMetadataCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityRelativeMoveCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntitySoundEffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityStatusCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityTeleportCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityVelocityCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerFaceAtCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EffectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityAnimationEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityCollectItemEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityEquipmentEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityHeadLookEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityLookEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityLookAndRelativeMoveEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityMetadataEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityRelativeMoveEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntitySoundEffectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityStatusEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityTeleportEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.EntityVelocityEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerFaceAtEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecPlayOutMultiBlockChange;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.NamedSoundEffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenBookCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenHorseWindowCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenSignCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenWindowCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.NamedSoundEffectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenBookEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenHorseWindowEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenSignEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.OpenWindowEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerAbilitiesCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerHealthCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerJoinCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerPositionAndLookCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerRespawnCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerSpawnPositionCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.RemovePotionEffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetActiveScoreboardObjectiveCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.ScoreboardObjectiveCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetActiveAdvancementTreeCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetResourcePackCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCameraCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCooldownCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetDifficultyCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerHealthEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerJoinEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerPositionAndLookEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerRespawnEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.PlayerSpawnPositionEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.RemovePotionEffectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetActiveScoreboardObjectiveEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ScoreboardObjectiveEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetActiveAdvancementTreeEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetResourcePackEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCameraEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetCooldownEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetDifficultyEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SetEntityPassengersCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetExperienceCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowSlotCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SoundEffectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnExperienceOrbCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnMobCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnObjectCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnPaintingCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnParticleCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnPlayerCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetExperienceEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowSlotEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SoundEffectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnExperienceOrbEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnMobEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnObjectEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnPaintingEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnParticleEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnPlayerEncoder;
 import org.lanternpowered.server.network.vanilla.packet.codec.play.SpawnThunderboltCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.StatisticsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.StopSoundsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.TabCompleteCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.TabListCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.TabListHeaderAndFooterCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.TagsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.TitleCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowTradeOffersCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.UnloadChunkCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.UnlockRecipesCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateBlockEntityCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateLightCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateViewDistanceCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateViewPositionCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowItemsCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowPropertyCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.WorldBorderCodec;
-import org.lanternpowered.server.network.vanilla.packet.codec.play.WorldTimeCodec;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.StatisticsEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.StopSoundsEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TabCompleteEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TabListEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TabListHeaderAndFooterEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TagsEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.TitleEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowTradeOffersEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.ChunkUnloadEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.UnlockRecipesEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateBlockEntityEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateLightEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateViewDistanceEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.UpdateViewPositionEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowItemsEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.SetWindowPropertyEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.WorldBorderEncoder;
+import org.lanternpowered.server.network.vanilla.packet.codec.play.WorldTimeEncoder;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientLockDifficultyHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSendChatMessageHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSetDifficultyHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientAdvancementTreeHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientModifySignHandler;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInChannelPayload;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ChannelPayloadHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientSettingsHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ContainerSessionForwardingHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientRecipeBookStatesHandler;
-import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInEditBook;
+import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientEditBookHandler;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.HandlerPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.packet.handler.play.ClientBlockPlacementHandler;
@@ -334,41 +334,41 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bindProcessor(TabListPacket.class, new TabListProcessor());
 
         // Register the codecs and handlers of the default messages
-        inbound.bind(ClientConfirmTeleportCodec.class, ClientConfirmTeleportPacket.class); // TODO: Handler
-        inbound.bind(ClientRequestBlockDataCodec.class, ClientRequestDataPacket.Block.class); // TODO: Handler
-        inbound.bind(ClientSetDifficultyCodec.class, ClientSetDifficultyPacket.class)
+        inbound.bind(ClientConfirmTeleportDecoder.class, ClientConfirmTeleportPacket.class); // TODO: Handler
+        inbound.bind(ClientRequestBlockDataDecoder.class, ClientRequestDataPacket.Block.class); // TODO: Handler
+        inbound.bind(ClientSetDifficultyDecoder.class, ClientSetDifficultyPacket.class)
                 .bindHandler(new ClientSetDifficultyHandler());
-        inbound.bind(ClientSendChatMessageCodec.class, ClientSendChatMessagePacket.class)
+        inbound.bind(ClientSendChatMessageDecoder.class, ClientSendChatMessagePacket.class)
                 .bindHandler(new ClientSendChatMessageHandler());
-        inbound.bind(ClientStatusCodec.class);
-        inbound.bind(ClientSettingsCodec.class, ClientSettingsPacket.class)
+        inbound.bind(ClientStatusDecoder.class);
+        inbound.bind(ClientSettingsDecoder.class, ClientSettingsPacket.class)
                 .bindHandler(new ClientSettingsHandler());
-        inbound.bind(ClientTabCompleteCodec.class, ClientTabCompletePacket.class)
+        inbound.bind(ClientTabCompleteDecoder.class, ClientTabCompletePacket.class)
                 .bindHandler(new HandlerPlayInTabComplete());
         inbound.bind(ConfirmWindowTransactionCodec.class, ConfirmWindowTransactionPacket.class); // TODO: Handler
-        inbound.bind(ClientClickWindowButtonCodec.class, ClientClickWindowButtonPacket.class)
+        inbound.bind(ClientClickWindowButtonDecoder.class, ClientClickWindowButtonPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleEnchantItem));
-        inbound.bind(ClientClickWindowCodec.class, ClientClickWindowPacket.class)
+        inbound.bind(ClientClickWindowDecoder.class, ClientClickWindowPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleWindowClick));
         inbound.bind(CloseWindowCodec.class, CloseWindowPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleWindowClose));
         inbound.bind(ChannelPayloadCodec.class);
-        inbound.bind(ClientModifyBookCodec.class);
-        inbound.bind(ClientRequestEntityDataCodec.class, ClientRequestDataPacket.Entity.class); // TODO: Handler
-        inbound.bind(ClientUseEntityCodec.class);
-        inbound.bind(GenerateJigsawStructureCodec.class, GenerateJigsawStructurePacket.class);
+        inbound.bind(ClientModifyBookDecoder.class);
+        inbound.bind(ClientRequestEntityDataDecoder.class, ClientRequestDataPacket.Entity.class); // TODO: Handler
+        inbound.bind(ClientUseEntityDecoder.class);
+        inbound.bind(GenerateJigsawStructureDecoder.class, GenerateJigsawStructurePacket.class);
         inbound.bind(KeepAliveCodec.class, KeepAlivePacket.class);
-        inbound.bind(ClientLocksDifficultyCodec.class, ClientLockDifficultyPacket.class)
+        inbound.bind(ClientLockDifficultyDecoder.class, ClientLockDifficultyPacket.class)
                 .bindHandler(new ClientLockDifficultyHandler());
-        inbound.bind(ClientPlayerMovementCodec.class, ClientPlayerMovementPacket.class)
+        inbound.bind(ClientPlayerMovementDecoder.class, ClientPlayerMovementPacket.class)
                 .bindHandler(new ClientPlayerMovementHandler());
-        inbound.bind(ClientPlayerMovementAndLookCodec.class, ClientPlayerMovementAndLookPacket.class)
+        inbound.bind(ClientPlayerMovementAndLookDecoder.class, ClientPlayerMovementAndLookPacket.class)
                 .bindHandler(new ClientPlayerMovementAndLookHandler());
-        inbound.bind(ClientPlayerLookCodec.class, ClientPlayerLookPacket.class)
+        inbound.bind(ClientPlayerLookDecoder.class, ClientPlayerLookPacket.class)
                 .bindHandler(new ClientPlayerLookHandler());
-        inbound.bind(ClientPlayerOnGroundStateCodec.class, ClientPlayerOnGroundStatePacket.class)
+        inbound.bind(ClientPlayerOnGroundStateDecoder.class, ClientPlayerOnGroundStatePacket.class)
                 .bindHandler(new ClientPlayerOnGroundStateHandler());
-        inbound.bind(ClientPlayerVehicleMovementCodec.class, ClientPlayerVehicleMovementPacket.class)
+        inbound.bind(ClientPlayerVehicleMovementDecoder.class, ClientPlayerVehicleMovementPacket.class)
                 .bindHandler(new ClientPlayerVehicleMovementHandler());
         inbound.bind(); // TODO: Steer Boat
         inbound.bind(ClientPickItemCodec.class, ClientPickItemPacket.class)
@@ -390,7 +390,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleOfferChange));
         inbound.bind(ClientAcceptBeaconEffectsCodec.class, ClientAcceptBeaconEffectsPacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleAcceptBeaconEffects));
-        inbound.bind(PlayerHeldItemChangeCodec.class, PlayerHeldItemChangePacket.class)
+        inbound.bind(PlayerHeldItemChangeEncoder.class, PlayerHeldItemChangePacket.class)
                 .bindHandler(new ContainerSessionForwardingHandler<>(PlayerInventoryContainerSession::handleHeldItemChange));
         inbound.bind(ClientEditCommandBlockBlockCodec.class, ClientEditCommandBlockPacket.Block.class);
         inbound.bind(ClientEditCommandBlockEntityCodec.class, ClientEditCommandBlockPacket.Entity.class);
@@ -411,11 +411,11 @@ final class ProtocolPlay extends ProtocolBase {
         // Provided by CodecPlayInOutCustomPayload
         inbound.bindMessage(BrandPacket.class); // TODO: Handler
         inbound.bindMessage(ClientModifyBookPacket.Edit.class)
-                .bindHandler(new HandlerPlayInEditBook());
+                .bindHandler(new ClientEditBookHandler());
         inbound.bindMessage(ClientModifyBookPacket.Sign.class)
                 .bindHandler(new ClientSignBookHandler());
         inbound.bindMessage(ChannelPayloadPacket.class)
-                .bindHandler(new HandlerPlayInChannelPayload());
+                .bindHandler(new ChannelPayloadHandler());
         inbound.bindMessage(RegisterChannelsPacket.class)
                 .bindHandler(new RegisterChannelsHandler());
         inbound.bindMessage(UnregisterChannelsPacket.class)
@@ -463,113 +463,113 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bindMessage(ChangeAdvancementTreePacket.Open.class)
                 .bindHandler(handlerPlayInAdvancementTree);
 
-        outbound.bind(SpawnObjectCodec.class, SpawnObjectPacket.class);
-        outbound.bind(SpawnExperienceOrbCodec.class, SpawnExperienceOrbPacket.class);
+        outbound.bind(SpawnObjectEncoder.class, SpawnObjectPacket.class);
+        outbound.bind(SpawnExperienceOrbEncoder.class, SpawnExperienceOrbPacket.class);
         outbound.bind(SpawnThunderboltCodec.class, SpawnThunderboltPacket.class);
-        outbound.bind(SpawnMobCodec.class, SpawnMobPacket.class);
-        outbound.bind(SpawnPaintingCodec.class, SpawnPaintingPacket.class);
-        outbound.bind(SpawnPlayerCodec.class, SpawnPlayerPacket.class);
-        outbound.bind(EntityAnimationCodec.class, EntityAnimationPacket.class);
-        outbound.bind(StatisticsCodec.class, StatisticsPacket.class);
-        outbound.bind(BlockBreakAnimationCodec.class, BlockBreakAnimationPacket.class);
-        outbound.bind(UpdateBlockEntityCodec.class, UpdateBlockEntityPacket.class);
-        outbound.bind(BlockActionCodec.class, BlockActionPacket.class);
-        outbound.bind(BlockChangeCodec.class, BlockChangePacket.class);
-        final CodecRegistration<BossBarPacket, BossBarCodec> codecPlayOutBossBar = outbound.bind(BossBarCodec.class);
+        outbound.bind(SpawnMobEncoder.class, SpawnMobPacket.class);
+        outbound.bind(SpawnPaintingEncoder.class, SpawnPaintingPacket.class);
+        outbound.bind(SpawnPlayerEncoder.class, SpawnPlayerPacket.class);
+        outbound.bind(EntityAnimationEncoder.class, EntityAnimationPacket.class);
+        outbound.bind(StatisticsEncoder.class, StatisticsPacket.class);
+        outbound.bind(BlockBreakAnimationEncoder.class, BlockBreakAnimationPacket.class);
+        outbound.bind(UpdateBlockEntityEncoder.class, UpdateBlockEntityPacket.class);
+        outbound.bind(BlockActionEncoder.class, BlockActionPacket.class);
+        outbound.bind(BlockChangeEncoder.class, BlockChangePacket.class);
+        final CodecRegistration<BossBarPacket, BossBarEncoder> codecPlayOutBossBar = outbound.bind(BossBarEncoder.class);
         codecPlayOutBossBar.bind(BossBarPacket.Add.class);
         codecPlayOutBossBar.bind(BossBarPacket.Remove.class);
         codecPlayOutBossBar.bind(BossBarPacket.UpdatePercent.class);
         codecPlayOutBossBar.bind(BossBarPacket.UpdateStyle.class);
         codecPlayOutBossBar.bind(BossBarPacket.UpdateName.class);
         codecPlayOutBossBar.bind(BossBarPacket.UpdateFlags.class);
-        outbound.bind(SetDifficultyCodec.class, SetDifficultyPacket.class);
-        outbound.bind(ChatMessageCodec.class, ChatMessagePacket.class);
+        outbound.bind(SetDifficultyEncoder.class, SetDifficultyPacket.class);
+        outbound.bind(ChatMessageEncoder.class, ChatMessagePacket.class);
         outbound.bind(CodecPlayOutMultiBlockChange.class, PacketPlayOutMultiBlockChange.class);
-        outbound.bind(TabCompleteCodec.class, TabCompletePacket.class);
-        outbound.bind(SetCommandsCodec.class, SetCommandsPacket.class);
+        outbound.bind(TabCompleteEncoder.class, TabCompletePacket.class);
+        outbound.bind(SetCommandsEncoder.class, SetCommandsPacket.class);
         outbound.bind(ConfirmWindowTransactionCodec.class, ConfirmWindowTransactionPacket.class);
         outbound.bind(CloseWindowCodec.class, CloseWindowPacket.class);
-        outbound.bind(SetWindowItemsCodec.class, SetWindowItemsPacket.class);
-        outbound.bind(SetWindowPropertyCodec.class, SetWindowPropertyPacket.class);
-        outbound.bind(SetWindowSlotCodec.class, SetWindowSlotPacket.class);
-        outbound.bind(SetCooldownCodec.class, SetCooldownPacket.class);
+        outbound.bind(SetWindowItemsEncoder.class, SetWindowItemsPacket.class);
+        outbound.bind(SetWindowPropertyEncoder.class, SetWindowPropertyPacket.class);
+        outbound.bind(SetWindowSlotEncoder.class, SetWindowSlotPacket.class);
+        outbound.bind(SetCooldownEncoder.class, SetCooldownPacket.class);
         final CodecRegistration<Packet, ChannelPayloadCodec> codecPlayInOutCustomPayload = outbound.bind(
                 ChannelPayloadCodec.class);
         codecPlayInOutCustomPayload.bind(ChannelPayloadPacket.class);
         codecPlayInOutCustomPayload.bind(BrandPacket.class);
-        outbound.bind(NamedSoundEffectCodec.class, NamedSoundEffectPacket.class);
-        outbound.bind(DisconnectCodec.class, DisconnectPacket.class);
-        final CodecRegistration<Packet, EntityStatusCodec> codecPlayOutEntityStatus = outbound.bind(EntityStatusCodec.class);
+        outbound.bind(NamedSoundEffectEncoder.class, NamedSoundEffectPacket.class);
+        outbound.bind(DisconnectEncoder.class, DisconnectPacket.class);
+        final CodecRegistration<Packet, EntityStatusEncoder> codecPlayOutEntityStatus = outbound.bind(EntityStatusEncoder.class);
         codecPlayOutEntityStatus.bind(EntityStatusPacket.class);
         codecPlayOutEntityStatus.bind(SetOpLevelPacket.class);
         codecPlayOutEntityStatus.bind(SetReducedDebugPacket.class);
         codecPlayOutEntityStatus.bind(FinishUsingItemPacket.class);
         outbound.bind(); // TODO: Explosion
-        outbound.bind(UnloadChunkCodec.class, UnloadChunkPacket.class);
-        outbound.bind(ChangeGameStateCodec.class, ChangeGameStatePacket.class);
-        outbound.bind(OpenHorseWindowCodec.class, OpenHorseWindowPacket.class);
+        outbound.bind(ChunkUnloadEncoder.class, UnloadChunkPacket.class);
+        outbound.bind(ChangeGameStateEncoder.class, ChangeGameStatePacket.class);
+        outbound.bind(OpenHorseWindowEncoder.class, OpenHorseWindowPacket.class);
         outbound.bind(KeepAliveCodec.class, KeepAlivePacket.class);
-        final CodecRegistration<ChunkPacket, ChunkCodec> codecPlayOutChunkData = outbound.bind(ChunkCodec.class);
-        codecPlayOutChunkData.bind(ChunkPacket.Initialize.class);
+        final CodecRegistration<ChunkPacket, ChunkInitOrUpdateEncoder> codecPlayOutChunkData = outbound.bind(ChunkInitOrUpdateEncoder.class);
+        codecPlayOutChunkData.bind(ChunkPacket.Init.class);
         codecPlayOutChunkData.bind(ChunkPacket.Update.class);
-        final CodecRegistration<Packet, EffectCodec> codecPlayOutEntityEffect = outbound.bind(EffectCodec.class);
+        final CodecRegistration<Packet, EffectEncoder> codecPlayOutEntityEffect = outbound.bind(EffectEncoder.class);
         codecPlayOutEntityEffect.bind(EffectPacket.class);
         codecPlayOutEntityEffect.bind(SetMusicDiscPacket.class);
-        outbound.bind(SpawnParticleCodec.class, SpawnParticlePacket.class);
-        outbound.bind(UpdateLightCodec.class, UpdateLightPacket.class);
-        outbound.bind(PlayerJoinCodec.class, PlayerJoinPacket.class);
+        outbound.bind(SpawnParticleEncoder.class, SpawnParticlePacket.class);
+        outbound.bind(UpdateLightEncoder.class, UpdateLightPacket.class);
+        outbound.bind(PlayerJoinEncoder.class, PlayerJoinPacket.class);
         outbound.bind(); // TODO: Map
-        outbound.bind(SetWindowTradeOffersCodec.class, SetWindowTradeOffersPacket.class);
-        outbound.bind(EntityRelativeMoveCodec.class, EntityRelativeMovePacket.class);
-        outbound.bind(EntityLookAndRelativeMoveCodec.class, EntityLookAndRelativeMovePacket.class);
-        outbound.bind(EntityLookCodec.class, EntityLookPacket.class);
+        outbound.bind(SetWindowTradeOffersEncoder.class, SetWindowTradeOffersPacket.class);
+        outbound.bind(EntityRelativeMoveEncoder.class, EntityRelativeMovePacket.class);
+        outbound.bind(EntityLookAndRelativeMoveEncoder.class, EntityLookAndRelativeMovePacket.class);
+        outbound.bind(EntityLookEncoder.class, EntityLookPacket.class);
         outbound.bind(); // Entity
         outbound.bind(); // TODO: Vehicle Move
-        outbound.bind(OpenSignCodec.class, OpenSignPacket.class);
-        outbound.bind(OpenWindowCodec.class, OpenWindowPacket.class);
-        outbound.bind(OpenBookCodec.class, OpenBookPacket.class);
+        outbound.bind(OpenSignEncoder.class, OpenSignPacket.class);
+        outbound.bind(OpenWindowEncoder.class, OpenWindowPacket.class);
+        outbound.bind(OpenBookEncoder.class, OpenBookPacket.class);
         outbound.bind(SetActiveRecipeCodec.class, SetActiveRecipePacket.class);
         outbound.bind(PlayerAbilitiesCodec.class, PlayerAbilitiesPacket.class);
         outbound.bind(); // TODO: Combat Event
-        outbound.bind(TabListCodec.class, TabListPacket.class);
-        final CodecRegistration<PlayerFaceAtPacket, PlayerFaceAtCodec> codecPlayOutFaceAt =
-                outbound.bind(PlayerFaceAtCodec.class);
+        outbound.bind(TabListEncoder.class, TabListPacket.class);
+        final CodecRegistration<PlayerFaceAtPacket, PlayerFaceAtEncoder> codecPlayOutFaceAt =
+                outbound.bind(PlayerFaceAtEncoder.class);
         codecPlayOutFaceAt.bind(PlayerFaceAtPacket.Entity.class);
         codecPlayOutFaceAt.bind(PlayerFaceAtPacket.Position.class);
-        outbound.bind(PlayerPositionAndLookCodec.class, PlayerPositionAndLookPacket.class);
-        final CodecRegistration<UnlockRecipesPacket, UnlockRecipesCodec> codecPlayOutUnlockRecipes =
-                outbound.bind(UnlockRecipesCodec.class);
+        outbound.bind(PlayerPositionAndLookEncoder.class, PlayerPositionAndLookPacket.class);
+        final CodecRegistration<UnlockRecipesPacket, UnlockRecipesEncoder> codecPlayOutUnlockRecipes =
+                outbound.bind(UnlockRecipesEncoder.class);
         codecPlayOutUnlockRecipes.bind(UnlockRecipesPacket.Add.class);
-        codecPlayOutUnlockRecipes.bind(UnlockRecipesPacket.Initialize.class);
+        codecPlayOutUnlockRecipes.bind(UnlockRecipesPacket.Init.class);
         codecPlayOutUnlockRecipes.bind(UnlockRecipesPacket.Remove.class);
-        outbound.bind(DestroyEntitiesCodec.class, DestroyEntitiesPacket.class);
-        outbound.bind(RemovePotionEffectCodec.class, RemovePotionEffectPacket.class);
-        outbound.bind(SetResourcePackCodec.class, SetResourcePackPacket.class);
-        outbound.bind(PlayerRespawnCodec.class, PlayerRespawnPacket.class);
-        outbound.bind(EntityHeadLookCodec.class, EntityHeadLookPacket.class);
-        outbound.bind(SetActiveAdvancementTreeCodec.class, SetActiveAdvancementTreePacket.class);
-        final CodecRegistration<WorldBorderPacket, WorldBorderCodec> codecPlayOutWorldBorder =
-                outbound.bind(WorldBorderCodec.class);
-        codecPlayOutWorldBorder.bind(WorldBorderPacket.Initialize.class);
+        outbound.bind(DestroyEntitiesEncoder.class, DestroyEntitiesPacket.class);
+        outbound.bind(RemovePotionEffectEncoder.class, RemovePotionEffectPacket.class);
+        outbound.bind(SetResourcePackEncoder.class, SetResourcePackPacket.class);
+        outbound.bind(PlayerRespawnEncoder.class, PlayerRespawnPacket.class);
+        outbound.bind(EntityHeadLookEncoder.class, EntityHeadLookPacket.class);
+        outbound.bind(SetActiveAdvancementTreeEncoder.class, SetActiveAdvancementTreePacket.class);
+        final CodecRegistration<WorldBorderPacket, WorldBorderEncoder> codecPlayOutWorldBorder =
+                outbound.bind(WorldBorderEncoder.class);
+        codecPlayOutWorldBorder.bind(WorldBorderPacket.Init.class);
         codecPlayOutWorldBorder.bind(WorldBorderPacket.UpdateCenter.class);
         codecPlayOutWorldBorder.bind(WorldBorderPacket.UpdateDiameter.class);
         codecPlayOutWorldBorder.bind(WorldBorderPacket.UpdateLerpedDiameter.class);
         codecPlayOutWorldBorder.bind(WorldBorderPacket.UpdateWarningDistance.class);
         codecPlayOutWorldBorder.bind(WorldBorderPacket.UpdateWarningTime.class);
-        outbound.bind(SetCameraCodec.class, SetCameraPacket.class);
-        outbound.bind(PlayerHeldItemChangeCodec.class, PlayerHeldItemChangePacket.class);
-        outbound.bind(UpdateViewPositionCodec.class, UpdateViewPositionPacket.class);
-        outbound.bind(UpdateViewDistanceCodec.class, UpdateViewDistancePacket.class);
-        outbound.bind(PlayerSpawnPositionCodec.class, PlayerSpawnPositionPacket.class);
-        outbound.bind(SetActiveScoreboardObjectiveCodec.class, SetActiveScoreboardObjectivePacket.class);
-        outbound.bind(EntityMetadataCodec.class, EntityMetadataPacket.class);
+        outbound.bind(SetCameraEncoder.class, SetCameraPacket.class);
+        outbound.bind(PlayerHeldItemChangeEncoder.class, PlayerHeldItemChangePacket.class);
+        outbound.bind(UpdateViewPositionEncoder.class, UpdateViewPositionPacket.class);
+        outbound.bind(UpdateViewDistanceEncoder.class, UpdateViewDistancePacket.class);
+        outbound.bind(PlayerSpawnPositionEncoder.class, PlayerSpawnPositionPacket.class);
+        outbound.bind(SetActiveScoreboardObjectiveEncoder.class, SetActiveScoreboardObjectivePacket.class);
+        outbound.bind(EntityMetadataEncoder.class, EntityMetadataPacket.class);
         outbound.bind(); // TODO: Attach Entity
-        outbound.bind(EntityVelocityCodec.class, EntityVelocityPacket.class);
-        outbound.bind(EntityEquipmentCodec.class, EntityEquipmentPacket.class);
-        outbound.bind(SetExperienceCodec.class, SetExperiencePacket.class);
-        outbound.bind(PlayerHealthCodec.class, PlayerHealthPacket.class);
-        final CodecRegistration<ScoreboardObjectivePacket, ScoreboardObjectiveCodec> codecPlayOutScoreboardObjective = outbound.bind(
-                ScoreboardObjectiveCodec.class);
+        outbound.bind(EntityVelocityEncoder.class, EntityVelocityPacket.class);
+        outbound.bind(EntityEquipmentEncoder.class, EntityEquipmentPacket.class);
+        outbound.bind(SetExperienceEncoder.class, SetExperiencePacket.class);
+        outbound.bind(PlayerHealthEncoder.class, PlayerHealthPacket.class);
+        final CodecRegistration<ScoreboardObjectivePacket, ScoreboardObjectiveEncoder> codecPlayOutScoreboardObjective = outbound.bind(
+                ScoreboardObjectiveEncoder.class);
         codecPlayOutScoreboardObjective.bind(ScoreboardObjectivePacket.Create.class);
         codecPlayOutScoreboardObjective.bind(ScoreboardObjectivePacket.Update.class);
         codecPlayOutScoreboardObjective.bind(ScoreboardObjectivePacket.Remove.class);
@@ -584,25 +584,25 @@ final class ProtocolPlay extends ProtocolBase {
                 CodecPlayOutScoreboardScore.class);
         codecPlayOutScoreboardScore.bind(ScoreboardScorePacket.CreateOrUpdate.class);
         codecPlayOutScoreboardScore.bind(ScoreboardScorePacket.Remove.class);
-        outbound.bind(WorldTimeCodec.class, WorldTimePacket.class);
-        final CodecRegistration<TitlePacket, TitleCodec> codecPlayOutTitle = outbound.bind(TitleCodec.class);
+        outbound.bind(WorldTimeEncoder.class, WorldTimePacket.class);
+        final CodecRegistration<TitlePacket, TitleEncoder> codecPlayOutTitle = outbound.bind(TitleEncoder.class);
         codecPlayOutTitle.bind(TitlePacket.Clear.class);
         codecPlayOutTitle.bind(TitlePacket.Reset.class);
         codecPlayOutTitle.bind(TitlePacket.SetSubtitle.class);
         codecPlayOutTitle.bind(TitlePacket.SetActionbarTitle.class);
         codecPlayOutTitle.bind(TitlePacket.SetTimes.class);
         codecPlayOutTitle.bind(TitlePacket.SetTitle.class);
-        outbound.bind(EntitySoundEffectCodec.class, EntitySoundEffectPacket.class);
-        outbound.bind(SoundEffectCodec.class, SoundEffectPacket.class);
-        outbound.bind(StopSoundsCodec.class, StopSoundsPacket.class);
-        outbound.bind(TabListHeaderAndFooterCodec.class, TabListHeaderAndFooterPacket.class);
-        outbound.bind(DataResponseCodec.class, DataResponsePacket.class);
-        outbound.bind(EntityCollectItemCodec.class, EntityCollectItemPacket.class);
-        outbound.bind(EntityTeleportCodec.class, EntityTeleportPacket.class);
-        outbound.bind(AdvancementsCodec.class, AdvancementsPacket.class);
+        outbound.bind(EntitySoundEffectEncoder.class, EntitySoundEffectPacket.class);
+        outbound.bind(SoundEffectEncoder.class, SoundEffectPacket.class);
+        outbound.bind(StopSoundsEncoder.class, StopSoundsPacket.class);
+        outbound.bind(TabListHeaderAndFooterEncoder.class, TabListHeaderAndFooterPacket.class);
+        outbound.bind(DataResponseEncoder.class, DataResponsePacket.class);
+        outbound.bind(EntityCollectItemEncoder.class, EntityCollectItemPacket.class);
+        outbound.bind(EntityTeleportEncoder.class, EntityTeleportPacket.class);
+        outbound.bind(AdvancementsEncoder.class, AdvancementsPacket.class);
         outbound.bind(); // TODO: Entity Properties
-        outbound.bind(AddPotionEffectCodec.class, AddPotionEffectPacket.class);
-        outbound.bind(SetRecipesCodec.class, SetRecipesPacket.class);
-        outbound.bind(TagsCodec.class, TagsPacket.class);
+        outbound.bind(AddPotionEffectEncoder.class, AddPotionEffectPacket.class);
+        outbound.bind(SetRecipesEncoder.class, SetRecipesPacket.class);
+        outbound.bind(TagsEncoder.class, TagsPacket.class);
     }
 }

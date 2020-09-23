@@ -17,10 +17,10 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ResourcePackStatusPacket
 
-class ResourcePackStatusHandler : Handler<ResourcePackStatusPacket> {
+class ResourcePackStatusHandler : PacketHandler<ResourcePackStatusPacket> {
 
     override fun handle(context: NetworkContext, packet: ResourcePackStatusPacket) {
         val resourcePack = context.session.player.resourcePackSendQueue.poll(packet.status)

@@ -20,7 +20,7 @@ object ClientRecipeBookStateCodec : PacketDecoder<ClientRecipeBookStatePacket> {
 
     private val types = ClientRecipeBookStatePacket.Type.values()
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientRecipeBookStatePacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientRecipeBookStatePacket {
         val type = this.types[buf.readVarInt()]
         val isCurrentlyOpen = buf.readBoolean()
         val isFilterActive = buf.readBoolean()

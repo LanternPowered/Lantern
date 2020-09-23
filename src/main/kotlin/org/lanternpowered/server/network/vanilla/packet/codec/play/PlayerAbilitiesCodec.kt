@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerAbilitie
 
 object PlayerAbilitiesCodec : PacketEncoder<PlayerAbilitiesPacket> {
 
-    override fun encode(context: CodecContext, packet: PlayerAbilitiesPacket): ByteBuffer {
+    override fun encode(ctx: CodecContext, packet: PlayerAbilitiesPacket): ByteBuffer {
         var bits = 0
         if (packet.isInvulnerable)
             bits += 0x1
@@ -27,7 +27,7 @@ object PlayerAbilitiesCodec : PacketEncoder<PlayerAbilitiesPacket> {
             bits += 0x4
         if (packet.isCreative)
             bits += 0x8
-        val buf = context.byteBufAlloc().buffer(9)
+        val buf = ctx.byteBufAlloc().buffer(9)
         buf.writeByte(bits.toByte())
         buf.writeFloat(packet.flySpeed)
         buf.writeFloat(packet.fieldOfView)

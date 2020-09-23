@@ -11,11 +11,10 @@
 package org.lanternpowered.server.network.packet
 
 import org.lanternpowered.server.network.NettyThreadOnlyHelper
-import org.lanternpowered.server.network.packet.handler.Handler
 
 data class HandlerPacket<P : Packet> @JvmOverloads constructor(
         val packet: P,
-        val handler: Handler<in P>,
+        val handler: PacketHandler<in P>,
         val handleThread: HandleThread = getDefaultHandleThread(handler)
 ) : Packet {
 
@@ -35,7 +34,7 @@ data class HandlerPacket<P : Packet> @JvmOverloads constructor(
     }
 }
 
-fun getDefaultHandleThread(handler: Handler<*>): HandlerPacket.HandleThread {
+fun getDefaultHandleThread(handler: PacketHandler<*>): HandlerPacket.HandleThread {
     return if (NettyThreadOnlyHelper.isHandlerNettyThreadOnly(handler::class.java)) {
         HandlerPacket.HandleThread.NETTY
     } else {

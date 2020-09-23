@@ -11,10 +11,10 @@
 package org.lanternpowered.server.network.vanilla.packet.handler.play
 
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDiggingPacket
 
-object ClientDiggingHandler : Handler<ClientDiggingPacket> {
+object ClientDiggingHandler : PacketHandler<ClientDiggingPacket> {
 
     override fun handle(context: NetworkContext, packet: ClientDiggingPacket) {
         val player = context.session.player

@@ -14,7 +14,6 @@ import org.lanternpowered.api.cause.entity.damage.DamageTypes
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources
 
-
 /**
  * A static collection of various [DamageSource]s that remain static, or
  * otherwise "ambiguous" with regards to the actual source. Examples include:

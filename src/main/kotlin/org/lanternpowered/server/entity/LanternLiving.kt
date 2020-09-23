@@ -41,7 +41,7 @@ import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.event.message.sendMessage
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.effect.sound.SoundTypes
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.EntityTypes

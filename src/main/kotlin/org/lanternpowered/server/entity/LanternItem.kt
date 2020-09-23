@@ -12,11 +12,13 @@ package org.lanternpowered.server.entity
 
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
+import org.lanternpowered.api.data.Keys
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
-import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.item.inventory.stack.isSimilarTo
 import org.lanternpowered.api.util.duration.max
+import org.lanternpowered.api.util.math.plus
+import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.getIntersectingBlockCollisionBoxes
 import org.lanternpowered.api.world.getIntersectingEntities
@@ -26,12 +28,11 @@ import org.lanternpowered.server.effect.entity.EntityEffectTypes
 import org.lanternpowered.server.effect.entity.particle.item.ItemDeathParticleEffect
 import org.lanternpowered.server.entity.event.CollectEntityEvent
 import org.lanternpowered.server.event.LanternEventContextKeys
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.inventory.IInventory
 import org.lanternpowered.server.inventory.LanternItemStack
-import org.lanternpowered.server.inventory.LanternItemStackSnapshot
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.data.Keys
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.Item
 import org.spongepowered.api.entity.living.Living
@@ -143,15 +144,15 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
             // Play the death effect?
             this.effectCollection.getCombinedOrEmpty(EntityEffectTypes.DEATH).play(this)
         } else {
-            this.updatePhysics()
+            this.updatePhysics(deltaTime)
         }
     }
 
-    private fun updatePhysics() {
+    private fun updatePhysics(deltaTime: Duration) {
         // Get the current velocity
         var velocity = this.require(Keys.VELOCITY)
         // Update the position based on the velocity
-        this.position = this.position.add(velocity)
+        this.position = this.position + (velocity * deltaTime.inSeconds)
 
         // We will check if there is a collision box under the entity
         var ground = false

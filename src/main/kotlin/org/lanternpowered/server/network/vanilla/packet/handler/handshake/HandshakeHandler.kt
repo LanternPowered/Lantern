@@ -18,12 +18,11 @@ import io.netty.handler.codec.CodecException
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.text.toText
 import org.lanternpowered.api.text.translatableTextOf
-import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.ProxyType
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.handler.login.LoginStartHandler
 import org.lanternpowered.server.network.vanilla.packet.type.handshake.HandshakePacket
@@ -34,20 +33,20 @@ import org.lanternpowered.server.util.gson.fromJson
 import org.spongepowered.api.profile.property.ProfileProperty
 import java.net.InetSocketAddress
 
-object HandshakeHandler : Handler<HandshakePacket> {
+object HandshakeHandler : PacketHandler<HandshakePacket> {
 
     private const val fmlMarker = "\u0000FML\u0000"
     private val gson = Gson()
 
     override fun handle(context: NetworkContext, packet: HandshakePacket) {
-        val nextState = ProtocolState.getFromId(packet.nextState).orNull()
+        val nextState = ProtocolState.byId(packet.nextState).orNull()
         val session = context.session
         if (nextState == null) {
             session.close(translatableTextOf("Unknown protocol state! ($nextState)"))
             return
         }
         session.protocolState = nextState
-        if (nextState != ProtocolState.LOGIN && nextState != ProtocolState.STATUS) {
+        if (nextState != ProtocolState.Login && nextState != ProtocolState.Status) {
             session.close(translatableTextOf("Received a unexpected handshake message! ($nextState)"))
             return
         }
@@ -127,7 +126,7 @@ object HandshakeHandler : Handler<HandshakePacket> {
         }
         session.virtualHost = virtualAddress
         session.protocolVersion = packet.protocolVersion
-        if (nextState == ProtocolState.LOGIN) {
+        if (nextState == ProtocolState.Login) {
             val version = context.game.platform.minecraftVersion
             if (packet.protocolVersion < version.protocol) {
                 session.close(translatableTextOf("multiplayer.disconnect.outdated_client", version.name.toText()))

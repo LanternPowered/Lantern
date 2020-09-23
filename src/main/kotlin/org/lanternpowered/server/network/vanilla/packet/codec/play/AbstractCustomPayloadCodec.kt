@@ -12,13 +12,12 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import com.google.common.base.Joiner
 import com.google.common.base.Splitter
-import com.google.common.collect.Sets
 import io.netty.handler.codec.CodecException
 import io.netty.handler.codec.DecoderException
 import io.netty.util.AttributeKey
 import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator
+import org.lanternpowered.server.network.buffer.UnpooledByteBufferAllocator
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.UnknownPacket
 import org.lanternpowered.server.network.packet.codec.Codec
@@ -30,8 +29,8 @@ import java.nio.charset.StandardCharsets
 
 abstract class AbstractCustomPayloadCodec : Codec<Packet> {
 
-    override fun encode(context: CodecContext, packet: Packet): ByteBuffer {
-        val buf = context.byteBufAlloc().buffer()
+    override fun encode(ctx: CodecContext, packet: Packet): ByteBuffer {
+        val buf = ctx.byteBufAlloc().buffer()
         val channel: String
         val content: ByteBuffer
         when (packet) {
@@ -51,7 +50,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
                 channel = "minecraft:unregister"
             }
             else -> {
-                val result = encode0(context, packet)
+                val result = encode0(ctx, packet)
                 channel = result.channel
                 content = result.byteBuf
             }
@@ -65,14 +64,14 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
         return buf
     }
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): Packet {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): Packet {
         val channel = buf.readLimitedString(100)
         val length = buf.available()
         if (length > Short.MAX_VALUE) {
             throw DecoderException("CustomPayload messages may not be longer then " + Short.MAX_VALUE + " bytes")
         }
         val content = buf.slice()
-        val packet = decode0(context, content, channel)
+        val packet = decode0(ctx, content, channel)
         if (content.available() > 0) {
             LanternGame.logger.warn("Trailing bytes {}b after decoding with custom payload message codec {} with channel {}!\n{}",
                     content.available(), javaClass.name, channel, packet)
@@ -146,6 +145,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
     }
 
     companion object {
+
         private val FML_MULTI_PART_MESSAGE = AttributeKey.valueOf<MultiPartMessage>("fml-mpm")
 
         /**
@@ -157,7 +157,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
         private fun decodeChannels(buffer: ByteBuffer): MutableSet<String> {
             val bytes = ByteArray(buffer.available())
             buffer.readBytes(bytes)
-            return Sets.newHashSet(Splitter.on('\u0000').split(String(bytes, StandardCharsets.UTF_8)))
+            return Splitter.on('\u0000').split(String(bytes, StandardCharsets.UTF_8)).toHashSet()
         }
 
         /**
@@ -167,7 +167,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
          * @return the byte buffer
          */
         private fun encodeChannels(channels: Set<String?>): ByteBuffer {
-            return ByteBufferAllocator.unpooled().wrappedBuffer(Joiner.on('\u0000').join(channels).toByteArray(StandardCharsets.UTF_8))
+            return UnpooledByteBufferAllocator.wrappedBuffer(Joiner.on('\u0000').join(channels).toByteArray(StandardCharsets.UTF_8))
         }
     }
 }

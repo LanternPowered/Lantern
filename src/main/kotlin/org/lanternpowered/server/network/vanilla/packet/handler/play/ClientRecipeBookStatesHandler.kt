@@ -12,10 +12,10 @@ package org.lanternpowered.server.network.vanilla.packet.handler.play
 
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientRecipeBookStatePacket
 
-object ClientRecipeBookStatesHandler : Handler<ClientRecipeBookStatePacket> {
+object ClientRecipeBookStatesHandler : PacketHandler<ClientRecipeBookStatePacket> {
 
     override fun handle(context: NetworkContext, packet: ClientRecipeBookStatePacket) {
         val player = context.session.player

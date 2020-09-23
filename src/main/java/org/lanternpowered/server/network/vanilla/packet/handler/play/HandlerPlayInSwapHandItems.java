@@ -17,7 +17,7 @@ import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.vanilla.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.packet.handler.Handler;
+import org.lanternpowered.server.network.packet.PacketHandler;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSwapHandItemsPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
@@ -30,7 +30,7 @@ import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class HandlerPlayInSwapHandItems implements Handler<ClientSwapHandItemsPacket> {
+public final class HandlerPlayInSwapHandItems implements PacketHandler<ClientSwapHandItemsPacket> {
 
     @Override
     public void handle(NetworkContext context, ClientSwapHandItemsPacket packet) {

@@ -38,7 +38,7 @@ import org.lanternpowered.server.inventory.carrier.CarrierInventoryTypes
 import org.lanternpowered.server.inventory.carrier.CarrierReference
 import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.KeyValueMatcher
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.item.inventory.Carrier
 import java.util.Optional

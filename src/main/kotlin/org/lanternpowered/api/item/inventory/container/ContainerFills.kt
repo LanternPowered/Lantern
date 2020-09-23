@@ -17,7 +17,7 @@ import org.lanternpowered.api.item.inventory.emptyItemStackSnapshot
 import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.api.text.emptyText
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import java.util.function.Supplier
 
 object ContainerFills {

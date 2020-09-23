@@ -17,8 +17,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientModifySi
 
 object ClientChangeSignCodec : PacketDecoder<ClientModifySignPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientModifySignPacket {
-        val position = buf.readPosition()
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientModifySignPacket {
+        val position = buf.readBlockPosition()
         val lines = Array(ClientModifySignPacket.EXPECTED_LINES_SIZE) { "" }
         for (i in lines.indices)
             lines[i] = buf.readLimitedString(384)

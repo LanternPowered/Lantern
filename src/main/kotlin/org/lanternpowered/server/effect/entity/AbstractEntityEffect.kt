@@ -12,7 +12,7 @@ package org.lanternpowered.server.effect.entity
 
 import org.lanternpowered.server.entity.EntityBodyPosition
 import org.lanternpowered.server.entity.LanternEntity
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.math.vector.Vector3d
 import kotlin.random.Random
 

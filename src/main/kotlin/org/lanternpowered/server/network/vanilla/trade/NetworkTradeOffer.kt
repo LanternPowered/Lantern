@@ -12,7 +12,8 @@ package org.lanternpowered.server.network.vanilla.trade
 
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.value.ContextualValueCodec
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
 data class NetworkTradeOffer(
@@ -27,20 +28,25 @@ data class NetworkTradeOffer(
         private val priceMultiplier: Double
 ) {
 
-    internal fun write(ctx: CodecContext, buf: ByteBuffer) {
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.firstInput)
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.output)
-        if (this.secondInput.isEmpty) {
-            buf.writeBoolean(false)
-        } else {
-            buf.writeBoolean(true)
-            ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.secondInput)
+    companion object : ContextualValueCodec<NetworkTradeOffer> {
+
+        override fun write(ctx: CodecContext, buf: ByteBuffer, value: NetworkTradeOffer) {
+            NetworkItemStack.write(ctx, buf, value.firstInput)
+            NetworkItemStack.write(ctx, buf, value.output)
+            if (value.secondInput.isEmpty) {
+                buf.writeBoolean(false)
+            } else {
+                buf.writeBoolean(true)
+                NetworkItemStack.write(ctx, buf, value.secondInput)
+            }
+            buf.writeBoolean(value.disabled)
+            buf.writeInt(value.uses)
+            buf.writeInt(value.maxUses)
+            buf.writeInt(value.experience)
+            buf.writeInt(value.specialPrice)
+            buf.writeFloat(value.priceMultiplier.toFloat())
         }
-        buf.writeBoolean(this.disabled)
-        buf.writeInt(this.uses)
-        buf.writeInt(this.maxUses)
-        buf.writeInt(this.experience)
-        buf.writeInt(this.specialPrice)
-        buf.writeFloat(this.priceMultiplier.toFloat())
+
+        override fun read(ctx: CodecContext, buf: ByteBuffer): NetworkTradeOffer = throw UnsupportedOperationException()
     }
 }

@@ -33,7 +33,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutM
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnloadChunkPacket;
 import org.lanternpowered.api.util.palette.Palette;
 import org.lanternpowered.api.util.VariableValueArray;
-import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldNew;
 import org.lanternpowered.server.world.WorldEventListener;
 import org.lanternpowered.server.world.chunk.ChunkBlockStateArray;
@@ -426,7 +425,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
 
             if (biomesArray != null) {
-                packets.add(0, new ChunkPacket.Initialize(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
+                packets.add(0, new ChunkPacket.Init(this.coords.getX(), this.coords.getY(), msgSections, biomesArray));
             } else {
                 packets.add(0, new ChunkPacket.Update(this.coords.getX(), this.coords.getY(), true, msgSections));
             }

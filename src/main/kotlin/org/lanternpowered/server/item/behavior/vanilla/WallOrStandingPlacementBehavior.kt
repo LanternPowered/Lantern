@@ -22,7 +22,7 @@ import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBaseB
 import org.lanternpowered.server.util.wrapDegRot
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.util.Direction
 import java.util.function.Supplier
 import kotlin.math.roundToInt

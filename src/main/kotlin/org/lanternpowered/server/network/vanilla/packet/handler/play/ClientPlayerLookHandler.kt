@@ -11,12 +11,12 @@
 package org.lanternpowered.server.network.vanilla.packet.handler.play
 
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerLookPacket
 import org.lanternpowered.server.util.wrapDegRot
 import org.spongepowered.math.vector.Vector3d
 
-object ClientPlayerLookHandler : Handler<ClientPlayerLookPacket> {
+object ClientPlayerLookHandler : PacketHandler<ClientPlayerLookPacket> {
 
     override fun handle(context: NetworkContext, packet: ClientPlayerLookPacket) {
         val player = context.session.player

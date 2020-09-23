@@ -34,7 +34,7 @@ class InjectionPointProvider : AbstractMatcher<Binding<*>>(), Module, ProvisionL
 
     override fun <T> onProvision(provision: ProvisionListener.ProvisionInvocation<T>) {
         try {
-            this.injectionPoint = findInjectionPoint(provision.dependencyChain)
+            this.injectionPoint = this.findInjectionPoint(provision.dependencyChain)
             provision.provision()
         } finally {
             this.injectionPoint = null
@@ -42,9 +42,8 @@ class InjectionPointProvider : AbstractMatcher<Binding<*>>(), Module, ProvisionL
     }
 
     private fun findInjectionPoint(dependencyChain: List<DependencyAndSource>): InjectionPoint? {
-        if (dependencyChain.size < 3) {
+        if (dependencyChain.size < 3)
             AssertionError("Provider is not included in the dependency chain").printStackTrace()
-        }
 
         // @Inject InjectionPoint is the last, so we can skip it
         for (i in dependencyChain.size - 2 downTo 0) {

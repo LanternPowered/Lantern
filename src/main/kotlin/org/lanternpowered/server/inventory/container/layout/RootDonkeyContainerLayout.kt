@@ -18,7 +18,7 @@ import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
-import org.lanternpowered.server.network.entity.parameter.DefaultParameterList
+import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityNetworkIDs
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
@@ -26,9 +26,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitie
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenHorseWindowPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnMobPacket
-import org.spongepowered.api.data.Keys
 import org.spongepowered.math.vector.Vector3d
-import java.lang.ref.WeakReference
 import java.util.UUID
 
 class RootDonkeyContainerLayout(val hasChest: Boolean) : LanternTopBottomContainerLayout<DonkeyContainerLayout>(
@@ -93,7 +91,7 @@ class RootDonkeyContainerLayout(val hasChest: Boolean) : LanternTopBottomContain
         val entityId = Int.MAX_VALUE
 
         // No entity was found, so create a fake one
-        val parameters = DefaultParameterList()
+        val parameters = MutableParameterList()
         parameters.add(EntityParameters.Base.FLAGS, EntityParameters.Base.Flags.IS_INVISIBLE.toByte())
         parameters.add(EntityParameters.ChestedHorse.HAS_CHEST, this.hasChest)
 

@@ -15,7 +15,7 @@ import org.lanternpowered.api.text.emptyText
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.server.network.block.VanillaBlockEntityProtocol
 import org.spongepowered.api.block.entity.BlockEntity
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataQuery
 import org.spongepowered.api.data.persistence.DataView
 

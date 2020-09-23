@@ -11,18 +11,30 @@
 package org.lanternpowered.server.registry.type.data
 
 import org.lanternpowered.api.data.Key
+import org.lanternpowered.api.data.Keys
 import org.lanternpowered.api.data.valueKeyOf
-import org.lanternpowered.api.key.minecraftKey
+import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.key.spongeKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.uncheckedCast
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.server.data.SpongeKeys
 import org.spongepowered.api.data.value.Value
+import kotlin.reflect.full.memberProperties
 
 val ValueKeyRegistry = catalogTypeRegistry<Key<*>> {
     val valueTypeParameter = Key::class.java.typeParameters[0]
-    processSuggestions(Keys::class) { suggestedId, type ->
-        val key = minecraftKey(suggestedId)
+    val found = hashSetOf<NamespacedKey>()
+    for (field in Keys::class.memberProperties) {
+        val valueKey = field.get(Keys) as Key<*>
+        found += valueKey.key
+        register(valueKey)
+    }
+    processSuggestions(SpongeKeys::class) { suggestedId, type ->
+        val key = spongeKey(suggestedId)
+        // Don't register the keys twice
+        if (key in found)
+            return@processSuggestions
         val valueType = type.resolveType(valueTypeParameter).uncheckedCast<TypeToken<Value<Any>>>()
         register(valueKeyOf(key, valueType))
     }

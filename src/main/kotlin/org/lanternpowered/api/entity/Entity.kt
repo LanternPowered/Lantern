@@ -11,6 +11,9 @@
 package org.lanternpowered.api.entity
 
 import org.lanternpowered.api.world.Location
+import org.spongepowered.api.data.value.Value
+import org.spongepowered.math.vector.Vector3d
+import org.spongepowered.api.data.Keys as SpongeKeys
 
 typealias Entity = org.spongepowered.api.entity.Entity
 typealias EntityType<T> = org.spongepowered.api.entity.EntityType<T>
@@ -19,4 +22,9 @@ typealias EntityTypes = org.spongepowered.api.entity.EntityTypes
 interface ExtendedEntity : Entity {
 
     override fun getLocation(): Location
+
+    @JvmDefault
+    @Deprecated("Use lantern Keys instead.",
+            ReplaceWith("this.requireValue(SpongeKeys.VELOCITY).asMutable()", "org.spongepowered.api.data.Keys"))
+    override fun velocity(): Value.Mutable<Vector3d> = this.requireValue(SpongeKeys.VELOCITY).asMutable()
 }

@@ -11,7 +11,7 @@
 package org.lanternpowered.server.entity
 
 import org.lanternpowered.api.util.optional.emptyOptional
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.entity.ai.goal.GoalExecutor
 import org.spongepowered.api.entity.ai.goal.GoalExecutorType
 import org.spongepowered.api.entity.living.Agent

@@ -18,9 +18,9 @@ interface PacketDecoder<P : Packet> {
     /**
      * Decodes the packet from an encoded byte buffer.
      *
-     * @param context The context
+     * @param ctx The context
      * @param buf The byte buffer to decode
      * @return The decoded packet
      */
-    fun decode(context: CodecContext, buf: ByteBuffer): P
+    fun decode(ctx: CodecContext, buf: ByteBuffer): P
 }

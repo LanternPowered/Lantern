@@ -26,7 +26,7 @@ import org.lanternpowered.server.entity.EntityCreationData
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
 import org.spongepowered.api.block.BlockSnapshot
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.Transaction
 import org.spongepowered.api.entity.weather.LightningBolt
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource

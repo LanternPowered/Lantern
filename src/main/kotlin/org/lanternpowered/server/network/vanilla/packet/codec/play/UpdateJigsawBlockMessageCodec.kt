@@ -17,9 +17,9 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateJigsawBl
 
 class UpdateJigsawBlockMessageCodec : Codec<UpdateJigsawBlockPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): UpdateJigsawBlockPacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): UpdateJigsawBlockPacket {
         return buf.run {
-            val position = readPosition()
+            val position = readBlockPosition()
             val name = readString()
             val target = readString()
             val pool = readString()

@@ -24,6 +24,7 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
 import org.lanternpowered.api.key.asNamespacedKey
+import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.scoreboard.Scoreboard
 import org.lanternpowered.api.service.serviceOf
 import org.lanternpowered.api.text.Text
@@ -88,7 +89,7 @@ import org.spongepowered.api.advancement.AdvancementProgress
 import org.spongepowered.api.advancement.AdvancementTree
 import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.entity.Sign
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.type.HandTypes
 import org.spongepowered.api.data.type.SkinPart
 import org.spongepowered.api.effect.particle.ParticleEffect
@@ -110,6 +111,7 @@ import org.spongepowered.api.resourcepack.ResourcePack
 import org.spongepowered.api.service.ban.Ban
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.util.AABB
+import org.spongepowered.api.util.locale.Locales
 import org.spongepowered.api.world.WorldBorder
 import org.spongepowered.api.world.gamerule.GameRules
 import org.spongepowered.math.vector.Vector3d
@@ -198,6 +200,41 @@ class LanternPlayer(
         // TODO this.setWorld(null)
         // Release the players entity id
         EntityProtocolManager.releaseEntityId(this.networkId)
+    }
+
+    private var _locale = Locales.DEFAULT
+
+    override fun getLocale(): Locale = this._locale
+
+    /**
+     * Sets the [Locale] of this [LanternPlayer]. Will
+     * update translatable components on the client.
+     *
+     * @param locale The locale
+     */
+    fun setLocale(locale: Locale) {
+        if (locale == this._locale)
+            return
+        this._locale = locale
+        // TODO: Update the client
+        // World may not be null
+        /*
+        if (world != null) {
+            // Update the advancements
+            advancementsProgress.initClient()
+            // Update the inventory
+            inventoryContainer.initClientContainer()
+            // Update the scoreboard
+            if (scoreboard != null) {
+                scoreboard.refreshPlayer(this)
+            }
+            // Update the entities for this player
+            world.getEntityProtocolManager().updateTrackerLocale(this)
+            if (tabList != null) {
+                tabList.refresh()
+            }
+        }
+        */
     }
 
     override fun getName(): String = this.profile.name.get()

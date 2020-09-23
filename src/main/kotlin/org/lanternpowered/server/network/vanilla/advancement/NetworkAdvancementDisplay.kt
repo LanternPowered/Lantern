@@ -10,11 +10,14 @@
  */
 package org.lanternpowered.server.network.vanilla.advancement
 
+import org.lanternpowered.api.item.inventory.stack.asStack
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.value.ContextualValueCodec
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.text.NetworkText
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
 import org.spongepowered.api.advancement.AdvancementType
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
@@ -31,23 +34,28 @@ class NetworkAdvancementDisplay(
         private val hidden: Boolean
 ) {
 
-    fun write(ctx: CodecContext, buf: ByteBuffer) {
-        ctx.write(buf, ContextualValueTypes.TEXT, this.title)
-        ctx.write(buf, ContextualValueTypes.TEXT, this.description)
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.icon.createStack())
-        buf.writeVarInt(AdvancementTypeRegistry.getId(this.frameType))
-        var flags = 0
-        if (this.background != null)
-            flags += 0x1
-        if (this.showToast)
-            flags += 0x2
-        if (this.hidden)
-            flags += 0x4
-        buf.writeInt(flags)
-        if (this.background != null)
-            buf.writeString(this.background)
-        buf.writeFloat(this.position.x.toFloat())
-        buf.writeFloat(this.position.y.toFloat())
+    companion object : ContextualValueCodec<NetworkAdvancementDisplay> {
+
+        override fun write(ctx: CodecContext, buf: ByteBuffer, value: NetworkAdvancementDisplay) {
+            NetworkText.write(ctx, buf, value.title)
+            NetworkText.write(ctx, buf, value.description)
+            NetworkItemStack.write(ctx, buf, value.icon.asStack())
+            buf.writeVarInt(AdvancementTypeRegistry.getId(value.frameType))
+            var flags = 0
+            if (value.background != null)
+                flags += 0x1
+            if (value.showToast)
+                flags += 0x2
+            if (value.hidden)
+                flags += 0x4
+            buf.writeInt(flags)
+            if (value.background != null)
+                buf.writeString(value.background)
+            buf.writeFloat(value.position.x.toFloat())
+            buf.writeFloat(value.position.y.toFloat())
+        }
+
+        override fun read(ctx: CodecContext, buf: ByteBuffer): NetworkAdvancementDisplay = throw UnsupportedOperationException()
     }
 
     override fun toString(): String = ToStringHelper(this)

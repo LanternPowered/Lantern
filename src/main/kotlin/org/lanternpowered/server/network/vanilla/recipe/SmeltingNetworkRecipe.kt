@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class SmeltingNetworkRecipe(
@@ -25,10 +25,10 @@ class SmeltingNetworkRecipe(
         private val smeltingTime: Int
 ) : GroupedNetworkRecipe(id, type, group) {
 
-    override fun write(ctx: CodecContext, buf: ByteBuffer) {
-        super.write(ctx, buf)
+    override fun writeProperties(ctx: CodecContext, buf: ByteBuffer) {
+        super.writeProperties(ctx, buf)
         this.ingredient.write(ctx, buf)
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.result)
+        NetworkItemStack.write(ctx, buf, this.result)
         buf.writeFloat(this.experience.toFloat())
         buf.writeVarInt(this.smeltingTime)
     }

@@ -22,19 +22,19 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientMovement
 
 object ClientVehicleControlsCodec : PacketDecoder<Packet> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): Packet {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): Packet {
         var sideways = buf.readFloat()
         var forwards = buf.readFloat()
         val flags = buf.readByte().toInt()
         val jump = flags and 0x1 != 0
         val sneak = flags and 0x2 != 0
         val packets = mutableListOf<Packet>()
-        val lastSneak = context.channel.attr(SNEAKING).getAndSet(sneak) ?: false
+        val lastSneak = ctx.channel.attr(SNEAKING).getAndSet(sneak) ?: false
         if (lastSneak != sneak)
             packets.add(ClientSneakStatePacket(sneak))
 
-        val lastJump = context.channel.attr(JUMPING).getAndSet(jump) ?: false
-        if (lastJump != jump && context.channel.attr(ClientPlayerActionCodec.CANCEL_NEXT_JUMP_MESSAGE).getAndSet(false) != true)
+        val lastJump = ctx.channel.attr(JUMPING).getAndSet(jump) ?: false
+        if (lastJump != jump && ctx.channel.attr(ClientPlayerActionCodec.CANCEL_NEXT_JUMP_MESSAGE).getAndSet(false) != true)
             packets.add(ClientVehicleJumpPacket(jump, 0f))
 
         // The mc client already applies the sneak speed, but we want to choose it

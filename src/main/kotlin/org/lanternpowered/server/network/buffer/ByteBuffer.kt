@@ -13,7 +13,9 @@ package org.lanternpowered.server.network.buffer
 import io.netty.handler.codec.DecoderException
 import io.netty.util.ReferenceCounted
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.server.network.value.ContextualValueCodec
 import org.lanternpowered.server.network.item.RawItemStack
+import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.network.channel.ChannelBuf
 import org.spongepowered.math.vector.Vector3d
@@ -161,11 +163,11 @@ interface ByteBuffer : ChannelBuf, ReferenceCounted {
     fun writeVector3i(x: Int, y: Int, z: Int): ByteBuffer
     fun writeVector3i(vector: Vector3i): ByteBuffer
 
-    fun getPosition(index: Int): Vector3i
-    fun setPosition(index: Int, vector: Vector3i): ByteBuffer
-    fun readPosition(): Vector3i
-    fun writePosition(x: Int, y: Int, z: Int): ByteBuffer
-    fun writePosition(vector: Vector3i): ByteBuffer
+    fun getBlockPosition(index: Int): Vector3i
+    fun setBlockPosition(index: Int, vector: Vector3i): ByteBuffer
+    fun readBlockPosition(): Vector3i
+    fun writeBlockPosition(x: Int, y: Int, z: Int): ByteBuffer
+    fun writeBlockPosition(vector: Vector3i): ByteBuffer
 
     fun getVector3f(index: Int): Vector3f
     fun setVector3f(index: Int, vector: Vector3f): ByteBuffer
@@ -188,6 +190,17 @@ interface ByteBuffer : ChannelBuf, ReferenceCounted {
     fun setRawItemStack(index: Int, rawItemStack: RawItemStack?): ByteBuffer
     fun readRawItemStack(): RawItemStack?
     fun writeRawItemStack(rawItemStack: RawItemStack?): ByteBuffer
+
+    /**
+     * Writes the specified value for the [ContextualValueCodec]. The value may be
+     * `null` depending on the value type.
+     *
+     * @param context The context
+     * @param type The type
+     * @param value The value
+     * @param V The value type
+     */
+    fun <V> write(context: CodecContext, type: ContextualValueCodec<V>, value: V)
 
     fun copy(): ByteBuffer
 }

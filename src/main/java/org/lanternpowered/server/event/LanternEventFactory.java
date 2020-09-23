@@ -465,7 +465,8 @@ public final class LanternEventFactory {
                 Optional.ofNullable(newBorder), player, Optional.ofNullable(previousBorder));
     }
 
-    public static @NonNull PlayerChatEvent createPlayerChatEvent(Cause cause,
+    public static @NonNull PlayerChatEvent createPlayerChatEvent(
+            final @NonNull Cause cause,
             final @NonNull PlayerChatRouter originalChatRouter,
             final @Nullable PlayerChatRouter chatRouter,
             final @NonNull Component originalMessage,

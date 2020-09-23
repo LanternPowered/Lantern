@@ -23,8 +23,8 @@ import java.util.Collection;
 public final class CodecPlayOutMultiBlockChange implements Codec<PacketPlayOutMultiBlockChange> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, PacketPlayOutMultiBlockChange packet) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext ctx, PacketPlayOutMultiBlockChange packet) throws CodecException {
+        ByteBuffer buf = ctx.byteBufAlloc().buffer();
         buf.writeInteger(packet.getChunkX());
         buf.writeInteger(packet.getChunkZ());
         Collection<BlockChangePacket> changes = packet.getChanges();

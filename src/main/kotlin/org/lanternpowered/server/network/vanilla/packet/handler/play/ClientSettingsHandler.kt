@@ -15,12 +15,12 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.network.NetworkContext
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSettingsPacket
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 
-class ClientSettingsHandler : Handler<ClientSettingsPacket> {
+object ClientSettingsHandler : PacketHandler<ClientSettingsPacket> {
 
     override fun handle(context: NetworkContext, packet: ClientSettingsPacket) {
         val player = context.session.player

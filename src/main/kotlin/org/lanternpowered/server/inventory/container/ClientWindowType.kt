@@ -12,4 +12,4 @@ package org.lanternpowered.server.inventory.container
 
 import org.lanternpowered.api.key.NamespacedKey
 
-data class ClientWindowType(val id: NamespacedKey)
+data class ClientWindowType(val id: NamespacedKey, val internalId: Int)

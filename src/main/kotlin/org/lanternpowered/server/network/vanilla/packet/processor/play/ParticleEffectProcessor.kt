@@ -17,7 +17,7 @@ import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.server.effect.particle.LanternParticleEffect
 import org.lanternpowered.server.inventory.LanternItemStack
 import org.lanternpowered.server.network.entity.EntityProtocolManager
-import org.lanternpowered.server.network.entity.parameter.DefaultParameterList
+import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.codec.CodecContext
@@ -34,7 +34,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnParticleP
 import org.lanternpowered.server.registry.type.block.BlockStateRegistry
 import org.lanternpowered.server.registry.type.data.NotePitchRegistry
 import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.type.NotePitch
 import org.spongepowered.api.effect.particle.ParticleEffect
 import org.spongepowered.api.effect.particle.ParticleOptions
@@ -98,7 +98,7 @@ object ParticleEffectProcessor : PacketProcessor<ParticleEffectPacket> {
                     itemStack.tryOffer(Keys.FIREWORK_EFFECTS, effect.getOptionOrDefault(ParticleOptions.FIREWORK_EFFECTS).get())
 
                     // Write the item to a parameter list
-                    val parameterList = DefaultParameterList()
+                    val parameterList = MutableParameterList()
                     parameterList.add(EntityParameters.Fireworks.ITEM, itemStack)
                     return CachedFireworksMessage(EntityMetadataPacket(CachedFireworksMessage.ENTITY_ID, parameterList))
                 }

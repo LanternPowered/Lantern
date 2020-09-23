@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.SetGameModePac
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket
 import org.lanternpowered.server.registry.type.data.GameModeRegistry
 
-class SetGameModeProcessor : PacketProcessor<SetGameModePacket> {
+object SetGameModeProcessor : PacketProcessor<SetGameModePacket> {
 
     override fun process(context: CodecContext, packet: SetGameModePacket, output: MutableList<Packet>) {
         output.add(ChangeGameStatePacket(3, GameModeRegistry.getId(packet.gameMode).toFloat()))

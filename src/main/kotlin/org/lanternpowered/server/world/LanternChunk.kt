@@ -11,6 +11,7 @@
 package org.lanternpowered.server.world
 
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap
 import org.lanternpowered.api.block.BlockState
 import org.lanternpowered.api.block.BlockType
 import org.lanternpowered.api.data.eq
@@ -26,10 +27,15 @@ import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.util.palette.PaletteBasedArray
 import org.lanternpowered.api.util.palette.PaletteBasedArrayFactory
 import org.lanternpowered.api.util.uncheckedCast
+import org.lanternpowered.api.world.BlockChangeFlag
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.chunk.Chunk
 import org.lanternpowered.api.world.chunk.ChunkPosition
+import org.lanternpowered.api.world.locationOf
+import org.lanternpowered.server.block.LanternBlockState
 import org.lanternpowered.server.block.LanternBlockType
+import org.lanternpowered.server.block.entity.LanternBlockEntity
+import org.lanternpowered.server.data.mergeWithAndCollectResult
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.registry.type.block.GlobalBlockStatePalette
 import org.lanternpowered.server.util.collect.array.NibbleArray
@@ -37,11 +43,12 @@ import org.lanternpowered.server.world.chunk.ChunkManager
 import org.lanternpowered.server.world.chunk.Chunks
 import org.lanternpowered.server.world.chunk.LanternChunkLayout
 import org.lanternpowered.server.world.chunk.LocalPosition
+import org.lanternpowered.server.world.update.ChunkScheduledUpdateList
 import org.spongepowered.api.block.BlockTypes
 import org.spongepowered.api.block.entity.BlockEntity
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.data.value.MergeFunction
 import org.spongepowered.api.data.value.Value
@@ -51,6 +58,7 @@ import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.scheduler.ScheduledUpdateList
 import org.spongepowered.api.util.AABB
 import org.spongepowered.api.util.PositionOutOfBoundsException
+import org.spongepowered.api.world.BlockChangeFlags
 import org.spongepowered.api.world.HeightType
 import org.spongepowered.api.world.biome.BiomeType
 import org.spongepowered.api.world.chunk.ChunkState
@@ -79,6 +87,7 @@ class LanternChunk(
     private val blockMin = Chunks.toGlobal(this.position)
     private val blockMax = this.blockMin.add(LanternChunkLayout.chunkSize).sub(1, 1, 1)
 
+    override fun getWorld(): World = this.manager.world
     override fun getChunkPosition(): Vector3i = this.position.toVector()
 
     override fun getBlockMin(): Vector3i = this.blockMin
@@ -120,7 +129,7 @@ class LanternChunk(
      * The array with all the block entities of this chunk, or `null` if
      * this chunk doesn't have any blocks.
      */
-    private var blockEntities: Short2ObjectMap<BlockEntity>? = null
+    private var blockEntities: Short2ObjectMap<LanternBlockEntity>? = null
 
     /**
      * The number of non empty (air with index 0, no cave/void air) blocks in this chunk section.
@@ -138,6 +147,16 @@ class LanternChunk(
     private var _entities = concurrentHashSetOf<Entity>()
 
     /**
+     * All the scheduled block updates in this chunk.
+     */
+    private var scheduledBlockUpdates = ChunkScheduledUpdateList<BlockType>(this.world, this.position)
+
+    /**
+     * All the scheduled fluid updates in this chunk.
+     */
+    private var scheduledFluidUpdates = ChunkScheduledUpdateList<FluidType>(this.world, this.position)
+
+    /**
      * An unmodifiable collection view of all the entities that are currently
      * located in this chunk.
      */
@@ -145,8 +164,6 @@ class LanternChunk(
 
     override fun getPlayers(): Collection<Player> =
             this._entities.asSequence().filterIsInstance<Player>().toImmutableSet()
-
-    override fun getWorld(): World = this.manager.world
 
     /**
      * Recounts the number of non empty and non air blocks.
@@ -177,9 +194,8 @@ class LanternChunk(
     override fun containsBlock(x: Int, y: Int, z: Int): Boolean = Chunks.toChunk(x, y, z) == this.position
     override fun isAreaAvailable(x: Int, y: Int, z: Int): Boolean = this.containsBlock(x, y, z) // TODO: This is probably not good
 
-    override fun getScheduledBlockUpdates(): ScheduledUpdateList<BlockType> {
-        TODO("Not yet implemented")
-    }
+    override fun getScheduledBlockUpdates(): ScheduledUpdateList<BlockType> = this.scheduledBlockUpdates
+    override fun getScheduledFluidUpdates(): ScheduledUpdateList<FluidType> = this.scheduledFluidUpdates
 
     override fun getBlockEntities(): Collection<BlockEntity> {
         val blockEntities = this.blockEntities ?: return emptyList()
@@ -191,7 +207,7 @@ class LanternChunk(
         return this.getBlockEntityLocally(Chunks.toLocal(x, y, z)).asOptional()
     }
 
-    fun getBlockEntityLocally(position: LocalPosition): BlockEntity? {
+    fun getBlockEntityLocally(position: LocalPosition): LanternBlockEntity? {
         val blockEntities = this.blockEntities ?: return null
         return blockEntities[position.packedShort]
     }
@@ -202,7 +218,8 @@ class LanternChunk(
     }
 
     fun removeBlockEntityLocally(position: LocalPosition) {
-        TODO("Not yet implemented")
+        val blockEntity = this.blockEntities?.remove(position.packedShort) ?: return
+        blockEntity.isValid = true
     }
 
     override fun addBlockEntity(x: Int, y: Int, z: Int, blockEntity: BlockEntity) {
@@ -211,14 +228,26 @@ class LanternChunk(
     }
 
     fun addBlockEntityLocally(position: LocalPosition, blockEntity: BlockEntity) {
-        TODO("Not yet implemented")
+        val previous = this.blockEntities?.get(position.packedShort)
+        if (previous != null)
+            previous.isValid = false
+        this.putBlockEntity(position, blockEntity)
+    }
+
+    private fun putBlockEntity(position: LocalPosition, blockEntity: BlockEntity) {
+        var blockEntities = this.blockEntities
+        if (blockEntities == null)
+            blockEntities = Short2ObjectOpenHashMap<LanternBlockEntity>().also { this.blockEntities = it }
+
+        blockEntity as LanternBlockEntity
+        blockEntity.setLocation(locationOf(this.world, Chunks.toGlobal(this.position, position)))
+        blockEntity.block = this.getBlockLocally(position)
+        blockEntity.isValid = true
+
+        blockEntities[position.packedShort] = blockEntity
     }
 
     override fun loadChunk(generate: Boolean): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun getScheduledFluidUpdates(): ScheduledUpdateList<FluidType> {
         TODO("Not yet implemented")
     }
 
@@ -227,17 +256,64 @@ class LanternChunk(
         return this.removeBlockLocally(Chunks.toLocal(x, y, z))
     }
 
-    fun removeBlockLocally(position: LocalPosition): Boolean {
-        TODO("Not yet implemented")
-    }
+    fun removeBlockLocally(position: LocalPosition): Boolean =
+            this.setBlockLocally(position, BlockTypes.AIR.get().defaultState)
 
     override fun setBlock(x: Int, y: Int, z: Int, block: BlockState): Boolean {
         this.checkBounds(x, y, z)
         return this.setBlockLocally(Chunks.toLocal(x, y, z), block)
     }
 
-    fun setBlockLocally(position: LocalPosition, block: BlockState): Boolean {
-        TODO("Not yet implemented")
+    fun setBlockLocally(position: LocalPosition, block: BlockState): Boolean =
+            this.setBlockLocally(position, block, BlockChangeFlags.ALL)
+
+    fun setBlockLocally(position: LocalPosition, block: BlockState, flag: BlockChangeFlag): Boolean {
+        block as LanternBlockState
+        if (block == GlobalBlockStatePalette.default && this.blocks == null)
+            return true
+
+        var blocks = this.blocks
+        if (blocks == null)
+            blocks = PaletteBasedArrayFactory.of(Chunks.Volume, GlobalBlockStatePalette).also { this.blocks = it }
+
+        val previous = blocks[position.packed] as LanternBlockState
+        // The block didn't change, no need to update anything
+        if (previous == block)
+            return true
+        blocks[position.packed] = block
+
+        // Update block counts
+        if (previous.type neq BlockTypes.AIR)
+            this.nonEmptyBlockCount--
+        if (block.type neq BlockTypes.AIR)
+            this.nonEmptyBlockCount++
+        if (!previous.type.isAir)
+            this.nonAirBlockCount--
+        if (!block.type.isAir)
+            this.nonAirBlockCount++
+
+        // Update the block entity
+        var removeBlockEntity = false
+        val previousBlockEntity = this.getBlockEntityLocally(position)
+        if (previousBlockEntity != null) {
+            if (block.type != previous.type) {
+                previousBlockEntity.isValid = false
+                removeBlockEntity = true
+            } else {
+                previousBlockEntity.block = block
+            }
+        }
+        val blockEntityType = block.type.blockEntityType
+        if (blockEntityType != null) {
+            this.putBlockEntity(position, blockEntityType.constructBlockEntity())
+            removeBlockEntity = false
+        }
+        if (removeBlockEntity)
+            this.blockEntities?.remove(position.packedShort)
+
+        // TODO: Notify neighbors, etc.
+        // TODO: Update heightmap
+        return true
     }
 
     override fun getBlock(x: Int, y: Int, z: Int): BlockState {
@@ -291,7 +367,7 @@ class LanternChunk(
             if (state != BlockTypes.AIR.get())
                 return Chunks.toGlobal(this.position.y, localY)
         }
-        return Chunks.toGlobal(this.position.y, 0)
+        return Chunks.toGlobal(this.position.y)
     }
 
     @Deprecated(message = "Use on world or column level.")
@@ -367,8 +443,20 @@ class LanternChunk(
         return this.copyFromLocally(Chunks.toLocal(xTo, yTo, zTo), from, function)
     }
 
-    fun copyFromLocally(to: LocalPosition, from: ValueContainer, function: MergeFunction): DataTransactionResult {
-        TODO("Not yet implemented")
+    fun copyFromLocally(
+            to: LocalPosition, from: ValueContainer, function: MergeFunction = MergeFunction.REPLACEMENT_PREFERRED
+    ): DataTransactionResult {
+        val previous = this.getBlockLocally(to)
+        val result = DataTransactionResult.builder()
+        val block = previous.mergeWithAndCollectResult(from, result)
+        if (previous != block)
+            this.setBlockLocally(to, block)
+        val blockEntity = this.getBlockEntityLocally(to)
+        if (blockEntity != null)
+            result.absorbResult(blockEntity.copyFrom(from, function))
+        from.get(Keys.CREATOR).ifPresent { value -> result.absorbResult(this.offerCreatorLocally(to, value, function)) }
+        from.get(Keys.NOTIFIER).ifPresent { value -> result.absorbResult(this.offerNotifierLocally(to, value, function)) }
+        return result.build()
     }
 
     override fun copyFrom(xTo: Int, yTo: Int, zTo: Int, xFrom: Int, yFrom: Int, zFrom: Int, function: MergeFunction): DataTransactionResult {
@@ -378,7 +466,21 @@ class LanternChunk(
     }
 
     fun copyFromLocally(to: LocalPosition, from: LocalPosition, function: MergeFunction): DataTransactionResult {
-        TODO("Not yet implemented")
+        val previous = this.getBlockLocally(to)
+        val fromBlock = this.getBlockLocally(from)
+        val result = DataTransactionResult.builder()
+        val block = previous.mergeWithAndCollectResult(fromBlock, function, result)
+        if (previous != block)
+            this.setBlockLocally(to, block)
+        val blockEntity = this.getBlockEntityLocally(to)
+        if (blockEntity != null) {
+            val fromBlockEntity = this.getBlockEntityLocally(from)
+            if (fromBlockEntity != null)
+                result.absorbResult(blockEntity.copyFrom(fromBlockEntity, function))
+        }
+        this.getCreatorLocally(from).let { value -> result.absorbResult(this.offerCreatorLocally(to, value, function)) }
+        this.getNotifierLocally(from).let { value -> result.absorbResult(this.offerNotifierLocally(to, value, function)) }
+        return result.build()
     }
 
     override fun validateRawData(x: Int, y: Int, z: Int, container: DataView): Boolean {
@@ -459,26 +561,31 @@ class LanternChunk(
         return builder.result(DataTransactionResult.Type.SUCCESS).build()
     }
 
-    private fun offerCreatorLocally(position: LocalPosition, uniqueId: UUID?): DataTransactionResult =
-            this.offerTrackerLocally(position, Keys.CREATOR.get(), uniqueId, this::getCreatorLocally, this::setCreatorLocally)
+    private fun offerCreatorLocally(position: LocalPosition, uniqueId: UUID?, merge: MergeFunction? = null): DataTransactionResult =
+            this.offerTrackerLocally(position, Keys.CREATOR.get(), uniqueId, this::getCreatorLocally, this::setCreatorLocally, merge)
 
-    private fun offerNotifierLocally(position: LocalPosition, uniqueId: UUID?): DataTransactionResult =
-            this.offerTrackerLocally(position, Keys.NOTIFIER.get(), uniqueId, this::getNotifierLocally, this::setNotifierLocally)
+    private fun offerNotifierLocally(position: LocalPosition, uniqueId: UUID?, merge: MergeFunction? = null): DataTransactionResult =
+            this.offerTrackerLocally(position, Keys.NOTIFIER.get(), uniqueId, this::getNotifierLocally, this::setNotifierLocally, merge)
 
     private inline fun offerTrackerLocally(
             position: LocalPosition,
             key: Key<out Value<UUID>>,
             value: UUID?,
             getter: (LocalPosition) -> UUID?,
-            setter: (LocalPosition, UUID?) -> Unit
+            setter: (LocalPosition, UUID?) -> Unit,
+            merge: MergeFunction? = null
     ): DataTransactionResult {
         val old = getter(position)
-        setter(position, value)
+        val oldValue = if (old == null) null else Value.immutableOf(key, old)
+        var newValue = if (value == null) null else Value.immutableOf(key, value)
+        if (merge != null)
+            newValue = merge.merge(oldValue, newValue)
+        setter(position, newValue?.get())
         val result = DataTransactionResult.builder()
         if (old != null)
-            result.replace(Value.immutableOf(key, old))
-        if (value != null)
-            result.success(Value.immutableOf(key, value))
+            result.replace(oldValue)
+        if (newValue != null)
+            result.success(newValue)
         return result.result(DataTransactionResult.Type.SUCCESS).build()
     }
 
@@ -531,12 +638,12 @@ class LanternChunk(
         TODO("Not yet implemented")
     }
 
-    override fun undo(x: Int, y: Int, z: Int, result: DataTransactionResult): DataTransactionResult {
+    override fun undo(x: Int, y: Int, z: Int, undo: DataTransactionResult): DataTransactionResult {
         this.checkBounds(x, y, z)
-        return this.undoLocally(Chunks.toLocal(x, y, z), result)
+        return this.undoLocally(Chunks.toLocal(x, y, z), undo)
     }
 
-    fun undoLocally(position: LocalPosition, result: DataTransactionResult): DataTransactionResult {
+    fun undoLocally(position: LocalPosition, undo: DataTransactionResult): DataTransactionResult {
         TODO("Not yet implemented")
     }
 
@@ -619,6 +726,10 @@ class LanternChunk(
     }
 }
 
+/**
+ * Filters the sequence of entities to only retain
+ * entities that are in the given [box].
+ */
 fun <E : Entity> Sequence<E>.inBox(box: AABB): Sequence<E> = this.filter { entity ->
     if (entity.isRemoved)
         return@filter false

@@ -20,9 +20,9 @@ import org.spongepowered.math.vector.Vector3d
 
 object ClientBlockPlacementCodec : PacketDecoder<ClientBlockPlacementPacket> {
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): ClientBlockPlacementPacket {
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): ClientBlockPlacementPacket {
         val hand = if (buf.readVarInt() == 0) HandTypes.MAIN_HAND.get() else HandTypes.OFF_HAND.get()
-        val position = buf.readPosition()
+        val position = buf.readBlockPosition()
         val face = decodeDirection(buf.readVarInt())
         val ox = buf.readFloat().toDouble()
         val oy = buf.readFloat().toDouble()

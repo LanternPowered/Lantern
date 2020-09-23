@@ -23,7 +23,7 @@ sealed class UnlockRecipesPacket : Packet {
             override val recipeIds: List<String>
     ) : UnlockRecipesPacket()
 
-    data class Initialize(
+    data class Init(
             override val recipeBookStates: RecipeBookStates,
             override val recipeIds: List<String>,
             val recipeIdsToBeDisplayed: List<String>

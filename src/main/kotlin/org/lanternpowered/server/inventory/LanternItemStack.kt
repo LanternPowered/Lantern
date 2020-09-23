@@ -24,7 +24,7 @@ import org.lanternpowered.server.data.LocalKeyRegistry
 import org.lanternpowered.server.data.SerializableLocalMutableDataHolder
 import org.lanternpowered.server.data.value.ValueFactory
 import org.lanternpowered.server.item.LanternItemType
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.entity.attribute.AttributeModifier

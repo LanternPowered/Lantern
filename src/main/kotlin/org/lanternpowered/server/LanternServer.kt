@@ -247,7 +247,7 @@ class LanternServer : Server {
 
         this.syncExecutor.scheduleAtFixedRate({
             try {
-                update()
+                this.update()
             } catch (e: Exception) {
                 this.logger.error("Error while updating main loop", e)
             }

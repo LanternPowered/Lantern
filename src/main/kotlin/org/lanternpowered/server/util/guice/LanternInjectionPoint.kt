@@ -15,7 +15,7 @@ import org.lanternpowered.api.util.type.TypeToken
 import org.lanternpowered.api.util.uncheckedCast
 import java.lang.reflect.Executable
 
-internal abstract class LanternInjectionPoint(
+internal sealed class LanternInjectionPoint(
         override val source: TypeToken<*>,
         override val type: TypeToken<*>,
         private val annotations: Array<Annotation>
@@ -33,14 +33,14 @@ internal abstract class LanternInjectionPoint(
             .add("annotations", this.annotations.contentToString())
             .toString()
 
-    internal class Field(
+    class Field(
             source: TypeToken<*>,
             type: TypeToken<*>,
             annotations: Array<Annotation>,
             override val field: java.lang.reflect.Field
     ) : LanternInjectionPoint(source, type, annotations), InjectionPoint.Field
 
-    internal class Parameter(
+    class Parameter(
             source: TypeToken<*>,
             type: TypeToken<*>,
             annotations: Array<Annotation>,

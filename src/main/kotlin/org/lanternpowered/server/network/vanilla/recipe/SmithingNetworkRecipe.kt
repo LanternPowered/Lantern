@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueTypes
+import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
 class SmithingNetworkRecipe(
@@ -23,9 +23,9 @@ class SmithingNetworkRecipe(
         private val addition: NetworkIngredient
 ) : NetworkRecipe(id, type) {
 
-    override fun write(ctx: CodecContext, buf: ByteBuffer) {
+    override fun writeProperties(ctx: CodecContext, buf: ByteBuffer) {
         this.base.write(ctx, buf)
         this.addition.write(ctx, buf)
-        ctx.write(buf, ContextualValueTypes.ITEM_STACK, this.result)
+        NetworkItemStack.write(ctx, buf, this.result)
     }
 }

@@ -43,7 +43,7 @@ import org.spongepowered.api.advancement.criteria.AdvancementCriterion
 import org.spongepowered.api.advancement.criteria.CriterionProgress
 import org.spongepowered.api.advancement.criteria.ScoreAdvancementCriterion
 import org.spongepowered.api.advancement.criteria.ScoreCriterionProgress
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.world.gamerule.GameRules
 import java.time.Instant
 import java.util.HashMap

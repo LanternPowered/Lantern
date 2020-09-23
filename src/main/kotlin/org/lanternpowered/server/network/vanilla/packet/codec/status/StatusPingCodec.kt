@@ -11,14 +11,15 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.status
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
+import org.lanternpowered.server.network.packet.PacketDecoder
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.status.StatusPingPacket
 
-class StatusPingCodec : Codec<StatusPingPacket> {
+object StatusPingCodec : PacketEncoder<StatusPingPacket>, PacketDecoder<StatusPingPacket> {
 
-    override fun encode(context: CodecContext, packet: StatusPingPacket): ByteBuffer =
-            context.byteBufAlloc().buffer(Long.SIZE_BYTES).writeLong(packet.time)
+    override fun encode(ctx: CodecContext, packet: StatusPingPacket): ByteBuffer =
+            ctx.byteBufAlloc().buffer(Long.SIZE_BYTES).writeLong(packet.time)
 
-    override fun decode(context: CodecContext, buf: ByteBuffer): StatusPingPacket = StatusPingPacket(buf.readLong())
+    override fun decode(ctx: CodecContext, buf: ByteBuffer): StatusPingPacket = StatusPingPacket(buf.readLong())
 }

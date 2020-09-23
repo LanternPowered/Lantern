@@ -30,6 +30,7 @@ import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.plugin.name
+import org.lanternpowered.api.profile.GameProfile
 import org.lanternpowered.api.service.serviceOf
 import org.lanternpowered.api.text.LiteralText
 import org.lanternpowered.api.text.Text
@@ -54,7 +55,7 @@ import org.lanternpowered.server.network.packet.HandlerPacket
 import org.lanternpowered.server.network.packet.MessageRegistration
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.UnknownPacket
-import org.lanternpowered.server.network.packet.handler.Handler
+import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.protocol.Protocol
 import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.DisconnectPacket
@@ -65,14 +66,13 @@ import org.lanternpowered.server.permission.Permissions
 import org.lanternpowered.server.profile.LanternGameProfile
 import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.Sponge
-import org.spongepowered.api.data.Keys
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.network.ServerPlayerConnection
-import org.spongepowered.api.profile.GameProfile
+import org.spongepowered.api.service.ban.Ban
 import org.spongepowered.api.service.ban.BanService
 import org.spongepowered.api.service.permission.PermissionService
 import org.spongepowered.api.service.whitelist.WhitelistService
-import org.spongepowered.api.util.ban.Ban
 import org.spongepowered.api.util.locale.Locales
 import org.spongepowered.math.vector.Vector3d
 import java.io.IOException
@@ -154,7 +154,7 @@ class NetworkSession(
      * The protocol state that is currently active.
      */
     @NettyThreadOnly
-    var protocolState = ProtocolState.HANDSHAKE
+    var protocolState = ProtocolState.Handshake
 
     /**
      * Gets the protocol associated with the current type.
@@ -230,6 +230,10 @@ class NetworkSession(
         this._virtualHost = address
     }
 
+    fun setProfile(profile: GameProfile) {
+        this._profile = profile as LanternGameProfile
+    }
+
     override fun channelRead0(ctx: ChannelHandlerContext, packet: Packet) {
         var actualPacket: Packet = packet
         if (actualPacket is HandlerPacket<*>) {
@@ -240,7 +244,7 @@ class NetworkSession(
             if (!this.firstClientSettingsPacket) {
                 this.firstClientSettingsPacket = true
                 // Trigger the init
-                packetReceived(HandlerPacket(UnknownPacket, object : Handler<UnknownPacket> {
+                packetReceived(HandlerPacket(UnknownPacket, object : PacketHandler<UnknownPacket> {
                     override fun handle(context: NetworkContext, packet: UnknownPacket) = finalizePlayer()
                 }))
             }
@@ -296,7 +300,7 @@ class NetworkSession(
             val address = this.channel.remoteAddress()
             val reason = this.disconnectReason!!.toPlain()
             this.server.logger.debug("$name ($address) disconnected. Reason: $reason")
-        } else if (this.protocolState != ProtocolState.STATUS) { // Ignore the status requests
+        } else if (this.protocolState != ProtocolState.Status) { // Ignore the status requests
             val profile = this._profile
             val name = if (profile == null) "" else " (${profile.name.orElse("Unknown")})"
             val address = this.channel.remoteAddress()
@@ -312,7 +316,7 @@ class NetworkSession(
         this.connectionTask?.cancel(true)
         this.connectionTask = this.channel.eventLoop().scheduleAtFixedRate({
             val protocolState = this.protocolState
-            if (protocolState == ProtocolState.PLAY) {
+            if (protocolState == ProtocolState.Play) {
                 val time = currentTime()
                 if (this.keepAliveTime == -1L) {
                     this.keepAliveTime = time
@@ -335,7 +339,7 @@ class NetworkSession(
             val profile = this._profile
             if (profile != null) {
                 // Trigger the init
-                packetReceived(HandlerPacket(UnknownPacket, object : Handler<UnknownPacket> {
+                packetReceived(HandlerPacket(UnknownPacket, object : PacketHandler<UnknownPacket> {
                     override fun handle(context: NetworkContext, packet: UnknownPacket) {
                         GlobalTabList[profile]?.setLatency(latency)
                     }
@@ -345,15 +349,15 @@ class NetworkSession(
     }
 
     /**
-     * Handles the inbound [Packet] with the specified [Handler].
+     * Handles the inbound [Packet] with the specified [PacketHandler].
      *
      * @param handler The handler
      * @param packet The packet
      */
-    private fun handlePacket(handler: Handler<*>, packet: Packet) {
+    private fun handlePacket(handler: PacketHandler<*>, packet: Packet) {
         try {
             @Suppress("UNCHECKED_CAST")
-            (handler as Handler<Packet>).handle(this.networkContext, packet)
+            (handler as PacketHandler<Packet>).handle(this.networkContext, packet)
         } catch (t: Throwable) {
             this.server.logger.error("Error while handling $packet", t)
         } finally {
@@ -367,7 +371,7 @@ class NetworkSession(
      * @param packet The packet
      */
     @NettyThreadOnly
-    public fun packetReceived(packet: Packet) {
+    fun packetReceived(packet: Packet) {
         if (packet == UnknownPacket)
             return
         when (packet) {
@@ -391,7 +395,7 @@ class NetworkSession(
                         ?: throw DecoderException("Failed to find a packet registration for ${messageClass.name}!")
                 registration.handler.ifPresent { handler: Any ->
                     @Suppress("UNCHECKED_CAST")
-                    handler as Handler<Packet>
+                    handler as PacketHandler<Packet>
                     if (isHandlerNettyThreadOnly(handler.javaClass)) {
                         this.handlePacket(handler, packet)
                     } else {
@@ -561,7 +565,7 @@ class NetworkSession(
             return false
         this.disconnectReason = reason
         if (this.channel.isActive &&
-                (this.protocolState == ProtocolState.PLAY || this.protocolState == ProtocolState.LOGIN)) {
+                (this.protocolState == ProtocolState.Play || this.protocolState == ProtocolState.Login)) {
             this.sendWithFuture(DisconnectPacket(reason)).addListener(ChannelFutureListener.CLOSE)
         } else {
             this.channel.close()
@@ -704,13 +708,13 @@ class NetworkSession(
         val fromLocation = player.location
         val fromRotation = player.rotation
         val loginEvent = LanternEventFactory.createServerSideConnectionEventLogin(cause, message, message,
-                fromLocation, fromLocation, fromRotation, fromRotation, this, player, false)
+                fromLocation, fromLocation, fromRotation, fromRotation, this, player.user, false)
         if (kickReason != null)
             loginEvent.isCancelled = true
 
         EventManager.post(loginEvent)
         if (loginEvent.isCancelled) {
-            this.close(if (loginEvent.isMessageCancelled) translatableTextOf("multiplayer.disconnect.generic") else loginEvent.message)
+            this.close(loginEvent.message)
             return
         }
         this.server.logger.debug("The player ${player.name} successfully to joined from ${this.channel.remoteAddress()}.")

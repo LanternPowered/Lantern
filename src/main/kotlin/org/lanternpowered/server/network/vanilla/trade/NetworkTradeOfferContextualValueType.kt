@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.trade
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.buffer.contextual.ContextualValueType
+import org.lanternpowered.server.network.value.ContextualValueCodec
 import org.lanternpowered.server.network.packet.codec.CodecContext
 
-class NetworkTradeOfferContextualValueType : ContextualValueType<NetworkTradeOffer> {
+class NetworkTradeOfferContextualValueType : ContextualValueCodec<NetworkTradeOffer> {
 
-    override fun write(ctx: CodecContext, tradeOffer: NetworkTradeOffer, buf: ByteBuffer) = tradeOffer.write(ctx, buf)
+    override fun write(ctx: CodecContext, buf: ByteBuffer, tradeOffer: NetworkTradeOffer) = tradeOffer.write(ctx, buf)
     override fun read(ctx: CodecContext, buf: ByteBuffer): NetworkTradeOffer = throw UnsupportedOperationException()
 }

@@ -10,15 +10,14 @@
  */
 package org.lanternpowered.server.data
 
+import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.DataTransactionResult
 import org.spongepowered.api.data.Key
-import org.spongepowered.api.data.Keys
 import org.spongepowered.api.data.type.BodyParts
 import org.spongepowered.api.data.value.MapValue
 import org.spongepowered.api.data.value.SetValue
 import org.spongepowered.api.data.value.Value
 import org.spongepowered.api.util.Direction
-import java.util.function.Supplier
 
 object DataRegistrar {
 
@@ -100,7 +99,7 @@ object DataRegistrar {
     }
 
     private fun registerDirectionBasedProvider(
-            valueKey: Supplier<out Key<SetValue<Direction>>>, directionKeys: Map<Key<Value<Boolean>>, Direction>) {
+            valueKey: Key<SetValue<Direction>>, directionKeys: Map<Key<Value<Boolean>>, Direction>) {
         GlobalKeyRegistry.register(valueKey).addProvider {
             supportedBy {
                 directionKeys.keys.any { supports(it) }
@@ -125,7 +124,7 @@ object DataRegistrar {
     }
 
     private fun <K, V> registerMapBasedProvider(
-            valueKey: Supplier<Key<MapValue<K, V>>>, mappedTypes: Map<Key<Value<V>>, K>) {
+            valueKey: Key<MapValue<K, V>>, mappedTypes: Map<Key<Value<V>>, K>) {
         GlobalKeyRegistry.register(valueKey).addProvider {
             supportedBy {
                 mappedTypes.keys.any { supports(it) }
@@ -160,7 +159,7 @@ object DataRegistrar {
                 Keys.HAS_PORES_NORTH to Direction.NORTH,
                 Keys.HAS_PORES_EAST to Direction.EAST,
                 Keys.HAS_PORES_DOWN to Direction.DOWN
-        ).entries.associate { (key, value) -> key.get() to value }
+        )
         registerDirectionBasedProvider(Keys.PORES, directionKeys)
     }
 
@@ -170,7 +169,7 @@ object DataRegistrar {
                 Keys.IS_CONNECTED_EAST to Direction.EAST,
                 Keys.IS_CONNECTED_NORTH to Direction.NORTH,
                 Keys.IS_CONNECTED_SOUTH to Direction.SOUTH
-        ).entries.associate { (key, value) -> key.get() to value }
+        )
         registerDirectionBasedProvider(Keys.CONNECTED_DIRECTIONS, directionKeys)
     }
 
@@ -180,7 +179,7 @@ object DataRegistrar {
                 Keys.WIRE_ATTACHMENT_EAST to Direction.EAST,
                 Keys.WIRE_ATTACHMENT_NORTH to Direction.NORTH,
                 Keys.WIRE_ATTACHMENT_SOUTH to Direction.SOUTH
-        ).entries.associate { (key, value) -> key.get() to value }
+        ).entries.associate { (key, value) -> key to value }
         registerMapBasedProvider(Keys.WIRE_ATTACHMENTS, directionKeys)
     }
 
@@ -192,7 +191,7 @@ object DataRegistrar {
                 Keys.LEFT_LEG_ROTATION to BodyParts.LEFT_LEG,
                 Keys.HEAD_ROTATION to BodyParts.HEAD,
                 Keys.CHEST_ROTATION to BodyParts.CHEST
-        ).entries.associate { (key, value) -> key.get() to value.get() }
+        )
         registerMapBasedProvider(Keys.BODY_ROTATIONS, bodyPartKeys)
     }
 }

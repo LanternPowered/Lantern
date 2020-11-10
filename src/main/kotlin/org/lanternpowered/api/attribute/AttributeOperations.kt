@@ -14,7 +14,7 @@ import org.lanternpowered.api.registry.CatalogRegistry
 import org.lanternpowered.api.registry.provide
 
 object AttributeOperations {
-    val ADD_AMOUNT: AttributeOperation = CatalogRegistry.provide("ADD_AMOUNT")
-    val MULTIPLY: AttributeOperation = CatalogRegistry.provide("MULTIPLY")
-    val MULTIPLY_BASE: AttributeOperation = CatalogRegistry.provide("MULTIPLY_BASE")
+    val ADD_AMOUNT: AttributeOperation by CatalogRegistry.provide("ADD_AMOUNT")
+    val MULTIPLY: AttributeOperation by CatalogRegistry.provide("MULTIPLY")
+    val MULTIPLY_BASE: AttributeOperation by CatalogRegistry.provide("MULTIPLY_BASE")
 }

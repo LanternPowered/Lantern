@@ -22,6 +22,7 @@ import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityNetworkIDs
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.value.PackedAngle
 import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenHorseWindowPacket
@@ -95,7 +96,7 @@ class RootLlamaContainerLayout(val chestColumns: Int) : LanternTopBottomContaine
 
         val packets = mutableListOf<Packet>()
         packets += SpawnMobPacket(entityId, UUID.randomUUID(), LLAMA_NETWORK_TYPE,
-                Vector3d.ZERO, 0, 0, 0, Vector3d.ZERO)
+                Vector3d.ZERO, PackedAngle.Zero, PackedAngle.Zero, PackedAngle.Zero, Vector3d.ZERO)
         packets += EntityMetadataPacket(entityId, parameters)
         packets += OpenHorseWindowPacket(data.containerId, TOP_INVENTORY_FLAGS.size + 1, entityId)
         packets += DestroyEntitiesPacket(entityId)

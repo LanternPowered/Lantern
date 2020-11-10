@@ -37,8 +37,9 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.SimpleChannelInboundHandler
 import io.netty.util.AttributeKey
 import org.lanternpowered.api.Lantern
-import org.lanternpowered.api.cause.CauseStack.Companion.current
+import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.causeOf
+import org.lanternpowered.api.cause.withCause
 import org.lanternpowered.api.event.EventManager
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.text.textOf
@@ -127,14 +128,13 @@ internal class RconHandler(
         // Process the command on the main thread and send
         // the response on the netty thread.
         this.server.syncExecutor.submit {
-            val causeStack = current()
-            causeStack.pushCause(connection)
-            try {
-                Lantern.commandManager.process(connection, payload)
-            } catch (e: CommandException) {
-                connection.sendMessage(textOf("An error occurred while executing the command: $payload; $e"))
+            CauseStack.withCause(connection) {
+                try {
+                    Lantern.commandManager.process(connection, payload)
+                } catch (e: CommandException) {
+                    connection.sendMessage(textOf("An error occurred while executing the command: $payload; $e"))
+                }
             }
-            causeStack.popCause()
             connection.flush()
         }.thenAsync(ctx.channel().eventLoop()) { content ->
             // Send the response on the netty thread
@@ -163,14 +163,14 @@ internal class RconHandler(
 
         private fun sendLargeResponse(ctx: ChannelHandlerContext, requestId: Int, payload: String) {
             if (payload.isEmpty()) {
-                sendResponse(ctx, requestId, TYPE_RESPONSE, "")
+                this.sendResponse(ctx, requestId, TYPE_RESPONSE, "")
                 return
             }
             var start = 0
             while (start < payload.length) {
                 val length = payload.length - start
                 val truncated = length.coerceAtMost(2048)
-                sendResponse(ctx, requestId, TYPE_RESPONSE, payload.substring(start, truncated))
+                this.sendResponse(ctx, requestId, TYPE_RESPONSE, payload.substring(start, truncated))
                 start += truncated
             }
         }

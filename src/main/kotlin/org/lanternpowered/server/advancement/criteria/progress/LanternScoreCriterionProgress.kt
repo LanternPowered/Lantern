@@ -42,7 +42,7 @@ class LanternScoreCriterionProgress(
         check(score <= this.goal) { "Score to set may not be greater than the goal" }
         if (score == this.score)
             return this.get()
-        val cause = CauseStack.current().currentCause
+        val cause = CauseStack.currentCause
         val advancement = advancementProgress.advancement
         val player = this.advancementProgress.player
         val event = when {

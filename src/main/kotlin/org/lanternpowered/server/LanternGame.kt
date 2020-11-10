@@ -42,6 +42,7 @@ import org.lanternpowered.server.service.pagination.LanternPaginationService
 import org.lanternpowered.server.service.permission.LanternPermissionService
 import org.lanternpowered.server.sql.LanternSqlManager
 import org.lanternpowered.server.text.TranslationRegistries
+import org.lanternpowered.server.text.Translators
 import org.lanternpowered.server.util.LocaleCache
 import org.lanternpowered.server.util.guice.GuiceModule
 import org.lanternpowered.server.util.metric.LanternMetricsConfigManager
@@ -72,6 +73,21 @@ object LanternGame : Game {
      * The number of ticks per second in vanilla minecraft.
      */
     const val MINECRAFT_TICKS_PER_SECOND = 20
+
+    /**
+     * The number of milliseconds per tick in vanilla minecraft.
+     */
+    private const val MINECRAFT_TICK_MILLIS = 1000 / MINECRAFT_TICKS_PER_SECOND
+
+    /**
+     * Gets the current time in ticks. This method is similar to
+     * [System.currentTimeMillis] but the unit is converted
+     * to ticks.
+     *
+     * @return The current time in ticks
+     */
+    @Deprecated(message = "Avoid using ticks.")
+    fun currentTimeTicks(): Long = System.currentTimeMillis() / MINECRAFT_TICK_MILLIS
 
     /**
      * The current protocol version number that's supported.
@@ -165,9 +181,9 @@ object LanternGame : Game {
         this.minecraftVersionCache.init()
 
         this.minecraftVersion = LanternMinecraftVersion(
-                this.minecraftPlugin.metadata.version, Protocol.CURRENT_VERSION, false)
+                this.minecraftPlugin.metadata.version, PROTOCOL_VERSION, false)
 
-        val versionCacheEntry = this.minecraftVersionCache.getVersionOrUnknown(Protocol.CURRENT_VERSION, false)
+        val versionCacheEntry = this.minecraftVersionCache.getVersionOrUnknown(PROTOCOL_VERSION, false)
         check(versionCacheEntry == this.minecraftVersion) {
             "The current version and version in the cache don't match: $minecraftVersion != $versionCacheEntry" }
 
@@ -187,6 +203,7 @@ object LanternGame : Game {
 
         // Load the translation files
         TranslationRegistries.init()
+        Translators.init()
 
         this.initPermissionService()
         this.initPaginationService()

@@ -33,7 +33,7 @@ class RootEnchantingContainerLayout : LanternTopBottomContainerLayout<Enchanting
                 Flags.REVERSE_SHIFT_INSERTION + Flags.POSSIBLY_DISABLED_SHIFT_INSERTION // Lapis lazuli slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private const val REQUIRED_EXPERIENCE_LEVEL_1 = 0
         private const val REQUIRED_EXPERIENCE_LEVEL_2 = 1

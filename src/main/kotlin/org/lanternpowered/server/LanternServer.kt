@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server
 
+import com.spotify.futures.CompletableFutures
 import io.netty.channel.EventLoopGroup
 import joptsimple.OptionSet
 import kotlinx.coroutines.Dispatchers
@@ -87,6 +88,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.system.exitProcess
 
 class LanternServer : Server {
@@ -203,10 +205,14 @@ class LanternServer : Server {
         }
 
         val transportType = TransportType.findBestType()
-        val threadFactory = ThreadHelper.newThreadFactory()
 
-        this.nettyBossGroup = transportType.eventLoopGroupSupplier( 0, threadFactory)
-        this.nettyWorkerGroup = transportType.eventLoopGroupSupplier( 0, threadFactory)
+        val nettyThreadCounter = AtomicInteger(0)
+        val nettyThreadFactory = ThreadHelper.newThreadFactory {
+            "netty-" + nettyThreadCounter.getAndIncrement()
+        }
+
+        this.nettyBossGroup = transportType.eventLoopGroupSupplier( 0, nettyThreadFactory)
+        this.nettyWorkerGroup = transportType.eventLoopGroupSupplier( 0, nettyThreadFactory)
 
         this.httpClient = NettyHttpClient("lantern/${this.game.lanternPlugin.version}", this.nettyWorkerGroup)
         val gameProfileService = this.game.serviceProvider.register<GameProfileService> {
@@ -279,28 +285,27 @@ class LanternServer : Server {
         this.networkManager = NetworkManager(this, this.nettyBossGroup, this.nettyWorkerGroup)
 
         val future = this.networkManager.init(address)
-        val channel = future.awaitUninterruptibly().channel()
+        val result = future.get()
 
-        if (!channel.isActive) {
-            val cause = future.cause()
+        if (result != null) {
             this.logger.error("The server could not bind to the requested address.")
-            val message = cause.message
+            val message = result.message
             if (message != null && message.startsWith("Cannot assign requested address")) {
                 this.logger.error("The 'server.ip' in your global config file may not be valid.")
                 this.logger.error("Unless you are sure you need it, try removing it.")
-                this.logger.error(cause.toString())
+                this.logger.error(result.toString())
             } else if (message != null && message.startsWith("Address already in use")) {
                 this.logger.error("The address was already in use. Check that no server is")
                 this.logger.error("already running on that port. If needed, try killing all")
                 this.logger.error("Java processes using Task Manager or similar.")
-                this.logger.error(cause.toString())
+                this.logger.error(result.toString())
             } else {
-                this.logger.error("An unknown bind error has occurred.", cause)
+                this.logger.error("An unknown bind error has occurred.", result)
             }
             exitProcess(1)
         }
 
-        this.logger.info("Successfully bound to: " + channel.localAddress())
+        this.logger.info("Successfully bound to: $address")
     }
 
     private fun startQueryServer(): QueryServer? {
@@ -375,7 +380,7 @@ class LanternServer : Server {
     }
 
     private fun update() {
-        this.networkManager.pulseSessions()
+        this.networkManager.update()
         this.worldManager.update()
     }
 
@@ -396,17 +401,26 @@ class LanternServer : Server {
         // Don't shut down twice
         if (!this.shuttingDown.compareAndSet(false, true))
             return
+
+        // Don't allow any new connections
+        this.networkManager.closeEndpoint()
+
+        val players = this.unsafePlayers.toImmutableList()
         // Kick all the online players
         for (player in this.unsafePlayers)
             player.connection.close(kickMessage)
 
-        // TODO: Wait for players to be disconnected so all events are called
+        val future = CompletableFutures.allAsList(players.map { player -> player.connection.closeFuture })
+        try {
+            future.get(15, TimeUnit.SECONDS)
+        } catch (ex: Throwable) {
+            this.logger.error("Disconnecting the players took too long", ex)
+        }
 
         this.eventManager.post(LanternStoppingServerEvent(this.game, this))
 
         this.ioExecutor.shutdown()
         this.syncExecutor.shutdown()
-        this.networkManager.shutdown()
         this.userManager.shutdown()
 
         this.queryServer?.shutdown()

@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateBlockEntityPacket
 import org.spongepowered.api.data.persistence.DataQuery
 

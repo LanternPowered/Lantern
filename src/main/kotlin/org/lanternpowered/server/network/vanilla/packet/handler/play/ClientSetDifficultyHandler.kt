@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSetDiffi
 
 object ClientSetDifficultyHandler : PacketHandler<ClientSetDifficultyPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientSetDifficultyPacket) {
-        Lantern.getLogger().info("${context.session.player.name} attempted to change the difficulty to ${packet.difficulty.key}.")
+    override fun handle(ctx: NetworkContext, packet: ClientSetDifficultyPacket) {
+        Lantern.getLogger().info("${ctx.session.player.name} attempted to change the difficulty to ${packet.difficulty.key}.")
     }
 }

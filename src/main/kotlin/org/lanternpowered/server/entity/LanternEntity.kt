@@ -16,13 +16,12 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.cause.entity.health.source.HealingSource
 import org.lanternpowered.api.cause.withFrame
-import org.lanternpowered.api.data.holder.transform
+import org.lanternpowered.api.data.Keys
 import org.lanternpowered.api.effect.sound.SoundCategory
 import org.lanternpowered.api.effect.sound.soundEffectOf
 import org.lanternpowered.api.entity.Entity
 import org.lanternpowered.api.entity.ExtendedEntity
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.text.emptyText
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.util.AABB
@@ -44,12 +43,12 @@ import org.lanternpowered.server.effect.entity.EntityEffectCollection
 import org.lanternpowered.server.entity.event.EntityEvent
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.event.LanternEventContextKeys
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.event.message.sendMessage
 import org.lanternpowered.server.network.entity.EntityProtocolType
 import org.lanternpowered.server.util.LanternTransform
 import org.lanternpowered.server.world.LanternLocation
 import org.lanternpowered.server.world.LanternWorldNew
-import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer
 import org.spongepowered.api.data.persistence.DataView
 import org.spongepowered.api.effect.sound.SoundType
@@ -129,7 +128,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
             register(Keys.FALL_DISTANCE, 0.0)
             register(Keys.IS_GLOWING, false)
             register(Keys.IS_INVISIBLE, false)
-            register(Keys.INVULNERABLE, false)
+            register(Keys.IS_INVULNERABLE, false)
             register(Keys.IS_GRAVITY_AFFECTED, true)
             register(Keys.CREATOR)
             register(Keys.NOTIFIER)
@@ -319,12 +318,10 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
     }
 
     protected open fun postRemoveEvent() {
-        val causeStack = CauseStack.current()
-
         val audience = this.nullableWorld ?: emptyAudience()
         val message = textOf("Entity ($uniqueId) got removed.")
 
-        val event = LanternEventFactory.createDestructEntityEvent(causeStack.currentCause,
+        val event = LanternEventFactory.createDestructEntityEvent(CauseStack.currentCause,
                 audience, audience, message, message, this, true)
         EventManager.post(event)
 
@@ -502,7 +499,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
             val voidDamageInterval = 0.5.seconds
             this.voidDamageTimer += deltaTime
             while (this.voidDamageTimer >= voidDamageInterval) {
-                damage(4.0, DamageSources.VOID)
+                this.damage(4.0, DamageSources.VOID)
                 this.voidDamageTimer -= voidDamageInterval
             }
         } else {
@@ -626,8 +623,7 @@ abstract class LanternEntity(creationData: EntityCreationData) : SerializableLoc
         val health = this.get(Keys.HEALTH).orElse(0.0)
         if (health == 0.0) // Is already dead
             return false
-        val causeStack = CauseStack.current()
-        causeStack.withFrame { frame ->
+        CauseStack.withFrame { frame ->
             frame.pushCause(source)
             frame.addContext(LanternEventContextKeys.HEALING_TYPE, source.healingType)
 

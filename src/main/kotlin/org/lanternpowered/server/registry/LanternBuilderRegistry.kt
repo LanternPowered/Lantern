@@ -29,13 +29,13 @@ object LanternBuilderRegistry : BuilderRegistry {
         return supplier.get()
     }
 
-    inline fun <reified T : BaseBuilder<*, in T>> register(noinline supplier: () -> T) = register(T::class, supplier)
+    inline fun <reified T : BaseBuilder<*, in T>> register(noinline supplier: () -> T) = this.register(T::class, supplier)
 
     fun <T : BaseBuilder<*, in T>> register(builderClass: KClass<T>, supplier: () -> T) =
-            register(builderClass.java, Supplier(supplier))
+            this.register(builderClass.java, Supplier(supplier))
 
     fun <T : BaseBuilder<*, in T>> register(builderClass: KClass<T>, supplier: Supplier<in T>) =
-            register(builderClass.java, supplier)
+            this.register(builderClass.java, supplier)
 
     fun <T : BaseBuilder<*, in T>> register(builderClass: Class<T>, supplier: Supplier<in T>) {
         val old = this.builders.putIfAbsent(builderClass, supplier.uncheckedCast())

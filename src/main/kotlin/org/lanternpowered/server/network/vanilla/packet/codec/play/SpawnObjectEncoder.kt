@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnObjectPacket
 
 object SpawnObjectEncoder : PacketEncoder<SpawnObjectPacket> {
@@ -23,8 +23,8 @@ object SpawnObjectEncoder : PacketEncoder<SpawnObjectPacket> {
         buf.writeUniqueId(packet.uniqueId)
         buf.writeVarInt(packet.objectType)
         buf.writeVector3d(packet.position)
-        buf.writeByte(packet.pitch.toByte())
-        buf.writeByte(packet.yaw.toByte())
+        buf.writeByte(packet.pitch.packed)
+        buf.writeByte(packet.yaw.packed)
         buf.writeInt(packet.objectData)
         val velocity = packet.velocity
         buf.writeShort((velocity.x * 8000.0).coerceAtMost(Short.MAX_VALUE.toDouble()).toShort())

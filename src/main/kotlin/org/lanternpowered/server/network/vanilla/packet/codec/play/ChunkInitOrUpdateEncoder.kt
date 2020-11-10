@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import org.lanternpowered.server.data.persistence.MemoryDataContainer
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket
 import org.spongepowered.api.data.persistence.DataQuery
 

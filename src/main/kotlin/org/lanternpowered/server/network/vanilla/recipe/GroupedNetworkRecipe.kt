@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 abstract class GroupedNetworkRecipe(id: String, type: String, private val group: String?) : NetworkRecipe(id, type) {
 

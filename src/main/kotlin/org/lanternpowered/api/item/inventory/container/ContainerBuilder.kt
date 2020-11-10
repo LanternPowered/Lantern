@@ -57,7 +57,7 @@ fun testFurnace(player: Player, playerInventory: PlayerInventory, furnaceInvento
 fun test(player: Player, playerInventory: PlayerInventory, furnaceInventory: Inventory) {
     val container = container {
         layout(ContainerTypes.Generic9x5) {
-            title(textOf("My Fancy Furnace"))
+            title = textOf("My Fancy Furnace")
             top {
                 fill(ContainerFills.Black)
                 val slots = furnaceInventory.slots()

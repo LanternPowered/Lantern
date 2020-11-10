@@ -26,8 +26,9 @@ import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.causeOf
 import org.lanternpowered.api.cause.withContext
+import org.lanternpowered.api.data.Keys
+import org.lanternpowered.api.data.eq
 import org.lanternpowered.api.event.EventManager
-import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.plugin.name
 import org.lanternpowered.api.profile.GameProfile
@@ -46,16 +47,15 @@ import org.lanternpowered.api.world.WorldProperties
 import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.entity.player.tab.GlobalTabList
+import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.event.message.sendMessage
-import org.lanternpowered.server.network.NettyThreadOnlyHelper.isHandlerNettyThreadOnly
 import org.lanternpowered.server.network.entity.EntityProtocolManager
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
 import org.lanternpowered.server.network.packet.BulkPacket
 import org.lanternpowered.server.network.packet.HandlerPacket
-import org.lanternpowered.server.network.packet.MessageRegistration
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.packet.UnknownPacket
 import org.lanternpowered.server.network.packet.PacketHandler
+import org.lanternpowered.server.network.packet.UnknownPacket
 import org.lanternpowered.server.network.protocol.Protocol
 import org.lanternpowered.server.network.protocol.ProtocolState
 import org.lanternpowered.server.network.vanilla.packet.type.DisconnectPacket
@@ -64,9 +64,9 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.BrandPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientSettingsPacket
 import org.lanternpowered.server.permission.Permissions
 import org.lanternpowered.server.profile.LanternGameProfile
+import org.lanternpowered.server.util.netty.addChannelFutureListener
 import org.lanternpowered.server.world.LanternWorldNew
 import org.spongepowered.api.Sponge
-import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.network.ServerPlayerConnection
 import org.spongepowered.api.service.ban.Ban
@@ -80,6 +80,7 @@ import java.net.InetSocketAddress
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.Queue
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.TimeUnit
 import kotlin.time.seconds
@@ -101,7 +102,8 @@ class NetworkSession(
         const val LEGACY_PING = "legacy-ping"
         const val COMPRESSION = "compression"
         const val FRAMING = "framing"
-        const val CODECS = "codecs"
+        const val PACKET_ENCODER = "packet_encoder"
+        const val PACKET_DECODER = "packet_decoder"
         const val PROCESSOR = "processor"
         const val HANDLER = "handler"
 
@@ -123,6 +125,12 @@ class NetworkSession(
      */
     val isClosed: Boolean
         get() = !this.channel.isActive
+
+    /**
+     * A future which is completed when the connection is closed.
+     */
+    val closeFuture: CompletableFuture<Unit> = CompletableFuture<Unit>()
+            .also { future -> this.channel.closeFuture().addChannelFutureListener { future.complete(Unit) } }
 
     /**
      * The game profile of the player that owns this connection.
@@ -245,7 +253,7 @@ class NetworkSession(
                 this.firstClientSettingsPacket = true
                 // Trigger the init
                 packetReceived(HandlerPacket(UnknownPacket, object : PacketHandler<UnknownPacket> {
-                    override fun handle(context: NetworkContext, packet: UnknownPacket) = finalizePlayer()
+                    override fun handle(ctx: NetworkContext, packet: UnknownPacket) = finalizePlayer()
                 }))
             }
         }
@@ -275,7 +283,7 @@ class NetworkSession(
     }
 
     override fun channelActive(ctx: ChannelHandlerContext) {
-        this.networkManager.onActive(this)
+        this.networkManager.add(this)
         // If the connection isn't established after 30 seconds,
         // kick the player. 30 seconds is the value used in vanilla
         this.connectionTask = this.channel.eventLoop().schedule({
@@ -284,7 +292,7 @@ class NetworkSession(
     }
 
     override fun channelInactive(ctx: ChannelHandlerContext) {
-        this.networkManager.onInactive(this)
+        this.networkManager.remove(this)
         // The player probably just left the server
         if (this.disconnectReason == null) {
             if (this.channel.isOpen) {
@@ -340,7 +348,7 @@ class NetworkSession(
             if (profile != null) {
                 // Trigger the init
                 packetReceived(HandlerPacket(UnknownPacket, object : PacketHandler<UnknownPacket> {
-                    override fun handle(context: NetworkContext, packet: UnknownPacket) {
+                    override fun handle(ctx: NetworkContext, packet: UnknownPacket) {
                         GlobalTabList[profile]?.setLatency(latency)
                     }
                 }))
@@ -390,19 +398,30 @@ class NetworkSession(
                 }
             }
             else -> {
-                val messageClass: Class<out Packet> = packet.javaClass
-                val registration: MessageRegistration<*> = this.protocol.inbound().findByMessageType(messageClass).orElse(null)
-                        ?: throw DecoderException("Failed to find a packet registration for ${messageClass.name}!")
-                registration.handler.ifPresent { handler: Any ->
+                val packetClass: Class<out Packet> = packet.javaClass
+                val registration = this.protocol.inbound.byType(packetClass)
+                        ?: throw DecoderException("Failed to find a packet registration for ${packetClass.name}!")
+                val handler = registration.handler
+                if (handler != null) {
                     @Suppress("UNCHECKED_CAST")
                     handler as PacketHandler<Packet>
-                    if (isHandlerNettyThreadOnly(handler.javaClass)) {
+                    if (NettyThreadOnlyHelper.isHandlerNettyThreadOnly(handler.javaClass)) {
                         this.handlePacket(handler, packet)
                     } else {
                         this.packetQueue.add(HandlerPacket(packet, handler))
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Updates the session. This should be called from the main thread.
+     */
+    fun update() {
+        while (true) {
+            val packet = this.packetQueue.poll() ?: break
+            this.handlePacket(packet.handler, packet.packet)
         }
     }
 
@@ -651,7 +670,7 @@ class NetworkSession(
                 fixSpawnLocation = true
             }
             // TODO: Don't block while loading world
-            world = worldManager.loadWorld(worldProperties).get().orElse(null)
+            world = worldManager.loadWorld(worldProperties).get()
             // Use the raw method to avoid triggering any network messages
             player.setRawWorld(world)
             player.userWorld = null
@@ -730,7 +749,7 @@ class NetworkSession(
         val config = world.properties.config
 
         // Update the game mode if necessary
-        if (config.gameMode.forced || player.get(Keys.GAME_MODE).get() == GameModes.NOT_SET.get())
+        if (config.gameMode.forced || player.get(Keys.GAME_MODE).get() eq GameModes.NOT_SET)
             player.offer(Keys.GAME_MODE, config.gameMode.mode)
 
         // Send the server brand

@@ -15,7 +15,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
-import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.dispatcher.Disambiguator;

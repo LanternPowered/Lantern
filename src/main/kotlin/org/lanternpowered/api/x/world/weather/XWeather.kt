@@ -10,14 +10,14 @@
  */
 package org.lanternpowered.api.x.world.weather
 
-import org.lanternpowered.api.text.translation.Translatable
+import org.lanternpowered.api.text.TextRepresentable
 import org.lanternpowered.api.world.weather.Weather
 import org.lanternpowered.api.world.weather.WeatherOptionMap
 
 /**
  * An extended version of [Weather].
  */
-interface XWeather : Weather, Translatable {
+interface XWeather : Weather, TextRepresentable {
 
     /**
      * The options of this weather.

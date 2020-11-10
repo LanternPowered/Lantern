@@ -40,11 +40,11 @@ object LoginEncryptionResponseHandler : PacketHandler<LoginEncryptionResponsePac
     private const val authBaseUrl = "https://sessionserver.mojang.com/session/minecraft/hasJoined"
     private val gson = Gson()
 
-    override fun handle(context: NetworkContext, packet: LoginEncryptionResponsePacket) {
-        val session = context.session
+    override fun handle(ctx: NetworkContext, packet: LoginEncryptionResponsePacket) {
+        val session = ctx.session
         val keyPair = session.server.keyPair
 
-        val authData: LoginAuthData? = context.channel.attr(LoginStartHandler.AUTH_DATA).getAndSet(null)
+        val authData: LoginAuthData? = ctx.channel.attr(LoginStartHandler.AUTH_DATA).getAndSet(null)
         checkNotNull(authData) { "No login auth data." }
 
         val decryptedVerifyToken = EncryptionHelper.decryptRsa(keyPair, packet.verifyToken)
@@ -52,12 +52,12 @@ object LoginEncryptionResponseHandler : PacketHandler<LoginEncryptionResponsePac
 
         val decryptedSharedSecret = EncryptionHelper.decryptRsa(keyPair, packet.sharedSecret)
         val serverId = EncryptionHelper.generateServerId(decryptedSharedSecret, keyPair.public)
-        val preventProxiesIp = this.preventProxiesIp(context.session)
+        val preventProxiesIp = this.preventProxiesIp(ctx.session)
 
         val secretKey = SecretKeySpec(decryptedSharedSecret, "AES")
-        val connection = WrappedServerSideConnection(context.session)
+        val connection = WrappedServerSideConnection(ctx.session)
 
-        this.requestAuth(context, authData.username, serverId, preventProxiesIp)
+        this.requestAuth(ctx, authData.username, serverId, preventProxiesIp)
                 .thenAsync(session.server.syncExecutor) { profile ->
                     val cause = causeOf(session, profile)
                     val originalMessage = translatableTextOf("multiplayer.disconnect.not_allowed_to_join")
@@ -69,10 +69,10 @@ object LoginEncryptionResponseHandler : PacketHandler<LoginEncryptionResponsePac
                         null
                     } else profile
                 }
-                .thenAsync(context.channel.eventLoop()) { profile ->
+                .thenAsync(ctx.channel.eventLoop()) { profile ->
                     if (profile == null)
                         return@thenAsync
-                    context.channel.pipeline().replace(NetworkSession.ENCRYPTION, NetworkSession.ENCRYPTION,
+                    ctx.channel.pipeline().replace(NetworkSession.ENCRYPTION, NetworkSession.ENCRYPTION,
                             PacketEncryptionHandler(secretKey))
                     session.packetReceived(LoginFinishPacket(profile))
                 }

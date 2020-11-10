@@ -38,7 +38,7 @@ class RootLoomContainerLayout : LanternTopBottomContainerLayout<LoomContainerLay
                 Flags.REVERSE_SHIFT_INSERTION + Flags.DISABLE_SHIFT_INSERTION or Flags.IGNORE_DOUBLE_CLICK // Result slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private const val SELECTED_SHAPE = 0
     }

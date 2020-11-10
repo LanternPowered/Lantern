@@ -14,24 +14,23 @@ import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.event.LanternEventFactory
-import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ResourcePackStatusPacket
 
-class ResourcePackStatusHandler : PacketHandler<ResourcePackStatusPacket> {
+object ResourcePackStatusHandler : PacketHandler<ResourcePackStatusPacket> {
 
-    override fun handle(context: NetworkContext, packet: ResourcePackStatusPacket) {
-        val resourcePack = context.session.player.resourcePackSendQueue.poll(packet.status)
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ResourcePackStatusPacket) {
+        val resourcePack = ctx.session.player.resourcePacketSendQueue.poll(packet.status)
+        val player = ctx.session.player
         if (resourcePack == null) {
-            Lantern.getLogger().warn("${player.name} received a unexpected resource pack status " +
+            LanternGame.logger.warn("${player.name} received a unexpected resource pack status " +
                     "message (${packet.status}), no resource pack was pending.")
             return
         }
-        val causeStack = CauseStack.current()
-        causeStack.withFrame { frame ->
+        CauseStack.withFrame { frame ->
             frame.addContext(CauseContextKeys.PLAYER, player)
             val event = LanternEventFactory.createResourcePackStatusEvent(
                     frame.currentCause, resourcePack, player, packet.status)

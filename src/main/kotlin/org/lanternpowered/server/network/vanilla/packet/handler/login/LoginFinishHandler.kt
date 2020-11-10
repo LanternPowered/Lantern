@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.server.network.vanilla.packet.handler.login
 
-import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.NetworkSession
 import org.lanternpowered.server.network.packet.PacketHandler
@@ -22,23 +21,23 @@ import org.lanternpowered.server.network.vanilla.packet.type.login.SetCompressio
 
 object LoginFinishHandler : PacketHandler<LoginFinishPacket> {
 
-    override fun handle(context: NetworkContext, packet: LoginFinishPacket) {
+    override fun handle(ctx: NetworkContext, packet: LoginFinishPacket) {
         val gameProfile = packet.gameProfile
-        val session = context.session
-        val compressionThreshold = Lantern.getGame().globalConfig.networkCompressionThreshold
+        val session = ctx.session
+        val compressionThreshold = ctx.server.config.server.networkCompressionThreshold
         if (compressionThreshold != -1) {
             session.sendWithFuture(SetCompressionPacket(compressionThreshold)).addListener {
-                context.channel.pipeline().replace(NetworkSession.COMPRESSION, NetworkSession.COMPRESSION,
+                ctx.channel.pipeline().replace(NetworkSession.COMPRESSION, NetworkSession.COMPRESSION,
                         PacketCompressionHandler(compressionThreshold))
             }
         } else {
             // Remove the compression handler placeholder
-            context.channel.pipeline().remove(NetworkSession.COMPRESSION)
+            ctx.channel.pipeline().remove(NetworkSession.COMPRESSION)
         }
-        val gameProfileCache = Lantern.getGame().gameProfileManager.cache
+        val gameProfileCache = ctx.server.gameProfileManager.cache
         // Store the old profile temporarily
         gameProfileCache.getById(gameProfile.uniqueId).ifPresent { profile ->
-            context.channel.attr(NetworkSession.PREVIOUS_GAME_PROFILE).set(profile)
+            ctx.channel.attr(NetworkSession.PREVIOUS_GAME_PROFILE).set(profile)
         }
         // Cache the new profile
         gameProfileCache.add(gameProfile, true, null)

@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.entity
 
+import org.lanternpowered.api.cause.CauseContextKeys
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.entity.health.source.HealingSources
 import org.lanternpowered.api.cause.withFrame
@@ -42,18 +43,19 @@ import org.lanternpowered.server.effect.potion.LanternPotionEffectType
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.event.message.sendMessage
 import org.lanternpowered.api.data.Keys
+import org.lanternpowered.api.data.eq
 import org.spongepowered.api.effect.sound.SoundTypes
 import org.spongepowered.api.entity.Entity
+import org.spongepowered.api.entity.EntityType
 import org.spongepowered.api.entity.EntityTypes
 import org.spongepowered.api.entity.attribute.Attribute
 import org.spongepowered.api.entity.attribute.type.AttributeType
 import org.spongepowered.api.entity.living.Living
 import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.entity.projectile.Projectile
-import org.spongepowered.api.event.cause.EventContextKeys
+import org.spongepowered.api.event.cause.entity.SpawnTypes
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes
 import org.spongepowered.api.event.entity.HarvestEntityEvent
 import org.spongepowered.api.event.item.inventory.DropItemEvent
 import org.spongepowered.api.item.inventory.Carrier
@@ -174,7 +176,7 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
             // to track the cause of the entity death.
             frame.pushCause(event)
             // Post the harvest event
-            handleDeath(causeStack)
+            this.handleDeath(causeStack)
         }
 
         // Clear the inventory, if keepsInventory is false in the thrown Death event
@@ -193,7 +195,7 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
                 causeStack.currentCause, experience, experience, this)
         EventManager.post(harvestEvent)
         // Finalize the harvest event
-        this.finalizeHarvestEvent(causeStack, harvestEvent, mutableListOf())
+        this.finalizeHarvestEvent(causeStack, harvestEvent, mutableListOf(), experience)
     }
 
     /**
@@ -202,36 +204,42 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
      *
      * @param causeStack The cause stack
      * @param event The harvest event
+     * @param droppedItems The items that will be dropped
+     * @param droppedExperience The experience that will be dropped
      */
-    protected open fun finalizeHarvestEvent(causeStack: CauseStack, event: HarvestEntityEvent, drops: MutableList<ItemStackSnapshot>) {
+    protected open fun finalizeHarvestEvent(
+            causeStack: CauseStack,
+            event: HarvestEntityEvent,
+            droppedItems: MutableList<ItemStackSnapshot>,
+            droppedExperience: Int
+    ) {
         if (event.isCancelled)
             return
-        causeStack.pushCauseFrame().use { frame ->
+        causeStack.withFrame { frame ->
             frame.pushCause(event)
-            val experience = event.experience
             // No experience, don't spawn any entity
-            if (experience > 0) {
-                frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE)
+            if (droppedExperience > 0) {
+                frame.addContext(CauseContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE)
                 // Spawn a experience orb with the experience value
                 this.world.entitySpawner.spawn(EntityTypes.EXPERIENCE_ORB, this.transform) { entity ->
-                    entity.offer(Keys.EXPERIENCE, experience)
+                    entity.offer(Keys.EXPERIENCE, droppedExperience)
                 }
             }
-            frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM)
+            frame.addContext(CauseContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM)
             // Collect entity drops
-            this.collectDrops(causeStack, drops)
-            if (drops.isNotEmpty()) {
+            this.collectDrops(causeStack, droppedItems)
+            if (droppedItems.isNotEmpty()) {
                 val preDropEvent: DropItemEvent.Pre = LanternEventFactory.createDropItemEventPre(
-                        frame.currentCause, drops.toImmutableList(), drops.asNonNullList())
+                        frame.currentCause, droppedItems.toImmutableList(), droppedItems.asNonNullList())
                 EventManager.post(preDropEvent)
                 if (!preDropEvent.isCancelled) {
                     val transform = this.transform.withPosition(this.boundingBox.map { it.center }.orElse(Vector3d.ZERO))
-                    val entries = drops.asSequence()
+                    val entries = droppedItems.asSequence()
                             .filter { snapshot -> !snapshot.isEmpty }
                             .map { snapshot ->
                                 EntitySpawnEntry(EntityTypes.ITEM, transform) {
                                     offer(Keys.ITEM_STACK_SNAPSHOT, snapshot)
-                                    offer(Keys.PICKUP_DELAY, 15)
+                                    offer(Keys.PICKUP_DELAY, 0.75.seconds)
                                 }
                             }
                             .toList()
@@ -323,19 +331,19 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
                 (newPotionEffect.type as LanternPotionEffectType).effectConsumer(this, newPotionEffect)
                 if (!instant)
                     newEffects.add(newPotionEffect)
-                if (effect.type == PotionEffectTypes.GLOWING.get()) {
+                if (effect.type eq PotionEffectTypes.GLOWING) {
                     this.offer(Keys.IS_GLOWING, duration > 0)
-                } else if (effect.type == PotionEffectTypes.INVISIBILITY.get()) {
+                } else if (effect.type eq PotionEffectTypes.INVISIBILITY) {
                     this.offer(Keys.IS_INVISIBLE, duration > 0)
-                } else if (effect.type == PotionEffectTypes.HUNGER.get() && this.supports(Keys.EXHAUSTION)) {
+                } else if (effect.type eq PotionEffectTypes.HUNGER && this.supports(Keys.EXHAUSTION)) {
                     val oldExhaustion = this.get(Keys.EXHAUSTION).orElse(0.0)
                     val newExhaustion = oldExhaustion + deltaTicks.toDouble() * 0.005 * (effect.amplifier + 1.0)
                     this.offer(Keys.EXHAUSTION, newExhaustion)
-                } else if (effect.type == PotionEffectTypes.SATURATION.get() && this.supports(Keys.SATURATION)) {
+                } else if (effect.type eq PotionEffectTypes.SATURATION && this.supports(Keys.SATURATION)) {
                     val amount = effect.amplifier + 1
-                    val newFood = this.get(Keys.FOOD_LEVEL).orElse(0) + amount
-                    val newSaturation = min(this.get(Keys.SATURATION).orElse(0.0) + amount * 2, newFood.toDouble())
-                    this.offer(Keys.FOOD_LEVEL, newFood)
+                    val newFood = this.get(Keys.FOOD).orElse(0.0) + amount
+                    val newSaturation = min(this.get(Keys.SATURATION).orElse(0.0) + amount * 2, newFood)
+                    this.offer(Keys.FOOD, newFood)
                     this.offer(Keys.SATURATION, newSaturation)
                 }
             }
@@ -348,18 +356,18 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
     private var peacefulFoodUpdateTimer = Duration.ZERO
 
     private fun updateFood(deltaTime: Duration) {
-        if (!this.supports(Keys.FOOD_LEVEL) ||
-                this.get(Keys.GAME_MODE).orElse(null) == GameModes.CREATIVE.get())
+        if (!this.supports(Keys.FOOD) ||
+                this.get(Keys.GAME_MODE) eq GameModes.CREATIVE)
             return
 
         val difficulty = this.world.difficulty
 
         var exhaustion = this.getOrElse(Keys.EXHAUSTION, 0.0)
         var saturation = this.getOrElse(Keys.SATURATION, 0.0)
-        var food = this.require(Keys.FOOD_LEVEL)
+        var food = this.require(Keys.FOOD)
 
-        val maxFood = this.getOrElse(LanternKeys.MAX_FOOD_LEVEL, 20)
-        val maxExhaustion = this.getOrElse(LanternKeys.MAX_EXHAUSTION, 4.0)
+        val maxFood = this.getOrElse(Keys.MAX_FOOD, 20.0)
+        val maxExhaustion = this.getOrElse(Keys.MAX_EXHAUSTION, 4.0)
 
         if (exhaustion >= maxExhaustion) {
             if (saturation > 0.0) {
@@ -367,9 +375,9 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
                 // Get the updated saturation
                 saturation = this.getOrElse(Keys.SATURATION, 0.0)
             } else if (difficulty != Difficulties.PEACEFUL.get()) {
-                this.offer(Keys.FOOD_LEVEL, food - 1)
+                this.offer(Keys.FOOD, food - 1)
                 // Get the updated food level
-                food = this.require(Keys.FOOD_LEVEL)
+                food = this.require(Keys.FOOD)
             }
             this.offer(Keys.EXHAUSTION, 0.0)
             exhaustion = this.getOrElse(Keys.EXHAUSTION, 0.0)
@@ -387,7 +395,7 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
                 this.offer(Keys.EXHAUSTION, exhaustion + amount)
                 this.foodUpdateTimer -= 0.5.seconds
             }
-        } else if (naturalRegeneration && food >= maxFood.toDouble() * 0.9) {
+        } else if (naturalRegeneration && food >= maxFood * 0.9) {
             if (this.foodUpdateTimer > 4.seconds) {
                 this.heal(1.0, HealingSources.FOOD)
                 this.offer(Keys.EXHAUSTION, exhaustion + 6.0)
@@ -396,8 +404,8 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
         } else if (food <= 0.0) {
             if (this.foodUpdateTimer > 4.seconds) {
                 val health = this.get(Keys.HEALTH).orElse(0.0)
-                if ((health > 10.0 && difficulty == Difficulties.EASY.get()) ||
-                        (health > 1.0 && difficulty == Difficulties.NORMAL.get()) || difficulty == Difficulties.HARD) {
+                if ((health > 10.0 && difficulty eq Difficulties.EASY) ||
+                        (health > 1.0 && difficulty eq Difficulties.NORMAL) || difficulty eq Difficulties.HARD) {
                     this.damage(1.0, DamageSources.STARVATION)
                 }
                 this.foodUpdateTimer -= 4.seconds
@@ -410,14 +418,14 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
 
         this.peacefulHealthUpdateTimer += deltaTime
         this.peacefulFoodUpdateTimer += deltaTime
-        if (naturalRegeneration && difficulty == Difficulties.PEACEFUL.get()) {
+        if (naturalRegeneration && difficulty eq Difficulties.PEACEFUL) {
             if (this.peacefulHealthUpdateTimer >= 1.seconds) {
                 this.heal(1.0, HealingSources.MAGIC)
                 this.peacefulHealthUpdateTimer -= 1.seconds
             }
             if (this.peacefulFoodUpdateTimer >= 0.5.seconds) {
                 if (food < maxFood)
-                    this.offer(Keys.FOOD_LEVEL, food + 1)
+                    this.offer(Keys.FOOD, food + 1)
                 this.peacefulFoodUpdateTimer -= 0.5.seconds
             }
         }
@@ -448,14 +456,20 @@ open class LanternLiving(creationData: EntityCreationData) : LanternEntity(creat
         TODO("Not yet implemented")
     }
 
-    override fun <T : Projectile> launchProjectileTo(projectileClass: Class<T>, target: Entity): Optional<T> = emptyOptional()
+    override fun <T : Projectile> launchProjectileTo(projectileType: EntityType<T>, target: Entity): Optional<T> {
+        TODO("Not yet implemented")
+    }
 
-    override fun <T : Projectile> launchProjectile(projectileClass: Class<T>): Optional<T> = emptyOptional()
+    override fun <T : Projectile> launchProjectile(projectileType: EntityType<T>): Optional<T> {
+        TODO("Not yet implemented")
+    }
 
-    override fun <T : Projectile> launchProjectile(projectileClass: Class<T>, velocity: Vector3d): Optional<T> = emptyOptional()
+    override fun <T : Projectile> launchProjectile(projectileType: EntityType<T>, velocity: Vector3d): Optional<T> {
+        TODO("Not yet implemented")
+    }
 
     override fun lookAt(targetPos: Vector3d) {
-        val eyePos = this.require(Keys.EYE_POSITION) ?: return
+        val eyePos = this.require(Keys.EYE_POSITION)
 
         // TODO: Simplify this
 

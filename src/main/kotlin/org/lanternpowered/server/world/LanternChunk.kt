@@ -415,13 +415,13 @@ class LanternChunk(
 
     fun getKeysLocally(position: LocalPosition): Set<Key<*>> {
         val keys = this.getBlockLocally(position).keys.toMutableSet()
-        keys.add(Keys.SKY_LIGHT.get())
-        keys.add(Keys.BLOCK_LIGHT.get())
+        keys.add(Keys.SKY_LIGHT)
+        keys.add(Keys.BLOCK_LIGHT)
 
         if (this.getCreatorLocally(position) != null)
-            keys.add(Keys.CREATOR.get())
+            keys.add(Keys.CREATOR)
         if (this.getNotifierLocally(position) != null)
-            keys.add(Keys.NOTIFIER.get())
+            keys.add(Keys.NOTIFIER)
 
         val blockEntity = this.getBlockEntityLocally(position)
         if (blockEntity != null)
@@ -562,10 +562,10 @@ class LanternChunk(
     }
 
     private fun offerCreatorLocally(position: LocalPosition, uniqueId: UUID?, merge: MergeFunction? = null): DataTransactionResult =
-            this.offerTrackerLocally(position, Keys.CREATOR.get(), uniqueId, this::getCreatorLocally, this::setCreatorLocally, merge)
+            this.offerTrackerLocally(position, Keys.CREATOR, uniqueId, this::getCreatorLocally, this::setCreatorLocally, merge)
 
     private fun offerNotifierLocally(position: LocalPosition, uniqueId: UUID?, merge: MergeFunction? = null): DataTransactionResult =
-            this.offerTrackerLocally(position, Keys.NOTIFIER.get(), uniqueId, this::getNotifierLocally, this::setNotifierLocally, merge)
+            this.offerTrackerLocally(position, Keys.NOTIFIER, uniqueId, this::getNotifierLocally, this::setNotifierLocally, merge)
 
     private inline fun offerTrackerLocally(
             position: LocalPosition,

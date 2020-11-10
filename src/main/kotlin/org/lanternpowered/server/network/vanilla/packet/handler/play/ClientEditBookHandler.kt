@@ -19,8 +19,8 @@ import org.spongepowered.api.item.ItemTypes
 
 object ClientEditBookHandler : PacketHandler<ClientModifyBookPacket.Edit> {
 
-    override fun handle(context: NetworkContext, packet: ClientModifyBookPacket.Edit) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientModifyBookPacket.Edit) {
+        val player = ctx.session.player
         val slot = player.inventory.hotbar.selectedSlot
         val itemStack = slot.peek()
         if (itemStack.type eq ItemTypes.WRITABLE_BOOK) {

@@ -17,9 +17,9 @@ interface PacketHandler<P : Packet> {
     /**
      * Handles a [Packet] that was received.
      *
-     * @param context The context that received the message
+     * @param ctx The context that received the message
      * @param packet The packet that was received
      */
-    fun handle(context: NetworkContext, packet: P)
+    fun handle(ctx: NetworkContext, packet: P)
 
 }

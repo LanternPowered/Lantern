@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketDecoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerVehicleMovementPacket
 
 object ClientPlayerVehicleMovementDecoder : PacketDecoder<ClientPlayerVehicleMovementPacket> {

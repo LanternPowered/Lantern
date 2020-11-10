@@ -38,7 +38,7 @@ class RootCraftingContainerLayout : LanternTopBottomContainerLayout<CraftingCont
                 Flags.DISABLE_SHIFT_INSERTION  // Input slot 9
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
     }
 
     override fun createOpenPackets(data: ContainerData): List<Packet> =

@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 import io.netty.handler.codec.EncoderException
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.BrandPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket
 

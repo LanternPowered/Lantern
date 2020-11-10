@@ -28,7 +28,7 @@ abstract class AbstractEntityEffect protected constructor(
                 relativePosition = Vector3d(0.0, eyeHeight, 0.0)
             }
         }
-        play(entity, relativePosition, Random)
+        this.play(entity, relativePosition, Random)
     }
 
     protected abstract fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random)

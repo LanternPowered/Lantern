@@ -31,7 +31,7 @@ abstract class RootSmeltingContainerLayout(title: Text) : LanternTopBottomContai
                 Flags.DISABLE_SHIFT_INSERTION // Output slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private const val MAX_PROGRESS_PROPERTY_VALUE = 1000.0
         private const val SMELT_PROGRESS_PROPERTY = 2

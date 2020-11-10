@@ -20,6 +20,7 @@ import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityNetworkIDs
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.value.PackedAngle
 import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenHorseWindowPacket
@@ -41,7 +42,7 @@ class RootHorseContainerLayout : LanternTopBottomContainerLayout<HorseContainerL
                 Flags.REVERSE_SHIFT_INSERTION + Flags.POSSIBLY_DISABLED_SHIFT_INSERTION  // Armor slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private val HORSE_NETWORK_TYPE = EntityNetworkIDs.REGISTRY.require(minecraftKey("horse"))
     }
@@ -71,7 +72,7 @@ class RootHorseContainerLayout : LanternTopBottomContainerLayout<HorseContainerL
         parameters.add(EntityParameters.Base.FLAGS, EntityParameters.Base.Flags.IS_INVISIBLE.toByte())
 
         packets += SpawnMobPacket(entityId, UUID.randomUUID(), HORSE_NETWORK_TYPE,
-                Vector3d.ZERO, 0, 0, 0, Vector3d.ZERO)
+                Vector3d.ZERO, PackedAngle.Zero, PackedAngle.Zero, PackedAngle.Zero, Vector3d.ZERO)
         packets += EntityMetadataPacket(entityId, parameters)
         packets += OpenHorseWindowPacket(data.containerId, TOP_INVENTORY_FLAGS.size, entityId)
         packets += DestroyEntitiesPacket(entityId)

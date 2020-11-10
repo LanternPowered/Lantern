@@ -14,7 +14,7 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.api.util.collections.contentToString
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.value.ContextualValueCodec
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 class NetworkAdvancement(
         private val id: String,

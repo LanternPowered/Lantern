@@ -10,16 +10,19 @@
  */
 package org.lanternpowered.server.network.entity.parameter
 
+import org.lanternpowered.api.block.BlockState
+import org.lanternpowered.api.data.persistence.DataView
+import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.text.Text
+import org.lanternpowered.api.util.Direction
 import org.lanternpowered.server.entity.Pose
 import org.lanternpowered.server.network.item.NetworkItemStack
 import org.lanternpowered.server.network.text.NetworkText
+import org.lanternpowered.server.network.value.VillagerData
 import org.lanternpowered.server.network.vanilla.packet.codec.play.CodecUtils
 import org.lanternpowered.server.registry.type.block.BlockStateRegistry
-import org.spongepowered.api.block.BlockState
-import org.spongepowered.api.data.persistence.DataView
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.util.Direction
+import org.lanternpowered.server.registry.type.data.ProfessionTypeRegistry
+import org.lanternpowered.server.registry.type.data.VillagerTypeRegistry
 import org.spongepowered.math.vector.Vector3f
 import org.spongepowered.math.vector.Vector3i
 import java.util.UUID
@@ -72,7 +75,11 @@ object ParameterValueTypes {
 
     @JvmField val PARTICLE: ParameterValueType<Void> = parameterValueType { ctx, buf, value -> TODO() }
 
-    @JvmField val VILLAGER_DATA: ParameterValueType<Void> = parameterValueType { ctx, buf, value -> TODO() }
+    @JvmField val VILLAGER_DATA: ParameterValueType<VillagerData> = parameterValueType { buf, value ->
+        buf.writeVarInt(VillagerTypeRegistry.getId(value.type))
+        buf.writeVarInt(ProfessionTypeRegistry.getId(value.profession))
+        buf.writeVarInt(value.level)
+    }
 
     @JvmField val OPTIONAL_INT: ParameterValueType<Int?> = parameterValueType { buf, value ->
         if (value != null) {

@@ -22,6 +22,7 @@ import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityNetworkIDs
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.value.PackedAngle
 import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityMetadataPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.OpenHorseWindowPacket
@@ -48,13 +49,11 @@ class RootDonkeyContainerLayout(val hasChest: Boolean) : LanternTopBottomContain
 
         private val TOP_INVENTORY_FLAGS = EQUIPMENT_INVENTORY_FLAGS + CHEST_INVENTORY_FLAGS
 
-        private val ALL_INVENTORY_FLAGS_WITH_CHEST = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS_WITH_CHEST = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + EQUIPMENT_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = EQUIPMENT_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private val DONKEY_NETWORK_TYPE = EntityNetworkIDs.REGISTRY.require(minecraftKey("donkey"))
-
-        private const val UPDATE_HAS_CHEST = 0x1
     }
 
     var entity: Entity? = null
@@ -97,7 +96,7 @@ class RootDonkeyContainerLayout(val hasChest: Boolean) : LanternTopBottomContain
 
         val packets = mutableListOf<Packet>()
         packets += SpawnMobPacket(entityId, UUID.randomUUID(), DONKEY_NETWORK_TYPE,
-                Vector3d.ZERO, 0, 0, 0, Vector3d.ZERO)
+                Vector3d.ZERO, PackedAngle.Zero, PackedAngle.Zero, PackedAngle.Zero, Vector3d.ZERO)
         packets += EntityMetadataPacket(entityId, parameters)
         packets += OpenHorseWindowPacket(data.containerId, TOP_INVENTORY_FLAGS.size + 1, entityId)
         packets += DestroyEntitiesPacket(entityId)

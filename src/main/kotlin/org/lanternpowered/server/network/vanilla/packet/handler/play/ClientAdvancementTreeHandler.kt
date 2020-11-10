@@ -17,12 +17,12 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ChangeAdvancem
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
 import org.lanternpowered.api.key.NamespacedKey
 
-class ClientAdvancementTreeHandler : PacketHandler<ChangeAdvancementTreePacket> {
+object ClientAdvancementTreeHandler : PacketHandler<ChangeAdvancementTreePacket> {
 
-    override fun handle(context: NetworkContext, packet: ChangeAdvancementTreePacket) {
+    override fun handle(ctx: NetworkContext, packet: ChangeAdvancementTreePacket) {
         if (packet is ChangeAdvancementTreePacket.Open) {
             val id = packet.id
-            context.session.player.offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
+            ctx.session.player.offer(LanternKeys.OPEN_ADVANCEMENT_TREE,
                     AdvancementTreeRegistry.require(NamespacedKey.resolve(id)))
         } else {
             // Do we need the close event?

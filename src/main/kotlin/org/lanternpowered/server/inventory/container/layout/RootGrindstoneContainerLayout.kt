@@ -32,7 +32,7 @@ class RootGrindstoneContainerLayout : LanternTopBottomContainerLayout<Grindstone
                 Flags.REVERSE_SHIFT_INSERTION + Flags.DISABLE_SHIFT_INSERTION + Flags.IGNORE_DOUBLE_CLICK // Result slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
     }
 
     override fun createOpenPackets(data: ContainerData): List<Packet> =

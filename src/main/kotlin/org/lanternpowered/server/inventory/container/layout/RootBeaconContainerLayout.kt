@@ -32,7 +32,7 @@ class RootBeaconContainerLayout : LanternTopBottomContainerLayout<BeaconContaine
                 Flags.REVERSE_SHIFT_INSERTION + Flags.DISABLE_SHIFT_INSERTION // Payment slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private const val POWER_LEVEL = 0
         private const val PRIMARY_POTION_EFFECT = 1

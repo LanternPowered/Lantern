@@ -24,10 +24,9 @@ class GridSubGridContainerLayout(
         private val base: GridContainerLayout
 ) : GridContainerLayout {
 
-    override val title: Text
+    override var title: Text
         get() = emptyText()
-
-    override fun title(title: Text) {}
+        set(_) {}
 
     override val size: Int = this.width * this.height
 

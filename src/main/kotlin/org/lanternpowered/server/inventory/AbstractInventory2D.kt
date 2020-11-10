@@ -57,7 +57,7 @@ abstract class AbstractInventory2D : AbstractChildrenInventory(), ExtendedInvent
             throw UnsupportedOperationException()
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> {
-        if (key == Keys.SLOT_POSITION.get() && child is Slot)
+        if (key == Keys.SLOT_POSITION && child is Slot)
             return this.slotPosition(child).asOptional().uncheckedCast()
         return super<AbstractChildrenInventory>.get(child, key)
     }

@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerVe
 
 object ClientPlayerVehicleMovementHandler : PacketHandler<ClientPlayerVehicleMovementPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientPlayerVehicleMovementPacket) {
+    override fun handle(ctx: NetworkContext, packet: ClientPlayerVehicleMovementPacket) {
         // TODO
     }
 }

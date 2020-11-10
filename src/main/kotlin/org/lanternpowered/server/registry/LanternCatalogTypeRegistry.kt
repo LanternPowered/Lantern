@@ -70,8 +70,8 @@ private class LanternGenericInternalMutableCatalogTypeRegistry<T : CatalogType, 
         MutableGenericInternalCatalogTypeRegistry<T, I>>(typeToken), MutableGenericInternalCatalogTypeRegistry<T, I> {
 
     override fun createBuilder() = LanternGenericInternalRegistryBuilder<T, I>(this.typeToken)
-    override fun getId(type: T): I? = ensureLoaded().getId(type)
-    override fun get(id: I): T? = ensureLoaded().get(id)
+    override fun getId(type: T): I? = this.ensureLoaded().getId(type)
+    override fun get(id: I): T? = this.ensureLoaded().get(id)
 }
 
 private class LanternInternalMutableCatalogTypeRegistry<T : CatalogType>(
@@ -80,8 +80,8 @@ private class LanternInternalMutableCatalogTypeRegistry<T : CatalogType>(
         MutableInternalCatalogTypeRegistry<T>>(typeToken), MutableInternalCatalogTypeRegistry<T> {
 
     override fun createBuilder() = LanternInternalRegistryBuilder(this.typeToken)
-    override fun getId(type: T) = ensureLoaded().getId(type)
-    override fun get(id: Int): T? = ensureLoaded().get(id)
+    override fun getId(type: T) = this.ensureLoaded().getId(type)
+    override fun get(id: Int): T? = this.ensureLoaded().get(id)
 }
 
 private class LanternMutableCatalogTypeRegistry<T : CatalogType>(
@@ -115,7 +115,7 @@ private abstract class AbstractMutableCatalogTypeRegistry<T, D, B, R>(
             builder.fn()
             builder.fix().registerPluginTypes()
             this.data = builder.fix().build()
-            invalidateProviders()
+            this.invalidateProviders()
             for (watcher in this.watchers)
                 watcher(this as R)
         }
@@ -136,8 +136,8 @@ private class LanternGenericInternalImmutableCatalogTypeRegistry<T : CatalogType
         GenericInternalCatalogTypeRegistry<T, I> {
 
     override fun createBuilder() = LanternGenericInternalRegistryBuilder<T, I>(this.typeToken)
-    override fun getId(type: T): I? = ensureLoaded().getId(type)
-    override fun get(id: I): T? = ensureLoaded().get(id)
+    override fun getId(type: T): I? = this.ensureLoaded().getId(type)
+    override fun get(id: I): T? = this.ensureLoaded().get(id)
 }
 
 private class LanternInternalImmutableCatalogTypeRegistry<T : CatalogType>(
@@ -146,8 +146,8 @@ private class LanternInternalImmutableCatalogTypeRegistry<T : CatalogType>(
         InternalCatalogTypeRegistry<T> {
 
     override fun createBuilder() = LanternInternalRegistryBuilder(this.typeToken)
-    override fun getId(type: T) = ensureLoaded().getId(type)
-    override fun get(id: Int): T? = ensureLoaded().get(id)
+    override fun getId(type: T) = this.ensureLoaded().getId(type)
+    override fun get(id: Int): T? = this.ensureLoaded().get(id)
 }
 
 private class LanternImmutableCatalogTypeRegistry<T : CatalogType>(
@@ -182,7 +182,7 @@ private abstract class AbstractImmutableCatalogTypeRegistry<T, D, B>(
             data = this.data
             if (data != null)
                 return data as D
-            return load(this.initializer!!)
+            return this.load(this.initializer!!)
         }
     }
 
@@ -205,7 +205,7 @@ private abstract class AbstractImmutableCatalogTypeRegistry<T, D, B>(
             val data = builder.fix().build()
             this.initializer = null
             this.data = data
-            invalidateProviders()
+            this.invalidateProviders()
             return data
         } finally {
             cycleStack.removeLast()

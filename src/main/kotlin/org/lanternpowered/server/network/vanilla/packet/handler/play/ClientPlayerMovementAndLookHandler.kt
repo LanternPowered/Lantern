@@ -16,8 +16,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerMo
 
 object ClientPlayerMovementAndLookHandler : PacketHandler<ClientPlayerMovementAndLookPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientPlayerMovementAndLookPacket) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientPlayerMovementAndLookPacket) {
+        val player = ctx.session.player
         player.setRawPosition(packet.position)
         player.setRawRotation(ClientPlayerLookHandler.toRotation(packet.pitch, packet.yaw))
         player.handleOnGroundState(packet.isOnGround)

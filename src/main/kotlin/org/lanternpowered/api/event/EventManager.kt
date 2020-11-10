@@ -11,11 +11,8 @@
 package org.lanternpowered.api.event
 
 import org.lanternpowered.api.Lantern
+import org.lanternpowered.api.plugin.PluginContainer
 import org.lanternpowered.api.util.type.TypeToken
-import org.spongepowered.api.event.Event
-import org.spongepowered.api.event.EventListener
-import org.spongepowered.api.event.Order
-import org.spongepowered.plugin.PluginContainer
 import kotlin.reflect.KClass
 
 /**

@@ -16,7 +16,7 @@ import it.unimi.dsi.fastutil.ints.IntList
 import org.lanternpowered.server.game.registry.InternalIDRegistries
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.TagsPacket
 
 object TagsEncoder : PacketEncoder<TagsPacket> {

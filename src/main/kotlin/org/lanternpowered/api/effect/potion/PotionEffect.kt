@@ -40,7 +40,7 @@ fun potionEffectOf(
 ): PotionEffect = PotionEffect.builder().potionType(type).amplifier(amplifier).duration(duration)
         .ambient(ambient).showParticles(showParticles).showIcon(showIcon).build()
 
-fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<PotionEffect> {
+fun Collection<PotionEffect>.mergeWith(that: Collection<PotionEffect>): MutableList<PotionEffect> {
     val effectsByType = mutableMapOf<PotionEffectType, PotionEffect>()
     for (effect in this) {
         effectsByType[effect.type] = effect
@@ -49,7 +49,7 @@ fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<
     for (effect in that) {
         val other = effectsByType.remove(effect.type)
         if (other != null) {
-            result.add(effect.merge(other))
+            result.add(effect.mergeWith(other))
         } else {
             result.add(effect)
         }
@@ -64,7 +64,7 @@ fun Collection<PotionEffect>.merge(that: Collection<PotionEffect>): MutableList<
  * @param that The potion effect to merge with
  * @return The merged potion effect
  */
-fun PotionEffect.merge(that: PotionEffect): PotionEffect {
+fun PotionEffect.mergeWith(that: PotionEffect): PotionEffect {
     val builder = builderOf<PotionEffectBuilder>().from(this)
     if (that.amplifier > amplifier) {
         builder.amplifier(that.amplifier).duration(that.duration)

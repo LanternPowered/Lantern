@@ -15,6 +15,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import it.unimi.dsi.fastutil.objects.Object2LongMap
 import org.lanternpowered.api.util.optional.orNull
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.advancement.criteria.LanternScoreCriterion
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.game.Lantern
@@ -58,9 +59,9 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
      * @return The path
      */
     private val savePath: Path
-        get() = Lantern.getGame().savesDirectory
+        get() = LanternGame.gameDirectory
                 .resolve("advancements")
-                .resolve(player.uniqueId.toString().toLowerCase() + ".json")
+                .resolve(this.player.uniqueId.toString().toLowerCase() + ".json")
 
     fun init() {
         init0()
@@ -71,13 +72,13 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
             try {
                 Files.newBufferedReader(file).use { reader -> loadProgressFromJson(gson.fromJson(reader)) }
             } catch (e: IOException) {
-                Lantern.getLogger().error("Failed to load the advancements progress for the player: " + player.uniqueId, e)
+                Lantern.getLogger().error("Failed to load the advancements progress for the player: ${player.uniqueId}", e)
             }
         }
     }
 
     fun initClient() {
-        player.connection.send(createUpdateMessage(true)!!)
+        this.player.connection.send(createUpdateMessage(true)!!)
     }
 
     fun save() {
@@ -113,7 +114,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
         this.cleanup()
 
         // Load all the advancements into this progress tracker
-        for (advancement in AdvancementRegistry.all) {
+        for (advancement in AdvancementRegistry) {
             val progress = get(advancement)
             // Update the visibility
             progress.dirtyVisibility = true
@@ -149,7 +150,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
     val unlockedAdvancementTrees: Collection<AdvancementTree>
         get() {
             val builder = ImmutableList.builder<AdvancementTree>()
-            for (tree in AdvancementTreeRegistry.all) {
+            for (tree in AdvancementTreeRegistry) {
                 val advancement = tree.rootAdvancement
                 val progress = get(advancement)
                 if (!progress.dirtyVisibility && progress.visible ||
@@ -161,7 +162,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
         }
 
     private fun loadProgress(progressMap: Map<String, Map<String, Instant>>) {
-        for (advancement in AdvancementRegistry.all) {
+        for (advancement in AdvancementRegistry) {
             val entry = progressMap[advancement.key.toString()]
             if (entry != null)
                 this.get(advancement).loadProgress(entry)
@@ -170,7 +171,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
 
     private fun saveProgress(): Map<String, Map<String, Instant>> {
         val progressMap: MutableMap<String, Map<String, Instant>> = HashMap()
-        for (entry in progress.values) {
+        for (entry in this.progress.values) {
             val entryProgress = entry.saveProgress()
             if (entryProgress.isNotEmpty())
                 progressMap[entry.advancement.key.toString()] = entryProgress
@@ -179,7 +180,7 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
     }
 
     private fun loadProgressFromJson(json: JsonObject) {
-        for (advancement in AdvancementRegistry.all) {
+        for (advancement in AdvancementRegistry) {
             val entry = json.getAsJsonObject(advancement.key.toString())
             if (entry != null)
                 this.loadAdvancementProgressFromJson(get(advancement), entry)
@@ -188,11 +189,10 @@ class LanternPlayerAdvancements(val player: LanternPlayer) {
 
     private fun saveProgressToJson(): JsonObject {
         val json = JsonObject()
-        for (entry in progress.values) {
+        for (entry in this.progress.values) {
             val entryJson = saveAdvancementProgressToJson(entry)
-            if (entryJson != null) {
+            if (entryJson != null)
                 json.add(entry.advancement.key.toString(), entryJson)
-            }
         }
         return json
     }

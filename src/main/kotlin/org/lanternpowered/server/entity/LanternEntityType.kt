@@ -21,12 +21,20 @@ import java.util.UUID
 class LanternEntityType<E : Entity> internal constructor(
         key: NamespacedKey,
         private val text: Text,
-        private val constructor: (EntityCreationData) -> E
+        private val constructor: ((EntityCreationData) -> E)?
 ) : DefaultCatalogType(key), EntityType<E>, TextRepresentable by text {
 
     /**
      * Constructs a new [Entity] instance with the given [UUID].
      */
-    fun constructEntity(uniqueId: UUID = UUID.randomUUID()): E =
-            this.constructor(EntityCreationData(uniqueId, this))
+    fun constructEntity(uniqueId: UUID = UUID.randomUUID()): E {
+        if (this.constructor == null)
+            throw UnsupportedOperationException("The entity type $key cannot be constructed.")
+        return (this.constructor)(EntityCreationData(uniqueId, this))
+    }
+
+    override fun isSummonable(): Boolean = this.constructor != null
+    override fun isTransient(): Boolean = false // TODO?
+    override fun isFlammable(): Boolean  = true // TODO?
+    override fun canSpawnAwayFromPlayer(): Boolean = this.constructor != null // TODO?
 }

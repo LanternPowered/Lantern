@@ -10,11 +10,12 @@
  */
 package org.lanternpowered.server.inventory.equipment
 
+import org.lanternpowered.api.item.inventory.equipment.Equipable
 import org.lanternpowered.server.inventory.AbstractChildrenInventory
 import org.lanternpowered.server.inventory.AbstractMutableInventory
 import org.lanternpowered.server.inventory.InventoryView
 
-class LanternEquipmentColumnInventory : AbstractChildrenInventory(), AbstractEquipmentInventory {
+class LanternEquipmentColumnInventory<C : Equipable> : AbstractChildrenInventory(), AbstractEquipmentInventory<C> {
 
     override fun instantiateView(): InventoryView<AbstractMutableInventory> {
         TODO("Not yet implemented")

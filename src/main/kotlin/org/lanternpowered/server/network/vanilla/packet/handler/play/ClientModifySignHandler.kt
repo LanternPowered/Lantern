@@ -25,8 +25,8 @@ import org.spongepowered.api.block.entity.Sign
 
 object ClientModifySignHandler : PacketHandler<ClientModifySignPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientModifySignPacket) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientModifySignPacket) {
+        val player = ctx.session.player
         val openedSignPosition = player.openedSignPosition
         val signPosition = packet.position
         player.resetOpenedSignPosition()
@@ -36,7 +36,7 @@ object ClientModifySignHandler : PacketHandler<ClientModifySignPacket> {
         val lines = sign.lines()
                 .set(packet.lines.map(::textOf).toMutableList<Text>())
         val originalLines = lines.asImmutable()
-        CauseStack.current().withFrame { frame ->
+        CauseStack.withFrame { frame ->
             frame.pushCause(player)
             frame.addContext(CauseContextKeys.PLAYER, player)
 

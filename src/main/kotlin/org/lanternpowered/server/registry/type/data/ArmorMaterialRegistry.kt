@@ -10,16 +10,16 @@
  */
 package org.lanternpowered.server.registry.type.data
 
-import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.item.ItemTypes
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.data.type.LanternArmorMaterial
 import org.spongepowered.api.data.type.ArmorMaterial
-import org.spongepowered.api.item.ItemTypes
 import org.spongepowered.api.item.recipe.crafting.Ingredient
 
 val ArmorMaterialRegistry = catalogTypeRegistry<ArmorMaterial> {
     fun register(id: String, repairIngredient: (() -> Ingredient)? = null) =
-            register(LanternArmorMaterial(NamespacedKey.minecraft(id), repairIngredient))
+            register(LanternArmorMaterial(minecraftKey(id), repairIngredient))
 
     register("chain")
     register("diamond") { Ingredient.of(ItemTypes.DIAMOND.get()) }

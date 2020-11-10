@@ -13,3 +13,4 @@ package org.lanternpowered.api.block
 typealias BlockState = org.spongepowered.api.block.BlockState
 typealias BlockType = org.spongepowered.api.block.BlockType
 typealias BlockTypes = org.spongepowered.api.block.BlockTypes
+typealias BlockSoundGroup = org.spongepowered.api.block.BlockSoundGroup

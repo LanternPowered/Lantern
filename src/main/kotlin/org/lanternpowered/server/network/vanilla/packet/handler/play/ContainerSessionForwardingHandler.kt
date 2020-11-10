@@ -19,5 +19,5 @@ class ContainerSessionForwardingHandler<P : Packet>(
         private val function: (PlayerInventoryContainerSession, P) -> Unit
 ) : PacketHandler<P> {
 
-    override fun handle(context: NetworkContext, packet: P) = this.function(context.session.player.containerSession, packet)
+    override fun handle(ctx: NetworkContext, packet: P) = this.function(ctx.session.player.containerSession, packet)
 }

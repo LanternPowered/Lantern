@@ -76,7 +76,7 @@ class SoftThreadLocal<V>(private val supplier: () -> V) {
             val value: V
             if (nullable == null) {
                 value = this.supplier()
-                set(value)
+                this.set(value)
             } else {
                 value = nullable
             }

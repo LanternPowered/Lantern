@@ -19,7 +19,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes
 import org.spongepowered.api.world.SerializationBehaviors
 import org.spongepowered.api.world.difficulty.Difficulties
 import org.spongepowered.api.world.dimension.DimensionTypes
-import org.spongepowered.api.world.gen.GeneratorTypes
 
 val WorldArchetypeRegistry = catalogTypeRegistry<WorldArchetype> {
     fun register(id: String, fn: WorldArchetypeBuilder.() -> Unit) =

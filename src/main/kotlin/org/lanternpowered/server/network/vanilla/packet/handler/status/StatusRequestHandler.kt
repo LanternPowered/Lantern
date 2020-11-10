@@ -33,20 +33,20 @@ object StatusRequestHandler : PacketHandler<StatusRequestPacket> {
 
     private val gson = Gson()
 
-    override fun handle(context: NetworkContext, packet: StatusRequestPacket) {
-        val session = context.session
+    override fun handle(ctx: NetworkContext, packet: StatusRequestPacket) {
+        val session = ctx.session
         val server = session.server
         val description = server.motd
         val address = session.address
         val virtualAddress = session.virtualHost
         val protocol = session.protocolVersion
-        val clientVersion = Lantern.getGame().minecraftVersionCache.getVersionOrUnknown(protocol, false)
+        val clientVersion = ctx.game.minecraftVersionCache.getVersionOrUnknown(protocol, false)
         if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
             Lantern.getLogger().debug("Client with unknown protocol version {} pinged the server.", protocol)
         }
         val client = LanternStatusClient(address, clientVersion, virtualAddress)
         val players = LanternStatusHelper.createPlayers(server)
-        val response = LanternStatusResponse(Lantern.getGame().platform.minecraftVersion,
+        val response = LanternStatusResponse(ctx.game.platform.minecraftVersion,
                 description, players, server.favicon)
         val cause = causeOf(WrappedRemoteConnection(session))
         val event = LanternEventFactory.createClientPingServerEvent(cause, client, response)
@@ -54,7 +54,7 @@ object StatusRequestHandler : PacketHandler<StatusRequestPacket> {
 
         // Cancelled, we are done here
         if (event.isCancelled) {
-            context.channel.close()
+            ctx.channel.close()
             return
         }
         val rootObject = JsonObject()

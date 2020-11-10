@@ -12,7 +12,7 @@ package org.lanternpowered.api.util.collections
 
 import java.util.Enumeration
 
-fun <T> Sequence<T>.asEnumeration(): Enumeration<T> = iterator().asEnumeration()
+fun <T> Sequence<T>.asEnumeration(): Enumeration<T> = this.iterator().asEnumeration()
 fun <T> Iterator<T>.asEnumeration(): Enumeration<T> = IteratorEnumeration(this)
 
 private class IteratorEnumeration<T>(private val iterator: Iterator<T>) : Enumeration<T> {

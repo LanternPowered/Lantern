@@ -95,6 +95,12 @@ internal object Chunks {
             ChunkPosition(this.toChunk(x), this.toChunk(y), this.toChunk(z))
 
     /**
+     * Converts the x, y, z components to chunk coordinates.
+     */
+    fun toChunk(position: Vector3i): ChunkPosition =
+            this.toChunk(position.x, position.y, position.z)
+
+    /**
      * Converts the x, y or z component to chunk column coordinates.
      */
     inline fun toChunkColumn(x: Int, z: Int): ChunkColumnPosition =
@@ -110,6 +116,12 @@ internal object Chunks {
      */
     fun toLocal(x: Int, y: Int, z: Int): LocalPosition =
             LocalPosition(this.toLocal(x), this.toLocal(y), this.toLocal(z))
+
+    /**
+     * Converts the x, y, z components to local coordinates.
+     */
+    fun toLocal(position: Vector3i): LocalPosition =
+            this.toLocal(position.x, position.y, position.z)
 
     /**
      * Converts the x, y or z component to a global component coordinate.

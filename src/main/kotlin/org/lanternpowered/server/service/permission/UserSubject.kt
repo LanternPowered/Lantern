@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.service.permission
 
+import org.lanternpowered.api.profile.copyWithoutProperties
 import org.lanternpowered.server.config.user.OpsEntry
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.profile.LanternGameProfile
@@ -50,7 +51,7 @@ internal class UserSubject(
                         subject.opLevel
                     }
                     if (opLevel > 0) {
-                        Lantern.getGame().opsConfig.addEntry(OpsEntry((player as LanternGameProfile).withoutProperties(), opLevel))
+                        Lantern.getGame().opsConfig.addEntry(OpsEntry(player.copyWithoutProperties(), opLevel))
                     } else {
                         Lantern.getGame().opsConfig.removeEntry(player.uniqueId)
                     }

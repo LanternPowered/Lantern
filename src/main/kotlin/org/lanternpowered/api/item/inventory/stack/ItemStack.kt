@@ -40,7 +40,7 @@ inline fun ItemStack.fix(): ExtendedItemStack {
 inline fun ExtendedItemStack.fix(): ExtendedItemStack = this
 
 /**
- * Gets the normal item stack as an extended item stack snapshot.
+ * Gets the normal item stack snapshot as an extended item stack snapshot.
  */
 inline fun ItemStackSnapshot.fix(): ExtendedItemStackSnapshot {
     contract { returns() implies (this@fix is ExtendedItemStackSnapshot) }

@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientUseItemP
 
 object ClientUseItemHandler : PacketHandler<ClientUseItemPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientUseItemPacket) {
-        context.session.player.interactionHandler.handleItemInteraction(packet)
+    override fun handle(ctx: NetworkContext, packet: ClientUseItemPacket) {
+        ctx.session.player.interactionHandler.handleItemInteraction(packet)
     }
 }

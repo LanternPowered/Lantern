@@ -13,7 +13,6 @@ package org.lanternpowered.server.world.weather;
 import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.server.catalog.DefaultCatalogType;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.script.context.EmptyScriptContext;
 import org.lanternpowered.server.util.option.OptionValueMap;
 import org.spongepowered.api.ResourceKey;

@@ -31,19 +31,19 @@ abstract class AbstractStateBuilder<S : State<S>, B : DataHolderBuilder.Immutabl
         return this as B
     }
 
-    override fun reset() = apply {
+    override fun reset() = this.apply {
         this.state = null
     }
 
-    override fun add(value: Value<*>) = apply {
-        checkState().with(value).ifPresent { state -> this.state = state }
+    override fun add(value: Value<*>) = this.apply {
+        this.checkState().with(value).ifPresent { state -> this.state = state }
     }
 
-    override fun <V> add(key: Key<out Value<V>>, value: V) = apply {
-        checkState().with(key, value).ifPresent { state -> this.state = state }
+    override fun <V> add(key: Key<out Value<V>>, value: V) = this.apply {
+        this.checkState().with(key, value).ifPresent { state -> this.state = state }
     }
 
-    override fun from(state: S) = apply {
+    override fun from(state: S) = this.apply {
         this.state = state
     }
 

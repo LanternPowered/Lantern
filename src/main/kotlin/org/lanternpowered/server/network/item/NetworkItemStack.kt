@@ -26,7 +26,7 @@ import org.lanternpowered.server.data.io.store.item.ItemStackStore
 import org.lanternpowered.server.inventory.LanternItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.value.ContextualValueCodec
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.text.NetworkText
 import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.persistence.DataContainer

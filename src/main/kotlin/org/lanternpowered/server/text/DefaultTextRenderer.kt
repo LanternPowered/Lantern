@@ -10,12 +10,12 @@
  */
 package org.lanternpowered.server.text
 
-import net.kyori.adventure.translation.TranslationRegistry
 import org.lanternpowered.api.locale.Locale
+import org.lanternpowered.api.text.translation.Translator
 import java.text.MessageFormat
 
-class DefaultTextRenderer(private val translationRegistry: TranslationRegistry) : LanternTextRenderer<Locale>() {
+class DefaultTextRenderer(private val translator: Translator) : LanternTextRenderer<Locale>() {
 
     override fun translate(key: String, context: Locale): MessageFormat? =
-            this.translationRegistry.translate(key, context)
+            this.translator.translate(key, context)
 }

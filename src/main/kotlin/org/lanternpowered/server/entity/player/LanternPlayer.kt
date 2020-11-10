@@ -150,7 +150,7 @@ class LanternPlayer(
         private val BOUNDING_BOX_EXTENT = AABB(Vector3d(-0.3, 0.0, -0.3), Vector3d(0.3, 1.8, 0.3))
     }
 
-    private val interactionHandler = PlayerInteractionHandler(this)
+    val interactionHandler = PlayerInteractionHandler(this)
     private val _user: LanternUser by lazy { this.server.userManager.getOrCreate(this.profile) as LanternUser }
 
     init {
@@ -253,10 +253,10 @@ class LanternPlayer(
     override fun handleDeath(causeStack: CauseStack) {
         // Call the harvest event
         val keepsInventory: Boolean = this.world.getGameRule(GameRules.KEEP_INVENTORY)
-        val exp = if (keepsInventory) 0 else min(100, this.get(Keys.EXPERIENCE_LEVEL).orElse(0) * 7)
-        // Humanoids get their own sub-interface for the event
+        val experienceLevel = this.get(Keys.EXPERIENCE_LEVEL).orElse(0)
+        val experience = if (keepsInventory) 0 else min(100, experienceLevel * 7)
         val harvestEvent = LanternEventFactory.createHarvestEntityEventTargetPlayer(
-                causeStack.currentCause, exp, exp, this, keepsInventory, keepsInventory, 0)
+                causeStack.currentCause, experience, experience, this, keepsInventory, keepsInventory, experienceLevel)
         EventManager.post(harvestEvent)
         if (!harvestEvent.isCancelled) {
             val drops = mutableListOf<ItemStackSnapshot>()
@@ -271,7 +271,7 @@ class LanternPlayer(
             if (!harvestEvent.keepsLevel())
                 this.offer(Keys.EXPERIENCE_LEVEL, harvestEvent.level)
             // Finalize the harvest event
-            this.finalizeHarvestEvent(causeStack, harvestEvent, drops)
+            this.finalizeHarvestEvent(causeStack, harvestEvent, drops, harvestEvent.experience)
         }
 
         // Ban the player if the world is hardcode
@@ -374,11 +374,11 @@ class LanternPlayer(
 
     // endregion
 
-    private val resourcePacketSendQueue = ResourcePackSendQueue(this)
+    val resourcePacketSendQueue = ResourcePackSendQueue(this)
 
     override fun sendResourcePack(pack: ResourcePack) = this.resourcePacketSendQueue.offer(pack)
 
-    override fun getDisplayedSkinParts(): Set<SkinPart> = this.require(LanternKeys.DISPLAYED_SKIN_PARTS)
+    override fun getDisplayedSkinParts(): Set<SkinPart> = this.require(Keys.DISPLAYED_SKIN_PARTS)
 
     private val tabList = LanternTabList(this)
 
@@ -630,13 +630,7 @@ class LanternPlayer(
 
     // endregion
 
-    private var networkId = -1
-
-    override fun getNetworkId(): Int = this.networkId
-
-    fun setNetworkId(id: Int) {
-        this.networkId = id
-    }
+    override var networkId = -1
 
     override fun sendEnvironment(dimensionType: DimensionType) {
         TODO("Not yet implemented")
@@ -658,9 +652,9 @@ class LanternPlayer(
         val xPos = position.x
         val yPos = position.y
         val zPos = position.z
-        val centralX = xPos.toInt() shr 4
-        val centralY = yPos.toInt() shr 4
-        val centralZ = zPos.toInt() shr 4
+        val centralX = Chunks.toChunk(xPos.toInt())
+        val centralY = Chunks.toChunk(yPos.toInt())
+        val centralZ = Chunks.toChunk(zPos.toInt())
 
         val chunkPos = ChunkPosition(centralX, centralY, centralZ)
 
@@ -720,4 +714,16 @@ class LanternPlayer(
     }
 
     // endregion
+
+    fun handleRespawn() {
+        TODO()
+    }
+
+    fun handleStartElytraFlying() {
+        TODO()
+    }
+
+    fun handleOnGroundState(isOnGround: Boolean) {
+        this.onGround = isOnGround
+    }
 }

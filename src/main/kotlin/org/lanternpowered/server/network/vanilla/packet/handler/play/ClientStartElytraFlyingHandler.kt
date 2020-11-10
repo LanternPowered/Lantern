@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientStartEly
 
 object ClientStartElytraFlyingHandler : PacketHandler<ClientStartElytraFlyingPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientStartElytraFlyingPacket) {
-        context.session.player.handleStartElytraFlying()
+    override fun handle(ctx: NetworkContext, packet: ClientStartElytraFlyingPacket) {
+        ctx.session.player.handleStartElytraFlying()
     }
 }

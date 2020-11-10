@@ -18,4 +18,4 @@ typealias Book = net.kyori.adventure.inventory.Book
  * Constructs a new book with the given [title], [author] and [pages].
  */
 fun bookOf(title: Text, author: Text, pages: Collection<Text>): Book =
-        Book.of(title, author, pages)
+        Book.book(title, author, pages)

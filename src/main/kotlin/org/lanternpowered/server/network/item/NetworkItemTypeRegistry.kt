@@ -81,7 +81,7 @@ object NetworkItemTypeRegistry {
     fun load(registry: CatalogTypeRegistry<ItemType>) {
         // Start counting after the vanilla ids
         var internalIdCounter = this.networkIdToVanilla.keys.max()!! + 1
-        for (type in registry.all) {
+        for (type in registry) {
             type as LanternItemType
             val data = this.vanillaToData[type.key]
             val internalId = data?.networkId ?: internalIdCounter++

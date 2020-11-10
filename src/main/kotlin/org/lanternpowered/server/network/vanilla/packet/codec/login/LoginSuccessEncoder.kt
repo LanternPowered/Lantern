@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.login
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.login.LoginSuccessPacket
 
 object LoginSuccessEncoder : PacketEncoder<LoginSuccessPacket> {

@@ -481,4 +481,11 @@ public final class LanternEventFactory {
             final @NonNull AdvancementTree tree) {
         return SpongeEventFactory.createAdvancementTreeEventGenerateLayout(cause, layout, tree);
     }
+
+    public static ChangeInventoryEvent.@NonNull SwapHand createChangeInventoryEventSwapHand(
+            @NonNull Cause cause,
+            @NonNull Inventory inventory,
+            @NonNull List<@NonNull SlotTransaction> transactions) {
+        return SpongeEventFactory.createChangeInventoryEventSwapHand(cause, inventory, transactions);
+    }
 }

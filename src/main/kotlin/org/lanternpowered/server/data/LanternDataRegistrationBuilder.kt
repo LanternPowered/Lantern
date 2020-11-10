@@ -66,7 +66,7 @@ class LanternDataRegistrationBuilder : AbstractCatalogBuilder<DataRegistration, 
     override fun build(key: NamespacedKey): DataRegistration {
         val keys = this.keys.toImmutableSet()
         check(keys.isNotEmpty()) { "At least one key must be added" }
-        val pluginContainer = CauseStack.current().first<PluginContainer>()!!
+        val pluginContainer = CauseStack.first<PluginContainer>()!!
         val providers = this.providers.toImmutableMap()
         val stores = this.stores.toImmutableList()
         return LanternDataRegistration(key, pluginContainer, keys, stores, providers)

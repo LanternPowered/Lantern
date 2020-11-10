@@ -30,7 +30,7 @@ import kotlin.reflect.KClass
  * @return The found type, if available
  * @see CatalogType
  */
-inline fun <reified T : CatalogType> CatalogRegistry.require(key: NamespacedKey): T = require(T::class, key)
+inline fun <reified T : CatalogType> CatalogRegistry.require(key: NamespacedKey): T = this.require(T::class, key)
 
 /**
  * Attempts to retrieve the specific type of {@link CatalogType} based on
@@ -45,7 +45,7 @@ inline fun <reified T : CatalogType> CatalogRegistry.require(key: NamespacedKey)
  * @return The found type, if available
  * @see CatalogType
  */
-inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: NamespacedKey): T? = get(T::class, key)
+inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: NamespacedKey): T? = this.get(T::class, key)
 
 /**
  * Provides the [T] that will be used to get [CatalogType] instances.
@@ -60,7 +60,7 @@ inline operator fun <reified T : CatalogType> CatalogRegistry.get(key: Namespace
  * @throws UnknownTypeException If the type provided has not been registered
  * @throws UnsupportedOperationException If the registry is a mutable registry
  */
-inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String): CatalogTypeProvider<T> = provide(T::class, suggestedId)
+inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String): CatalogTypeProvider<T> = this.provide(T::class, suggestedId)
 
 /**
  * Gets a collection of all available found specific types of
@@ -73,7 +73,7 @@ inline fun <reified T : CatalogType> CatalogRegistry.provide(suggestedId: String
  * @param T The type of [CatalogType]
  * @return A collection of all known types of the requested catalog type
  */
-inline fun <reified T : CatalogType> CatalogRegistry.getAllOf(): Collection<T> = getAllOf(T::class)
+inline fun <reified T : CatalogType> CatalogRegistry.getAllOf(): Collection<T> = this.getAllOf(T::class)
 
 /**
  * The catalog registry.
@@ -86,7 +86,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
             replaceWith = ReplaceWith("provide(catalogClass, suggestedId)")
     )
     override fun <T : CatalogType, E : T> provideSupplier(catalogClass: Class<T>, suggestedId: String): Supplier<E> =
-            provide(catalogClass.kotlin, suggestedId)
+            this.provide(catalogClass.kotlin, suggestedId)
 
     /**
      * Creates a [CatalogTypeProvider] that will be used to get [CatalogType] instances.
@@ -131,7 +131,7 @@ interface CatalogRegistry : org.spongepowered.api.registry.CatalogRegistry {
      * @see CatalogType
      */
     fun <T : CatalogType> require(typeClass: KClass<T>, key: NamespacedKey): T =
-            get(typeClass, key) ?: throw IllegalArgumentException("Can't find a ${typeClass.simpleName} with the key: $key")
+            this.get(typeClass, key) ?: throw IllegalArgumentException("Can't find a ${typeClass.simpleName} with the key: $key")
 
     /**
      * Gets a collection of all available found specific types of

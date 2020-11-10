@@ -16,8 +16,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientUseEntit
 
 object ClientUseEntityInteractHandler : PacketHandler<ClientUseEntityPacket.Interact> {
 
-    override fun handle(context: NetworkContext, packet: ClientUseEntityPacket.Interact) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientUseEntityPacket.Interact) {
+        val player = ctx.session.player
         player.world.entityProtocolManager.playerInteract(player, packet.entityId, packet.position)
     }
 }

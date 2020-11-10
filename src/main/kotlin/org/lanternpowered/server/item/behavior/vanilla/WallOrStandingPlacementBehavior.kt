@@ -61,9 +61,7 @@ class WallOrStandingPlacementBehavior private constructor(
         val blockType = blockState.type as LanternBlockType
         context.addContext(ContextKeys.BLOCK_TYPE, blockType)
         context.addContext(ContextKeys.USED_BLOCK_STATE, blockState)
-        return context.process(blockType.pipeline.pipeline(PlaceBlockBehavior::class.java)) {
-            ctx, bh: PlaceBlockBehavior -> bh.tryPlace(pipeline, ctx)
-        }.isSuccess
+        return context.process(blockType.pipeline.pipeline(PlaceBlockBehavior::class.java)) { ctx, bh -> bh.tryPlace(pipeline, ctx) }.isSuccess
     }
 
     companion object {

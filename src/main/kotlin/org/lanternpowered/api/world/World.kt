@@ -16,6 +16,7 @@ import org.lanternpowered.api.entity.spawn.EntitySpawner
 import org.lanternpowered.api.world.weather.WeatherUniverse
 import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.util.AABB
+import org.spongepowered.api.world.gamerule.GameRuleHolder
 import org.spongepowered.api.world.server.ServerWorld
 import kotlin.contracts.contract
 import org.spongepowered.api.world.World as SpongeWorld
@@ -71,7 +72,7 @@ inline fun World.getIntersectingEntities(box: AABB, noinline filter: (Entity) ->
 /**
  * World extensions.
  */
-interface ExtendedWorld : World {
+interface ExtendedWorld : World, GameRuleHolder {
 
     /**
      * The weather universe of this world, if it exists.

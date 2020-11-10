@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.api.cause
 
+import org.lanternpowered.api.Lantern
 import java.util.Optional
 import java.util.function.Supplier
 import kotlin.contracts.InvocationKind
@@ -24,10 +25,10 @@ inline fun CauseStack.withCause(cause: Any, block: () -> Unit) {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
     try {
-        pushCause(cause)
+        this.pushCause(cause)
         block()
     } finally {
-        popCause()
+        this.popCause()
     }
 }
 
@@ -41,12 +42,12 @@ inline fun CauseStack.withCauses(iterable: Iterable<Any>, block: () -> Unit) {
     var count = 0
     try {
         for (cause in iterable) {
-            pushCause(cause)
+            this.pushCause(cause)
             count++
         }
         block()
     } finally {
-        popCauses(count)
+        this.popCauses(count)
     }
 }
 
@@ -59,15 +60,15 @@ inline fun CauseStack.withCauses(first: Any, second: Any, vararg more: Any, bloc
     }
     var count = 2
     try {
-        pushCause(first)
-        pushCause(second)
+        this.pushCause(first)
+        this.pushCause(second)
         for (cause in more) {
-            pushCause(cause)
+            this.pushCause(cause)
             count++
         }
         block()
     } finally {
-        popCauses(count)
+        this.popCauses(count)
     }
 }
 
@@ -79,7 +80,7 @@ inline fun CauseStack.withFrame(block: (frame: CauseStack.Frame) -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    pushCauseFrame().use(block)
+    this.pushCauseFrame().use(block)
 }
 
 /**
@@ -107,7 +108,8 @@ inline fun <reified T : Any> CauseStack.last(): T? = last(T::class)
 inline fun <reified T : Any> CauseStack.containsType(): Boolean = containsType(T::class)
 
 /**
- * A [CauseStack] for a specific [Thread].
+ * A [CauseStack] for a specific context. Usually, each thread
+ * will use it's own [CauseStack].
  */
 interface CauseStack : org.spongepowered.api.event.CauseStackManager {
 
@@ -118,7 +120,7 @@ interface CauseStack : org.spongepowered.api.event.CauseStackManager {
      * @param T The type of the value stored with the event context key
      * @return The context object, if present
      */
-    operator fun <T : Any> get(key: Supplier<out CauseContextKey<T>>): T? = get(key.get())
+    operator fun <T : Any> get(key: Supplier<out CauseContextKey<T>>): T? = this[key.get()]
 
     /**
      * Gets the context value with the given key.
@@ -136,7 +138,7 @@ interface CauseStack : org.spongepowered.api.event.CauseStackManager {
      * @param value The object
      * @param T The type of the value stored with the event context key
      */
-    operator fun <T : Any> set(key: Supplier<out CauseContextKey<T>>, value: T) = set(key.get(), value)
+    operator fun <T : Any> set(key: Supplier<out CauseContextKey<T>>, value: T) = this.set(key.get(), value)
 
     /**
      * Adds the given object to the current context under the given key.
@@ -219,13 +221,14 @@ interface CauseStack : org.spongepowered.api.event.CauseStackManager {
         override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): Frame
     }
 
-    companion object {
-
-        /**
-         * Gets the current [Cause].
-         */
-        val currentCause: Cause
-            get() = this.current().currentCause
+    /**
+     * Represents a cause stack which will access the current cause stack, or throw
+     * [IllegalStateException]s if the current context doesn't have a cause stack.
+     *
+     * The `current` functions can be used to access the actual [CauseStack]
+     * for the current context.
+     */
+    companion object : CauseStack by Lantern.causeStackManager {
 
         /**
          * Gets the [CauseStack] for the current [Thread].
@@ -234,26 +237,26 @@ interface CauseStack : org.spongepowered.api.event.CauseStackManager {
          * @return The cause stack
          */
         @JvmStatic
-        fun currentOrNull() = CauseStackManager.currentStackOrNull()
+        fun currentOrNull(): CauseStack? = CauseStackManager.currentStackOrNull()
 
         /**
-         * Gets the [CauseStack] for the current [Thread]. A
+         * Gets the [CauseStack] for the current [Thread]. An
          * empty [CauseStack] will be returned if the thread
          * isn't supported.
          *
          * @return The cause stack
          */
         @JvmStatic
-        fun currentOrEmpty() = CauseStackManager.currentStackOrEmpty()
+        fun currentOrEmpty(): CauseStack = CauseStackManager.currentStackOrEmpty()
 
         /**
-         * Gets the [CauseStack] for the current [Thread]. A
+         * Gets the [CauseStack] for the current [Thread]. An
          * [IllegalStateException] will be thrown if the current thread
          * isn't supported.
          *
          * @return The cause stack
          */
         @JvmStatic
-        fun current() = CauseStackManager.currentStack()
+        fun current(): CauseStack = CauseStackManager.currentStack()
     }
 }

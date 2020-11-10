@@ -16,9 +16,9 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerSw
 
 object ClientPlayerSwingArmHandler : PacketHandler<ClientPlayerSwingArmPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientPlayerSwingArmPacket) {
-        val player = context.session.player
-        player.resetIdleTimeoutCounter()
+    override fun handle(ctx: NetworkContext, packet: ClientPlayerSwingArmPacket) {
+        val player = ctx.session.player
+        player.resetIdleTime()
         player.resetOpenedSignPosition()
         player.interactionHandler.handleSwingArm(packet)
     }

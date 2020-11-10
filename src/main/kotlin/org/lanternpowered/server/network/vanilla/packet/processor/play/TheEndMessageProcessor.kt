@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.processor.play
 
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.TheEndPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.internal.ChangeGameStatePacket

@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.BlockActionPac
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UpdateBlockEntityPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChunkPacket;
-import org.lanternpowered.server.network.vanilla.packet.type.play.PacketPlayOutMultiBlockChange;
+import org.lanternpowered.server.network.vanilla.packet.type.play.MultiBlockChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnloadChunkPacket;
 import org.lanternpowered.api.util.palette.Palette;
 import org.lanternpowered.api.util.VariableValueArray;
@@ -285,7 +285,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 } else {
                     packets = new ArrayList<>();
                     if (changes.size() > 1) {
-                        packets.add(new PacketPlayOutMultiBlockChange(
+                        packets.add(new MultiBlockChangePacket(
                                 this.coords.getX(), this.coords.getY(), changes.stream().map(coords -> {
                             final int x = coords.getX() & 0xf;
                             final int z = coords.getZ() & 0xf;

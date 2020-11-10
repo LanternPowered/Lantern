@@ -15,7 +15,7 @@ import org.lanternpowered.api.util.math.component2
 import org.lanternpowered.api.util.math.component3
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.NamedSoundEffectPacket
 
 object NamedSoundEffectEncoder : PacketEncoder<NamedSoundEffectPacket> {

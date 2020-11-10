@@ -174,7 +174,6 @@ import org.lanternpowered.server.item.recipe.smelting.LanternSmeltingRecipeRegis
 import org.lanternpowered.server.network.block.BlockEntityProtocolType;
 import org.lanternpowered.server.network.block.BlockEntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
-import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;

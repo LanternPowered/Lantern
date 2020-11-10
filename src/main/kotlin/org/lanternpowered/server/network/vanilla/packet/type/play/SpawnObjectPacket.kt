@@ -11,6 +11,7 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.value.PackedAngle
 import org.spongepowered.math.vector.Vector3d
 import java.util.UUID
 
@@ -20,7 +21,7 @@ data class SpawnObjectPacket(
         val objectType: Int,
         val objectData: Int,
         val position: Vector3d,
-        val yaw: Int,
-        val pitch: Int,
+        val yaw: PackedAngle,
+        val pitch: PackedAngle,
         val velocity: Vector3d
 ) : Packet

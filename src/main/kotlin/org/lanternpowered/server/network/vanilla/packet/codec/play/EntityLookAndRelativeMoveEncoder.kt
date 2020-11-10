@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookAndRelativeMovePacket
 
 object EntityLookAndRelativeMoveEncoder : PacketEncoder<EntityLookAndRelativeMovePacket> {
@@ -23,8 +23,8 @@ object EntityLookAndRelativeMoveEncoder : PacketEncoder<EntityLookAndRelativeMov
         buf.writeShort(packet.deltaX.toShort())
         buf.writeShort(packet.deltaY.toShort())
         buf.writeShort(packet.deltaZ.toShort())
-        buf.writeByte(packet.yaw)
-        buf.writeByte(packet.pitch)
+        buf.writeByte(packet.yaw.packed)
+        buf.writeByte(packet.pitch.packed)
         buf.writeBoolean(packet.isOnGround)
         return buf
     }

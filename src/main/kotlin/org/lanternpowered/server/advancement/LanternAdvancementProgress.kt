@@ -147,7 +147,7 @@ class LanternAdvancementProgress internal constructor(
                 message = playerName + textOf(" achieved ") + advancementText
             }
 
-            val cause = CauseStack.current().currentCause
+            val cause = CauseStack.currentCause
             val instant = this.get().get()
             val audience = this.player.server.broadcastAudience
 
@@ -162,7 +162,7 @@ class LanternAdvancementProgress internal constructor(
                 if (!progress.achieved())
                     progress.attachTrigger()
             }
-            val cause = CauseStack.current().currentCause
+            val cause = CauseStack.currentCause
             val event = LanternEventFactory.createAdvancementEventRevoke(
                     cause, this.advancement, this.player)
             EventManager.post(event)

@@ -28,7 +28,6 @@ import org.spongepowered.math.vector.Vector3f
 import org.spongepowered.math.vector.Vector3i
 import java.io.InputStream
 import java.io.OutputStream
-import java.nio.charset.StandardCharsets
 import java.util.OptionalInt
 import java.util.UUID
 
@@ -526,7 +525,7 @@ class LanternByteBuffer(val delegate: ByteBuf) : ByteBuffer {
 
     companion object {
 
-        private val UTF_8 = StandardCharsets.UTF_8
+        private val UTF_8 = Charsets.UTF_8
 
         /**
          * Writes a optional int to the [ByteBuf].
@@ -536,9 +535,8 @@ class LanternByteBuffer(val delegate: ByteBuf) : ByteBuffer {
          */
         fun writeOptVarInt(byteBuf: ByteBuf, optValue: OptionalInt) {
             var value: Long = 0
-            if (optValue.isPresent) {
+            if (optValue.isPresent)
                 value = (optValue.asInt shl 1 or 1.toLong().toInt()).toLong()
-            }
             writeVarLong(byteBuf, value)
         }
 

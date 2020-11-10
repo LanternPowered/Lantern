@@ -25,8 +25,8 @@ import kotlin.streams.toList
 
 object ClientSignBookHandler : PacketHandler<ClientModifyBookPacket.Sign> {
 
-    override fun handle(context: NetworkContext, packet: ClientModifyBookPacket.Sign) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientModifyBookPacket.Sign) {
+        val player = ctx.session.player
         val slot = player.inventory.hotbar.selectedSlot
         val itemStack: ItemStack = slot.peek()
 

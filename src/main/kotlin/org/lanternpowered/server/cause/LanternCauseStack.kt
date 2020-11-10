@@ -15,6 +15,7 @@ import org.lanternpowered.api.cause.CauseContext
 import org.lanternpowered.api.cause.CauseContextKey
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.util.optional.asOptional
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.game.Lantern
 import org.lanternpowered.server.util.PrettyPrinter
 import org.lanternpowered.server.util.SystemProperties
@@ -35,7 +36,7 @@ class LanternCauseStack : CauseStack {
     override fun getCurrentCause(): Cause {
         if (this.cachedCause == null || this.cachedCtx == null) {
             if (this.cause.isEmpty()) {
-                this.cachedCause = Cause.of(currentContext, Lantern.getGame())
+                this.cachedCause = Cause.of(currentContext, LanternGame)
             } else {
                 this.cachedCause = Cause.of(currentContext, this.cause)
             }

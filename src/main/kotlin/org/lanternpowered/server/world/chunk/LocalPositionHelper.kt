@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.world.chunk
 
+import org.spongepowered.math.vector.Vector3i
+
 object LocalPositionHelper {
 
     /*
@@ -17,15 +19,23 @@ object LocalPositionHelper {
      * y (4 bits) | z (4 bits) | x (4 bits)
      */
 
-    @JvmStatic
-    fun pack(localX: Int, localY: Int, localZ: Int): Short = ((localY shl 8) or (localZ shl 4) or localX).toShort()
+    /**
+     * The number of bits used to pack local positions.
+     */
+    val Bits = Chunks.LocalIndexBits
 
     @JvmStatic
-    fun unpackX(packed: Short): Int = packed.toInt() and 0xf
+    fun pack(local: Vector3i): Short = this.pack(local.x, local.y, local.z)
 
     @JvmStatic
-    fun unpackZ(packed: Short): Int = (packed.toInt() shr 4) and 0xf
+    fun pack(localX: Int, localY: Int, localZ: Int): Short = ((localY shl (Chunks.Bits * 2)) or (localZ shl Chunks.Bits) or localX).toShort()
 
     @JvmStatic
-    fun unpackY(packed: Short): Int = (packed.toInt() shr 8) and 0xf
+    fun unpackX(packed: Short): Int = packed.toInt() and Chunks.Mask
+
+    @JvmStatic
+    fun unpackZ(packed: Short): Int = (packed.toInt() shr Chunks.Bits) and Chunks.Mask
+
+    @JvmStatic
+    fun unpackY(packed: Short): Int = (packed.toInt() shr (Chunks.Bits * 2)) and Chunks.Mask
 }

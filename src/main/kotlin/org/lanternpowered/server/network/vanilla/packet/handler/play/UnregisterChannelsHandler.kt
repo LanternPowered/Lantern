@@ -16,9 +16,9 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.UnregisterChan
 
 object UnregisterChannelsHandler : PacketHandler<UnregisterChannelsPacket> {
 
-    override fun handle(context: NetworkContext, packet: UnregisterChannelsPacket) {
+    override fun handle(ctx: NetworkContext, packet: UnregisterChannelsPacket) {
         val channels = packet.channels
-        val registeredChannels = context.session.registeredChannels
+        val registeredChannels = ctx.session.registeredChannels
         registeredChannels.removeAll(channels)
     }
 }

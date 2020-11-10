@@ -13,6 +13,7 @@ package org.lanternpowered.server.inventory.slot
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.item.inventory.ItemStackSnapshot
+import org.lanternpowered.api.item.inventory.ViewableInventory
 import org.lanternpowered.api.item.inventory.emptyItemStack
 import org.lanternpowered.api.item.inventory.slot.ExtendedSlot
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
@@ -24,7 +25,6 @@ import org.lanternpowered.server.inventory.InventoryView
 import org.lanternpowered.server.inventory.SlotChangeTracker
 import org.lanternpowered.server.inventory.TransactionConsumer
 import org.lanternpowered.server.item.predicate.ItemPredicate
-import org.spongepowered.api.item.inventory.type.ViewableInventory
 import java.util.HashSet
 import kotlin.math.min
 

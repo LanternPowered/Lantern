@@ -49,48 +49,58 @@ fun Text.toPlain(): String = PlainTextSerializer.serialize(this)
  * Gets an empty [Text].
  */
 inline fun emptyText(): LiteralText =
-        LiteralText.empty()
+        Text.empty()
 
 /**
  * Creates a new [LiteralText].
  */
 inline fun textOf(text: String): LiteralText =
-        LiteralText.of(text)
+        Text.text(text)
+
+/**
+ * Creates a new [LiteralTextBuilder].
+ */
+fun literalTextBuilderOf(): LiteralTextBuilder = Text.text()
+
+/**
+ * Creates a new [LiteralTextBuilder] with the given content.
+ */
+fun literalTextBuilderOf(content: String): LiteralTextBuilder = literalTextBuilderOf().content(content);
 
 /**
  * Creates a new [Text].
  */
 inline fun textOf(vararg text: TextRepresentable): Text =
-        LiteralText.builder().append(text.asList()).build()
+        Text.text().append(text.asList()).build()
 
 /**
  * Creates a new [TranslatableText].
  */
 inline fun translatableTextOf(key: String): TranslatableText =
-        TranslatableText.of(key)
+        Text.translatable(key)
 
 /**
  * Creates a new [TranslatableText].
  */
 fun translatableTextOf(key: String, vararg args: TextRepresentable): TranslatableText =
-        TranslatableText.of(key, args.map { it.toText() })
+        Text.translatable(key, args.map { it.toText() })
 
 /**
  * Creates a new [TranslatableText].
  */
 fun translatableTextOf(key: String, vararg args: String): TranslatableText =
-        TranslatableText.of(key, args.map { it.toText() })
+        Text.translatable(key, args.map { it.toText() })
 
 /**
  * Creates a new [TranslatableText].
  */
 fun translatableTextOf(key: String, args: Iterable<TextRepresentable>): TranslatableText =
-        TranslatableText.of(key, args.map { it.toText() })
+        Text.translatable(key, args.map { it.toText() })
 
 /**
  * Gets this [String] as a [Text] representation.
  */
-inline fun String.toText(): LiteralText = LiteralText.of(this)
+inline fun String.toText(): LiteralText = Text.text(this)
 
 /**
  * Gets this [TextRepresentable] as a [Text] representation.
@@ -142,4 +152,4 @@ inline operator fun Text.plus(other: Text): Text = this.append(other)
 inline operator fun Text.plus(other: String): Text = this.append(other.toText())
 
 fun <B : TextBuilder<*, B>> B.appendNewline(): B =
-        this.append(LiteralText.newline())
+        this.append(Text.newline())

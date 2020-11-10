@@ -38,9 +38,9 @@ object HandshakeHandler : PacketHandler<HandshakePacket> {
     private const val fmlMarker = "\u0000FML\u0000"
     private val gson = Gson()
 
-    override fun handle(context: NetworkContext, packet: HandshakePacket) {
-        val nextState = ProtocolState.byId(packet.nextState).orNull()
-        val session = context.session
+    override fun handle(ctx: NetworkContext, packet: HandshakePacket) {
+        val nextState = ProtocolState.byId(packet.nextState)
+        val session = ctx.session
         if (nextState == null) {
             session.close(translatableTextOf("Unknown protocol state! ($nextState)"))
             return
@@ -50,7 +50,7 @@ object HandshakeHandler : PacketHandler<HandshakePacket> {
             session.close(translatableTextOf("Received a unexpected handshake message! ($nextState)"))
             return
         }
-        val proxyType = context.game.config.server.proxy.type
+        val proxyType = ctx.game.config.server.proxy.type
         var hostname = packet.hostname
         val virtualAddress: InetSocketAddress
         when (proxyType) {
@@ -83,7 +83,7 @@ object HandshakeHandler : PacketHandler<HandshakePacket> {
             ProxyType.LILY_PAD -> {
                 virtualAddress = try {
                     val jsonObject = gson.fromJson<JsonObject>(hostname)
-                    val securityKey = context.game.config.server.proxy.securityKey
+                    val securityKey = ctx.game.config.server.proxy.securityKey
                     // Validate the security key
                     if (securityKey.isNotEmpty() && jsonObject["s"].asString != securityKey) {
                         session.close(textOf("Proxy security key mismatch"))
@@ -95,14 +95,12 @@ object HandshakeHandler : PacketHandler<HandshakePacket> {
                     val properties: Multimap<String, ProfileProperty> = LinkedHashMultimap.create()
                     if (jsonObject.has("p")) {
                         val jsonArray = jsonObject.getAsJsonArray("p")
-                        var i = 0
-                        while (i < jsonArray.size()) {
-                            val property = jsonArray[i].asJsonObject
+                        for (property in jsonArray) {
+                            property as JsonObject
                             val propertyName = property["n"].asString
                             val propertyValue = property["v"].asString
                             val propertySignature = if (property.has("s")) property["s"].asString else null
                             properties.put(propertyName, LanternProfileProperty(propertyName, propertyValue, propertySignature))
-                            i++
                         }
                     }
                     session.attr(LoginStartHandler.SPOOFED_GAME_PROFILE).set(LanternGameProfile(uniqueId, name, properties))
@@ -127,7 +125,7 @@ object HandshakeHandler : PacketHandler<HandshakePacket> {
         session.virtualHost = virtualAddress
         session.protocolVersion = packet.protocolVersion
         if (nextState == ProtocolState.Login) {
-            val version = context.game.platform.minecraftVersion
+            val version = ctx.game.platform.minecraftVersion
             if (packet.protocolVersion < version.protocol) {
                 session.close(translatableTextOf("multiplayer.disconnect.outdated_client", version.name.toText()))
             } else if (packet.protocolVersion > version.protocol) {

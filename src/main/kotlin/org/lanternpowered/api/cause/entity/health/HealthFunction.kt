@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.api.cause.entity.health
 
-import org.spongepowered.api.event.cause.entity.ModifierFunction
+import org.spongepowered.api.event.cause.entity.damage.ModifierFunction
 import java.util.function.DoubleUnaryOperator
 
 data class HealthFunction(

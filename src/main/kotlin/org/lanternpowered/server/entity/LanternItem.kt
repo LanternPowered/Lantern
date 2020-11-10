@@ -14,7 +14,12 @@ import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.cause.withFrame
 import org.lanternpowered.api.data.Keys
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.item.inventory.Carrier
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.emptyItemStackSnapshot
+import org.lanternpowered.api.item.inventory.fix
 import org.lanternpowered.api.item.inventory.stack.asSnapshot
+import org.lanternpowered.api.item.inventory.stack.isNotEmpty
 import org.lanternpowered.api.item.inventory.stack.isSimilarTo
 import org.lanternpowered.api.util.duration.max
 import org.lanternpowered.api.util.math.plus
@@ -22,32 +27,20 @@ import org.lanternpowered.api.util.math.times
 import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.api.world.getIntersectingBlockCollisionBoxes
 import org.lanternpowered.api.world.getIntersectingEntities
-import org.lanternpowered.server.data.key.LanternKeys
 import org.lanternpowered.server.effect.entity.EntityEffectCollection
 import org.lanternpowered.server.effect.entity.EntityEffectTypes
 import org.lanternpowered.server.effect.entity.particle.item.ItemDeathParticleEffect
 import org.lanternpowered.server.entity.event.CollectEntityEvent
 import org.lanternpowered.server.event.LanternEventContextKeys
 import org.lanternpowered.server.event.LanternEventFactory
-import org.lanternpowered.server.inventory.IInventory
-import org.lanternpowered.server.inventory.LanternItemStack
 import org.lanternpowered.server.network.entity.EntityProtocolTypes
-import org.spongepowered.api.Sponge
-import org.spongepowered.api.entity.Entity
 import org.spongepowered.api.entity.Item
 import org.spongepowered.api.entity.living.Living
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent.Pickup
-import org.spongepowered.api.item.inventory.Carrier
-import org.spongepowered.api.item.inventory.Inventory
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
-import org.spongepowered.api.item.inventory.entity.PlayerInventory
-import org.spongepowered.api.item.inventory.transaction.SlotTransaction
 import org.spongepowered.api.util.AABB
 import org.spongepowered.api.util.Direction
 import org.spongepowered.math.vector.Vector3d
 import kotlin.time.Duration
-import kotlin.time.milliseconds
 import kotlin.time.seconds
 
 class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData), Item {
@@ -71,30 +64,20 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
         this.effectCollection = DEFAULT_EFFECT_COLLECTION.copy()
 
         keyRegistry {
-            register(Keys.ITEM_STACK_SNAPSHOT, ItemStackSnapshot.empty())
-            registerBounded(LanternKeys.PICKUP_DELAY, 0.5.seconds).minimum(Duration.ZERO).coerceInBounds()
-            registerBounded(LanternKeys.DESPAWN_DELAY, 300.seconds).minimum(Duration.ZERO).coerceInBounds()
-            register(LanternKeys.GRAVITY_FACTOR, 0.002)
+            register(Keys.ITEM_STACK_SNAPSHOT, emptyItemStackSnapshot())
+            registerBounded(Keys.PICKUP_DELAY, 0.5.seconds).minimum(Duration.ZERO).coerceInBounds()
+            registerBounded(Keys.DESPAWN_DELAY, 300.seconds).minimum(Duration.ZERO).coerceInBounds()
+            register(Keys.GRAVITATIONAL_ACCELERATION, 0.04)
             register(Keys.INFINITE_PICKUP_DELAY, false)
             register(Keys.INFINITE_DESPAWN_DELAY, false)
-
-            // TODO: Replace lantern keys with sponge keys once duration is added
-            registerProvider(Keys.PICKUP_DELAY) {
-                get { (this.require(LanternKeys.PICKUP_DELAY).inMilliseconds / 50).toInt() }
-                setFastAnd { value -> this.offerFast(LanternKeys.PICKUP_DELAY, (value * 50).milliseconds) }
-            }
-            registerProvider(Keys.DESPAWN_DELAY) {
-                get { (this.require(LanternKeys.DESPAWN_DELAY).inMilliseconds / 50).toInt() }
-                setFastAnd { value -> this.offerFast(LanternKeys.DESPAWN_DELAY, (value * 50).milliseconds) }
-            }
         }
     }
 
     override fun update(deltaTime: Duration) {
         super.update(deltaTime)
 
-        var pickupDelay = this.require(LanternKeys.PICKUP_DELAY)
-        var despawnDelay = this.require(LanternKeys.DESPAWN_DELAY)
+        var pickupDelay = this.require(Keys.PICKUP_DELAY)
+        var despawnDelay = this.require(Keys.DESPAWN_DELAY)
 
         val infinitePickupDelay = this.require(Keys.INFINITE_PICKUP_DELAY)
         val infiniteDespawnDelay = this.require(Keys.INFINITE_DESPAWN_DELAY)
@@ -124,17 +107,16 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
         if (timer > 0.5.seconds && !infinitePickupDelay && pickupDelay <= Duration.ZERO)
             this.tryToPickupItems()
         if (pickupDelay != oldPickupDelay)
-            this.offer(LanternKeys.PICKUP_DELAY, pickupDelay)
+            this.offer(Keys.PICKUP_DELAY, pickupDelay)
         if (despawnDelay != oldDespawnDelay)
-            this.offer(LanternKeys.DESPAWN_DELAY, despawnDelay)
+            this.offer(Keys.DESPAWN_DELAY, despawnDelay)
         if (despawnDelay <= Duration.ZERO) {
-            val causeStack = CauseStack.current()
-            causeStack.pushCauseFrame().use { frame ->
+            CauseStack.withFrame { frame ->
                 frame.pushCause(this)
 
                 // Throw the expire entity event
                 val event = LanternEventFactory.createExpireEntityEvent(
-                        causeStack.currentCause, this)
+                        frame.currentCause, this)
                 EventManager.post(event)
 
                 // Remove the item, also within this context
@@ -156,18 +138,18 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
 
         // We will check if there is a collision box under the entity
         var ground = false
-        val thisBox = boundingBox.get().offset(0.0, -0.1, 0.0)
-        val boxes: Set<AABB> = world.getIntersectingBlockCollisionBoxes(thisBox)
+        val thisBox = this.boundingBox.get().offset(0.0, -0.1, 0.0)
+        val boxes: Set<AABB> = this.world.getIntersectingBlockCollisionBoxes(thisBox)
         for (box in boxes) {
             val factor = box.center.sub(thisBox.center)
             if (Direction.getClosest(factor).isUpright)
                 ground = true
         }
-        if (!ground) {
-            val gravityFactor = this.get(LanternKeys.GRAVITY_FACTOR).orNull()
-            if (gravityFactor != null) {
+        if (!ground && this.get(Keys.IS_GRAVITY_AFFECTED).orElse(true)) {
+            val constant = this.get(Keys.GRAVITATIONAL_ACCELERATION).orNull()
+            if (constant != null) {
                 // Apply the gravity factor
-                velocity = velocity.add(0.0, -gravityFactor, 0.0)
+                velocity = velocity.add(0.0, -constant * deltaTime.inSeconds, 0.0)
             }
         }
         velocity = velocity.mul(0.98, 0.98, 0.98)
@@ -178,11 +160,11 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
     }
 
     private fun tryToPickupItems() {
-        val entities: Set<Entity> = this.world.getIntersectingEntities(
+        val entities = this.world.getIntersectingEntities(
                 this.boundingBox.get().expand(2.0, 0.5, 2.0)) { entity -> entity !== this && entity is Carrier }
         if (entities.isEmpty())
             return
-        val stack = this.require(Keys.ITEM_STACK_SNAPSHOT).createStack() as LanternItemStack
+        val stack = this.require(Keys.ITEM_STACK_SNAPSHOT).createStack()
         if (stack.isEmpty) {
             this.remove()
             return
@@ -190,44 +172,42 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
         // TODO: Call pre pickup event
         for (entity in entities) {
             // Ignore dead entities
-            if (entity is LanternLiving && entity.isDead) {
+            if (entity is LanternLiving && entity.isDead)
                 continue
-            }
-            var inventory: Inventory = (entity as Carrier).inventory
+            val inventory = (entity as Carrier).inventory.fix()
+            /*
             if (inventory is PlayerInventory) {
                 // TODO: Get priority hotbar inventory
                 //inventory = inventory.primary.transform(InventoryTransforms.PRIORITY_HOTBAR)
             }
+            */
 
             // Copy before consuming
             val originalStack = stack.copy()
-            val peekResult = (inventory as IInventory).peekOffer(stack)
-            val causeStack = CauseStack.current()
+            val peekResult = inventory.peekOffer(stack)
             var event: Pickup
-            causeStack.withFrame { frame ->
+            CauseStack.withFrame { frame ->
                 frame.addContext(LanternEventContextKeys.ORIGINAL_ITEM_STACK, originalStack)
-                if (stack.isNotEmpty) {
+                if (stack.isNotEmpty)
                     frame.addContext(LanternEventContextKeys.REST_ITEM_STACK, stack)
-                }
                 event = LanternEventFactory.createChangeInventoryEventPickup(
-                        causeStack.currentCause, inventory, peekResult.transactions)
+                        frame.currentCause, inventory, peekResult.transactions)
                 event.isCancelled = peekResult.transactions.isEmpty()
-                Sponge.getEventManager().post(event)
+                EventManager.post(event)
             }
             // Don't continue if the entity was removed during the event
             if (event.isCancelled && !this.isRemoved)
                 continue
 
             event.transactions.stream()
-                    .filter { obj: SlotTransaction -> obj.isValid }
-                    .forEach { transaction: SlotTransaction -> transaction.slot.set(transaction.final.createStack()) }
+                    .filter { transaction -> transaction.isValid }
+                    .forEach { transaction -> transaction.slot.set(transaction.final.createStack()) }
 
             val added = originalStack.quantity - stack.quantity
             if (added != 0 && entity is Living)
                 this.triggerEvent(CollectEntityEvent(entity as Living, added))
-            if (isRemoved) {
+            if (this.isRemoved)
                 stack.quantity = 0
-            }
             if (stack.isEmpty)
                 break
         }
@@ -255,8 +235,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
         // Check if the stack is already at it's maximum size
         if (quantity >= max)
             return null
-        val causeStack = CauseStack.current()
-        val frame = causeStack.pushCauseFrame()
+        val frame = CauseStack.pushCauseFrame()
         frame.pushCause(this)
         // Search for surrounding items
         val entities = this.world.getIntersectingEntities(
@@ -268,7 +247,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
             val otherInfinitePickupDelay = other.require(Keys.INFINITE_PICKUP_DELAY)
             if (otherInfinitePickupDelay)
                 continue
-            val otherPickupDelay = other.require(LanternKeys.PICKUP_DELAY)
+            val otherPickupDelay = other.require(Keys.PICKUP_DELAY)
             val otherItem = other.require(Keys.ITEM_STACK_SNAPSHOT)
 
             var otherQuantity = otherItem.quantity
@@ -279,7 +258,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
 
             // Call the merge event
             val event = LanternEventFactory.createItemMergeWithItemEvent(
-                    causeStack.currentCause, other as Item, this)
+                    frame.currentCause, other as Item, this)
             EventManager.post(event)
             if (event.isCancelled)
                 continue
@@ -298,7 +277,7 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
                 other.offer(Keys.ITEM_STACK_SNAPSHOT, newOtherItem.asSnapshot())
             } else {
                 // The other entity is completely drained and will be removed
-                other.offer(Keys.ITEM_STACK_SNAPSHOT, ItemStackSnapshot.empty())
+                other.offer(Keys.ITEM_STACK_SNAPSHOT, emptyItemStackSnapshot())
                 other.remove()
             }
             // The item stack has changed
@@ -308,13 +287,13 @@ class LanternItem(creationData: EntityCreationData) : LanternEntity(creationData
 
             // When merging items, also merge the pickup and despawn delays
             newPickupDelay = max(newPickupDelay, otherPickupDelay)
-            newDespawnDelay = max(newDespawnDelay, other.require(LanternKeys.DESPAWN_DELAY))
+            newDespawnDelay = max(newDespawnDelay, other.require(Keys.DESPAWN_DELAY))
 
             // The stack is already full, stop here
             if (quantity == max)
                 break
         }
-        causeStack.popCauseFrame(frame)
+        frame.close()
         if (newItem != null) {
             this.offer(Keys.ITEM_STACK_SNAPSHOT, newItem.asSnapshot())
             return CombineData(newPickupDelay, newDespawnDelay)

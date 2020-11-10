@@ -34,7 +34,7 @@ class LanternTabListEntryBuilder : TabListEntry.Builder {
         val list = checkNotNull(this.list) { "list must be set" }
         val profile = checkNotNull(this.profile) { "profile must be set" }
         val gameMode = checkNotNull(this.gameMode) { "game mode must be set" }
-        return LanternTabListEntry(GlobalTabList.instance.getOrCreate(profile), list, gameMode, latency, displayName)
+        return LanternTabListEntry(GlobalTabList.getOrCreate(profile), list, gameMode, latency, displayName)
     }
 
     override fun from(value: TabListEntry): LanternTabListEntryBuilder = apply {

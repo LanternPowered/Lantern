@@ -73,9 +73,8 @@ class LanternLightningBolt(creationData: EntityCreationData) : LanternEntity(cre
         if (this.timeToLive > Duration.ZERO)
             return
 
-        val causeStack = CauseStack.current()
         if (this.remove) {
-            causeStack.withFrame { frame ->
+            CauseStack.withFrame { frame ->
                 // Add this entity to the cause of removal
                 frame.pushCause(this)
                 // Throw the expire and post event
@@ -90,7 +89,7 @@ class LanternLightningBolt(creationData: EntityCreationData) : LanternEntity(cre
             // Play the sound effect
             this.effectCollection.getCombinedOrEmpty(EntityEffectTypes.LIGHTNING).play(this)
 
-            causeStack.withFrame { frame ->
+            CauseStack.withFrame { frame ->
                 frame.pushCause(this)
 
                 val entities: MutableList<Entity> = if (this.require(Keys.IS_EFFECT_ONLY)) {

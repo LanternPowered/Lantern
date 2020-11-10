@@ -26,11 +26,17 @@ private const val TPS_DOUBLE = TPS.toDouble()
 
 fun GlobalKeyRegistry.registerSpongeKeyConversions() {
     convertDurationTicks(SpongeKeys.AGE, Keys.AGE)
+    convertDurationTicks(SpongeKeys.PICKUP_DELAY, Keys.PICKUP_DELAY)
+    convertDurationTicks(SpongeKeys.DESPAWN_DELAY, Keys.DESPAWN_DELAY)
 
     convertMetersPerTick(SpongeKeys.VELOCITY, Keys.VELOCITY)
+    convertMetersPerTick(SpongeKeys.ACCELERATION, Keys.ACCELERATION)
     convertMetersPerTick(SpongeKeys.POTENTIAL_MAX_SPEED, Keys.POTENTIAL_MAX_SPEED)
 
-    convert(SpongeKeys.FOOD_LEVEL, Keys.FOOD, { it.toInt() }, { it.toDouble() })
+    convertInt(SpongeKeys.FOOD_LEVEL, Keys.FOOD)
+    convertInt(SpongeKeys.REPLENISHED_FOOD, Keys.REPLENISHED_FOOD)
+
+    identity(SpongeKeys.INVULNERABLE, Keys.IS_INVULNERABLE)
 }
 
 private val Int.ticks: Duration
@@ -62,6 +68,11 @@ private val Vector3d.inMetersPerSecond: Vector3d
  */
 private val Vector3d.inMetersPerTick: Vector3d
     get() = this / TPS_DOUBLE
+
+private fun <SV : Value<Int>, LV : Value<Double>> GlobalKeyRegistry.convertInt(
+        spongeKey: Supplier<out Key<SV>>,
+        lanternKey: Key<LV>
+) = this.convert(spongeKey, lanternKey, { value -> value.toInt() }, { value -> value.toDouble() })
 
 @JvmName("convertMetersPerTickVector")
 private fun <SV : Value<Vector3d>, LV : Value<Vector3d>> GlobalKeyRegistry.convertMetersPerTick(

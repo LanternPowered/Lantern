@@ -23,7 +23,7 @@ inline fun CauseStackManager.withCause(cause: Any, block: () -> Unit) {
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    currentStack().withCause(cause) {
+    this.currentStack().withCause(cause) {
         block()
     }
 }
@@ -35,7 +35,7 @@ inline fun CauseStackManager.withCauses(iterable: Iterable<Any>, block: () -> Un
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    currentStack().withCauses(iterable) {
+    this.currentStack().withCauses(iterable) {
         block()
     }
 }
@@ -47,7 +47,7 @@ inline fun CauseStackManager.withCauses(first: Any, second: Any, vararg more: An
     contract {
         callsInPlace(block, InvocationKind.EXACTLY_ONCE)
     }
-    currentStack().withCauses(first, second, *more) {
+    this.currentStack().withCauses(first, second, *more) {
         block()
     }
 }

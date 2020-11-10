@@ -21,11 +21,14 @@ import org.lanternpowered.server.network.vanilla.packet.type.status.StatusRespon
 
 val StatusProtocol = protocol {
     inbound {
-        bind(StatusRequestPacket::class).decoder(StatusRequestDecoder).handler(StatusRequestHandler)
-        bind(StatusPingPacket::class).decoder(StatusPingCodec).handler(StatusPingHandler)
+        bind().decoder(StatusRequestDecoder)
+        bind().decoder(StatusPingCodec)
+
+        type(StatusRequestPacket::class).handler(StatusRequestHandler)
+        type(StatusPingPacket::class).handler(StatusPingHandler)
     }
     outbound {
-        bind(StatusResponsePacket::class).encoder(StatusResponseEncoder)
-        bind(StatusPingPacket::class).encoder(StatusPingCodec)
+        bind().encoder(StatusResponseEncoder).accept(StatusResponsePacket::class)
+        bind().encoder(StatusPingCodec).accept(StatusPingPacket::class)
     }
 }

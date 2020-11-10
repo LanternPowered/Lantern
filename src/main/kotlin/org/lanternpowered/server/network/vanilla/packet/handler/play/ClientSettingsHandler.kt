@@ -22,8 +22,8 @@ import org.lanternpowered.api.data.Keys
 
 object ClientSettingsHandler : PacketHandler<ClientSettingsPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientSettingsPacket) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientSettingsPacket) {
+        val player = ctx.session.player
         val cause = causeOf(player)
         val skinParts = SkinPartRegistry.fromBitPattern(packet.skinPartsBitPattern)
         val event = LanternEventFactory.createPlayerChangeClientSettingsEvent(

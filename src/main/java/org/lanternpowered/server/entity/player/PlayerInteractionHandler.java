@@ -22,7 +22,6 @@ import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.AbstractSlot;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -40,7 +39,6 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientUseItemP
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockBreakAnimationPacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.BlockChangePacket;
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityAnimationPacket;
-import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldNew;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -63,7 +61,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.Set;
 
 @SuppressWarnings("ConstantConditions")
 public final class PlayerInteractionHandler {

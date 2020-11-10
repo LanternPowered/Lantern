@@ -185,12 +185,12 @@ object DataRegistrar {
 
     private fun registerBodyRotationsProvider() {
         val bodyPartKeys = mapOf(
-                Keys.RIGHT_ARM_ROTATION to BodyParts.RIGHT_ARM,
-                Keys.RIGHT_LEG_ROTATION to BodyParts.RIGHT_LEG,
-                Keys.LEFT_ARM_ROTATION to BodyParts.LEFT_ARM,
-                Keys.LEFT_LEG_ROTATION to BodyParts.LEFT_LEG,
-                Keys.HEAD_ROTATION to BodyParts.HEAD,
-                Keys.CHEST_ROTATION to BodyParts.CHEST
+                Keys.RIGHT_ARM_ROTATION to BodyParts.RIGHT_ARM.get(),
+                Keys.RIGHT_LEG_ROTATION to BodyParts.RIGHT_LEG.get(),
+                Keys.LEFT_ARM_ROTATION to BodyParts.LEFT_ARM.get(),
+                Keys.LEFT_LEG_ROTATION to BodyParts.LEFT_LEG.get(),
+                Keys.HEAD_ROTATION to BodyParts.HEAD.get(),
+                Keys.CHEST_ROTATION to BodyParts.CHEST.get()
         )
         registerMapBasedProvider(Keys.BODY_ROTATIONS, bodyPartKeys)
     }

@@ -15,7 +15,7 @@ import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.TextRepresentable
-import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
+import org.lanternpowered.api.item.enchantment.ExtendedEnchantmentType
 import org.lanternpowered.server.catalog.DefaultCatalogType
 
 class LanternEnchantmentType internal constructor(
@@ -28,7 +28,7 @@ class LanternEnchantmentType internal constructor(
         text: Text,
         enchantabilityRangeProvider: ((Int) -> IntRange)?,
         compatibilityTester: ((EnchantmentType) -> Boolean)?
-) : DefaultCatalogType(key), XEnchantmentType, TextRepresentable by text {
+) : DefaultCatalogType(key), ExtendedEnchantmentType, TextRepresentable by text {
 
     private val compatibilityTester = compatibilityTester ?: { true }
     private val enchantabilityRangeProvider = enchantabilityRangeProvider ?: {

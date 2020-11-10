@@ -12,12 +12,14 @@ package org.lanternpowered.server.registry.type.entity
 
 import org.lanternpowered.api.entity.Entity
 import org.lanternpowered.api.entity.EntityType
+import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.key.spongeKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.api.text.translatableTextOf
 import org.lanternpowered.server.entity.EntityCreationData
+import org.lanternpowered.server.entity.LanternEntityType
 import org.lanternpowered.server.entity.LanternHuman
 import org.lanternpowered.server.entity.LanternItem
 import org.lanternpowered.server.entity.LanternZombie
@@ -34,7 +36,5 @@ val EntityTypeRegistry = catalogTypeRegistry<EntityType<*>> {
     register(minecraftKey("item"), "entity.item.name", ::LanternItem)
     register(minecraftKey("lightning_bolt"), "entity.lightning.name", ::LanternLightningBolt)
 
-    register(minecraftKey("player"), "entity.player.name") {
-        throw UnsupportedOperationException("You cannot construct a Player.")
-    }
+    register(LanternEntityType<Player>(minecraftKey("player"), translatableTextOf("entity.player.name"), null))
 }

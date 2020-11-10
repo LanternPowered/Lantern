@@ -14,18 +14,18 @@ import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
 import org.lanternpowered.server.network.buffer.ByteBuffer
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.value.ContextualValueCodec
-import org.lanternpowered.server.network.packet.codec.CodecContext
 import org.lanternpowered.server.text.DefaultTextRenderer
 import org.lanternpowered.server.text.LanternTextRenderer
-import org.lanternpowered.server.text.TranslationRegistries
+import org.lanternpowered.server.text.Translators
 
 object NetworkText : ContextualValueCodec<Text> {
 
     /**
      * The renderer used to render [Text] components.
      */
-    val renderer: LanternTextRenderer<Locale> = DefaultTextRenderer(TranslationRegistries.Default)
+    val renderer: LanternTextRenderer<Locale> = DefaultTextRenderer(Translators.Global)
 
     override fun write(ctx: CodecContext, buf: ByteBuffer, value: Text) {
         val locale = ctx.session.locale

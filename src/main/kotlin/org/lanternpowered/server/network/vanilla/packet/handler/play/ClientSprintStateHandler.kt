@@ -17,7 +17,7 @@ import org.lanternpowered.api.data.Keys
 
 object ClientSprintStateHandler : PacketHandler<ClientSprintStatePacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientSprintStatePacket) {
-        context.session.player.offer(Keys.IS_SPRINTING, packet.isSprinting)
+    override fun handle(ctx: NetworkContext, packet: ClientSprintStatePacket) {
+        ctx.session.player.offer(Keys.IS_SPRINTING, packet.isSprinting)
     }
 }

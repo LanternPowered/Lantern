@@ -34,7 +34,7 @@ class RootBrewingContainerLayout : LanternTopBottomContainerLayout<BrewingContai
                 Flags.REVERSE_SHIFT_INSERTION + Flags.POSSIBLY_DISABLED_SHIFT_INSERTION  // Blaze powder slot
         )
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
 
         private const val BREW_PROGRESS_PROPERTY = 0
         private const val FUEL_PROGRESS_PROPERTY = 1

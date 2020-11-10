@@ -48,7 +48,7 @@ fun titleOf(
         title: Text,
         subtitle: Text = emptyText(),
         times: TitleTimes? = null
-): Title = Title.of(title, subtitle, times)
+): Title = Title.title(title, subtitle, times)
 
 /**
  * Gets a new title with the given times.
@@ -61,4 +61,4 @@ fun Title.times(
         fadeIn: Duration = 0.5.seconds,
         stay: Duration = 3.5.seconds,
         fadeOut: Duration = 1.seconds
-): Title = Title.of(this.title(), this.subtitle(), titleTimesOf(fadeIn, stay, fadeOut))
+): Title = Title.title(this.title(), this.subtitle(), titleTimesOf(fadeIn, stay, fadeOut))

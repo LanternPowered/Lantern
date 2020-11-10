@@ -10,7 +10,7 @@
  */
 package org.lanternpowered.server.item.behavior.vanilla.consumable
 
-import org.lanternpowered.api.effect.potion.merge
+import org.lanternpowered.api.effect.potion.mergeWith
 import org.lanternpowered.api.util.collections.immutableSetOf
 import org.lanternpowered.api.util.collections.toImmutableSet
 import org.lanternpowered.api.util.optional.orNull
@@ -25,7 +25,7 @@ val PotionEffectsProvider: ItemStack.() -> Set<PotionEffect> = {
     // Add extra customizable potion effects
     val extraPotionEffects = this.get(Keys.POTION_EFFECTS).orNull()
     if (extraPotionEffects != null) {
-        potionEffects = potionEffects?.merge(extraPotionEffects) ?: extraPotionEffects
+        potionEffects = potionEffects?.mergeWith(extraPotionEffects) ?: extraPotionEffects
     }
     potionEffects?.toImmutableSet() ?: immutableSetOf()
 }

@@ -10,6 +10,8 @@
  */
 package org.lanternpowered.server.network.status
 
+import org.lanternpowered.api.profile.copyWithoutProperties
+import org.lanternpowered.api.util.collections.asNonNullList
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.server.LanternServer
 import org.lanternpowered.server.profile.LanternGameProfile

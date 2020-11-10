@@ -20,7 +20,6 @@ import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStor
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
 import org.lanternpowered.server.data.property.entity.DominantHandPropertyStore;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.data.DataSerializerRegistry;
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder;
 import org.lanternpowered.server.profile.LanternGameProfileBuilder;

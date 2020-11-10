@@ -11,6 +11,7 @@
 package org.lanternpowered.server.registry.type.item
 
 import org.lanternpowered.api.block.BlockTypes
+import org.lanternpowered.api.data.Keys
 import org.lanternpowered.api.effect.potion.PotionEffectTypes
 import org.lanternpowered.api.effect.potion.potionEffectOf
 import org.lanternpowered.api.entity.EntityType
@@ -18,6 +19,8 @@ import org.lanternpowered.api.entity.EntityTypes
 import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.api.item.ItemTypes
 import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.equipment.EquipmentType
+import org.lanternpowered.api.item.inventory.equipment.EquipmentTypes
 import org.lanternpowered.api.item.inventory.itemStackOf
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.minecraftKey
@@ -36,12 +39,10 @@ import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBeha
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior
 import org.lanternpowered.server.item.behavior.vanilla.WallOrStandingPlacementBehavior
-import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer
 import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider
 import org.lanternpowered.server.item.itemTypeOf
 import org.lanternpowered.server.item.property.BowProjectile
 import org.lanternpowered.server.registry.type.block.BlockTypeRegistry
-import org.lanternpowered.api.data.Keys
 import org.spongepowered.api.data.type.ArmorMaterial
 import org.spongepowered.api.data.type.ArmorMaterials
 import org.spongepowered.api.data.type.DyeColor
@@ -57,8 +58,6 @@ import org.spongepowered.api.entity.vehicle.minecart.MinecartEntity
 import org.spongepowered.api.fluid.FluidStackSnapshot
 import org.spongepowered.api.fluid.FluidType
 import org.spongepowered.api.fluid.FluidTypes
-import org.spongepowered.api.item.inventory.equipment.EquipmentType
-import org.spongepowered.api.item.inventory.equipment.EquipmentTypes
 import java.util.Collections
 import java.util.function.Supplier
 import kotlin.random.Random
@@ -147,7 +146,7 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
         armor(useLimit, ArmorMaterials.DIAMOND, equipmentType)
     }
 
-    fun ItemTypeBuilder.food(food: Int, saturation: Double,
+    fun ItemTypeBuilder.food(food: Double, saturation: Double,
                                      consumeDuration: Int = 32,
                                      consumeBehavior: ConsumableInteractionBehavior.() -> Unit = {}) {
         keys {
@@ -646,19 +645,19 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
     }
 
     register(minecraftKey("cookie")) {
-        food(food = 2, saturation = 0.4)
+        food(food = 2.0, saturation = 0.4)
     }
 
     register(minecraftKey("melon_slice")) {
-        food(food = 2, saturation = 1.2)
+        food(food = 2.0, saturation = 1.2)
     }
 
     register(minecraftKey("apple")) {
-        food(food = 3, saturation = 2.4)
+        food(food = 3.0, saturation = 2.4)
     }
 
     register(minecraftKey("golden_apple")) {
-        food(food = 4, saturation = 9.6)
+        food(food = 4.0, saturation = 9.6)
         keys {
             registerApplicablePotionEffects(
                     potionEffectOf(PotionEffectTypes.REGENERATION, amplifier = 1, duration = 100),
@@ -669,7 +668,7 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
     }
 
     register(minecraftKey("enchanted_golden_apple")) {
-        food(food = 4, saturation = 9.6)
+        food(food = 4.0, saturation = 9.6)
         keys {
             registerApplicablePotionEffects(
                     potionEffectOf(PotionEffectTypes.REGENERATION, amplifier = 1, duration = 400),
@@ -683,54 +682,54 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
 
     register(minecraftKey("mushroom_stew")) {
         maxStackQuantity(1)
-        food(food = 6, saturation = 7.2)
+        food(food = 6.0, saturation = 7.2)
     }
 
     register(minecraftKey("bread")) {
-        food(food = 5, saturation = 6.0)
+        food(food = 5.0, saturation = 6.0)
     }
 
     register(minecraftKey("porkchop")) {
-        food(food = 6, saturation = 0.3)
+        food(food = 6.0, saturation = 0.3)
     }
 
     register(minecraftKey("cooked_porkchop")) {
-        food(food = 8, saturation = 12.8)
+        food(food = 8.0, saturation = 12.8)
     }
 
     register(minecraftKey("beef")) {
-        food(food = 3, saturation = 1.8)
+        food(food = 3.0, saturation = 1.8)
     }
 
     register(minecraftKey("cooked_beef")) {
-        food(food = 8, saturation = 12.8)
+        food(food = 8.0, saturation = 12.8)
     }
 
     register(minecraftKey("mutton")) {
-        food(food = 2, saturation = 1.2)
+        food(food = 2.0, saturation = 1.2)
     }
 
     register(minecraftKey("cooked_mutton")) {
-        food(food = 6, saturation = 9.6)
+        food(food = 6.0, saturation = 9.6)
     }
 
     register(minecraftKey("rabbit")) {
-        food(food = 3, saturation = 1.8)
+        food(food = 3.0, saturation = 1.8)
     }
 
     register(minecraftKey("cooked_rabbit")) {
-        food(food = 5, saturation = 6.0)
+        food(food = 5.0, saturation = 6.0)
     }
 
     register(minecraftKey("rabbit_stew")) {
         maxStackQuantity(1)
-        food(food = 10, saturation = 12.0) {
+        food(food = 10.0, saturation = 12.0) {
             restItem { itemStackOf(ItemTypes.BOWL) }
         }
     }
 
     register(minecraftKey("chicken")) {
-        food(food = 2, saturation = 1.2) {
+        food(food = 2.0, saturation = 1.2) {
             val hungerEffect = potionEffectOf(PotionEffectTypes.HUNGER, amplifier = 0, duration = 600)
             consumer { player, _, _ ->
                 if (Random.nextInt(100) < 40) { // 40% chance of getting hunger effect
@@ -741,11 +740,11 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
     }
 
     register(minecraftKey("cooked_chicken")) {
-        food(food = 6, saturation = 7.2)
+        food(food = 6.0, saturation = 7.2)
     }
 
     register(minecraftKey("rotten_flesh")) {
-        food(food = 4, saturation = 0.8) {
+        food(food = 4.0, saturation = 0.8) {
             val hungerEffect = potionEffectOf(PotionEffectTypes.HUNGER, amplifier = 0, duration = 600)
             consumer { player, _, _ ->
                 if (Random.nextInt(100) < 80) { // 80% chance of getting hunger effect
@@ -756,27 +755,27 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
     }
 
     register(minecraftKey("cod")) {
-        food(food = 2, saturation = 0.4)
+        food(food = 2.0, saturation = 0.4)
     }
 
     register(minecraftKey("cooked_cod")) {
-        food(food = 5, saturation = 6.0)
+        food(food = 5.0, saturation = 6.0)
     }
 
     register(minecraftKey("salmon")) {
-        food(food = 2, saturation = 0.4)
+        food(food = 2.0, saturation = 0.4)
     }
 
     register(minecraftKey("cooked_salmon")) {
-        food(food = 6, saturation = 9.6)
+        food(food = 6.0, saturation = 9.6)
     }
 
     register(minecraftKey("tropical_fish")) {
-        food(food = 1, saturation = 0.2)
+        food(food = 1.0, saturation = 0.2)
     }
 
     register(minecraftKey("pufferfish")) {
-        food(food = 1, saturation = 0.2)
+        food(food = 1.0, saturation = 0.2)
         keys {
             registerApplicablePotionEffects(
                     potionEffectOf(PotionEffectTypes.POISON, amplifier = 3, duration = 1200),
@@ -787,7 +786,7 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
     }
 
     register(minecraftKey("spider_eye")) {
-        food(food = 2, saturation = 3.2)
+        food(food = 2.0, saturation = 3.2)
         keys {
             registerApplicablePotionEffects(
                     potionEffectOf(PotionEffectTypes.POISON, amplifier = 0, duration = 100)
@@ -796,19 +795,19 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
     }
 
     register(minecraftKey("carrot")) {
-        food(food = 3, saturation = 3.6)
+        food(food = 3.0, saturation = 3.6)
     }
 
     register(minecraftKey("potato")) {
-        food(food = 1, saturation = 0.6)
+        food(food = 1.0, saturation = 0.6)
     }
 
     register(minecraftKey("baked_potato")) {
-        food(food = 5, saturation = 6.0)
+        food(food = 5.0, saturation = 6.0)
     }
 
     register(minecraftKey("poisonous_potato")) {
-        food(food = 2, saturation = 1.2)
+        food(food = 2.0, saturation = 1.2)
         keys {
             registerApplicablePotionEffects(
                     potionEffectOf(PotionEffectTypes.POISON, amplifier = 0, duration = 100)
@@ -818,25 +817,25 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
 
     register(minecraftKey("beetroot")) {
         maxStackQuantity(1)
-        food(food = 1, saturation = 1.2)
+        food(food = 1.0, saturation = 1.2)
     }
 
     register(minecraftKey("beetroot_soup")) {
-        food(food = 6, saturation = 7.2) {
+        food(food = 6.0, saturation = 7.2) {
             restItem { itemStackOf(ItemTypes.BOWL) }
         }
     }
 
     register(minecraftKey("golden_carrot")) {
-        food(food = 6, saturation = 14.4)
+        food(food = 6.0, saturation = 14.4)
     }
 
     register(minecraftKey("pumpkin_pie")) {
-        food(food = 8, saturation = 4.8)
+        food(food = 8.0, saturation = 4.8)
     }
 
     register(minecraftKey("chorus_fruit")) {
-        food(food = 4, saturation = 2.4) {
+        food(food = 4.0, saturation = 2.4) {
             // TODO: Add random teleport consumer behavior
         }
         keys {
@@ -852,7 +851,9 @@ val ItemTypeRegistry = catalogTypeRegistry<ItemType> {
         }
         behaviors {
             add(ConsumableInteractionBehavior().apply {
-                consumer(MilkConsumer())
+                consumer { player, _, _ ->
+                    player.offer(Keys.POTION_EFFECTS, emptyList())
+                }
                 restItem { itemStackOf(ItemTypes.BUCKET) }
             })
         }

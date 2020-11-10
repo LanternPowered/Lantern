@@ -59,7 +59,7 @@ class LanternTrigger<C : FilteredTriggerConfiguration>(
         val collection = this.progress[playerAdvancements]
         if (collection.isEmpty())
             return
-        val cause = CauseStack.current().currentCause
+        val cause = CauseStack.currentCause
         for (progress in this.progress[playerAdvancements].toList()) {
             val advancement = progress.advancementProgress.advancement
             val criterion: AdvancementCriterion = progress.criterion
@@ -71,7 +71,7 @@ class LanternTrigger<C : FilteredTriggerConfiguration>(
             EventManager.post(event)
             if (event.result) {
                 if (progress is ScoreCriterionProgress) {
-                    (progress as ScoreCriterionProgress).add(1)
+                    progress.add(1)
                 } else {
                     progress.grant()
                 }

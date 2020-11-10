@@ -14,7 +14,7 @@ import io.netty.handler.codec.CodecException
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.FinishUsingItemPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityStatusPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetOpLevelPacket
@@ -29,11 +29,11 @@ object EntityStatusEncoder : PacketEncoder<Packet> {
         val action: Int
         when (packet) {
             is SetReducedDebugPacket -> {
-                entityId = ctx.channel.attr(PlayerJoinEncoder.PLAYER_ENTITY_ID).get()
+                entityId = ctx.session.attr(PlayerJoinEncoder.PLAYER_ENTITY_ID).get()
                 action = if (packet.isReduced) 22 else 23
             }
             is SetOpLevelPacket -> {
-                entityId = ctx.channel.attr(PlayerJoinEncoder.PLAYER_ENTITY_ID).get()
+                entityId = ctx.session.attr(PlayerJoinEncoder.PLAYER_ENTITY_ID).get()
                 action = 24 + packet.opLevel.coerceIn(0..4)
             }
             is EntityStatusPacket -> {
@@ -41,7 +41,7 @@ object EntityStatusEncoder : PacketEncoder<Packet> {
                 action = packet.status
             }
             is FinishUsingItemPacket -> {
-                entityId = ctx.channel.attr(PlayerJoinEncoder.PLAYER_ENTITY_ID).get()
+                entityId = ctx.session.attr(PlayerJoinEncoder.PLAYER_ENTITY_ID).get()
                 action = 9
             }
             else -> throw CodecException("Unsupported message type: " + packet.javaClass.name)

@@ -56,8 +56,8 @@ object LoginStartHandler : PacketHandler<LoginStartPacket> {
     val SPOOFED_GAME_PROFILE: AttributeKey<LanternGameProfile> = AttributeKey.valueOf<LanternGameProfile>("spoofed-game-profile")
 
     @NettyThreadOnly
-    override fun handle(context: NetworkContext, packet: LoginStartPacket) {
-        val session = context.session
+    override fun handle(ctx: NetworkContext, packet: LoginStartPacket) {
+        val session = ctx.session
         val username = packet.username
         if (session.server.onlineMode) {
             // Convert to X509 format
@@ -65,13 +65,13 @@ object LoginStartHandler : PacketHandler<LoginStartPacket> {
             val verifyToken = EncryptionHelper.generateVerifyToken()
 
             // Store the auth data
-            context.channel.attr(AUTH_DATA).set(LoginAuthData(username, verifyToken))
+            session.attr(AUTH_DATA).set(LoginAuthData(username, verifyToken))
             // Send created request message and wait for the response
             session.send(LoginEncryptionRequestPacket(publicKey, verifyToken))
         } else {
             // Remove the encryption handler placeholder
-            context.channel.pipeline().remove(NetworkSession.ENCRYPTION)
-            var profile = context.channel.attr(SPOOFED_GAME_PROFILE).getAndSet(null)
+            ctx.channel.pipeline().remove(NetworkSession.ENCRYPTION)
+            var profile = ctx.channel.attr(SPOOFED_GAME_PROFILE).getAndSet(null)
             profile = if (profile != null) {
                 LanternGameProfile(profile.uniqueId, username, profile.propertyMap)
             } else {

@@ -14,11 +14,11 @@ import org.lanternpowered.server.network.NetworkContext
 import org.lanternpowered.server.network.packet.PacketHandler
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientBlockPlacementPacket
 
-class ClientBlockPlacementHandler : PacketHandler<ClientBlockPlacementPacket> {
+object ClientBlockPlacementHandler : PacketHandler<ClientBlockPlacementPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientBlockPlacementPacket) {
-        val player = context.session.player
-        player.resetIdleTimeoutCounter()
+    override fun handle(ctx: NetworkContext, packet: ClientBlockPlacementPacket) {
+        val player = ctx.session.player
+        player.resetIdleTime()
         player.resetOpenedSignPosition()
         player.interactionHandler.handleBlockPlacing(packet)
     }

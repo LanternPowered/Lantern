@@ -20,7 +20,7 @@ import org.spongepowered.api.item.inventory.Inventory
 import org.spongepowered.api.item.inventory.ItemStackSnapshot
 import org.spongepowered.api.item.recipe.Recipe
 import org.spongepowered.api.item.recipe.RecipeType
-import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe
+import org.spongepowered.api.item.recipe.cooking.CookingRecipe
 import java.util.Optional
 
 object LanternRecipeRegistry : RecipeRegistry, MutableCatalogTypeRegistry<Recipe> by mutableCatalogTypeRegistry() {
@@ -44,7 +44,7 @@ object LanternRecipeRegistry : RecipeRegistry, MutableCatalogTypeRegistry<Recipe
         TODO("Not yet implemented")
     }
 
-    override fun <T : SmeltingRecipe> findSmeltingRecipe(type: RecipeType<T>, ingredient: ItemStackSnapshot): Optional<T> {
+    override fun <T : CookingRecipe> findCookingRecipe(type: RecipeType<T>, ingredient: ItemStackSnapshot): Optional<T> {
         TODO("Not yet implemented")
     }
 }

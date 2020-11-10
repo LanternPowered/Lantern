@@ -12,15 +12,16 @@ package org.lanternpowered.server.state
 
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.ImmutableMap
-import com.google.common.collect.ImmutableSet
 import com.google.common.collect.ImmutableTable
 import com.google.common.collect.Lists
-import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.catalog.CatalogType
+import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.namespacedKey
 import org.lanternpowered.api.registry.CatalogTypeRegistry
 import org.lanternpowered.api.util.collections.immutableMapBuilderOf
+import org.lanternpowered.api.util.collections.immutableMapOf
 import org.lanternpowered.api.util.collections.immutableSetBuilderOf
+import org.lanternpowered.api.util.collections.immutableSetOf
 import org.lanternpowered.api.util.collections.toImmutableList
 import org.lanternpowered.api.util.uncheckedCast
 import org.spongepowered.api.data.Key
@@ -46,10 +47,9 @@ abstract class AbstractStateContainer<S : State<S>>(
         val properties = stateProperties.toMutableList()
         properties.sortBy { property -> property.getName() }
 
-        val keysToPropertyBuilder = ImmutableMap.builder<Key<out Value<*>>, StateProperty<*>>()
-        for (property in properties) {
+        val keysToPropertyBuilder = immutableMapBuilderOf<Key<out Value<*>>, StateProperty<*>>()
+        for (property in properties)
             keysToPropertyBuilder.put((property as IStateProperty<*,*>).valueKey, property)
-        }
         this.keysToProperty = keysToPropertyBuilder.build()
 
         val cartesianProductInput = properties.map { property ->
@@ -77,8 +77,8 @@ abstract class AbstractStateContainer<S : State<S>>(
 
             val stateValues = stateValuesBuilder.build()
             val immutableValues = immutableValuesBuilder.build()
-            val key = buildKey(baseKey, stateValues)
-            val dataContainer = buildDataContainer(baseKey, stateValues)
+            val key = this.buildKey(baseKey, stateValues)
+            val dataContainer = this.buildDataContainer(baseKey, stateValues)
 
             @Suppress("LeakingThis")
             stateBuilders += LanternStateBuilder(key, dataContainer, this, stateValues, immutableValues, internalId)
@@ -87,10 +87,10 @@ abstract class AbstractStateContainer<S : State<S>>(
         // There are no properties, so just add
         // the single state of this container
         if (properties.isEmpty()) {
-            val dataContainer = buildDataContainer(baseKey, ImmutableMap.of())
+            val dataContainer = this.buildDataContainer(baseKey, immutableMapOf())
 
             @Suppress("LeakingThis")
-            stateBuilders += LanternStateBuilder(baseKey, dataContainer, this, ImmutableMap.of(), ImmutableSet.of(), 0)
+            stateBuilders += LanternStateBuilder(baseKey, dataContainer, this, immutableMapOf(), immutableSetOf(), 0)
         }
 
         this.validStates = stateBuilders.map {

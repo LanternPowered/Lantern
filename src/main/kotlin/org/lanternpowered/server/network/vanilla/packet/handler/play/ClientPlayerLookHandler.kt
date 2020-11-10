@@ -18,8 +18,8 @@ import org.spongepowered.math.vector.Vector3d
 
 object ClientPlayerLookHandler : PacketHandler<ClientPlayerLookPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientPlayerLookPacket) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientPlayerLookPacket) {
+        val player = ctx.session.player
         player.setRawRotation(this.toRotation(packet.pitch, packet.yaw))
         player.handleOnGroundState(packet.isOnGround)
     }

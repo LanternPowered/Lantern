@@ -16,9 +16,9 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientDiggingP
 
 object ClientDiggingHandler : PacketHandler<ClientDiggingPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientDiggingPacket) {
-        val player = context.session.player
-        player.resetIdleTimeoutCounter()
+    override fun handle(ctx: NetworkContext, packet: ClientDiggingPacket) {
+        val player = ctx.session.player
+        player.resetIdleTime()
         player.resetOpenedSignPosition()
         player.interactionHandler.handleDigging(packet)
     }

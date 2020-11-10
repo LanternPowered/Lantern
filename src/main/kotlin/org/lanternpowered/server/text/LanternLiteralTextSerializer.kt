@@ -21,7 +21,7 @@ open class LanternLiteralTextSerializer(
         private val serializer: ComponentSerializer<Text, out Text, String>
 ) : TextSerializer {
 
-    private val renderer = LiteralTextRenderer(TranslationRegistries.All)
+    private val renderer = LiteralTextRenderer(Translators.GlobalAndMinecraft)
 
     override fun serialize(text: Text): String =
             this.serialize(text, Locales.DEFAULT)

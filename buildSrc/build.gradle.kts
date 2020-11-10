@@ -15,4 +15,5 @@ repositories {
 dependencies {
     implementation(group = "org.spongepowered", name = "SpongeGradle", version = "0.11.3-SNAPSHOT")
     implementation(group = "org.lanternpowered", name = "lanterngradle", version = "1.0.2")
+    implementation(group = "gradle.plugin.org.cadixdev.gradle", name = "licenser", version = "0.5.0")
 }

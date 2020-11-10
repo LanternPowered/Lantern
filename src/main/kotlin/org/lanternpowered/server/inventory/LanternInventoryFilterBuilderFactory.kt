@@ -12,9 +12,12 @@ package org.lanternpowered.server.inventory
 
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.query.InventoryFilterBuilder
+import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.inventory.query.LanternInventoryFilterBuilder
 
 object LanternInventoryFilterBuilderFactory : InventoryFilterBuilder.Factory {
 
-    override fun <I : Inventory> of(): InventoryFilterBuilder<I> = LanternInventoryFilterBuilder()
+    private val filter = LanternInventoryFilterBuilder<Inventory>()
+
+    override fun <I : Inventory> of(): InventoryFilterBuilder<I> = this.filter.uncheckedCast()
 }

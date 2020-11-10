@@ -34,9 +34,9 @@ import java.util.function.Supplier
 
 val testBlockType = blockTypeOf(namespacedKey("namespace", "value")) {
     name("Test Block")
-    stateProperty(BlockStateProperties.IS_WET)
+    stateProperty(BlockStateProperties.IS_WET, false)
     keys {
-        register(LanternKeys.BLOCK_SOUND_GROUP, BlockSoundGroups.GLASS)
+        register(Keys.BLOCK_SOUND_GROUP, BlockSoundGroups.GLASS)
         register(Keys.BLAST_RESISTANCE, 10.2)
     }
     stateKeys {
@@ -85,19 +85,9 @@ interface BlockTypeBuilder {
     fun name(name: Text)
 
     /**
-     * Adds a single [StateProperty].
+     * Adds a [StateProperty] with the given default value.
      */
-    fun stateProperty(stateProperty: StateProperty<*>)
-
-    /**
-     * Adds multiple [StateProperty]s.
-     */
-    fun stateProperties(first: StateProperty<*>, vararg more: StateProperty<*>)
-
-    /**
-     * Applies a new default [BlockState].
-     */
-    fun defaultState(fn: @BlockTypeBuilderDsl BlockState.() -> BlockState)
+    fun <V : Comparable<V>> stateProperty(stateProperty: StateProperty<V>, defaultValue: V)
 
     /**
      * Applies a [BlockEntity] to the block type.
@@ -107,7 +97,7 @@ interface BlockTypeBuilder {
     /**
      * Applies a [BlockEntity] to the block type.
      */
-    fun blockEntity(blockEntityType: Supplier<out BlockEntityType>) = blockEntity(blockEntityType.get())
+    fun blockEntity(blockEntityType: Supplier<out BlockEntityType>) = this.blockEntity(blockEntityType.get())
 
     /**
      * Applies the selection bounding box.

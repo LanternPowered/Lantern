@@ -33,10 +33,6 @@ object ItemKeys {
             = valueKeyOf(minecraft("use_cooldown"))
 
     @JvmField
-    val HEALTH_RESTORATION: Key<Value<Double>>
-            = valueKeyOf(minecraft("health_restoration"))
-
-    @JvmField
     val MAXIMUM_USE_DURATION: Key<Value<Int>>
             = valueKeyOf(minecraft("maximum_use_duration"))
 

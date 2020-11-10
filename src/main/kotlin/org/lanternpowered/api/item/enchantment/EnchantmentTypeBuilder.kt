@@ -11,14 +11,13 @@
 package org.lanternpowered.api.item.enchantment
 
 import org.lanternpowered.api.text.Text
-import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
 import org.spongepowered.api.util.NamedCatalogBuilder
 import java.util.function.Predicate
 
 /**
  * A builder to construct [EnchantmentType]s.
  */
-interface EnchantmentTypeBuilder : NamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder> {
+interface EnchantmentTypeBuilder : NamedCatalogBuilder<ExtendedEnchantmentType, EnchantmentTypeBuilder> {
 
     fun name(name: Text): EnchantmentTypeBuilder
     fun weight(weight: Int): EnchantmentTypeBuilder

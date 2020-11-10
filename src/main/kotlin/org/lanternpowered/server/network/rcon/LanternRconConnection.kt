@@ -11,6 +11,8 @@
 package org.lanternpowered.server.network.rcon
 
 import io.netty.channel.Channel
+import net.kyori.adventure.identity.Identity
+import org.lanternpowered.api.audience.MessageType
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.toPlain
 import org.lanternpowered.api.util.ToStringHelper
@@ -45,7 +47,7 @@ class LanternRconConnection internal constructor(
         this.channel.close()
     }
 
-    override fun sendMessage(message: Text) {
+    override fun sendMessage(source: Identity, message: Text, type: MessageType) {
         this.buffer.append(message.toPlain()).append('\n')
     }
 

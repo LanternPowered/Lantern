@@ -15,7 +15,7 @@ import org.lanternpowered.api.data.persistence.DataContainer
 import org.lanternpowered.api.data.persistence.DataQuery
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.PlayerJoinPacket
 import org.lanternpowered.server.registry.type.data.GameModeRegistry
 import kotlin.math.min
@@ -35,7 +35,7 @@ object PlayerJoinEncoder : PacketEncoder<PlayerJoinPacket> {
     private val valueKey = DataQuery.of("value")
 
     override fun encode(ctx: CodecContext, packet: PlayerJoinPacket): ByteBuffer {
-        ctx.channel.attr(PLAYER_ENTITY_ID).set(packet.entityId)
+        ctx.session.attr(PLAYER_ENTITY_ID).set(packet.entityId)
         val buf = ctx.byteBufAlloc().buffer()
         buf.writeInt(packet.entityId)
         buf.writeBoolean(packet.isHardcore)

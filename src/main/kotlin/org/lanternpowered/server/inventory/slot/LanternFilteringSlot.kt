@@ -18,10 +18,10 @@ import org.lanternpowered.server.inventory.InventoryView
 open class LanternFilteringSlot : LanternSlot(), ExtendedFilteringSlot {
 
     override fun isValidItem(stack: ItemStack): Boolean =
-            this.filter?.test(stack) ?: true
+            this.filter?.invoke(stack) ?: true
 
     override fun isValidItem(type: ItemType): Boolean =
-            this.filter?.test(type) ?: true
+            this.filter?.invoke(type) ?: true
 
     override fun instantiateView(): InventoryView<LanternFilteringSlot> = View(this)
 

@@ -12,6 +12,7 @@ package org.lanternpowered.server.inventory.user
 
 import org.lanternpowered.api.item.inventory.ExtendedInventory
 import org.lanternpowered.api.util.optional.asOptional
+import org.spongepowered.api.data.KeyValueMatcher
 import org.spongepowered.api.entity.living.player.User
 import org.spongepowered.api.item.inventory.entity.PlayerInventory
 import org.spongepowered.api.item.inventory.entity.StandardInventory
@@ -24,4 +25,8 @@ class LanternUserInventory(
 ) : StandardInventory by playerInventory, ExtendedInventory by playerInventory as ExtendedInventory, UserInventory {
 
     override fun getCarrier(): Optional<User> = this.carrier.asOptional()
+
+    override fun query(matcher: KeyValueMatcher<*>): ExtendedInventory {
+        TODO("Not yet implemented")
+    }
 }

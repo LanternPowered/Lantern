@@ -16,8 +16,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientUseEntit
 
 object ClientUseEntityAttackHandler : PacketHandler<ClientUseEntityPacket.Attack> {
 
-    override fun handle(context: NetworkContext, packet: ClientUseEntityPacket.Attack) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientUseEntityPacket.Attack) {
+        val player = ctx.session.player
         player.world.entityProtocolManager.playerAttack(player, packet.entityId)
     }
 }

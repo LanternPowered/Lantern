@@ -15,7 +15,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.command.ArgumentNode
 import org.lanternpowered.server.network.vanilla.command.LiteralNode
 import org.lanternpowered.server.network.vanilla.command.Node

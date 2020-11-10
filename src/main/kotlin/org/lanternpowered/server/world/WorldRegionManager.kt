@@ -10,11 +10,11 @@
  */
 package org.lanternpowered.server.world
 
-import org.lanternpowered.api.util.math.toBlockPosition
 import org.lanternpowered.api.world.World
 import org.lanternpowered.api.world.chunk.ChunkPosition
 import org.lanternpowered.server.entity.player.LanternPlayer
 import org.lanternpowered.server.world.chunk.ChunkPositionSet
+import org.lanternpowered.server.world.chunk.Chunks
 import org.lanternpowered.server.world.chunk.MergedChunkPositionCollection
 
 // TODO: Move to the player
@@ -23,18 +23,21 @@ import org.lanternpowered.server.world.chunk.MergedChunkPositionCollection
  * will be viewed by the player.
  */
 fun LanternPlayer.getViewedChunks(): ChunkPositionSet {
-    val radius = this.actualViewDistance
-    val position = this.position.toBlockPosition().chunkPosition
+    val radius = this.world.properties.viewDistance
+    val position = Chunks.toChunk(this.position.toInt())
 
     val minX = position.x - radius
     val maxX = position.x + radius
+    val minY = position.y - radius
+    val maxY = position.y + radius
     val minZ = position.z - radius
     val maxZ = position.z + radius
 
     val set = ChunkPositionSet()
     for (x in minX..maxX) {
         for (z in minZ..maxZ) {
-            set += ChunkPosition(x, z)
+            for (y in minY..maxY)
+                set += ChunkPosition(x, y, z)
         }
     }
     return set
@@ -154,7 +157,7 @@ class WorldRegionManager(private val world: World) {
      * will start and the process will be repeated.
      */
     fun update(collector: (() -> Unit) -> Unit) {
-        recalculate()
+        this.recalculate()
 
         // Queue region tasks, bound to the world
         for (region in this.regions) {

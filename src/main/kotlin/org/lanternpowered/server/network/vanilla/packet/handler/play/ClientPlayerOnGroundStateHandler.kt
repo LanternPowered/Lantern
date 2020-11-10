@@ -16,8 +16,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerOn
 
 object ClientPlayerOnGroundStateHandler : PacketHandler<ClientPlayerOnGroundStatePacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientPlayerOnGroundStatePacket) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientPlayerOnGroundStatePacket) {
+        val player = ctx.session.player
         player.handleOnGroundState(packet.isOnGround)
     }
 }

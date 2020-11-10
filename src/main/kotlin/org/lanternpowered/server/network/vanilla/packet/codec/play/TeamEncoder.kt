@@ -14,7 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap
 import org.lanternpowered.api.text.format.NamedTextColor
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.text.LegacyNetworkText
 import org.lanternpowered.server.network.text.NetworkText
 import org.lanternpowered.server.network.vanilla.packet.type.play.TeamPacket
@@ -23,7 +23,7 @@ import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 
 object TeamEncoder : PacketEncoder<TeamPacket> {
 
-    private val colorIndex = NamedTextColor.values()
+    private val colorIndex = NamedTextColor.NAMES.values()
             .withIndex().associateTo(Object2IntOpenHashMap()) { (index, value) -> value to index }
 
     override fun encode(ctx: CodecContext, packet: TeamPacket): ByteBuffer {

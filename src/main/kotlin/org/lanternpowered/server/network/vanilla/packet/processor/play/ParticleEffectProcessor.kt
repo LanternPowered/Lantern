@@ -20,7 +20,7 @@ import org.lanternpowered.server.network.entity.EntityProtocolManager
 import org.lanternpowered.server.network.entity.parameter.MutableParameterList
 import org.lanternpowered.server.network.entity.vanilla.EntityParameters
 import org.lanternpowered.server.network.packet.Packet
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.vanilla.packet.type.play.DestroyEntitiesPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.EffectPacket

@@ -11,7 +11,9 @@
 package org.lanternpowered.server.effect.entity.sound
 
 import org.lanternpowered.api.cause.CauseStack
+import org.lanternpowered.api.data.Keys
 import org.lanternpowered.api.effect.sound.SoundType
+import org.lanternpowered.api.util.optional.orNull
 import org.lanternpowered.server.effect.entity.AbstractEntityEffect
 import org.lanternpowered.server.entity.LanternEntity
 import org.lanternpowered.server.event.LanternEventContextKeys
@@ -37,19 +39,16 @@ class DefaultLivingFallSoundEffect @JvmOverloads constructor(
         var soundType: SoundType? = this.fallSoundType
         // A big fall sound, if the distance (damage) was high enough
         if (this.bigFallSoundType != null) {
-            val baseDamage = CauseStack.current().getContext(LanternEventContextKeys.BASE_DAMAGE_VALUE).orElse(0.0)
-            if (baseDamage > 4.0) {
+            val baseDamage = CauseStack.getContext(LanternEventContextKeys.BASE_DAMAGE_VALUE).orElse(0.0)
+            if (baseDamage > 4.0)
                 soundType = this.bigFallSoundType
-            }
         }
         entity.makeSound(soundType!!)
 
         // Play a sound for hitting the ground
         val blockPos = entity.position.add(0.0, -0.2, 0.0).toInt()
-        /* TODO
-        entity.world.get(blockPos, Keys.BLOCK_SOUND_GROUP).ifPresent { soundGroup ->
-            entity.playSound(soundGroup.getFallSound(), soundGroup.getVolume() * 0.5, soundGroup.getPitch() * 0.75)
-        }
-        */
+        val soundGroup = entity.world.get(blockPos, Keys.BLOCK_SOUND_GROUP).orNull()
+        if (soundGroup != null)
+            entity.makeSound(soundGroup.fallSound, relativePosition, volume = soundGroup.volume * 0.5, pitch = soundGroup.pitch * 0.75)
     }
 }

@@ -24,13 +24,13 @@ import org.lanternpowered.api.world.Locatable
 import org.spongepowered.api.block.BlockSnapshot
 import org.spongepowered.api.command.CommandCause
 import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.world.Location
 import org.spongepowered.api.service.permission.Subject
-import org.spongepowered.api.world.ServerLocation
 import org.spongepowered.math.vector.Vector3d
 import java.util.Optional
 
 object LanternCommandCauseFactory : CommandCause.Factory {
-    override fun create(): CommandCause = LanternCommandCause(CauseStack.current().currentCause)
+    override fun create(): CommandCause = LanternCommandCause(CauseStack.currentCause)
 }
 
 private class LanternCommandCause(private val cause: Cause) : CommandCause {
@@ -41,7 +41,7 @@ private class LanternCommandCause(private val cause: Cause) : CommandCause {
     override fun getAudience(): Audience =
             this.cause[CauseContextKeys.AUDIENCE] ?: this.cause.first() ?: Lantern.systemSubject
 
-    override fun getLocation(): Optional<ServerLocation> {
+    override fun getLocation(): Optional<Location> {
         var location = this.cause[CauseContextKeys.LOCATION]
         if (location != null)
             return location.asOptional()

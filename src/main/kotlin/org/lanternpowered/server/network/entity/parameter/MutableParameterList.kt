@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.entity.parameter
 
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 /**
  * A mutable [ParameterList].

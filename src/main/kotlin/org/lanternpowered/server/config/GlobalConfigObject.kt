@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.config
 
+import ninja.leaping.configurate.objectmapping.Setting
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.util.Tristate
 import org.lanternpowered.server.network.ProxyType
@@ -114,6 +115,9 @@ class ServerConfigObject : ConfigObject() {
 
     var preventProxyConnections by setting(default = false, name = "prevent-proxy-connections",
             description = "Whether proxy connections should be prevented. This is only supported in the online mode.")
+
+    var networkCompressionThreshold by setting(default = 256, name = "network-compression-threshold",
+            description = "The network compression threshold, set to -1 to disable packet compression.")
 
     // TODO: Expand explanation of ip based contexts
 

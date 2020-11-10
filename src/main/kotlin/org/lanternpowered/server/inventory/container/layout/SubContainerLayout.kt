@@ -22,10 +22,9 @@ open class SubContainerLayout(
         val base: LanternContainerLayout
 ) : ContainerLayout {
 
-    override val title: Text
+    override var title: Text
         get() = emptyText()
-
-    override fun title(title: Text) {}
+        set(_) {}
 
     override fun get(index: Int): ContainerSlot {
         if (index >= this.size)

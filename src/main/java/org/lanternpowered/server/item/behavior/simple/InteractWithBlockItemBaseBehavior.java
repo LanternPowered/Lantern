@@ -49,7 +49,7 @@ public abstract class InteractWithBlockItemBaseBehavior implements InteractWithI
         final boolean success = place(pipeline, context);
 
         if (success) {
-            for (BlockSnapshot blockSnapshot : context.getBlockSnapshots()) {
+            for (BlockSnapshot blockSnapshot : context.blockSnapshots) {
                 final Location location1 = blockSnapshot.getLocation().get();
                 final int buildHeight = location1.getWorld().getDimension().getBuildHeight();
                 // Check if the block is placed within the building limits

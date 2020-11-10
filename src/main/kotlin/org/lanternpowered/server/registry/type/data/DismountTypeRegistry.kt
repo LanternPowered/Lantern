@@ -14,7 +14,7 @@ import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.event.cause.entity.dismount.DismountType
+import org.spongepowered.api.event.cause.entity.DismountType
 
 val DismountTypeRegistry = catalogTypeRegistry<DismountType> {
     fun register(id: String) =

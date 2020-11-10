@@ -25,33 +25,33 @@ interface EquipmentItemPredicate : ItemPredicate {
      * @param equipmentType The equipment type
      * @return Whether the equipment type is valid
      */
-    fun test(equipmentType: EquipmentType): Boolean
+    operator fun invoke(equipmentType: EquipmentType): Boolean
 
     override fun andThen(itemPredicate: ItemPredicate): EquipmentItemPredicate {
         val thisPredicate = this
         return object : EquipmentItemPredicate {
-            override fun test(stack: ItemStack)
-                    = thisPredicate.test(stack) && itemPredicate.test(stack)
+            override fun invoke(stack: ItemStack)
+                    = thisPredicate(stack) && itemPredicate(stack)
 
-            override fun test(type: ItemType)
-                    = thisPredicate.test(type) && itemPredicate.test(type)
+            override fun invoke(type: ItemType)
+                    = thisPredicate(type) && itemPredicate(type)
 
-            override fun test(stack: ItemStackSnapshot)
-                    = thisPredicate.test(stack) && itemPredicate.test(stack)
+            override fun invoke(stack: ItemStackSnapshot)
+                    = thisPredicate(stack) && itemPredicate(stack)
 
-            override fun test(equipmentType: EquipmentType)
-                    = thisPredicate.test(equipmentType) &&
-                        (itemPredicate !is EquipmentItemPredicate || itemPredicate.test(equipmentType))
+            override fun invoke(equipmentType: EquipmentType)
+                    = thisPredicate(equipmentType) &&
+                        (itemPredicate !is EquipmentItemPredicate || itemPredicate(equipmentType))
         }
     }
 
     override fun invert(): EquipmentItemPredicate {
         val thisPredicate = this
         return object : EquipmentItemPredicate {
-            override fun test(equipmentType: EquipmentType) = !thisPredicate.test(equipmentType)
-            override fun test(stack: ItemStack) = !thisPredicate.test(stack)
-            override fun test(type: ItemType) = !thisPredicate.test(type)
-            override fun test(stack: ItemStackSnapshot) = !thisPredicate.test(stack)
+            override fun invoke(equipmentType: EquipmentType) = !thisPredicate(equipmentType)
+            override fun invoke(stack: ItemStack) = !thisPredicate(stack)
+            override fun invoke(type: ItemType) = !thisPredicate(type)
+            override fun invoke(stack: ItemStackSnapshot) = !thisPredicate(stack)
         }
     }
 
@@ -67,17 +67,17 @@ interface EquipmentItemPredicate : ItemPredicate {
         @JvmStatic
         fun of(predicate: (type: EquipmentType) -> Boolean): EquipmentItemPredicate {
             return object : EquipmentItemPredicate {
-                override fun test(equipmentType: EquipmentType)
+                override fun invoke(equipmentType: EquipmentType)
                         = predicate(equipmentType)
 
-                override fun test(stack: ItemStack)
-                        = stack.get(Keys.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
+                override fun invoke(stack: ItemStack)
+                        = stack.get(Keys.EQUIPMENT_TYPE).map { invoke(it) }.orElse(false)
 
-                override fun test(stack: ItemStackSnapshot)
-                        = stack.get(Keys.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
+                override fun invoke(stack: ItemStackSnapshot)
+                        = stack.get(Keys.EQUIPMENT_TYPE).map { invoke(it) }.orElse(false)
 
-                override fun test(type: ItemType)
-                        = type.get(Keys.EQUIPMENT_TYPE).map { test(it) }.orElse(false)
+                override fun invoke(type: ItemType)
+                        = type.get(Keys.EQUIPMENT_TYPE).map { invoke(it) }.orElse(false)
             }
         }
 

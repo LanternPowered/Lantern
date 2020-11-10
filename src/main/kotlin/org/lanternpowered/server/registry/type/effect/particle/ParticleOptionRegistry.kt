@@ -42,4 +42,4 @@ val ParticleOptionRegistry: CatalogTypeRegistry<ParticleOption<*>> = catalogType
 
 private inline fun <reified V> CatalogTypeRegistryBuilder<ParticleOption<*>>.register(
         id: String, noinline valueValidator: (V) -> Unit = {}
-): ParticleOption<*> = register(LanternParticleOption(NamespacedKey.minecraft(id), V::class.java, valueValidator))
+): ParticleOption<*> = register(LanternParticleOption(NamespacedKey.sponge(id), V::class.java, valueValidator))

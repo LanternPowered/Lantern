@@ -11,7 +11,7 @@
 package org.lanternpowered.server.network.value
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 interface ContextualValueWriter<V> {
 

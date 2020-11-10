@@ -10,12 +10,13 @@
  */
 package org.lanternpowered.api.data
 
-import net.kyori.adventure.bossbar.BossBar
-import net.kyori.adventure.text.Component
+import org.lanternpowered.api.block.BlockSoundGroup
+import org.lanternpowered.api.block.BlockState
+import org.lanternpowered.api.boss.BossBar
 import org.lanternpowered.api.key.lanternKey
 import org.lanternpowered.api.key.spongeKey
+import org.lanternpowered.api.text.Text
 import org.spongepowered.api.ResourceKey
-import org.spongepowered.api.block.BlockState
 import org.spongepowered.api.block.BlockType
 import org.spongepowered.api.data.meta.BannerPatternLayer
 import org.spongepowered.api.data.type.ArmorMaterial
@@ -30,6 +31,7 @@ import org.spongepowered.api.data.type.DoorHinge
 import org.spongepowered.api.data.type.DyeColor
 import org.spongepowered.api.data.type.FoxType
 import org.spongepowered.api.data.type.HandPreference
+import org.spongepowered.api.data.type.HandType
 import org.spongepowered.api.data.type.HorseColor
 import org.spongepowered.api.data.type.HorseStyle
 import org.spongepowered.api.data.type.InstrumentType
@@ -46,6 +48,7 @@ import org.spongepowered.api.data.type.PortionType
 import org.spongepowered.api.data.type.ProfessionType
 import org.spongepowered.api.data.type.RabbitType
 import org.spongepowered.api.data.type.RailDirection
+import org.spongepowered.api.data.type.SkinPart
 import org.spongepowered.api.data.type.SlabPortion
 import org.spongepowered.api.data.type.SpellType
 import org.spongepowered.api.data.type.StairShape
@@ -107,19 +110,44 @@ object Keys {
     // region Lantern Keys
 
     /**
+     * The acceleration of a [DamagingProjectile]. The unit is in meters
+     * per second ^ 2 (m/s^2).
+     *
+     * This key isn't the same as [SpongeKeys.ACCELERATION], which uses
+     * meters per tick ^ 2 (m/t^2).
+     */
+    val ACCELERATION: Key<Value<Vector3d>> = valueKeyOf(lanternKey("acceleration"))
+
+    /**
      * Represents the score of something, primarily used for the score
      * on a player death screen.
      */
     val SCORE: Key<Value<Int>> = valueKeyOf(lanternKey("score"))
 
     /**
+     * The mass of something, e.g. [Entity]s. The unit is in kilograms (kg).
+     */
+    val MASS: Key<Value<Double>> = valueKeyOf(lanternKey("mass"))
+
+    /**
      * Represents the velocity of an object, primarily used for entities. The
-     * unit is in meters per second.
+     * unit is in meters per second (m/s).
      *
      * This key isn't the same as [SpongeKeys.VELOCITY], which uses
-     * meters per tick.
+     * meters per tick (m/t).
      */
     val VELOCITY: Key<Value<Vector3d>> = valueKeyOf(lanternKey("velocity"))
+
+    /**
+     * The gravitational acceleration that is applied to something, e.g. [Entity]s. The
+     * unit is in meters per second ^ 2 (m/s^2).
+     */
+    val GRAVITATIONAL_ACCELERATION: Key<Value<Double>> = valueKeyOf(lanternKey("gravitational_acceleration"))
+
+    /**
+     * Whether something is affected by gravity, e.g. [Entity]s and [BlockState]s.
+     */
+    val IS_GRAVITY_AFFECTED: Key<Value<Boolean>> = valueKeyOf(spongeKey("is_gravity_affected"))
 
     /**
      * The age of an entity. e.g. The age of an [AreaEffectCloud].
@@ -129,10 +157,10 @@ object Keys {
     val AGE: Key<Value<Duration>> = valueKeyOf(lanternKey("age"))
 
     /**
-     * The potential max speed of a [Minecart]. The unit is in meters per second.
+     * The potential max speed of a [Minecart]. The unit is in meters per second (m/s).
      *
      * This key isn't the same as [SpongeKeys.POTENTIAL_MAX_SPEED], which uses
-     * meters per tick.
+     * meters per tick (m/t).
      */
     val POTENTIAL_MAX_SPEED: Key<Value<Double>> = valueKeyOf(lanternKey("potential_max_speed"))
 
@@ -145,6 +173,81 @@ object Keys {
      */
     val FOOD: Key<Value<Double>> = valueKeyOf(lanternKey("food"))
 
+    /**
+     * The maximum food of a [Humanoid].
+     *
+     * Defaults to 20 in vanilla for players.
+     */
+    val MAX_FOOD: Key<Value<Double>> = valueKeyOf(lanternKey("max_food"))
+
+    /**
+     * The maximum exhaustion of an entity.
+     */
+    val MAX_EXHAUSTION: Key<Value<Double>> = valueKeyOf<Value<Double>>(lanternKey("max_exhaustion"))
+
+    /**
+     * The amount of food a food [ItemStack] restores when eaten.
+     */
+    val REPLENISHED_FOOD: Key<Value<Double>> = valueKeyOf(lanternKey("replenished_food"))
+
+    /**
+     * The amount of health a something restores. E.g. when eating certain food/drinking potions.
+     */
+    val RESTORED_HEALTH: Key<Value<Double>> = valueKeyOf(lanternKey("restored_health"))
+
+    /**
+     * Whether an [ItemStack] can always be consumed, even if e.g. food has reached its maximum.
+     */
+    val IS_ALWAYS_CONSUMABLE: Key<Value<Boolean>> = valueKeyOf(lanternKey("is_always_consumable"))
+
+    /**
+     * Whether an [Entity] is invulnerable.
+     *
+     * This does not protect from the void, players in creative mode,
+     * and manual killing like the /kill command.
+     */
+    val IS_INVULNERABLE: Key<Value<Boolean>> = valueKeyOf(lanternKey("is_invulnerable"))
+
+    /**
+     * The block sound group of a block.
+     */
+    val BLOCK_SOUND_GROUP: Key<Value<BlockSoundGroup>> = valueKeyOf(lanternKey("block_sound_group"))
+
+    /**
+     * The hand of a entity that is currently active with an interaction.
+     */
+    val ACTIVE_HAND: Key<Value<HandType>> = valueKeyOf(lanternKey("active_hand"))
+
+    /**
+     * The pickup delay of an [Item].
+     */
+    val PICKUP_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("pickup_delay"))
+
+    /**
+     * The despawn delay of a [Item], [Endermite], [Weather] [TraderLlama] or [EyeOfEnder].
+     */
+    val DESPAWN_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("despawn_delay"))
+
+    /**
+     * A set with all the parts of a skin that should be displayed.
+     */
+    val DISPLAYED_SKIN_PARTS: Key<SetValue<SkinPart>> = valueKeyOf(lanternKey("displayed_skin_parts"))
+
+    /**
+     * Whether a snowman has a pumpkin head.
+     */
+    val HAS_PUMPKIN_HEAD: Key<Value<Boolean>> = valueKeyOf(lanternKey("has_pumpkin_head"))
+
+    /**
+     * Whether an entity is a baby.
+     */
+    val IS_BABY: Key<Value<Boolean>> = valueKeyOf(lanternKey("is_baby"))
+
+    /**
+     * Whether something is holding its hands up, usually related to zombies.
+     */
+    val ARE_HANDS_UP: Key<Value<Boolean>> = valueKeyOf(lanternKey("are_hands_up"))
+
     // endregion
 
     // region Sponge Keys
@@ -153,11 +256,6 @@ object Keys {
      * The [PotionEffectTypes.ABSORPTION] amount of a [Living] entity.
      */
     val ABSORPTION: Key<Value<Double>> = valueKeyOf(spongeKey("absorption"))
-
-    /**
-     * The acceleration of a [DamagingProjectile].
-     */
-    val ACCELERATION: Key<Value<Vector3d>> = valueKeyOf(spongeKey("acceleration"))
 
     /**
      * The item a [Living] entity is currently using.
@@ -238,7 +336,7 @@ object Keys {
     /**
      * The author of a [ItemTypes.WRITTEN_BOOK] [ItemStack].
      */
-    val AUTHOR: Key<Value<Component>> = valueKeyOf(spongeKey("author"))
+    val AUTHOR: Key<Value<Text>> = valueKeyOf(spongeKey("author"))
 
     /**
      * The [Axis] direction of a [BlockState].
@@ -373,7 +471,6 @@ object Keys {
     /**
      * Whether a [Humanoid] can fly.
      *
-     *
      * For a [Player] this means they are able to toggle flight mode
      * by double-tapping the jump button.
      */
@@ -435,7 +532,6 @@ object Keys {
     /**
      * The [Color] of an [ItemStack]
      *
-     *
      * e.g. [ItemTypes.LEATHER_CHESTPLATE] or [ItemTypes.POTION] custom color
      *
      * or an [AreaEffectCloud].
@@ -455,9 +551,7 @@ object Keys {
     /**
      * The connected directions of a [BlockState].
      *
-     *
      * e.g. [BlockTypes.GLASS_PANE], [BlockTypes.IRON_BARS], [BlockTypes.CHEST],
-     *
      */
     val CONNECTED_DIRECTIONS: Key<SetValue<Direction>> = valueKeyOf(spongeKey("connected_directions"))
 
@@ -509,8 +603,7 @@ object Keys {
      * How much damage a [FallingBlock] deals to [Living] entities
      * it hits per block fallen.
      *
-     *
-     * This damage is capped by [.MAX_FALL_DAMAGE].
+     * This damage is capped by [MAX_FALL_DAMAGE].
      */
     val DAMAGE_PER_BLOCK: Key<Value<Double>> = valueKeyOf(spongeKey("damage_per_block"))
 
@@ -526,11 +619,6 @@ object Keys {
     val DERAILED_VELOCITY_MODIFIER: Key<Value<Vector3d>> = valueKeyOf(spongeKey("derailed_velocity_modifier"))
 
     /**
-     * The despawn delay (in ticks) of a [Item], [Endermite], [Weather] [TraderLlama] or [EyeOfEnder].
-     */
-    val DESPAWN_DELAY: Key<Value<Int>> = valueKeyOf(spongeKey("despawn_delay"))
-
-    /**
      * The detonator of a [PrimedTNT].
      */
     val DETONATOR: Key<Value<Living>> = valueKeyOf(spongeKey("detonator"))
@@ -544,15 +632,13 @@ object Keys {
     /**
      * The display name of an [Entity], [ItemStack] or [BlockEntity].
      *
-     *
      * On a [ItemTypes.WRITTEN_BOOK] item this will also set the title
      * of the book.
      */
-    val DISPLAY_NAME: Key<Value<Component>> = valueKeyOf(spongeKey("display_name"))
+    val DISPLAY_NAME: Key<Value<Text>> = valueKeyOf(spongeKey("display_name"))
 
     /**
      * The dominant [HandPreference] of an [Agent] entity.
-     *
      *
      * *NOTE:* For [Player]s is this key read-only, the
      * [HandPreference] of a player can not be changed server-side.
@@ -601,13 +687,10 @@ object Keys {
     /**
      * The time (in ticks) until a [Chicken] lays an [ItemTypes.EGG].
      *
-     *
-     *
      * Vanilla will calculate the egg timer by taking a random value between
      * 0 (inclusive) and 6000 (exclusive) and then add that by another 6000.
      * This unit ends up being in ticks. Once the chicken lays the egg, this
      * calculation is ran again.
-     *
      */
     val EGG_TIME: Key<Value<Int>> = valueKeyOf(spongeKey("egg_time"))
 
@@ -1013,15 +1096,6 @@ object Keys {
     val INVULNERABILITY_TICKS: Key<Value<Int>> = valueKeyOf(spongeKey("invulnerability_ticks"))
 
     /**
-     * Whether an [Entity] is invulnerable.
-     *
-     *
-     * This does not protect from the void, players in creative mode,
-     * and manual killing like the /kill command.
-     */
-    val INVULNERABLE: Key<Value<Boolean>> = valueKeyOf(spongeKey("invulnerable"))
-
-    /**
      * Whether a fence gate [BlockState] is in a wall.
      */
     val IN_WALL: Key<Value<Boolean>> = valueKeyOf(spongeKey("in_wall"))
@@ -1214,13 +1288,6 @@ object Keys {
      * Whether [Turtle] is proceeding to it's [home position][Vector3i].
      */
     val IS_GOING_HOME: Key<Value<Boolean>> = valueKeyOf(spongeKey("is_going_home"))
-
-    /**
-     * Whether something is affected by gravity.
-     * e.g. [Entity]s and [BlockState]s
-     * Readonly(BlockState.class)
-     */
-    val IS_GRAVITY_AFFECTED: Key<Value<Boolean>> = valueKeyOf(spongeKey("is_gravity_affected"))
 
     /**
      * Whether a [Cat] is hissing.
@@ -1582,7 +1649,7 @@ object Keys {
     /**
      * The output yielded by the last command of a [CommandBlock] or [CommandBlockMinecart].
      */
-    val LAST_COMMAND_OUTPUT: Key<Value<Component>> = valueKeyOf(spongeKey("last_command_output"))
+    val LAST_COMMAND_OUTPUT: Key<Value<Text>> = valueKeyOf(spongeKey("last_command_output"))
 
     /**
      * The last damage a [Living] received.
@@ -1663,7 +1730,7 @@ object Keys {
      * over the stack. For the contents of a book see [.PAGES]
      * instead.
      */
-    val LORE: Key<ListValue<Component>> = valueKeyOf(spongeKey("lore"))
+    val LORE: Key<ListValue<Text>> = valueKeyOf(spongeKey("lore"))
 
     /**
      * The matter state of a [BlockState]
@@ -1796,11 +1863,10 @@ object Keys {
     /**
      * The content of a [ItemTypes.WRITTEN_BOOK] [ItemStack].
      *
-     *
      * Use [Keys.PLAIN_PAGES] if you wish to inspect the contents
      * of a [ItemTypes.WRITABLE_BOOK].
      */
-    val PAGES: Key<ListValue<Component>> = valueKeyOf(spongeKey("pages"))
+    val PAGES: Key<ListValue<Text>> = valueKeyOf(spongeKey("pages"))
 
     /**
      * The [type][ParrotType] of a [Parrot].
@@ -1845,11 +1911,6 @@ object Keys {
      * The [phase][PhantomPhase] of a [Phantom].
      */
     val PHANTOM_PHASE: Key<Value<PhantomPhase>> = valueKeyOf(spongeKey("phantom_phase"))
-
-    /**
-     * The pickup delay (in ticks) of an [Item].
-     */
-    val PICKUP_DELAY: Key<Value<Int>> = valueKeyOf(spongeKey("pickup_delay"))
 
     /**
      * The [PickupRule] of an [ArrowEntity].
@@ -2001,12 +2062,6 @@ object Keys {
     val REMAINING_SPAWN_DELAY: Key<Value<Int>> = valueKeyOf(spongeKey("remaining_spawn_delay"))
 
     /**
-     * The amount of food a food [ItemStack] restores when eaten.
-     * Readonly
-     */
-    val REPLENISHED_FOOD: Key<Value<Int>> = valueKeyOf(spongeKey("replenished_food"))
-
-    /**
      * The amount of saturation a food [ItemStack] provides when eaten.
      * Readonly
      */
@@ -2101,7 +2156,7 @@ object Keys {
     /**
      * The lines displayed on a [Sign].
      */
-    val SIGN_LINES: Key<ListValue<Component>> = valueKeyOf(spongeKey("sign_lines"))
+    val SIGN_LINES: Key<ListValue<Text>> = valueKeyOf(spongeKey("sign_lines"))
 
     /**
      * The size of a [Slime].
@@ -2113,7 +2168,6 @@ object Keys {
     /**
      * The skin of a [Humanoid].
      *
-     *
      * Skins can only be manipulated by supplying the UUID of a player
      * having that skin. The binary skin data is signed by Mojang so fully
      * customized skins are not possible.
@@ -2124,14 +2178,11 @@ object Keys {
     /**
      * The "moisture" state of a [Dolphin].
      *
-     *
-     *
      * Vanilla sets the dolphin's skin moisture to 2400 so long as the entity
      * is in water, being rained on, or in a bubble column. If not, the dolphin
      * will loose 1 moisture per tick. Once this value is 0 or below, the dolphin
      * will be damaged via [DamageSources.DRYOUT] with a value of 1 per tick
      * until death.
-     *
      */
     val SKIN_MOISTURE: Key<Value<Int>> = valueKeyOf(spongeKey("skin_moisture"))
 

@@ -10,12 +10,13 @@
  */
 package org.lanternpowered.server.data
 
-import com.google.common.reflect.TypeToken
 import org.lanternpowered.api.util.optional.emptyOptional
 import org.lanternpowered.api.util.optional.asOptional
 import org.lanternpowered.api.util.uncheckedCast
 import org.lanternpowered.server.catalog.DefaultCatalogType
 import org.lanternpowered.api.key.NamespacedKey
+import org.lanternpowered.api.plugin.PluginContainer
+import org.lanternpowered.api.util.type.TypeToken
 import org.spongepowered.api.data.DataHolder
 import org.spongepowered.api.data.DataProvider
 import org.spongepowered.api.data.DataRegistration
@@ -23,7 +24,6 @@ import org.spongepowered.api.data.Key
 import org.spongepowered.api.data.UnregisteredKeyException
 import org.spongepowered.api.data.persistence.DataStore
 import org.spongepowered.api.data.value.Value
-import org.spongepowered.plugin.PluginContainer
 import java.util.Optional
 
 class LanternDataRegistration(
@@ -44,7 +44,7 @@ class LanternDataRegistration(
     }
 
     override fun getDataStore(token: TypeToken<out DataHolder>) =
-            this.dataStores.first { store -> token.isSubtypeOf(store.supportedToken) }.asOptional()
+            this.dataStores.first { store -> store.supportedTokens.any { token.isSubtypeOf(it) } }.asOptional()
 
     override fun getKeys() = this.keys
     override fun getPluginContainer() = this.pluginContainer

@@ -13,46 +13,62 @@ package org.lanternpowered.server.network.protocol
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.PacketDecoder
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.PacketProcessor
 import org.lanternpowered.server.network.packet.PacketHandler
+import org.lanternpowered.server.network.packet.PacketProcessor
 import kotlin.reflect.KClass
 
-interface PacketRegistryBuilder {
+interface InboundPacketRegistryBuilder {
 
-    fun <P : Packet> bind(first: KClass<out P>, vararg more: KClass<out P>): PacketBindingBuilder<P> =
-            this.bind(listOf(first) + more.asList())
+    fun bind(): InboundOpcodeBindingBuilder
 
-    fun <P : Packet> bind(types: Iterable<KClass<out P>>): PacketBindingBuilder<P>
-
-    fun <P : Packet> bind(types: KClass<out P>): PacketBindingBuilder<P>
-
-    fun bind(): OpcodeBindingBuilder
-
-    fun <P : Packet> type(first: KClass<out P>, vararg more: KClass<out P>): PacketBindingBuilder<P> =
+    fun <P : Packet> types(first: KClass<out P>, vararg more: KClass<out P>): InboundPacketBindingBuilder<P> =
             this.types(listOf(first) + more.asList())
 
-    fun <P : Packet> types(types: Iterable<KClass<out P>>): PacketBindingBuilder<P>
+    fun <P : Packet> types(types: Iterable<KClass<out P>>): InboundPacketBindingBuilder<P>
 
-    fun <P : Packet> types(types: KClass<out P>): PacketBindingBuilder<P>
+    fun <P : Packet> type(type: KClass<out P>): InboundPacketBindingBuilder<P>
 }
 
-interface OpcodeBindingBuilder : PacketBindingBuilder<Packet> {
+interface InboundOpcodeBindingBuilder {
 
-    fun <P : Packet> types(first: KClass<out P>, vararg more: KClass<out P>): PacketBindingBuilder<P> =
+    fun decoder(decoder: PacketDecoder<*>)
+}
+
+interface InboundPacketBindingBuilder<P : Packet> {
+
+    fun processor(processor: PacketProcessor<in P>): InboundPacketBindingBuilder<P>
+
+    fun handler(handler: PacketHandler<in P>): InboundPacketBindingBuilder<P>
+}
+
+interface OutboundPacketRegistryBuilder {
+
+    fun bind(): OutboundOpcodeBindingBuilder
+
+    fun <P : Packet> types(first: KClass<out P>, vararg more: KClass<out P>): OutboundPacketBindingBuilder<P> =
             this.types(listOf(first) + more.asList())
 
-    fun <P : Packet> types(types: Iterable<KClass<out P>>): PacketBindingBuilder<P>
+    fun <P : Packet> types(types: Iterable<KClass<out P>>): OutboundPacketBindingBuilder<P>
 
-    fun <P : Packet> type(types: KClass<out P>): PacketBindingBuilder<P>
+    fun <P : Packet> type(type: KClass<out P>): OutboundPacketBindingBuilder<P>
 }
 
-interface PacketBindingBuilder<P : Packet> {
+interface OutboundOpcodeBindingBuilder {
 
-    fun encoder(encoder: PacketEncoder<in P>): PacketBindingBuilder<P>
+    fun <P : Packet> encoder(encoder: PacketEncoder<P>): Accepts<P>
 
-    fun decoder(decoder: PacketDecoder<out P>): PacketBindingBuilder<P>
+    interface Accepts<P : Packet> {
 
-    fun processor(processor: PacketProcessor<in P>): PacketBindingBuilder<P>
+        fun acceptAll(first: KClass<out P>, vararg more: KClass<out P>): Accepts<P> =
+                this.acceptAll(listOf(first) + more.asList())
 
-    fun handler(handler: PacketHandler<in P>)
+        fun acceptAll(types: Iterable<KClass<out P>>): Accepts<P>
+
+        fun accept(type: KClass<out P>): Accepts<P>
+    }
+}
+
+interface OutboundPacketBindingBuilder<P : Packet> {
+
+    fun processor(processor: PacketProcessor<in P>): OutboundPacketBindingBuilder<P>
 }

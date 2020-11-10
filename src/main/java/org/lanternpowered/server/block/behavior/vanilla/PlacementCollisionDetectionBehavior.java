@@ -33,7 +33,7 @@ public class PlacementCollisionDetectionBehavior implements PlaceBlockBehavior, 
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final Collection<BlockSnapshot> snapshots = context.getBlockSnapshots();
+        final Collection<BlockSnapshot> snapshots = context.blockSnapshots;
         for (BlockSnapshot snapshot : snapshots) {
             final Optional<Location> optLoc = snapshot.getLocation();
             if (!optLoc.isPresent()) {

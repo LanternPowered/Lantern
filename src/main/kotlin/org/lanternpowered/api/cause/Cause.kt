@@ -32,7 +32,7 @@ typealias CauseContextBuilder = org.spongepowered.api.event.EventContext.Builder
  * @param T The type of object being queried for
  * @return The first element of the type, if available
  */
-inline fun <reified T : Any> Cause.first(): T? = first(T::class)
+inline fun <reified T : Any> Cause.first(): T? = this.first(T::class)
 
 /**
  * Gets the first [T] object of this [Cause], if available.
@@ -41,7 +41,7 @@ inline fun <reified T : Any> Cause.first(): T? = first(T::class)
  * @param T The type of object being queried for
  * @return The first element of the type, if available
  */
-fun <T : Any> Cause.first(target: KClass<T>): T? = first(target.java).orNull()
+fun <T : Any> Cause.first(target: KClass<T>): T? = this.first(target.java).orNull()
 
 /**
  * Gets the last [T] object of this [Cause], if available.
@@ -49,7 +49,7 @@ fun <T : Any> Cause.first(target: KClass<T>): T? = first(target.java).orNull()
  * @param T The type of object being queried for
  * @return The last element of the type, if available
  */
-inline fun <reified T : Any> Cause.last(): T? = last(T::class)
+inline fun <reified T : Any> Cause.last(): T? = this.last(T::class)
 
 /**
  * Gets the last [T] object of this [Cause], if available.
@@ -58,7 +58,7 @@ inline fun <reified T : Any> Cause.last(): T? = last(T::class)
  * @param T The type of object being queried for
  * @return The last element of the type, if available
  */
-fun <T : Any> Cause.last(target: KClass<T>): T? = last(target.java).orNull()
+fun <T : Any> Cause.last(target: KClass<T>): T? = this.last(target.java).orNull()
 
 /**
  * Gets the object immediately before the object that is an instance of the given target.
@@ -66,7 +66,7 @@ fun <T : Any> Cause.last(target: KClass<T>): T? = last(target.java).orNull()
  * @param T The target type
  * @return The object
  */
-inline fun <reified T : Any> Cause.before(): Any? = before(T::class)
+inline fun <reified T : Any> Cause.before(): Any? = this.before(T::class)
 
 /**
  * Gets the object immediately before the object that is an instance of the given target.
@@ -74,7 +74,7 @@ inline fun <reified T : Any> Cause.before(): Any? = before(T::class)
  * @param target The class of the target type
  * @return The object
  */
-fun Cause.before(target: KClass<*>): Any? = before(target.java).orNull()
+fun Cause.before(target: KClass<*>): Any? = this.before(target.java).orNull()
 
 /**
  * Gets the object immediately after the object that is an instance of the given target.
@@ -82,7 +82,7 @@ fun Cause.before(target: KClass<*>): Any? = before(target.java).orNull()
  * @param T The target type
  * @return The object
  */
-inline fun <reified T : Any> Cause.after(): Any? = after(T::class)
+inline fun <reified T : Any> Cause.after(): Any? = this.after(T::class)
 
 /**
  * Gets the object immediately after the object that is an instance of the given target.
@@ -90,7 +90,7 @@ inline fun <reified T : Any> Cause.after(): Any? = after(T::class)
  * @param target The class of the target type
  * @return The object
  */
-fun Cause.after(target: KClass<*>): Any? = after(target.java).orNull()
+fun Cause.after(target: KClass<*>): Any? = this.after(target.java).orNull()
 
 /**
  * Gets a list of all objects that are instances of the given type [T].
@@ -98,7 +98,7 @@ fun Cause.after(target: KClass<*>): Any? = after(target.java).orNull()
  * @param T The type of objects to query for
  * @return A list of the objects queried
  */
-inline fun <reified T : Any> Cause.allOf(): List<T> = allOf(T::class)
+inline fun <reified T : Any> Cause.allOf(): List<T> = this.allOf(T::class)
 
 /**
  * Gets a list of all objects that are instances of the given type [T].
@@ -107,7 +107,7 @@ inline fun <reified T : Any> Cause.allOf(): List<T> = allOf(T::class)
  * @param T The type of objects to query for
  * @return A list of the objects queried
  */
-fun <T : Any> Cause.allOf(target: KClass<T>): List<T> = allOf(target.java)
+fun <T : Any> Cause.allOf(target: KClass<T>): List<T> = this.allOf(target.java)
 
 /**
  * Gets a list of all objects that are not instances of the given type [T].
@@ -115,7 +115,7 @@ fun <T : Any> Cause.allOf(target: KClass<T>): List<T> = allOf(target.java)
  * @param T The type of objects to query for
  * @return A list of the objects queried
  */
-inline fun <reified T : Any> Cause.noneOf(): List<Any> = noneOf(T::class)
+inline fun <reified T : Any> Cause.noneOf(): List<Any> = this.noneOf(T::class)
 
 /**
  * Gets a list of all objects that are not instances of the given target type.
@@ -123,7 +123,7 @@ inline fun <reified T : Any> Cause.noneOf(): List<Any> = noneOf(T::class)
  * @param target The class of the target type
  * @return A list of the objects queried
  */
-fun Cause.noneOf(target: KClass<*>): List<Any> = noneOf(target.java)
+fun Cause.noneOf(target: KClass<*>): List<Any> = this.noneOf(target.java)
 
 /**
  * Gets the value for the given context key, if present.
@@ -220,7 +220,7 @@ interface CauseBuilder : BaseBuilder<Cause, CauseBuilder> {
     /**
      * Adds a context value.
      */
-    fun <T> context(key: Supplier<out CauseContextKey<T>>, value: T): CauseBuilder = context(key.get(), value)
+    fun <T> context(key: Supplier<out CauseContextKey<T>>, value: T): CauseBuilder = this.context(key.get(), value)
 
     /**
      * Builds the [Cause].

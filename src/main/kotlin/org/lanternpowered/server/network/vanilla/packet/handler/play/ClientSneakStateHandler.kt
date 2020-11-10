@@ -17,7 +17,7 @@ import org.lanternpowered.api.data.Keys
 
 object ClientSneakStateHandler : PacketHandler<ClientSneakStatePacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientSneakStatePacket) {
-        context.session.player.offer(Keys.IS_SNEAKING, packet.isSneaking)
+    override fun handle(ctx: NetworkContext, packet: ClientSneakStatePacket) {
+        ctx.session.player.offer(Keys.IS_SNEAKING, packet.isSneaking)
     }
 }

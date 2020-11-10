@@ -361,7 +361,7 @@ abstract class AbstractInventory : ExtendedInventory, DataHolderBase {
             this.children().contains(child)
 
     override fun <V : Any> get(child: Inventory, key: Key<out Value<V>>): Optional<V> {
-        if (key == Keys.SLOT_INDEX.get() && child is Slot)
+        if (key == Keys.SLOT_INDEX && child is Slot)
             return this.slotIndex(child).asOptional().uncheckedCast()
         return child.get(key)
     }

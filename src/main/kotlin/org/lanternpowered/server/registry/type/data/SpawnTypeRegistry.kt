@@ -14,7 +14,7 @@ import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.registry.catalogTypeRegistry
 import org.lanternpowered.server.catalog.DefaultCatalogType
-import org.spongepowered.api.event.cause.entity.spawn.SpawnType
+import org.spongepowered.api.event.cause.entity.SpawnType
 
 val SpawnTypeRegistry = catalogTypeRegistry<SpawnType> {
     fun register(id: String) =

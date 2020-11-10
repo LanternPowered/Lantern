@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientMovement
 
 object ClientMovementInputHandler : PacketHandler<ClientMovementInputPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientMovementInputPacket) {
+    override fun handle(ctx: NetworkContext, packet: ClientMovementInputPacket) {
         // TODO
     }
 }

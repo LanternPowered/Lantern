@@ -11,13 +11,14 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.value.PackedAngle
 
 data class EntityLookAndRelativeMovePacket(
         val entityId: Int,
         val deltaX: Int,
         val deltaY: Int,
         val deltaZ: Int,
-        val yaw: Byte,
-        val pitch: Byte,
+        val yaw: PackedAngle,
+        val pitch: PackedAngle,
         val isOnGround: Boolean
 ) : Packet

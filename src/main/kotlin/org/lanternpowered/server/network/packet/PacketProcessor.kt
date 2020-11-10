@@ -10,8 +10,6 @@
  */
 package org.lanternpowered.server.network.packet
 
-import org.lanternpowered.server.network.packet.codec.CodecContext
-
 /**
  * A processor for packets that aren't ready to be send to the client, this
  * processor allows packets to be translated and modified before they are send.

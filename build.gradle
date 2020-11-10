@@ -59,6 +59,8 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     compile "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion"
 
+    compile 'net.kyori:adventure-api:4.0.0'
+
     // Launch Options
     compile 'net.sf.jopt-simple:jopt-simple:5.0.4'
 
@@ -125,7 +127,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile)*.kotlinOptions {
             '-XXLanguage:+InlineClasses',
             '-XXLanguage:+NonParenthesizedAnnotationsOnFunctionalTypes',
             '-Xjvm-default=enable',
-            '-Xopt-in=kotlin.RequiresOptIn'
+            '-Xopt-in=kotlin.RequiresOptIn',
+            '-Xno-call-assertions'
     ]
 }
 

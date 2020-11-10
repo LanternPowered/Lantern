@@ -16,11 +16,11 @@ fun protocol(block: ProtocolBuilder.() -> Unit): Protocol {
 
 interface ProtocolBuilder {
 
-    fun inbound(): PacketRegistryBuilder
+    fun inbound(): InboundPacketRegistryBuilder
 
-    fun inbound(block: PacketRegistryBuilder.() -> Unit) = this.inbound().run(block)
+    fun inbound(block: InboundPacketRegistryBuilder.() -> Unit) = this.inbound().run(block)
 
-    fun outbound(): PacketRegistryBuilder
+    fun outbound(): OutboundPacketRegistryBuilder
 
-    fun outbound(block: PacketRegistryBuilder.() -> Unit) = this.outbound().run(block)
+    fun outbound(block: OutboundPacketRegistryBuilder.() -> Unit) = this.outbound().run(block)
 }

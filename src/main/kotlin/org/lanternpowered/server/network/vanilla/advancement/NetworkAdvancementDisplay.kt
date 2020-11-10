@@ -16,7 +16,7 @@ import org.lanternpowered.api.util.ToStringHelper
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.value.ContextualValueCodec
 import org.lanternpowered.server.network.item.NetworkItemStack
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.text.NetworkText
 import org.lanternpowered.server.registry.type.advancement.AdvancementTypeRegistry
 import org.spongepowered.api.advancement.AdvancementType

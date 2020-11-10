@@ -14,7 +14,7 @@ import org.lanternpowered.api.item.inventory.ItemStack
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.value.ContextualValueCodec
 import org.lanternpowered.server.network.item.NetworkItemStack
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 data class NetworkTradeOffer(
         private val firstInput: ItemStack,

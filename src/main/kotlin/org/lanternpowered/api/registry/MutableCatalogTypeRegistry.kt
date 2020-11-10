@@ -49,7 +49,7 @@ interface MutableCatalogTypeRegistryBase<T, B, R> : CatalogTypeRegistry<T>
     /**
      * Loads or reloads the [MutableCatalogTypeRegistry]. This clears the
      * registry and populates the registry again. This is the only way
-     * to remove entries.
+     * to add or remove entries.
      */
     fun load(fn: B.() -> Unit)
 }

@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayload
 
 object ChannelPayloadHandler : PacketHandler<ChannelPayloadPacket> {
 
-    override fun handle(context: NetworkContext, packet: ChannelPayloadPacket) {
+    override fun handle(ctx: NetworkContext, packet: ChannelPayloadPacket) {
         // TODO
         /*
         Lantern.getGame().getChannelRegistrar().handlePayload(packet.getContent(),

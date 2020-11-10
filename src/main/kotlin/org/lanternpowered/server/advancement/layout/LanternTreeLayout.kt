@@ -76,7 +76,7 @@ class LanternTreeLayout(private val advancementTree: AdvancementTree) : TreeLayo
         // TODO: Improve the tree to look more like vanilla, "compacter"
 
         // Call the event for post processing
-        val cause = CauseStack.current().currentCause
+        val cause = CauseStack.currentCause
         val event = LanternEventFactory.createAdvancementTreeEventGenerateLayout(
                 cause, this, this.advancementTree)
         EventManager.post(event)

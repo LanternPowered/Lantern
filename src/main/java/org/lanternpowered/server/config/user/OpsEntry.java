@@ -13,6 +13,7 @@ package org.lanternpowered.server.config.user;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.spongepowered.api.profile.GameProfile;
 
 @ConfigSerializable
 public final class OpsEntry extends UserEntry {
@@ -29,8 +30,8 @@ public final class OpsEntry extends UserEntry {
      * @param gameProfile the game profile
      * @param opLevel the op level
      */
-    public OpsEntry(LanternGameProfile gameProfile, int opLevel) {
-        super(gameProfile);
+    public OpsEntry(GameProfile gameProfile, int opLevel) {
+        super((LanternGameProfile) gameProfile);
         this.opLevel = opLevel;
     }
 

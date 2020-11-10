@@ -10,6 +10,7 @@
  */
 package org.lanternpowered.server.catalog
 
+import net.kyori.adventure.key.Key
 import org.lanternpowered.api.key.NamespacedKey
 import java.util.Objects
 
@@ -17,10 +18,12 @@ open class LanternNamespacedKey(private val namespace: String, private val value
 
     override fun getNamespace(): String = this.namespace
     override fun getValue(): String = this.value
+    override fun namespace(): String = this.namespace
+    override fun value(): String = this.value
 
-    override fun compareTo(other: NamespacedKey): Int {
-        val i = this.namespace.compareTo(other.namespace)
-        return if (i != 0) i else this.value.compareTo(other.value)
+    override fun compareTo(other: Key): Int {
+        val i = this.namespace.compareTo(other.namespace())
+        return if (i != 0) i else this.value.compareTo(other.value())
     }
 
     override fun getFormatted(): String = toString()

@@ -32,7 +32,7 @@ inline fun <C> BlockEntityInventory<C>.fix(): ExtendedBlockEntityInventory<C>
 /**
  * An extended version of [BlockEntityInventory].
  */
-interface ExtendedBlockEntityInventory<C> : BlockEntityInventory<C>, ExtendedCarriedInventory<C>
+interface ExtendedBlockEntityInventory<C> : BlockEntityInventory<C>, ExtendedSpongeCarriedInventory<C>
         where C : Carrier,
               C : BlockEntity {
 

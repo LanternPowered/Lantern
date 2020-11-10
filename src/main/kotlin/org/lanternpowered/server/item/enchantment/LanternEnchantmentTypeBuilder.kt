@@ -12,14 +12,14 @@ package org.lanternpowered.server.item.enchantment
 
 import org.lanternpowered.api.item.enchantment.EnchantmentType
 import org.lanternpowered.api.item.enchantment.EnchantmentTypeBuilder
-import org.lanternpowered.api.x.item.enchantment.XEnchantmentType
+import org.lanternpowered.api.item.enchantment.ExtendedEnchantmentType
 import org.lanternpowered.server.catalog.AbstractNamedCatalogBuilder
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.textOf
 import org.lanternpowered.api.text.toPlain
 
-class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
+class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<ExtendedEnchantmentType, EnchantmentTypeBuilder>(), EnchantmentTypeBuilder {
 
     private var weight = 5
     private var levelRange = 1..1
@@ -42,7 +42,7 @@ class LanternEnchantmentTypeBuilder : AbstractNamedCatalogBuilder<XEnchantmentTy
         this.textName = name
     }
 
-    override fun build(key: NamespacedKey, name: String): XEnchantmentType {
+    override fun build(key: NamespacedKey, name: String): ExtendedEnchantmentType {
         val textName = this.textName ?: textOf(name)
         return LanternEnchantmentType(key, name, this.levelRange, this.weight, this.treasure,
                 this.curse, textName, this.enchantabilityRange, this.compatibilityTester)

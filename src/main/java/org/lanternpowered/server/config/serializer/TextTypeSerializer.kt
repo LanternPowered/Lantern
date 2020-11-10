@@ -16,8 +16,8 @@ import ninja.leaping.configurate.gson.GsonConfigurationLoader
 import ninja.leaping.configurate.loader.HeaderMode
 import ninja.leaping.configurate.objectmapping.ObjectMappingException
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer
+import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.text.serializer.JsonTextSerializer
-import org.spongepowered.api.text.Text
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.IOException

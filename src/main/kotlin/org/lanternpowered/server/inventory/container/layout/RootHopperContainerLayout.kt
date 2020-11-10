@@ -28,7 +28,7 @@ class RootHopperContainerLayout : LanternTopBottomContainerLayout<GridContainerL
 
         private val TOP_INVENTORY_FLAGS = IntArray(WIDTH) { Flags.REVERSE_SHIFT_INSERTION }
 
-        private val ALL_INVENTORY_FLAGS = MAIN_INVENTORY_FLAGS + TOP_INVENTORY_FLAGS
+        private val ALL_INVENTORY_FLAGS = TOP_INVENTORY_FLAGS + MAIN_INVENTORY_FLAGS
     }
 
     override fun createOpenPackets(data: ContainerData): List<Packet> =

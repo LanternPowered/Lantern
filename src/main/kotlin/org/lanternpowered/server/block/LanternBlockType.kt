@@ -10,7 +10,6 @@
  */
 package org.lanternpowered.server.block
 
-import net.kyori.adventure.text.Component
 import org.lanternpowered.api.key.NamespacedKey
 import org.lanternpowered.api.text.Text
 import org.lanternpowered.api.util.uncheckedCast
@@ -49,7 +48,7 @@ class LanternBlockType(
     private var updateRandomly: Boolean = false
 
     override fun getKey() = this.key
-    override fun asComponent(): Component = this.name
+    override fun asComponent(): Text = this.name
 
     override fun setUpdateRandomly(updateRandomly: Boolean) {
         this.updateRandomly = updateRandomly

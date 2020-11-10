@@ -11,8 +11,9 @@
 package org.lanternpowered.server.network.vanilla.packet.type.play
 
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.value.PackedAngle
 
 data class EntityHeadLookPacket(
         val entityId: Int,
-        val yaw: Byte
+        val yaw: PackedAngle
 ) : Packet

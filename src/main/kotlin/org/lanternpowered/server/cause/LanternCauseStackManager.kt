@@ -44,34 +44,34 @@ object LanternCauseStackManager : CauseStackManager {
         }
     }
 
-    override fun currentStackOrNull() = getCauseStackOrNull(Thread.currentThread())
+    override fun currentStackOrNull() = this.getCauseStackOrNull(Thread.currentThread())
 
-    fun getCauseStackOrNull(thread: Thread)
+    private fun getCauseStackOrNull(thread: Thread)
             = if (thread is LanternThread) thread.causeStack else this.fallbackCauseStacks.get()
 
-    fun getCauseStackOrEmpty(thread: Thread) = getCauseStackOrNull(thread) ?: EmptyCauseStack
+    fun getCauseStackOrEmpty(thread: Thread) = this.getCauseStackOrNull(thread) ?: EmptyCauseStack
 
-    override fun currentStackOrEmpty(): CauseStack = currentStackOrNull() ?: EmptyCauseStack
-    override fun currentStack() = currentStackOrNull() ?: error("The current thread doesn't support a cause stack.")
+    override fun currentStackOrEmpty(): CauseStack = this.currentStackOrNull() ?: EmptyCauseStack
+    override fun currentStack() = this.currentStackOrNull() ?: error("The current thread doesn't support a cause stack.")
 
-    override fun getCurrentCause(): Cause = currentStack().currentCause
-    override fun getCurrentContext(): CauseContext = currentStack().currentContext
-    override fun pushCause(obj: Any): CauseStackManager = apply { currentStack().pushCause(obj) }
-    override fun popCause(): Any = currentStack().popCause()
-    override fun popCauses(n: Int) = currentStack().popCauses(n)
-    override fun peekCause(): Any = currentStack().peekCause()
-    override fun pushCauseFrame(): CauseStack.Frame = currentStack().pushCauseFrame()
-    override fun popCauseFrame(handle: org.spongepowered.api.event.CauseStackManager.StackFrame) = currentStack().popCauseFrame(handle)
-    override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): CauseStackManager = apply { currentStack().addContext(key, value) }
-    override fun <T : Any> getContext(key: CauseContextKey<T>): Optional<T> = currentStack().getContext(key)
-    override fun <T : Any> removeContext(key: CauseContextKey<T>): Optional<T> = currentStack().removeContext(key)
-    override fun <T : Any> get(key: CauseContextKey<T>): T?= currentStack()[key]
-    override fun <T : Any> set(key: CauseContextKey<T>, value: T) = currentStack().set(key, value)
-    override fun <T : Any> first(target: KClass<T>): T?  = currentStack().first(target)
-    override fun <T : Any> first(target: Class<T>): Optional<T> = currentStack().first(target)
-    override fun <T : Any> last(target: KClass<T>): T? = currentStack().last(target)
-    override fun <T : Any> last(target: Class<T>): Optional<T> = currentStack().last(target)
-    override fun containsType(target: KClass<*>): Boolean = currentStack().containsType(target)
-    override fun containsType(target: Class<*>): Boolean = currentStack().containsType(target)
-    override fun contains(any: Any): Boolean = currentStack().contains(any)
+    override fun getCurrentCause(): Cause = this.currentStack().currentCause
+    override fun getCurrentContext(): CauseContext = this.currentStack().currentContext
+    override fun pushCause(obj: Any): CauseStackManager = apply { this.currentStack().pushCause(obj) }
+    override fun popCause(): Any = this.currentStack().popCause()
+    override fun popCauses(n: Int) = this.currentStack().popCauses(n)
+    override fun peekCause(): Any = this.currentStack().peekCause()
+    override fun pushCauseFrame(): CauseStack.Frame = this.currentStack().pushCauseFrame()
+    override fun popCauseFrame(handle: org.spongepowered.api.event.CauseStackManager.StackFrame) = this.currentStack().popCauseFrame(handle)
+    override fun <T : Any> addContext(key: CauseContextKey<T>, value: T): CauseStackManager = apply { this.currentStack().addContext(key, value) }
+    override fun <T : Any> getContext(key: CauseContextKey<T>): Optional<T> = this.currentStack().getContext(key)
+    override fun <T : Any> removeContext(key: CauseContextKey<T>): Optional<T> = this.currentStack().removeContext(key)
+    override fun <T : Any> get(key: CauseContextKey<T>): T?= this.currentStack()[key]
+    override fun <T : Any> set(key: CauseContextKey<T>, value: T) = this.currentStack().set(key, value)
+    override fun <T : Any> first(target: KClass<T>): T?  = this.currentStack().first(target)
+    override fun <T : Any> first(target: Class<T>): Optional<T> = this.currentStack().first(target)
+    override fun <T : Any> last(target: KClass<T>): T? = this.currentStack().last(target)
+    override fun <T : Any> last(target: Class<T>): Optional<T> = this.currentStack().last(target)
+    override fun containsType(target: KClass<*>): Boolean = this.currentStack().containsType(target)
+    override fun containsType(target: Class<*>): Boolean = this.currentStack().containsType(target)
+    override fun contains(any: Any): Boolean = this.currentStack().contains(any)
 }

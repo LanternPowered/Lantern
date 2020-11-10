@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.handshake
 import org.lanternpowered.server.network.ProxyType
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketDecoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.handshake.HandshakePacket
 
 object HandshakeDecoder : PacketDecoder<HandshakePacket> {

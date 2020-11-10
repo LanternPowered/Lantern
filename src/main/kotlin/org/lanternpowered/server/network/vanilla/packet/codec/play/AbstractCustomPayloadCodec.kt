@@ -19,15 +19,15 @@ import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.buffer.UnpooledByteBufferAllocator
 import org.lanternpowered.server.network.packet.Packet
+import org.lanternpowered.server.network.packet.PacketDecoder
+import org.lanternpowered.server.network.packet.PacketEncoder
 import org.lanternpowered.server.network.packet.UnknownPacket
-import org.lanternpowered.server.network.packet.codec.Codec
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ChannelPayloadPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.RegisterChannelsPacket
 import org.lanternpowered.server.network.vanilla.packet.type.play.UnregisterChannelsPacket
-import java.nio.charset.StandardCharsets
 
-abstract class AbstractCustomPayloadCodec : Codec<Packet> {
+abstract class AbstractCustomPayloadCodec : PacketEncoder<Packet>, PacketDecoder<Packet> {
 
     override fun encode(ctx: CodecContext, packet: Packet): ByteBuffer {
         val buf = ctx.byteBufAlloc().buffer()
@@ -95,7 +95,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
                 return UnregisterChannelsPacket(channels)
             }
         } else if ("FML|MP" == channel) {
-            val attribute = context.channel.attr(FML_MULTI_PART_MESSAGE)
+            val attribute = context.session.attr(FML_MULTI_PART_MESSAGE)
             val message0 = attribute.get()
             if (message0 == null) {
                 val channel0 = content.readString()
@@ -157,7 +157,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
         private fun decodeChannels(buffer: ByteBuffer): MutableSet<String> {
             val bytes = ByteArray(buffer.available())
             buffer.readBytes(bytes)
-            return Splitter.on('\u0000').split(String(bytes, StandardCharsets.UTF_8)).toHashSet()
+            return Splitter.on('\u0000').split(String(bytes, Charsets.UTF_8)).toHashSet()
         }
 
         /**
@@ -167,7 +167,7 @@ abstract class AbstractCustomPayloadCodec : Codec<Packet> {
          * @return the byte buffer
          */
         private fun encodeChannels(channels: Set<String?>): ByteBuffer {
-            return UnpooledByteBufferAllocator.wrappedBuffer(Joiner.on('\u0000').join(channels).toByteArray(StandardCharsets.UTF_8))
+            return UnpooledByteBufferAllocator.wrappedBuffer(Joiner.on('\u0000').join(channels).toByteArray(Charsets.UTF_8))
         }
     }
 }

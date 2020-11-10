@@ -55,16 +55,6 @@ object LanternKeys {
     @JvmField val CAN_PICK_UP_LOOT: Key<Value<Boolean>> = valueKeyOf(lanternKey("can_pick_up_loot"))
 
     /**
-     * Whether a entity is a baby.
-     */
-    @JvmField val IS_BABY: Key<Value<Boolean>> = valueKeyOf(lanternKey("is_baby"))
-
-    /**
-     * Whether something is holding its hands up, usually related to zombies.
-     */
-    @JvmField val ARE_HANDS_UP: Key<Value<Boolean>> = valueKeyOf(lanternKey("are_hands_up"))
-
-    /**
      * How many arrows are stuck a entity's body.
      */
     @JvmField val ARROWS_IN_ENTITY: Key<Value<Int>> = valueKeyOf(lanternKey("arrows_in_entity"))
@@ -73,16 +63,6 @@ object LanternKeys {
      * Whether something is converting, usually a zombie villager converting to a villager.
      */
     @JvmField val IS_CONVERTING: Key<Value<Boolean>> = valueKeyOf(lanternKey("is_converting"))
-
-    /**
-     * A set with all the parts of a skin that should be displayed.
-     */
-    @JvmField val DISPLAYED_SKIN_PARTS: Key<SetValue<SkinPart>> = valueKeyOf(lanternKey("displayed_skin_parts"))
-
-    /**
-     * A factor which alters how much something (e.g. entity) is affected by gravity.
-     */
-    @JvmField val GRAVITY_FACTOR: Key<Value<Double>> = valueKeyOf(lanternKey("gravity_factor"))
 
     /**
      * Represents the part of a door.
@@ -120,11 +100,6 @@ object LanternKeys {
      * Whether a iron golem is holding a poppy.
      */
     @JvmField val HOLDS_POPPY: Key<Value<Boolean>> = valueKeyOf(lanternKey("holds_poppy"))
-
-    /**
-     * Whether a snowman has a pumpkin head.
-     */
-    @JvmField val HAS_PUMPKIN_HEAD: Key<Value<Boolean>> = valueKeyOf(lanternKey("has_pumpkin_head"))
 
     /**
      * Whether something is hanging.
@@ -165,16 +140,6 @@ object LanternKeys {
      * The hand of a entity that is currently active with an interaction.
      */
     @JvmField val ACTIVE_HAND = valueKeyOf<Value<HandType>>(lanternKey("active_hand"))
-
-    /**
-     * The maximum exhaustion of a entity.
-     */
-    @JvmField val MAX_EXHAUSTION = valueKeyOf<Value<Double>>(lanternKey("max_exhaustion"))
-
-    /**
-     * The maximum food level of a entity.
-     */
-    @JvmField val MAX_FOOD_LEVEL = valueKeyOf<Value<Int>>(lanternKey("max_food_level"))
 
     /**
      * The crafting recipe book state.
@@ -227,9 +192,6 @@ object LanternKeys {
     @JvmField val CONNECTED_WEST: Key<Value<Boolean>> = valueKeyOf(lanternKey("connected_west"))
 
     @JvmField val POSE: Key<Value<Pose>> = valueKeyOf(lanternKey("pose"))
-
-    @JvmField val PICKUP_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("pickup_delay"))
-    @JvmField val DESPAWN_DELAY: Key<Value<Duration>> = valueKeyOf(lanternKey("despawn_delay"))
 
     @JvmField val BLOCK_SOUND_GROUP: Key<Value<BlockSoundGroup>> = valueKeyOf(lanternKey("block_sound_group"))
     @JvmField val FLAMMABLE_INFO: Key<Value<FlammableInfo>> = valueKeyOf(lanternKey("flammable_info"))

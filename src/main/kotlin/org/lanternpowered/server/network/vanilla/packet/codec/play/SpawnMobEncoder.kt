@@ -12,8 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.Codec
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnMobPacket
 import kotlin.math.min
 
@@ -25,9 +24,9 @@ object SpawnMobEncoder : PacketEncoder<SpawnMobPacket> {
         buf.writeUniqueId(packet.uniqueId)
         buf.writeVarInt(packet.mobType)
         buf.writeVector3d(packet.position)
-        buf.writeByte(packet.yaw)
-        buf.writeByte(packet.pitch)
-        buf.writeByte(packet.headPitch)
+        buf.writeByte(packet.yaw.packed)
+        buf.writeByte(packet.pitch.packed)
+        buf.writeByte(packet.headPitch.packed)
         val velocity = packet.velocity
         buf.writeShort(min(velocity.x * 8000.0, Short.MAX_VALUE.toDouble()).toShort())
         buf.writeShort(min(velocity.y * 8000.0, Short.MAX_VALUE.toDouble()).toShort())

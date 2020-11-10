@@ -16,8 +16,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientPlayerMo
 
 object ClientPlayerMovementHandler : PacketHandler<ClientPlayerMovementPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientPlayerMovementPacket) {
-        val player = context.session.player
+    override fun handle(ctx: NetworkContext, packet: ClientPlayerMovementPacket) {
+        val player = ctx.session.player
         player.setRawPosition(packet.position)
         player.handleOnGroundState(packet.isOnGround)
     }

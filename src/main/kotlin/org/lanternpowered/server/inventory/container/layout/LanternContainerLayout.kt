@@ -603,10 +603,12 @@ abstract class LanternContainerLayout(
      * click on the given slot index.
      */
     private fun queueDoubleClickChanges(data: ContainerData, slotIndex: Int) {
+        // TODO: Consider items that were made unstackable on the
+        //  client, they don't need to be updated
         val doubleClickItem = data.doubleClickItem
         if (doubleClickItem != null) {
             val maxStack = NetworkItemTypeRegistry.getByType(doubleClickItem.type)!!.originalMaxStackSize
-            val flags = slotFlags
+            val flags = this.slotFlags
             for (i in flags.indices) {
                 // The stack is full, stop
                 if (doubleClickItem.quantity >= maxStack)

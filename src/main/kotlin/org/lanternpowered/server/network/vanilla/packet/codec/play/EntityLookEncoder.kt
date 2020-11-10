@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.EntityLookPacket
 
 object EntityLookEncoder : PacketEncoder<EntityLookPacket> {
@@ -20,8 +20,8 @@ object EntityLookEncoder : PacketEncoder<EntityLookPacket> {
     override fun encode(ctx: CodecContext, packet: EntityLookPacket): ByteBuffer {
         val buf = ctx.byteBufAlloc().buffer()
         buf.writeVarInt(packet.entityId)
-        buf.writeByte(packet.yaw)
-        buf.writeByte(packet.pitch)
+        buf.writeByte(packet.yaw.packed)
+        buf.writeByte(packet.pitch.packed)
         buf.writeBoolean(packet.isOnGround)
         return buf
     }

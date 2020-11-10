@@ -17,6 +17,7 @@ import java.util.Optional
 import java.util.OptionalDouble
 import java.util.OptionalInt
 import java.util.OptionalLong
+import kotlin.time.Duration
 
 /**
  * Gets a empty [Optional].
@@ -110,3 +111,8 @@ inline fun Optional<Int>.asInt(): OptionalInt = if (this.isPresent) OptionalInt.
  * Transforms this [Optional] into a [OptionalDouble].
  */
 inline fun Optional<Double>.asDouble(): OptionalDouble = if (this.isPresent) OptionalDouble.of(this.get()) else OptionalDouble.empty()
+
+/**
+ * Gets the [Duration] if present, otherwise returns [Duration.ZERO].
+ */
+inline fun Optional<Duration>.orZero(): Duration = this.orElse(Duration.ZERO)

@@ -18,6 +18,7 @@ import org.lanternpowered.api.attribute.AttributeModifierBuilder
 import org.lanternpowered.api.attribute.AttributeTypeBuilder
 import org.lanternpowered.api.catalog.CatalogType
 import org.lanternpowered.api.cause.Cause
+import org.lanternpowered.api.cause.CauseBuilder
 import org.lanternpowered.api.cause.CauseContextKeyBuilder
 import org.lanternpowered.api.cause.CauseStackManager
 import org.lanternpowered.api.data.KeyBuilder
@@ -50,6 +51,7 @@ import org.lanternpowered.server.block.LanternBlockSnapshotBuilder
 import org.lanternpowered.server.block.LanternLocatableBlockBuilder
 import org.lanternpowered.server.block.entity.LanternBlockEntityArchetypeBuilder
 import org.lanternpowered.server.catalog.LanternNamespacedKeyBuilder
+import org.lanternpowered.server.cause.LanternCauseBuilder
 import org.lanternpowered.server.command.LanternCommandCauseFactory
 import org.lanternpowered.server.config.user.ban.LanternBanBuilder
 import org.lanternpowered.server.data.key.SpongeValueKeyBuilder
@@ -75,6 +77,7 @@ import org.lanternpowered.server.inventory.transaction.LanternInventoryTransacti
 import org.lanternpowered.server.item.ItemStackComparatorsRegistry
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentBuilder
 import org.lanternpowered.server.item.enchantment.LanternEnchantmentTypeBuilder
+import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTreeRegistry
 import org.lanternpowered.server.registry.type.advancement.AdvancementTriggerRegistry
@@ -117,7 +120,7 @@ import org.lanternpowered.server.registry.type.data.RailDirectionRegistry
 import org.lanternpowered.server.registry.type.data.SkinPartRegistry
 import org.lanternpowered.server.registry.type.data.SlabPortionRegistry
 import org.lanternpowered.server.registry.type.data.SpawnTypeRegistry
-import org.lanternpowered.server.registry.type.data.TeleportTypeRegistry
+import org.lanternpowered.server.registry.type.data.MovementTypeRegistry
 import org.lanternpowered.server.registry.type.data.ToolTypeRegistry
 import org.lanternpowered.server.registry.type.data.TopHatRegistry
 import org.lanternpowered.server.registry.type.data.ValueKeyRegistry
@@ -147,7 +150,6 @@ import org.lanternpowered.server.registry.type.scoreboard.DisplaySlotRegistry
 import org.lanternpowered.server.registry.type.scoreboard.ObjectiveDisplayModeRegistry
 import org.lanternpowered.server.registry.type.scoreboard.VisibilityRegistry
 import org.lanternpowered.server.registry.type.text.ChatVisibilityRegistry
-import org.lanternpowered.server.registry.type.text.TextSerializerRegistry
 import org.lanternpowered.server.registry.type.util.BanTypeRegistry
 import org.lanternpowered.server.registry.type.util.RotationRegistry
 import org.lanternpowered.server.registry.type.world.DifficultyRegistry
@@ -243,7 +245,9 @@ class LanternGameRegistry(
             register<NamespacedKeyBuilder> { LanternNamespacedKeyBuilder() }
             register<Key.Builder<Any, Value<Any>>> { SpongeValueKeyBuilder() }
             register<KeyBuilder<Value<Any>>> { ValueKeyBuilder() }
+
             register<CauseContextKeyBuilder<Any>> { LanternCauseContextKeyBuilder() }
+            register<CauseBuilder> { LanternCauseBuilder() }
 
             register<BlockSnapshot.Builder> { LanternBlockSnapshotBuilder() }
             register<BlockSnapshotBuilder> { LanternBlockSnapshotBuilder() }
@@ -328,7 +332,7 @@ class LanternGameRegistry(
             register(RabbitTypeRegistry)
             register(SkinPartRegistry)
             register(SpawnTypeRegistry)
-            register(TeleportTypeRegistry)
+            register(MovementTypeRegistry)
             register(ToolTypeRegistry)
             register(TopHatRegistry)
             register(ValueKeyRegistry)
@@ -385,7 +389,6 @@ class LanternGameRegistry(
             register(VisibilityRegistry)
 
             register(ChatVisibilityRegistry)
-            register(TextSerializerRegistry)
 
             register(BanTypeRegistry)
             register(RotationRegistry)
@@ -398,6 +401,8 @@ class LanternGameRegistry(
             register(WorldArchetypeRegistry)
 
             register(PlaceholderParserRegistry)
+
+            register(EntityProtocolTypeRegistry)
         }
 
         // Allow plugins to register their catalog type, builders and factories

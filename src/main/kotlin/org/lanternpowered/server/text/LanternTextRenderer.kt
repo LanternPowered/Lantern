@@ -82,13 +82,13 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
     protected open fun renderLiteralIfNeeded(text: LiteralText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            LiteralText.builder(text.content())
+            Text.text().content(text.content())
         }
     }
 
     protected open fun renderStorageNbtIfNeeded(text: StorageDataText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            StorageDataText.builder()
+            Text.storageNBT()
                     .storage(text.storage())
                     .applyNbt(text)
         }
@@ -96,7 +96,7 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
     protected open fun renderEntityNbtIfNeeded(text: EntityDataText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            EntityDataText.builder()
+            Text.entityNBT()
                     .selector(text.selector())
                     .applyNbt(text)
         }
@@ -104,7 +104,7 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
     protected open fun renderBlockNbtIfNeeded(text: BlockDataText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            BlockDataText.builder()
+            Text.blockNBT()
                     .pos(text.pos())
                     .applyNbt(text)
         }
@@ -112,7 +112,7 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
     protected open fun renderScoreIfNeeded(text: ScoreText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            ScoreText.builder()
+            Text.score()
                     .objective(text.objective())
                     .value(text.value())
                     .name(text.name())
@@ -121,13 +121,13 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
 
     protected open fun renderKeybindIfNeeded(text: KeybindText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            KeybindText.builder().keybind(text.keybind())
+            Text.keybind().keybind(text.keybind())
         }
     }
 
     protected open fun renderSelectorIfNeeded(text: SelectorText, context: C): Text? {
         return this.renderIfNeeded(text, context) {
-            SelectorText.builder().pattern(text.pattern())
+            Text.selector().pattern(text.pattern())
         }
     }
 
@@ -138,12 +138,12 @@ abstract class LanternTextRenderer<C> : AbstractComponentRenderer<C>() {
         if (format == null) {
             val renderedArgs = this.renderListIfNeeded(text.args(), context)
             return this.renderIfNeeded(text, context, force = renderedArgs != null) {
-                TranslatableText.builder(text.key())
+                Text.translatable().key(text.key())
                         .args(renderedArgs ?: args)
             }
         }
 
-        val builder = LiteralText.builder()
+        val builder = Text.text()
 
         if (args.isEmpty())
             return builder.content(format.format(null, StringBuffer(), null).toString())

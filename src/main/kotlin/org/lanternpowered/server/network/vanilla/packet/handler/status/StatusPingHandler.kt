@@ -16,7 +16,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.status.StatusPingPa
 
 object StatusPingHandler : PacketHandler<StatusPingPacket> {
 
-    override fun handle(context: NetworkContext, packet: StatusPingPacket) {
-        context.session.send(packet)
+    override fun handle(ctx: NetworkContext, packet: StatusPingPacket) {
+        ctx.session.send(packet)
     }
 }

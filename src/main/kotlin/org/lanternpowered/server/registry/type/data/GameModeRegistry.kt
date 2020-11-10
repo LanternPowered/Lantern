@@ -28,20 +28,20 @@ val GameModeRegistry = internalCatalogTypeRegistry<GameMode> {
     register(0, "survival", "survival") {
         offer(Keys.CAN_FLY, false)
         offer(Keys.IS_FLYING, false)
-        offer(Keys.INVULNERABLE, false)
+        offer(Keys.IS_INVULNERABLE, false)
     }
     register(1, "creative", "creative") {
         offer(Keys.CAN_FLY, true)
-        offer(Keys.INVULNERABLE, true)
+        offer(Keys.IS_INVULNERABLE, true)
     }
     register(2, "adventure", "adventure") {
         offer(Keys.CAN_FLY, false)
         offer(Keys.IS_FLYING, false)
-        offer(Keys.INVULNERABLE, false)
+        offer(Keys.IS_INVULNERABLE, false)
     }
     register(3, "spectator", "spectator") {
         offer(Keys.CAN_FLY, true)
         offer(Keys.IS_FLYING, true)
-        offer(Keys.INVULNERABLE, true)
+        offer(Keys.IS_INVULNERABLE, true)
     }
 }

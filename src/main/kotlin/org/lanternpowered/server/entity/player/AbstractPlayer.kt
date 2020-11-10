@@ -73,13 +73,13 @@ abstract class AbstractPlayer(private val profile: GameProfile) : LanternLiving(
 
         keyRegistry {
             register(LanternKeys.TOP_HAT)
-            registerBounded(LanternKeys.MAX_EXHAUSTION, 4.0).minimum(0.0).maximum(Double.MAX_VALUE)
-            registerBounded(Keys.EXHAUSTION, DEFAULT_EXHAUSTION).minimum(0.0).maximum(LanternKeys.MAX_EXHAUSTION)
-            registerBounded(LanternKeys.MAX_FOOD_LEVEL, 20).minimum(0).maximum(Int.MAX_VALUE)
-            registerBounded(Keys.FOOD_LEVEL, 20).minimum(0).maximum(LanternKeys.MAX_FOOD_LEVEL)
+            registerBounded(Keys.MAX_EXHAUSTION, 4.0).minimum(0.0).maximum(Double.MAX_VALUE)
+            registerBounded(Keys.EXHAUSTION, DEFAULT_EXHAUSTION).minimum(0.0).maximum(Keys.MAX_EXHAUSTION)
+            registerBounded(Keys.MAX_FOOD, 20.0).minimum(0.0).maximum(Double.MAX_VALUE)
+            registerBounded(Keys.FOOD, 20.0).minimum(0.0).maximum(Keys.MAX_FOOD)
             registerBounded(Keys.SATURATION, DEFAULT_SATURATION)
                     .minimum(0.0)
-                    .maximum { this.get(Keys.FOOD_LEVEL).orElse(20).toDouble() }
+                    .maximum { this.get(Keys.FOOD).orElse(20.0).toDouble() }
             register(Keys.LAST_DATE_PLAYED)
             register(Keys.LAST_DATE_JOINED)
             register(Keys.FIRST_DATE_JOINED)
@@ -111,14 +111,14 @@ abstract class AbstractPlayer(private val profile: GameProfile) : LanternLiving(
             register(LanternKeys.SUPER_STEVE, false)
             register(LanternKeys.CAN_WALL_JUMP, false)
             register(LanternKeys.CAN_DUAL_WIELD, false)
-            register(LanternKeys.SCORE, 0)
+            register(Keys.SCORE, 0)
             register(LanternKeys.ACTIVE_HAND)
             register(LanternKeys.FURNACE_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT)
             register(LanternKeys.CRAFTING_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT)
             register(LanternKeys.SMOKER_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT)
             register(LanternKeys.BLAST_FURNACE_RECIPE_BOOK_STATE, RecipeBookState.DEFAULT)
             register(LanternKeys.OPEN_ADVANCEMENT_TREE)
-            register(LanternKeys.DISPLAYED_SKIN_PARTS, SkinPartRegistry.all.toSet())
+            register(Keys.DISPLAYED_SKIN_PARTS, SkinPartRegistry.toSet())
             register(LanternKeys.POSE, Pose.STANDING)
             registerProvider(Keys.STATISTICS) {
                 get { this.statistics.statisticValues }

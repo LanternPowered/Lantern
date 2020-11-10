@@ -13,22 +13,22 @@ package org.lanternpowered.server.item
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap
 import org.lanternpowered.api.cause.CauseStack
 import org.lanternpowered.api.event.EventManager
+import org.lanternpowered.api.item.ItemType
 import org.lanternpowered.server.event.LanternEventFactory
 import org.lanternpowered.api.util.optional.emptyOptionalDouble
 import org.lanternpowered.api.util.optional.emptyOptionalInt
 import org.lanternpowered.api.util.optional.asOptionalDouble
 import org.lanternpowered.api.util.optional.asOptionalInt
+import org.lanternpowered.server.LanternGame
 import org.lanternpowered.server.entity.player.LanternPlayer
-import org.lanternpowered.server.game.LanternGame
 import org.lanternpowered.server.network.vanilla.packet.type.play.SetCooldownPacket
 import org.spongepowered.api.entity.living.player.CooldownTracker
-import org.spongepowered.api.item.ItemType
 import java.util.OptionalDouble
 import java.util.OptionalInt
 
 class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracker {
 
-    private val map = Object2LongOpenHashMap<ItemType>().apply { defaultReturnValue(-1L) }
+    private val map = Object2LongOpenHashMap<ItemType>().apply { this.defaultReturnValue(-1L) }
 
     override fun setCooldown(itemType: ItemType, ticks: Int): Boolean {
         var cooldown = ticks
@@ -38,7 +38,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
             return false
         }
         val optionalStartCooldown = if (time <= 0) emptyOptionalInt() else time.toInt().asOptionalInt()
-        val event = LanternEventFactory.createCooldownEventSet(CauseStack.current().currentCause,
+        val event = LanternEventFactory.createCooldownEventSet(CauseStack.currentCause,
                 cooldown, cooldown, itemType, this.player, optionalStartCooldown)
         EventManager.post(event)
         if (event.isCancelled)
@@ -61,16 +61,15 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
     }
 
     override fun resetCooldown(itemType: ItemType): Boolean {
-        return setCooldown(itemType, 0)
+        return this.setCooldown(itemType, 0)
     }
 
     override fun getCooldown(itemType: ItemType): OptionalInt {
         val time = this.map.getLong(itemType)
         if (time != -1L) {
             val current = LanternGame.currentTimeTicks()
-            if (time > current) {
+            if (time > current)
                 return (time - current).toInt().asOptionalInt()
-            }
         }
         return emptyOptionalInt()
     }
@@ -79,16 +78,15 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
         val time = this.map.getLong(itemType)
         if (time != -1L) {
             val current = LanternGame.currentTimeTicks()
-            if (time > current) {
+            if (time > current)
                 return true
-            }
         }
         return false
     }
 
     override fun getFractionRemaining(type: ItemType): OptionalDouble {
         // TODO: Properly implement this
-        return if (hasCooldown(type)) 1.0.asOptionalDouble() else emptyOptionalDouble()
+        return if (this.hasCooldown(type)) 1.0.asOptionalDouble() else emptyOptionalDouble()
     }
 
     fun process() {
@@ -96,7 +94,7 @@ class LanternCooldownTracker(private val player: LanternPlayer) : CooldownTracke
         this.map.object2LongEntrySet().removeIf { entry ->
             if (entry.longValue < current) {
                 val event = LanternEventFactory.createCooldownEventEnd(
-                        CauseStack.current().currentCause, entry.key, this.player)
+                        CauseStack.currentCause, entry.key, this.player)
                 EventManager.post(event)
                 true
             } else false

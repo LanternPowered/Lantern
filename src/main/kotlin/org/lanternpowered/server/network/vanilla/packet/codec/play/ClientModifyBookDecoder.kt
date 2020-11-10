@@ -16,7 +16,7 @@ import org.lanternpowered.server.data.io.store.item.WritableBookItemTypeObjectSe
 import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.PacketDecoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.ClientModifyBookPacket
 import org.spongepowered.api.data.type.HandTypes
 

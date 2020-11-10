@@ -28,7 +28,7 @@ class LanternCriterionProgress(
     override fun grant(invalidator: () -> Unit): Optional<Instant> {
         if (this.achievingTime != null)
             return this.achievingTime.asOptional()
-        val cause = CauseStack.current().currentCause
+        val cause = CauseStack.currentCause
         val advancement = this.advancementProgress.advancement
         val event = LanternEventFactory.createCriterionEventGrant(
                 cause, advancement, criterion, advancementProgress.player, Instant.now())
@@ -44,7 +44,7 @@ class LanternCriterionProgress(
     override fun revoke(invalidator: () -> Unit): Optional<Instant> {
         if (this.achievingTime == null)
             return emptyOptional()
-        val cause = CauseStack.current().currentCause
+        val cause = CauseStack.currentCause
         val advancement = this.advancementProgress.advancement
         val event = LanternEventFactory.createCriterionEventRevoke(
                 cause, advancement, criterion, advancementProgress.player)

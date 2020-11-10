@@ -16,6 +16,8 @@ import org.lanternpowered.server.network.vanilla.packet.type.handshake.Handshake
 
 val HandshakeProtocol = protocol {
     inbound {
-        bind(HandshakePacket::class).decoder(HandshakeDecoder).handler(HandshakeHandler)
+        bind().decoder(HandshakeDecoder)
+
+        type(HandshakePacket::class).handler(HandshakeHandler)
     }
 }

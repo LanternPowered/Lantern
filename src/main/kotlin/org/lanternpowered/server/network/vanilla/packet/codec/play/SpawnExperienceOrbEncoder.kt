@@ -11,11 +11,11 @@
 package org.lanternpowered.server.network.vanilla.packet.codec.play
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.Codec
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.PacketEncoder
+import org.lanternpowered.server.network.packet.CodecContext
 import org.lanternpowered.server.network.vanilla.packet.type.play.SpawnExperienceOrbPacket
 
-object SpawnExperienceOrbEncoder : Codec<SpawnExperienceOrbPacket> {
+object SpawnExperienceOrbEncoder : PacketEncoder<SpawnExperienceOrbPacket> {
 
     override fun encode(ctx: CodecContext, packet: SpawnExperienceOrbPacket): ByteBuffer {
         val buf = ctx.byteBufAlloc().buffer()

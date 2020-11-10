@@ -13,7 +13,7 @@ package org.lanternpowered.server.network.vanilla.packet.codec
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.packet.Packet
 import org.lanternpowered.server.network.packet.PacketEncoder
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 @Deprecated(message = "Actually implement the encoder.")
 object EncoderPlaceholder : PacketEncoder<Packet> {

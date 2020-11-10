@@ -20,8 +20,8 @@ object LightningSoundEffect : AbstractEntityEffect() {
 
     override fun play(entity: LanternEntity, relativePosition: Vector3d, random: Random) {
         entity.makeSound(SoundTypes.ENTITY_LIGHTNING_BOLT_THUNDER,
-                10000.0, 0.8 + random.nextDouble() * 0.2)
+                volume = 10000.0, pitch = 0.8 + random.nextDouble() * 0.2)
         entity.makeSound(SoundTypes.ENTITY_LIGHTNING_BOLT_IMPACT,
-                2.0, 0.5 + random.nextDouble() * 0.2)
+                volume = 2.0, pitch = 0.5 + random.nextDouble() * 0.2)
     }
 }

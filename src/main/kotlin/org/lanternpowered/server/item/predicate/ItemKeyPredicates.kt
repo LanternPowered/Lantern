@@ -27,9 +27,9 @@ object ItemKeyPredicates {
      */
     fun hasMatchingKey(keyValueMatcher: KeyValueMatcher<*>): ItemPredicate {
         return object : ItemPredicate {
-            override fun test(stack: ItemStack) = keyValueMatcher.matcherContainer(stack)
-            override fun test(stack: ItemStackSnapshot) = keyValueMatcher.matcherContainer(stack)
-            override fun test(type: ItemType) = keyValueMatcher.matcherContainer(type)
+            override fun invoke(stack: ItemStack) = keyValueMatcher.matchesContainer(stack)
+            override fun invoke(stack: ItemStackSnapshot) = keyValueMatcher.matchesContainer(stack)
+            override fun invoke(type: ItemType) = keyValueMatcher.matchesContainer(type)
         }
     }
 
@@ -42,9 +42,9 @@ object ItemKeyPredicates {
      */
     fun <T> hasKey(key: Key<out Value<T>>): ItemPredicate {
         return object : ItemPredicate {
-            override fun test(stack: ItemStack) = stack.get(key).isPresent
-            override fun test(stack: ItemStackSnapshot) = stack.get(key).isPresent
-            override fun test(type: ItemType) = type.get(key).isPresent
+            override fun invoke(stack: ItemStack) = stack.get(key).isPresent
+            override fun invoke(stack: ItemStackSnapshot) = stack.get(key).isPresent
+            override fun invoke(type: ItemType) = type.get(key).isPresent
         }
     }
 }

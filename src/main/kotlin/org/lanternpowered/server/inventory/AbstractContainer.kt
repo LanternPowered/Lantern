@@ -14,11 +14,12 @@ import org.lanternpowered.api.entity.player.Player
 import org.lanternpowered.api.item.inventory.container.ExtendedContainer
 import org.lanternpowered.api.item.inventory.Inventory
 import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.container.layout.ContainerLayout
 import org.lanternpowered.api.item.inventory.slot.Slot
 import org.spongepowered.api.item.inventory.ContainerType
 import java.util.Optional
 
-class AbstractContainer : AbstractChildrenInventory(), ExtendedContainer {
+class AbstractContainer(override var layout: ContainerLayout) : AbstractChildrenInventory(), ExtendedContainer {
 
     override fun getType(): ContainerType {
         TODO("Not yet implemented")

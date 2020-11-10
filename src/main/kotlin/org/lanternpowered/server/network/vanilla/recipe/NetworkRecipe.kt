@@ -12,7 +12,7 @@ package org.lanternpowered.server.network.vanilla.recipe
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
 import org.lanternpowered.server.network.value.ContextualValueCodec
-import org.lanternpowered.server.network.packet.codec.CodecContext
+import org.lanternpowered.server.network.packet.CodecContext
 
 abstract class NetworkRecipe(val id: String, val type: String) {
 

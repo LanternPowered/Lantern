@@ -38,17 +38,16 @@ import kotlin.time.milliseconds
 
 object ClientSendChatMessageHandler : PacketHandler<ClientSendChatMessagePacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientSendChatMessagePacket) {
-        val session = context.session
+    override fun handle(ctx: NetworkContext, packet: ClientSendChatMessagePacket) {
+        val session = ctx.session
 
-        val player = context.session.player
+        val player = ctx.session.player
         player.resetIdleTime()
         player.resetOpenedSignPosition()
 
         val message = packet.message
-        val causeStack = CauseStack.current()
 
-        causeStack.withFrame { frame ->
+        CauseStack.withFrame { frame ->
             frame.pushCause(player)
             frame.addContext(CauseContextKeys.PLAYER, player)
 
@@ -67,7 +66,7 @@ object ClientSendChatMessageHandler : PacketHandler<ClientSendChatMessagePacket>
             }
 
             if (!this.isAllowedString(message)) {
-                context.session.close(translatableTextOf("multiplayer.disconnect.illegal_characters"))
+                ctx.session.close(translatableTextOf("multiplayer.disconnect.illegal_characters"))
                 return
             }
 
@@ -77,7 +76,7 @@ object ClientSendChatMessageHandler : PacketHandler<ClientSendChatMessagePacket>
             if (possibleCommand.startsWith("/")) {
                 Lantern.commandManager.process(player, possibleCommand.substring(1))
             } else {
-                this.handleChatMessage(context.server, player, message)
+                this.handleChatMessage(ctx.server, player, message)
             }
         }
     }

@@ -10,40 +10,33 @@
  */
 package org.lanternpowered.server.text
 
-import net.kyori.adventure.translation.TranslationRegistry
 import net.kyori.adventure.util.UTF8ResourceBundleControl
+import org.lanternpowered.api.key.lanternKey
+import org.lanternpowered.api.key.minecraftKey
 import org.lanternpowered.api.locale.Locale
 import org.lanternpowered.api.locale.Locales
-
+import org.lanternpowered.api.text.translation.TranslationRegistry
 import java.util.ResourceBundle
 
 object TranslationRegistries {
 
     /**
-     * The default translation registry that will be used
-     * by plugins, lantern, etc.
+     * The default translation registry that will be used by lantern.
      */
-    val Default: TranslationRegistry = TranslationRegistry.get()
+    val Lantern: TranslationRegistry = TranslationRegistry.create(lanternKey("default"))
 
     /**
      * A translation registry which contains all the vanilla
      * minecraft translations.
      */
-    val Minecraft: TranslationRegistry = TranslationRegistry.create()
-
-    /**
-     * The translation registry that will attempt to translate everything,
-     * including vanilla minecraft and other translations. Minecraft translations
-     * can be overwritten through the default registry.
-     */
-    val All: UnmodifiableTranslationRegistry = ComposedTranslationRegistry(Default, Minecraft)
+    val Minecraft: TranslationRegistry = TranslationRegistry.create(minecraftKey("default"))
 
     /**
      * Loads the translation files.
      */
     fun init() {
-        Default.registerBundle(Locales.EN_US, "data/lantern/lang/lantern_en_us.properties")
-        Default.registerBundle(Locales.NL_NL, "data/lantern/lang/lantern_nl_nl.properties")
+        Lantern.registerBundle(Locales.EN_US, "data/lantern/lang/lantern_en_us.properties")
+        Lantern.registerBundle(Locales.NL_NL, "data/lantern/lang/lantern_nl_nl.properties")
 
         Minecraft.registerBundle(Locales.EN_US, "data/minecraft/lang/minecraft_en_us.properties")
     }

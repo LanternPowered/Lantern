@@ -10,19 +10,16 @@
  */
 package org.lanternpowered.server.item.predicate
 
+import org.lanternpowered.api.item.inventory.ItemStack
+import org.lanternpowered.api.item.inventory.ItemStackSnapshot
+import org.lanternpowered.api.item.inventory.stack.asStack
 import org.lanternpowered.server.inventory.LanternItemStack
-import org.lanternpowered.server.inventory.LanternItemStackSnapshot
-import org.spongepowered.api.item.inventory.ItemStack
-import org.spongepowered.api.item.inventory.ItemStackSnapshot
-
-import java.util.function.Predicate
 
 object ItemPredicates {
 
     /**
-     * Constructs a [Predicate] that matches
+     * Constructs a predicate that matches
      * [ItemStack]s with the given [ItemStack].
-     *
      *
      * The provided item stack is not copied, so modifying the
      * stack will result in different predicate results.
@@ -31,26 +28,25 @@ object ItemPredicates {
      * @return The item predicate
      */
     @JvmStatic
-    fun similarItemStack(itemStack: ItemStack): Predicate<ItemStack> {
+    fun similarItemStack(itemStack: ItemStack): (ItemStack) -> Boolean {
         return similarItem(itemStack).asStackPredicate()
     }
 
     /**
-     * Constructs a [Predicate] that matches
+     * Constructs a predicate that matches
      * [ItemStack]s with the given [ItemStack].
      *
      * @param itemStackSnapshot The item stack snapshot
      * @return The item predicate
      */
     @JvmStatic
-    fun similarItemStack(itemStackSnapshot: ItemStackSnapshot): Predicate<ItemStack> {
+    fun similarItemStack(itemStackSnapshot: ItemStackSnapshot): (ItemStack) -> Boolean {
         return similarItem(itemStackSnapshot).asStackPredicate()
     }
 
     /**
      * Constructs a [ItemPredicate] that matches
      * items with the given [ItemStack].
-     *
      *
      * The provided item stack is not copied, so modifying the
      * stack will result in different predicate results.
@@ -72,6 +68,6 @@ object ItemPredicates {
      */
     @JvmStatic
     fun similarItem(itemStackSnapshot: ItemStackSnapshot): ItemPredicate {
-        return SimilarItemPredicate((itemStackSnapshot as LanternItemStackSnapshot).asStack())
+        return SimilarItemPredicate(itemStackSnapshot.asStack())
     }
 }

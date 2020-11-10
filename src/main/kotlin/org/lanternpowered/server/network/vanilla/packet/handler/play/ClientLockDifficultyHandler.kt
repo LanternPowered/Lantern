@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.packet.type.play.ClientLockDiff
 
 object ClientLockDifficultyHandler : PacketHandler<ClientLockDifficultyPacket> {
 
-    override fun handle(context: NetworkContext, packet: ClientLockDifficultyPacket) {
-        Lantern.getLogger().info("${context.session.player.name} attempted to ${ if (packet.locked) "lock" else "unlock" } the difficulty.")
+    override fun handle(ctx: NetworkContext, packet: ClientLockDifficultyPacket) {
+        Lantern.getLogger().info("${ctx.session.player.name} attempted to ${ if (packet.locked) "lock" else "unlock" } the difficulty.")
     }
 }

@@ -33,17 +33,20 @@ import org.lanternpowered.server.network.vanilla.packet.type.login.SetCompressio
 
 val LoginProtocol = protocol {
     inbound {
-        bind(LoginStartPacket::class).decoder(LoginStartDecoder).handler(LoginStartHandler)
-        bind(LoginEncryptionResponsePacket::class).decoder(LoginEncryptionResponseDecoder).handler(LoginEncryptionResponseHandler)
-        bind(LoginChannelResponsePacket::class).decoder(LoginChannelResponseDecoder)
+        bind().decoder(LoginStartDecoder)
+        bind().decoder(LoginEncryptionResponseDecoder)
+        bind().decoder(LoginChannelResponseDecoder)
 
-        bind(LoginFinishPacket::class).handler(LoginFinishHandler)
+        type(LoginStartPacket::class).handler(LoginStartHandler)
+        type(LoginEncryptionResponsePacket::class).handler(LoginEncryptionResponseHandler)
+        type(LoginChannelResponsePacket::class) // TODO: Handler
+        type(LoginFinishPacket::class).handler(LoginFinishHandler)
     }
     outbound {
-        bind(DisconnectPacket::class).encoder(DisconnectEncoder)
-        bind(LoginEncryptionRequestPacket::class).encoder(LoginEncryptionRequestEncoder)
-        bind(LoginSuccessPacket::class).encoder(LoginSuccessEncoder)
-        bind(SetCompressionPacket::class).encoder(SetCompressionEncoder)
-        bind(LoginChannelRequestPacket::class).encoder(LoginChannelRequestEncoder)
+        bind().encoder(DisconnectEncoder).accept(DisconnectPacket::class)
+        bind().encoder(LoginEncryptionRequestEncoder).accept(LoginEncryptionRequestPacket::class)
+        bind().encoder(LoginSuccessEncoder).accept(LoginSuccessPacket::class)
+        bind().encoder(SetCompressionEncoder).accept(SetCompressionPacket::class)
+        bind().encoder(LoginChannelRequestEncoder).accept(LoginChannelRequestPacket::class)
     }
 }

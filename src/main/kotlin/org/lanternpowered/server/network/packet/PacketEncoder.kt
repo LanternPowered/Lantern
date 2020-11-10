@@ -11,7 +11,6 @@
 package org.lanternpowered.server.network.packet
 
 import org.lanternpowered.server.network.buffer.ByteBuffer
-import org.lanternpowered.server.network.packet.codec.CodecContext
 
 interface PacketEncoder<P : Packet> {
 

@@ -55,9 +55,6 @@ enum class ProtocolState(
          */
         fun byId(id: Int): ProtocolState? = this.lookup[id]
 
-        @JvmStatic
-        fun init() {}
-
         init {
             for (state in values())
                 this.lookup[state.id] = state

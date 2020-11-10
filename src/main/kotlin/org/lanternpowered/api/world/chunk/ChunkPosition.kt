@@ -8,6 +8,8 @@
  * This work is licensed under the terms of the MIT License (MIT). For
  * a copy, see 'LICENSE.txt' or <https://opensource.org/licenses/MIT>.
  */
+@file:Suppress("NOTHING_TO_INLINE")
+
 package org.lanternpowered.api.world.chunk
 
 import org.lanternpowered.server.world.chunk.ChunkPositionHelper
@@ -43,6 +45,10 @@ inline class ChunkPosition @PublishedApi internal constructor(
      */
     val z: Int
         get() = ChunkPositionHelper.unpackZ(this.packed)
+
+    inline operator fun component1(): Int = this.x
+    inline operator fun component2(): Int = this.y
+    inline operator fun component3(): Int = this.z
 
     /**
      * The column this position belongs to.

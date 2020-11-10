@@ -22,7 +22,7 @@ val FireworkShapeRegistry = internalCatalogTypeRegistry<FireworkShape> {
     fun register(id: String) =
             register(LanternFireworkShape(minecraftKey(id)))
 
-    register("ball")
+    register("small_ball")
     register("large_ball")
     register("star")
     register("creeper")

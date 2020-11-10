@@ -69,7 +69,7 @@ class LegacyProtocolHandler(private val session: NetworkSession) : ChannelInboun
                 legacy = true
                 ctx.disconnect(translatableTextOf("multiplayer.disconnect.outdated_client",
                         this.server.platform.minecraftVersion.name.toText()).toPlain())
-                val clientVersion = Lantern.getGame().minecraftVersionCache.getVersionOrUnknown(protocol, true)
+                val clientVersion = this.server.game.minecraftVersionCache.getVersionOrUnknown(protocol, true)
                 if (clientVersion === LanternMinecraftVersion.UNKNOWN_LEGACY) {
                     this.logger.debug(
                             "Client with unknown legacy protocol version $protocol attempted to join the server.")

@@ -1,13 +1,7 @@
 // Gradle plugins
 buildscript {
-    repositories {
-        mavenCentral()
-        maven {
-            url = 'https://dl.bintray.com/lanternpowered/maven/'
-        }
-    }
     dependencies {
-        classpath 'org.lanternpowered:lanterngradle:1.0.2'
+        classpath files('gradle/lanterngradle-1.0.3.jar')
     }
 }
 

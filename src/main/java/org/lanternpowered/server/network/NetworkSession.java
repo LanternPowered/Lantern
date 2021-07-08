@@ -50,6 +50,7 @@ import org.lanternpowered.api.cause.CauseStack;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.shard.NetworkShard;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
@@ -915,7 +916,8 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      * the server.
      */
     private void finalizePlayer() {
-        this.player.setEntityProtocolType(EntityProtocolTypes.PLAYER);
+        final NetworkShard networkComponent = this.player.addShard(NetworkShard.class).get();
+        networkComponent.setEntityProtocolType(EntityProtocolTypes.PLAYER);
 
         LanternWorld world = this.player.getWorld();
         if (world == null) {

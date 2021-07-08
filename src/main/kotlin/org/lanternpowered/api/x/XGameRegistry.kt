@@ -26,9 +26,15 @@
 package org.lanternpowered.api.x
 
 import org.lanternpowered.api.GameRegistry
+import org.lanternpowered.api.shard.ShardRegistry
 import org.lanternpowered.api.x.text.XTextFactory
 
 interface XGameRegistry : GameRegistry {
 
     override fun getTextFactory(): XTextFactory
+
+    /**
+     * The shard registry.
+     */
+    val shardRegistry: ShardRegistry
 }

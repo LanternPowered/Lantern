@@ -30,9 +30,8 @@ import static org.lanternpowered.server.network.entity.EntityProtocolManager.INV
 import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.event.EntityEvent;
-import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
-import org.lanternpowered.server.entity.event.SpectateEntityEvent;
+import org.lanternpowered.server.entity.event.RequestPlayerAbilitiesRefreshShardevent;
+import org.lanternpowered.server.entity.event.SpectateEntityShardevent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.extra.accessory.TopHat;
@@ -54,6 +53,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.lanternpowered.api.shard.event.Shardevent;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.entity.Entity;
@@ -93,7 +93,6 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
-        setTickRate(1);
     }
 
     @Override
@@ -363,15 +362,15 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     @Override
-    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
-        if (event instanceof SpectateEntityEvent) {
-            final Entity entity = ((SpectateEntityEvent) event).getSpectatedEntity().orElse(null);
+    protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
+        if (event instanceof SpectateEntityShardevent) {
+            final Entity entity = ((SpectateEntityShardevent) event).getSpectatedEntity();
             if (entity == null) {
                 context.sendToSelf(() -> new MessagePlayOutSetCamera(getRootEntityId()));
             } else {
                 context.getId(entity).ifPresent(id -> context.sendToSelf(() -> new MessagePlayOutSetCamera(id)));
             }
-        } else if (event instanceof RefreshAbilitiesPlayerEvent) {
+        } else if (event instanceof RequestPlayerAbilitiesRefreshShardevent) {
             final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
             final float flySpeed = getFlySpeed();
             final float fov = getFovModifier();

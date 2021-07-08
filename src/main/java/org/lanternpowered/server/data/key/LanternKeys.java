@@ -142,6 +142,22 @@ public final class LanternKeys {
     public static final Key<Value<Boolean>> DUMMY =
             makeValueKey(Boolean.class, DataQuery.of("Dummy"), "dummy");
 
+    ///////////////////
+    ///    Boats    ///
+    ///////////////////
+
+    public static final Key<Value<Double>> MAX_SPEED =
+            makeValueKey(Double.class, DataQuery.of("MaxSpeed"), "max_speed");
+
+    public static final Key<Value<Boolean>> CAN_MOVE_ON_LAND =
+            makeValueKey(Boolean.class, DataQuery.of("CanMoveOnLand"), "can_move_on_land");
+
+    public static final Key<Value<Double>> OCCUPIED_DECELERATION =
+            makeValueKey(Double.class, DataQuery.of("OccupiedDeceleration"), "occupied_deceleration");
+
+    public static final Key<Value<Double>> UNOCCUPIED_DECELERATION =
+            makeValueKey(Double.class, DataQuery.of("UnoccupiedDeceleration"), "unoccupied_deceleration");
+
     private LanternKeys() {
     }
 }

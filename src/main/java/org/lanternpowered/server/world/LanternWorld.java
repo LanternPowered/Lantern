@@ -57,12 +57,12 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityType;
+import org.lanternpowered.api.entity.event.EntityWorldShardevent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
-import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRecord;
@@ -1389,10 +1389,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
         if (entity1 != null) {
             return entity1;
         }
-        final EntityProtocolType entityProtocolType = entity.getEntityProtocolType();
-        if (entityProtocolType != null) {
-            this.entityProtocolManager.add(entity, entityProtocolType);
-        }
+        entity.getShardeventBus().post(new EntityWorldShardevent.Join(this));
         entity.setPositionAndWorld(this, entity.getPosition());
         return null;
     }
@@ -1408,7 +1405,7 @@ public class LanternWorld implements AbstractExtent, org.lanternpowered.api.worl
                         chunk.removeEntity(entity, lastChunk.getY());
                     }
                 }
-                this.entityProtocolManager.remove(entity);
+                entity.getShardeventBus().post(new EntityWorldShardevent.Leave(this));
                 this.entitiesByUniqueId.remove(entity.getUniqueId());
             } else {
                 final Vector3i lastChunkSection = entity.getLastChunkSectionCoords();

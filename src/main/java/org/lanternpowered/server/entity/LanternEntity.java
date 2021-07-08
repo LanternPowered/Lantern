@@ -42,12 +42,12 @@ import org.lanternpowered.server.data.ValueCollection;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.effect.entity.EntityEffectCollection;
-import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.entity.interfaces.IEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.event.LanternEventContextKeys;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
-import org.lanternpowered.server.network.entity.EntityProtocolType;
+import org.lanternpowered.server.shards.AbstractComponentHolder;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
@@ -108,7 +108,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPropertyHolder {
+public class LanternEntity extends AbstractComponentHolder implements IEntity, IAdditionalDataHolder, AbstractPropertyHolder {
 
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
@@ -142,11 +142,6 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
      * The {@link EntityEffectCollection} of this entity.
      */
     private EntityEffectCollection effectCollection = EntityEffectCollection.build();
-
-    /**
-     * The entity protocol type of this entity.
-     */
-    @Nullable private EntityProtocolType<?> entityProtocolType;
 
     /**
      * The state of the removal of this entity.
@@ -257,19 +252,6 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         return Direction.getClosest(getHorizontalDirectionVector(), division);
     }
 
-    @Nullable
-    public EntityProtocolType<?> getEntityProtocolType() {
-        return this.entityProtocolType;
-    }
-
-    public void setEntityProtocolType(@Nullable EntityProtocolType<?> entityProtocolType) {
-        if (entityProtocolType != null) {
-            checkArgument(entityProtocolType.getEntityType().isInstance(this),
-                    "The protocol type %s is not applicable to this entity.");
-        }
-        this.entityProtocolType = entityProtocolType;
-    }
-
     /**
      * Gets whether this {@link Entity} is dead, should
      * only be implemented by a {@link Living}.
@@ -294,6 +276,16 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
         if (!event.isMessageCancelled()) {
             // TODO
         }
+    }
+
+    /**
+     * Gets whether this {@link LanternEntity} currently
+     * exists in a {@link LanternWorld}.
+     *
+     * @return Exists in world
+     */
+    public boolean existsInWorld() {
+        return this.world != null;
     }
 
     @Override
@@ -869,15 +861,6 @@ public class LanternEntity implements Entity, IAdditionalDataHolder, AbstractPro
     @Override
     public EntityArchetype createArchetype() {
         return null;
-    }
-
-    /**
-     * Triggers the {@link EntityEvent} for this entity.
-     *
-     * @param event The event
-     */
-    public void triggerEvent(EntityEvent event) {
-        getWorld().getEntityProtocolManager().triggerEvent(this, event);
     }
 
     /**

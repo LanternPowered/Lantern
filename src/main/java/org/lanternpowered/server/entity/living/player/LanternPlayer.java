@@ -50,7 +50,8 @@ import org.lanternpowered.server.effect.entity.sound.player.PlayerHurtSoundEffec
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.EntityBodyPosition;
 import org.lanternpowered.server.entity.LanternLiving;
-import org.lanternpowered.server.entity.event.SpectateEntityEvent;
+import org.lanternpowered.server.entity.shard.NetworkShard;
+import org.lanternpowered.server.entity.event.SpectateEntityShardevent;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
@@ -311,6 +312,8 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
         setBoundingBoxBase(BOUNDING_BOX_BASE);
         // Attach this player to the proxy user and load player data
         getProxyUser().setInternalUser(this);
+        // Set the fastest update rate
+        getShard(NetworkShard.class).ifPresent(networkComponent -> networkComponent.setTrackingUpdateRate(1));
     }
 
     /**
@@ -1202,7 +1205,7 @@ public class LanternPlayer extends AbstractUser implements Player, AbstractViewe
     @Override
     public void setSpectatorTarget(@Nullable Entity entity) {
         this.spectatorEntity = entity;
-        triggerEvent(new SpectateEntityEvent(entity));
+        getShardeventBus().post(new SpectateEntityShardevent(entity));
     }
 
     @Override

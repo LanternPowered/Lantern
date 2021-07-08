@@ -34,7 +34,6 @@ public class LightningEntityProtocol<E extends LanternEntity> extends EntityProt
 
     public LightningEntityProtocol(E entity) {
         super(entity);
-        setTrackingRange(512);
     }
 
     @Override

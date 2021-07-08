@@ -40,6 +40,7 @@ import org.lanternpowered.server.effect.entity.animation.DefaultLivingHurtAnimat
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingFallSoundEffect;
 import org.lanternpowered.server.effect.entity.sound.DefaultLivingSoundEffect;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
+import org.lanternpowered.server.entity.interfaces.living.ILiving;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.collect.Lists2;
@@ -87,7 +88,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("ConstantConditions")
-public class LanternLiving extends LanternEntity implements Living {
+public class LanternLiving extends LanternEntity implements ILiving {
 
     public static final EntityEffectCollection DEFAULT_EFFECT_COLLECTION = EntityEffectCollection.builder()
             .add(EntityEffectTypes.HURT, new DefaultLivingSoundEffect(EntityBodyPosition.HEAD, SoundTypes.ENTITY_GENERIC_HURT))

@@ -26,12 +26,12 @@
 package org.lanternpowered.server.entity;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
+import org.lanternpowered.server.entity.interfaces.living.IHumanoid;
 
 import java.util.HashSet;
 import java.util.UUID;
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
+public abstract class LanternHumanoid extends LanternLiving implements IHumanoid {
 
     public LanternHumanoid(UUID uniqueId) {
         super(uniqueId);

@@ -31,7 +31,9 @@ import org.lanternpowered.server.effect.entity.EntityEffectCollection;
 import org.lanternpowered.server.effect.entity.EntityEffectTypes;
 import org.lanternpowered.server.effect.entity.sound.weather.LightningSoundEffect;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.shard.NetworkShard;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
+import org.lanternpowered.server.entity.interfaces.weather.ILightning;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
@@ -51,7 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class LanternLightning extends LanternEntity implements AbstractLightning {
+public class LanternLightning extends LanternEntity implements ILightning {
 
     public static final EntityEffectCollection DEFAULT_SOUND_COLLECTION = EntityEffectCollection.builder()
             .add(EntityEffectTypes.LIGHTNING, new LightningSoundEffect())
@@ -70,9 +72,12 @@ public class LanternLightning extends LanternEntity implements AbstractLightning
 
     public LanternLightning(UUID uniqueId) {
         super(uniqueId);
-        setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
         setEffectCollection(DEFAULT_SOUND_COLLECTION.copy());
         setSoundCategory(SoundCategories.WEATHER);
+
+        final NetworkShard networkComponent = addShard(NetworkShard.class).get();
+        networkComponent.setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
+        networkComponent.setTrackingRange(512);
     }
 
     @Override

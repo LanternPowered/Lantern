@@ -27,11 +27,11 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.event.EntityEvent;
-import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
+import org.lanternpowered.api.entity.event.animation.SwingHandAnimation;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
+import org.lanternpowered.api.shard.event.Shardevent;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 
@@ -71,7 +71,7 @@ public class IronGolemEntityProcotol<E extends LanternEntity> extends Insentient
         super.update(context);
         final boolean holdsPoppy = getEntity().get(LanternKeys.HOLDS_POPPY).orElse(false);
         if (holdsPoppy) {
-            this.lastHoldPoppyTime -= getTickRate();
+            this.lastHoldPoppyTime -= getNetworkComponent().getTrackingUpdateRate();
             if (this.lastHoldPoppyTime <= 0) {
                 context.sendToAll(() -> new MessagePlayOutEntityStatus(getRootEntityId(), POPPY_ADD_STATUS));
                 this.lastHoldPoppyTime = POPPY_RESEND_DELAY;
@@ -83,9 +83,9 @@ public class IronGolemEntityProcotol<E extends LanternEntity> extends Insentient
     }
 
     @Override
-    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
-        if (event instanceof SwingHandEntityEvent) {
-            final HandType handType = ((SwingHandEntityEvent) event).getHandType();
+    protected void handleEvent(EntityProtocolUpdateContext context, Shardevent event) {
+        if (event instanceof SwingHandAnimation) {
+            final HandType handType = ((SwingHandAnimation) event).getHandType();
             // Doesn't matter which hand type, just play the swing animation,
             // the golem will use both arms at the same time
             if (handType == HandTypes.MAIN_HAND || handType == HandTypes.OFF_HAND) {

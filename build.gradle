@@ -345,3 +345,10 @@ gradle.taskGraph.whenReady { TaskExecutionGraph graph ->
     // Only enable the wrapper task if the updateWrapper task is run
     wrapper.enabled = graph.allTasks.contains(updateWrapper)
 }
+
+allprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.fork = true
+    }
+
+}
